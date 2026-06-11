@@ -1,0 +1,19 @@
+# Phase 3: 배포 확장용 스켈레톤
+# services:
+#   postgres:
+#     image: postgres:16
+#     environment:
+#       POSTGRES_USER: sar
+#       POSTGRES_PASSWORD: sar
+#       POSTGRES_DB: sar
+#     ports:
+#       - "5432:5432"
+#   api:
+#     build: ./apps/api
+#     env_file: ./apps/api/.env
+#     ports:
+#       - "3000:3000"
+#   web:
+#     build: ./apps/web
+#     ports:
+#       - "5173:80"
