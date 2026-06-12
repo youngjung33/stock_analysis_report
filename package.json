@@ -10,6 +10,7 @@
     "dev:web": "npm run dev -w @sar/web",
     "dev:api": "npm run dev -w @sar/api",
     "build": "npm run build -w @sar/api && npm run build -w @sar/web",
+    "test": "npm run test -w @sar/api && npm run test -w @sar/web",
     "lint": "npm run lint -w @sar/web && npm run lint -w @sar/api"
   },
   "devDependencies": {

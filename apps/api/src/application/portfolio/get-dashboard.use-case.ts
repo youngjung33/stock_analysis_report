@@ -6,7 +6,7 @@ import {
   IStockRepository,
   ITransactionRepository,
 } from '../../domain/repositories';
-import { computePosition } from '../transactions/transaction.use-cases';
+import { computePosition } from '../../domain/services/position-calculator';
 
 @Injectable()
 export class GetDashboardUseCase {

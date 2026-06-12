@@ -9,11 +9,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { TransactionType } from '@sar/shared';
-import {
-  CreateTransactionUseCase,
-  DeleteTransactionUseCase,
-  ListTransactionsUseCase,
-} from '../../application/transactions/transaction.use-cases';
+import { CreateTransactionUseCase } from '../../application/transactions/create-transaction.use-case';
+import { DeleteTransactionUseCase } from '../../application/transactions/delete-transaction.use-case';
+import { ListTransactionsUseCase } from '../../application/transactions/list-transactions.use-case';
 import { CreateTransactionDto } from '../dto';
 import { AuthUser, JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { CurrentUser } from '../decorators/current-user.decorator';

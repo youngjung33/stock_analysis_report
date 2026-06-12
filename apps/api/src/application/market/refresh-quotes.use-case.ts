@@ -5,7 +5,7 @@ import {
   IStockQuoteRepository,
   IStockRepository,
 } from '../../domain/repositories';
-import { computePosition } from '../transactions/transaction.use-cases';
+import { computePosition } from '../../domain/services/position-calculator';
 import { ITransactionRepository } from '../../domain/repositories';
 
 @Injectable()

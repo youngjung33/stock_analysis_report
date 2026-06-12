@@ -24,9 +24,7 @@ export interface IPortfolioRepository {
   refreshQuotes(): Promise<RefreshQuoteResult>;
 }
 
-export interface ITokenStorage {
-  getAccessToken(): string | null;
-  setAccessToken(token: string | null): void;
+export interface IAuthSessionPort {
   onUnauthorized(callback: () => void): void;
 }
 

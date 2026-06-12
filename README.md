@@ -65,6 +65,16 @@ npm run dev:web
 - 포트폴리오 대시보드 (평단, 미실현/실현 손익)
 - **갱신** 버튼으로 보유 종목 시세 최신화
 
+## 테스트
+
+```bash
+npm run test              # API + Web 전체
+npm run test -w @sar/api  # Jest (domain + use case)
+npm run test -w @sar/web  # Vitest (use case)
+```
+
+Use Case 정의 및 테스트 ID: [docs/USECASES.md](docs/USECASES.md)
+
 ## 클린 아키텍처
 
 프론트/백엔드 모두 `domain` → `application` → `infrastructure` / `presentation` 레이어를 따릅니다. ESLint boundaries 규칙으로 의존성 방향을 강제합니다.

@@ -1,20 +1,16 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ThrottlerModule } from '@nestjs/throttler';
-import {
-  LoginUseCase,
-  LogoutUseCase,
-  RefreshTokenUseCase,
-} from './application/auth/auth.use-cases';
+import { LoginUseCase } from './application/auth/login.use-case';
+import { LogoutUseCase } from './application/auth/logout.use-case';
+import { RefreshTokenUseCase } from './application/auth/refresh-token.use-case';
 import { RefreshQuotesUseCase } from './application/market/refresh-quotes.use-case';
 import { GetDashboardUseCase } from './application/portfolio/get-dashboard.use-case';
-import {
-  CreateTransactionUseCase,
-  DeleteTransactionUseCase,
-  ListTransactionsUseCase,
-} from './application/transactions/transaction.use-cases';
+import { CreateTransactionUseCase } from './application/transactions/create-transaction.use-case';
+import { DeleteTransactionUseCase } from './application/transactions/delete-transaction.use-case';
+import { ListTransactionsUseCase } from './application/transactions/list-transactions.use-case';
 import {
   MARKET_DATA_PROVIDERS,
   PASSWORD_HASHER,

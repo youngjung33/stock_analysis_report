@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState, createContext, useContext } from 'react';
-import { tokenStorage } from '../../infrastructure/auth/token-storage';
 import { useServices } from './useServices';
 
 interface AuthContextValue {
@@ -13,7 +12,7 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { loginUseCase, refreshSessionUseCase, logoutUseCase } = useServices();
+  const { loginUseCase, refreshSessionUseCase, logoutUseCase, authSession } = useServices();
   const [username, setUsername] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -26,7 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [logoutUseCase]);
 
   useEffect(() => {
-    tokenStorage.onUnauthorized(() => {
+    authSession.onUnauthorized(() => {
       setUsername(null);
     });
 
@@ -35,7 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .then((result) => setUsername(result.username))
       .catch(() => setUsername(null))
       .finally(() => setIsLoading(false));
-  }, [refreshSessionUseCase]);
+  }, [refreshSessionUseCase, authSession]);
 
   const login = useCallback(
     async (user: string, password: string) => {

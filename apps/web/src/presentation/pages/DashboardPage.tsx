@@ -1,36 +1,29 @@
 import { useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
+import { getErrorMessage } from '../../domain/errors/app-error';
 import { useAuth } from '../hooks/useAuth';
-import { useServices } from '../hooks/useServices';
+import { useDashboard } from '../hooks/useDashboard';
 import { SummaryCards } from '../components/SummaryCards';
 import { HoldingsTable } from '../components/HoldingsTable';
 
 export function DashboardPage() {
   const { username, logout } = useAuth();
-  const { getDashboardUseCase, refreshQuotesUseCase } = useServices();
-  const queryClient = useQueryClient();
+  const { data, isLoading, error, refresh } = useDashboard();
   const [refreshMessage, setRefreshMessage] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['dashboard'],
-    queryFn: () => getDashboardUseCase.execute(),
-  });
 
   async function handleRefresh() {
     setRefreshing(true);
     setRefreshMessage('');
     try {
-      const result = await refreshQuotesUseCase.execute();
-      await queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      const result = await refresh();
       const failMsg =
         result.failed.length > 0
           ? ` (실패 ${result.failed.length}건: ${result.failed.map((f) => f.symbol).join(', ')})`
           : '';
       setRefreshMessage(`${result.updated}개 종목 시세 갱신 완료${failMsg}`);
-    } catch {
-      setRefreshMessage('시세 갱신에 실패했습니다.');
+    } catch (err) {
+      setRefreshMessage(getErrorMessage(err, '시세 갱신에 실패했습니다.'));
     } finally {
       setRefreshing(false);
     }

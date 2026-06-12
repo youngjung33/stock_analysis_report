@@ -1,7 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { Market, TransactionType } from '@sar/shared';
+import { getErrorMessage } from '../../domain/errors/app-error';
 import { useServices } from '../hooks/useServices';
-import axios from 'axios';
 
 interface Props {
   onSuccess: () => void;
@@ -42,12 +42,7 @@ export function TransactionForm({ onSuccess }: Props) {
       setMemo('');
       onSuccess();
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const msg = err.response?.data?.message;
-        setError(Array.isArray(msg) ? msg.join(', ') : (msg ?? '등록 실패'));
-      } else {
-        setError('등록 실패');
-      }
+      setError(getErrorMessage(err, '등록 실패'));
     } finally {
       setLoading(false);
     }

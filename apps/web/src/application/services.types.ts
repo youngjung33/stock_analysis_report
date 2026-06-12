@@ -6,6 +6,7 @@ import {
   ListTransactionsUseCase,
   RefreshQuotesUseCase,
 } from './portfolio/portfolio.use-cases';
+import { IAuthSessionPort } from '../domain/repositories';
 
 export interface AppServices {
   loginUseCase: LoginUseCase;
@@ -16,4 +17,5 @@ export interface AppServices {
   deleteTransactionUseCase: DeleteTransactionUseCase;
   getDashboardUseCase: GetDashboardUseCase;
   refreshQuotesUseCase: RefreshQuotesUseCase;
+  authSession: IAuthSessionPort;
 }
