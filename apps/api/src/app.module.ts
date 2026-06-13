@@ -3,14 +3,14 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { LoginUseCase } from './application/auth/login.use-case';
-import { LogoutUseCase } from './application/auth/logout.use-case';
-import { RefreshTokenUseCase } from './application/auth/refresh-token.use-case';
-import { RefreshQuotesUseCase } from './application/market/refresh-quotes.use-case';
-import { GetDashboardUseCase } from './application/portfolio/get-dashboard.use-case';
-import { CreateTransactionUseCase } from './application/transactions/create-transaction.use-case';
-import { DeleteTransactionUseCase } from './application/transactions/delete-transaction.use-case';
-import { ListTransactionsUseCase } from './application/transactions/list-transactions.use-case';
+import { LoginUseCase } from './domain/usecases/auth/login.use-case';
+import { LogoutUseCase } from './domain/usecases/auth/logout.use-case';
+import { RefreshTokenUseCase } from './domain/usecases/auth/refresh-token.use-case';
+import { RefreshQuotesUseCase } from './domain/usecases/market/refresh-quotes.use-case';
+import { GetDashboardUseCase } from './domain/usecases/portfolio/get-dashboard.use-case';
+import { CreateTransactionUseCase } from './domain/usecases/transactions/create-transaction.use-case';
+import { DeleteTransactionUseCase } from './domain/usecases/transactions/delete-transaction.use-case';
+import { ListTransactionsUseCase } from './domain/usecases/transactions/list-transactions.use-case';
 import {
   MARKET_DATA_PROVIDERS,
   PASSWORD_HASHER,
@@ -21,18 +21,18 @@ import {
   TRANSACTION_REPOSITORY,
   USER_REPOSITORY,
 } from './domain/repositories';
-import { BcryptPasswordHasher } from './infrastructure/auth/password-hasher';
-import { NestTokenService } from './infrastructure/auth/token.service';
-import { FinnhubProvider } from './infrastructure/market/finnhub.provider';
-import { YahooFinanceProvider } from './infrastructure/market/yahoo-finance.provider';
+import { BcryptPasswordHasher } from './data/auth/password-hasher';
+import { NestTokenService } from './data/auth/token.service';
+import { FinnhubProvider } from './data/market/finnhub.provider';
+import { YahooFinanceProvider } from './data/market/yahoo-finance.provider';
 import {
   PrismaRefreshTokenRepository,
   PrismaStockQuoteRepository,
   PrismaStockRepository,
   PrismaTransactionRepository,
   PrismaUserRepository,
-} from './infrastructure/persistence/prisma.repositories';
-import { PrismaService } from './infrastructure/persistence/prisma.service';
+} from './data/persistence/prisma.repositories';
+import { PrismaService } from './data/persistence/prisma.service';
 import { AuthController } from './presentation/controllers/auth.controller';
 import { MarketController, PortfolioController } from './presentation/controllers/portfolio.controller';
 import { TransactionsController } from './presentation/controllers/transactions.controller';

@@ -10,9 +10,9 @@ import { ConfigService } from '@nestjs/config';
 import { Throttle } from '@nestjs/throttler';
 import { REFRESH_TOKEN_COOKIE } from '@sar/shared';
 import type { Request, Response } from 'express';
-import { LoginUseCase } from '../../application/auth/login.use-case';
-import { LogoutUseCase } from '../../application/auth/logout.use-case';
-import { RefreshTokenUseCase } from '../../application/auth/refresh-token.use-case';
+import { LoginUseCase } from '../../domain/usecases/auth/login.use-case';
+import { LogoutUseCase } from '../../domain/usecases/auth/logout.use-case';
+import { RefreshTokenUseCase } from '../../domain/usecases/auth/refresh-token.use-case';
 import { LoginDto } from '../dto';
 
 @Controller('auth')

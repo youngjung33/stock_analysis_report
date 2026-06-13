@@ -73,11 +73,13 @@ npm run test -w @sar/api  # Jest (domain + use case)
 npm run test -w @sar/web  # Vitest (use case)
 ```
 
+테스트 소스는 루트 `test/` 디렉터리에 있습니다 (`test/api`, `test/web`).
+
 Use Case 정의 및 테스트 ID: [docs/USECASES.md](docs/USECASES.md)
 
-## 클린 아키텍처
+## 클린 아키텍처 (3계층)
 
-프론트/백엔드 모두 `domain` → `application` → `infrastructure` / `presentation` 레이어를 따릅니다. ESLint boundaries 규칙으로 의존성 방향을 강제합니다.
+Presentation · **Domain** (Use Case 포함) · **Data** 구조입니다. Web Presentation은 MVVM(Hook = ViewModel) 패턴을 사용합니다. ESLint boundaries로 의존성 방향을 강제합니다.
 
 ## 확장
 

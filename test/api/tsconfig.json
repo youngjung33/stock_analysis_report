@@ -1,0 +1,12 @@
+{
+  "extends": "../../apps/api/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@api/*": ["../../apps/api/src/*"],
+      "@sar/shared": ["../../packages/shared/src/index.ts"]
+    }
+  },
+  "include": ["./**/*"]
+}

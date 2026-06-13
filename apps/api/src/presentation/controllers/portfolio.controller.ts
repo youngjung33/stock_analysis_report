@@ -1,6 +1,6 @@
 import { Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { GetDashboardUseCase } from '../../application/portfolio/get-dashboard.use-case';
-import { RefreshQuotesUseCase } from '../../application/market/refresh-quotes.use-case';
+import { GetDashboardUseCase } from '../../domain/usecases/portfolio/get-dashboard.use-case';
+import { RefreshQuotesUseCase } from '../../domain/usecases/market/refresh-quotes.use-case';
 import { AuthUser, JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { CurrentUser } from '../decorators/current-user.decorator';
 

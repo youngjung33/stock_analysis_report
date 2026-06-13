@@ -21,6 +21,5 @@
       "@sar/shared": ["../../packages/shared/src/index.ts"]
     }
   },
-  "include": ["src", "src/vite-env.d.ts"],
-  "exclude": ["src/**/*.spec.ts", "src/infrastructure/testing"]
+  "include": ["src", "src/vite-env.d.ts"]
 }

@@ -2,21 +2,21 @@ import {
   LoginUseCase,
   LogoutUseCase,
   RefreshSessionUseCase,
-} from './application/auth/auth.use-cases';
+} from './domain/usecases/auth/auth.use-cases';
 import {
   CreateTransactionUseCase,
   DeleteTransactionUseCase,
   GetDashboardUseCase,
   ListTransactionsUseCase,
   RefreshQuotesUseCase,
-} from './application/portfolio/portfolio.use-cases';
-import { AppServices } from './application/services.types';
-import { authSessionAdapter } from './infrastructure/auth/auth-session.adapter';
+} from './domain/usecases/portfolio/portfolio.use-cases';
+import { AppServices } from './domain/services.types';
+import { authSessionAdapter } from './data/auth/auth-session.adapter';
 import {
   authRepository,
   portfolioRepository,
   transactionRepository,
-} from './infrastructure/repositories/api.repositories';
+} from './data/repositories/api.repositories';
 
 export function wireAppServices(): AppServices {
   return {

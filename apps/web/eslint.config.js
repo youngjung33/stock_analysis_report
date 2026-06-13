@@ -22,8 +22,7 @@ export default tseslint.config(
     settings: {
       'boundaries/elements': [
         { type: 'domain', pattern: 'src/domain/**' },
-        { type: 'application', pattern: 'src/application/**' },
-        { type: 'infrastructure', pattern: 'src/infrastructure/**' },
+        { type: 'data', pattern: 'src/data/**' },
         { type: 'presentation', pattern: 'src/presentation/**' },
       ],
     },
@@ -36,9 +35,8 @@ export default tseslint.config(
           default: 'disallow',
           rules: [
             { from: 'domain', allow: ['domain'] },
-            { from: 'application', allow: ['domain', 'application'] },
-            { from: 'infrastructure', allow: ['domain', 'application', 'infrastructure'] },
-            { from: 'presentation', allow: ['domain', 'application', 'presentation'] },
+            { from: 'data', allow: ['domain', 'data'] },
+            { from: 'presentation', allow: ['domain', 'presentation'] },
           ],
         },
       ],
