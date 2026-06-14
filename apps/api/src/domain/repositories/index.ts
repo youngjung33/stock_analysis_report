@@ -1,7 +1,5 @@
 import {
-  DashboardResult,
   QuoteResult,
-  RefreshQuoteResult,
   RefreshTokenEntity,
   StockEntity,
   StockQuoteEntity,
@@ -82,12 +80,4 @@ export interface CreateTransactionInput {
   price: number;
   tradedAt: Date;
   memo?: string;
-}
-
-export interface IGetDashboardUseCase {
-  execute(userId: string): Promise<DashboardResult>;
-}
-
-export interface IRefreshQuotesUseCase {
-  execute(userId: string): Promise<RefreshQuoteResult>;
 }

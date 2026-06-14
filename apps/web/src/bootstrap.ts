@@ -1,16 +1,12 @@
-import {
-  LoginUseCase,
-  LogoutUseCase,
-  RefreshSessionUseCase,
-} from './domain/usecases/auth/auth.use-cases';
-import {
-  CreateTransactionUseCase,
-  DeleteTransactionUseCase,
-  GetDashboardUseCase,
-  ListTransactionsUseCase,
-  RefreshQuotesUseCase,
-} from './domain/usecases/portfolio/portfolio.use-cases';
+import { LoginUseCase } from './domain/usecases/auth/login.use-case';
+import { LogoutUseCase } from './domain/usecases/auth/logout.use-case';
+import { RefreshSessionUseCase } from './domain/usecases/auth/refresh-session.use-case';
 import { AppServices } from './domain/services.types';
+import { GetDashboardUseCase } from './domain/usecases/portfolio/get-dashboard.use-case';
+import { RefreshQuotesUseCase } from './domain/usecases/portfolio/refresh-quotes.use-case';
+import { CreateTransactionUseCase } from './domain/usecases/transactions/create-transaction.use-case';
+import { DeleteTransactionUseCase } from './domain/usecases/transactions/delete-transaction.use-case';
+import { ListTransactionsUseCase } from './domain/usecases/transactions/list-transactions.use-case';
 import { authSessionAdapter } from './data/auth/auth-session.adapter';
 import {
   authRepository,
