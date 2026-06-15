@@ -4,7 +4,7 @@
 
 ## 기술 스택
 
-- **Frontend**: React 19, Vite, TypeScript, Tailwind CSS, TanStack Query
+- **Frontend**: React 19, Vite, TypeScript, Tailwind CSS v4, SCSS(reset/variables), TanStack Query
 - **Backend**: NestJS, Prisma, SQLite
 - **Auth**: JWT access token + refresh token (httpOnly cookie)
 
@@ -79,7 +79,7 @@ Use Case 정의 및 테스트 ID: [docs/USECASES.md](docs/USECASES.md)
 
 ## 클린 아키텍처 (3계층)
 
-Presentation · **Domain** (Use Case 포함) · **Data** 구조입니다. Web Presentation은 MVVM(Hook = ViewModel) 패턴을 사용합니다. ESLint boundaries로 의존성 방향을 강제합니다.
+Presentation · **Domain** (Use Case 포함) · **Data** 구조입니다. Web Presentation은 MVVM(Hook = ViewModel) 패턴을 사용하며, **768px 미만은 mobile UI**, 이상은 desktop UI로 분기합니다. 전역 스타일은 [`apps/web/src/styles/main.scss`](apps/web/src/styles/main.scss)(reset + CSS variables + Tailwind)에서 로드합니다. ESLint boundaries로 의존성 방향을 강제합니다.
 
 ## 확장
 

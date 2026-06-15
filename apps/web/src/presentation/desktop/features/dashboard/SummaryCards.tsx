@@ -1,29 +1,25 @@
-import { DashboardSummary } from '../../domain/models';
-import { formatNumber, formatPercent, pnlClass } from './formatters';
+import { DashboardSummary } from '../../../../domain/models';
+import { formatNumber, pnlClass } from '../../../shared/formatters';
 
 interface Props {
   summary: DashboardSummary;
 }
 
-export function SummaryCards({ summary }: Props) {
+export function DesktopSummaryCards({ summary }: Props) {
   const cards = [
-    { label: '총 투자원금', value: formatNumber(summary.totalCostBasis), className: 'text-white' },
+    { label: '? ????', value: formatNumber(summary.totalCostBasis), className: 'text-white' },
+    { label: '? ????', value: formatNumber(summary.totalMarketValue), className: 'text-white' },
     {
-      label: '총 평가금액',
-      value: formatNumber(summary.totalMarketValue),
-      className: 'text-white',
-    },
-    {
-      label: '미실현 손익',
+      label: '??? ??',
       value: formatNumber(summary.totalUnrealizedPnl),
       className: pnlClass(summary.totalUnrealizedPnl),
     },
     {
-      label: '실현 손익',
+      label: '?? ??',
       value: formatNumber(summary.totalRealizedPnl),
       className: pnlClass(summary.totalRealizedPnl),
     },
-    { label: '보유 종목', value: `${summary.holdingsCount}개`, className: 'text-white' },
+    { label: '?? ??', value: `${summary.holdingsCount}?`, className: 'text-white' },
   ];
 
   return (
@@ -37,5 +33,3 @@ export function SummaryCards({ summary }: Props) {
     </div>
   );
 }
-
-export { formatPercent };

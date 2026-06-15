@@ -1,30 +1,19 @@
-import { useQuery } from '@tanstack/react-query';
-import { useServices } from '../hooks/useServices';
-import { formatNumber } from './formatters';
+import { useTransactionList } from '../../../hooks/screens/useTransactionList';
+import { formatNumber } from '../../../shared/formatters';
 
 interface Props {
   refreshKey: number;
 }
 
-export function TransactionList({ refreshKey }: Props) {
-  const { listTransactionsUseCase, deleteTransactionUseCase } = useServices();
-  const { data, isLoading, refetch } = useQuery({
-    queryKey: ['transactions', refreshKey],
-    queryFn: () => listTransactionsUseCase.execute(),
-  });
+export function DesktopTransactionList({ refreshKey }: Props) {
+  const { data, isLoading, handleDelete } = useTransactionList(refreshKey);
 
-  async function handleDelete(id: string) {
-    if (!confirm('이 거래를 삭제할까요?')) return;
-    await deleteTransactionUseCase.execute(id);
-    refetch();
-  }
-
-  if (isLoading) return <p className="text-slate-400">거래 내역 로딩 중...</p>;
+  if (isLoading) return <p className="text-slate-400">?? ?? ?? ?...</p>;
 
   if (!data?.length) {
     return (
       <div className="rounded-xl border border-dashed border-slate-700 p-6 text-center text-slate-400">
-        등록된 거래가 없습니다.
+        ??? ??? ????.
       </div>
     );
   }
@@ -34,12 +23,12 @@ export function TransactionList({ refreshKey }: Props) {
       <table className="min-w-full text-left text-sm">
         <thead className="bg-slate-900 text-slate-400">
           <tr>
-            <th className="px-4 py-3">일자</th>
-            <th className="px-4 py-3">종목</th>
-            <th className="px-4 py-3">유형</th>
-            <th className="px-4 py-3">수량</th>
-            <th className="px-4 py-3">단가</th>
-            <th className="px-4 py-3">메모</th>
+            <th className="px-4 py-3">??</th>
+            <th className="px-4 py-3">??</th>
+            <th className="px-4 py-3">??</th>
+            <th className="px-4 py-3">??</th>
+            <th className="px-4 py-3">??</th>
+            <th className="px-4 py-3">??</th>
             <th className="px-4 py-3"></th>
           </tr>
         </thead>
@@ -53,8 +42,10 @@ export function TransactionList({ refreshKey }: Props) {
                 <div className="text-white">{tx.stock?.symbol}</div>
                 <div className="text-xs text-slate-500">{tx.stock?.name}</div>
               </td>
-              <td className={`px-4 py-3 ${tx.type === 'BUY' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                {tx.type === 'BUY' ? '매수' : '매도'}
+              <td
+                className={`px-4 py-3 ${tx.type === 'BUY' ? 'text-emerald-400' : 'text-rose-400'}`}
+              >
+                {tx.type === 'BUY' ? '??' : '??'}
               </td>
               <td className="px-4 py-3 text-slate-300">{tx.quantity}</td>
               <td className="px-4 py-3 text-slate-300">
@@ -63,10 +54,11 @@ export function TransactionList({ refreshKey }: Props) {
               <td className="px-4 py-3 text-slate-500">{tx.memo ?? '-'}</td>
               <td className="px-4 py-3">
                 <button
+                  type="button"
                   onClick={() => handleDelete(tx.id)}
                   className="text-sm text-rose-400 hover:text-rose-300"
                 >
-                  삭제
+                  ??
                 </button>
               </td>
             </tr>
