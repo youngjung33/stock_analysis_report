@@ -67,6 +67,9 @@ export interface ITokenService {
 
 export interface IMarketDataProvider {
   supports(market: Market): boolean;
+  /** false when env/API key is missing — fetchQuote must not be called. */
+  isAvailable(): boolean;
+  unavailableReason(): string | null;
   fetchQuote(stock: StockEntity): Promise<QuoteResult>;
 }
 

@@ -23,8 +23,11 @@ import {
 } from './domain/repositories';
 import { BcryptPasswordHasher } from './data/auth/password-hasher';
 import { NestTokenService } from './data/auth/token.service';
-import { FinnhubProvider } from './data/market/finnhub.provider';
-import { YahooFinanceProvider } from './data/market/yahoo-finance.provider';
+import {
+  KrYahooMarketProvider,
+  MarketDataConfig,
+  UsFinnhubMarketProvider,
+} from './data/market';
 import {
   PrismaRefreshTokenRepository,
   PrismaStockQuoteRepository,
@@ -48,8 +51,8 @@ const repositoryProviders = [
   { provide: TOKEN_SERVICE, useClass: NestTokenService },
   {
     provide: MARKET_DATA_PROVIDERS,
-    useFactory: (finnhub: FinnhubProvider, yahoo: YahooFinanceProvider) => [finnhub, yahoo],
-    inject: [FinnhubProvider, YahooFinanceProvider],
+    useFactory: (us: UsFinnhubMarketProvider, kr: KrYahooMarketProvider) => [us, kr],
+    inject: [UsFinnhubMarketProvider, KrYahooMarketProvider],
   },
 ];
 
@@ -64,8 +67,9 @@ const repositoryProviders = [
   providers: [
     PrismaService,
     JwtStrategy,
-    FinnhubProvider,
-    YahooFinanceProvider,
+    MarketDataConfig,
+    UsFinnhubMarketProvider,
+    KrYahooMarketProvider,
     ...repositoryProviders,
     {
       provide: LoginUseCase,
@@ -120,7 +124,7 @@ const repositoryProviders = [
         stockRepo: PrismaStockRepository,
         txRepo: PrismaTransactionRepository,
         quoteRepo: PrismaStockQuoteRepository,
-        providers: (FinnhubProvider | YahooFinanceProvider)[],
+        providers: (UsFinnhubMarketProvider | KrYahooMarketProvider)[],
       ) => new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, providers),
       inject: [STOCK_REPOSITORY, TRANSACTION_REPOSITORY, STOCK_QUOTE_REPOSITORY, MARKET_DATA_PROVIDERS],
     },

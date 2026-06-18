@@ -10,10 +10,14 @@ import {
 
 function createProvider(options: {
   supports?: (market: Market) => boolean;
+  isAvailable?: boolean;
+  unavailableReason?: string | null;
   fetchQuote?: jest.Mock;
 }) {
   return {
     supports: jest.fn((market: Market) => options.supports?.(market) ?? true),
+    isAvailable: jest.fn(() => options.isAvailable ?? true),
+    unavailableReason: jest.fn(() => options.unavailableReason ?? null),
     fetchQuote:
       options.fetchQuote ??
       jest.fn().mockResolvedValue({ currentPrice: 180, changePercent: 1 }),
@@ -144,5 +148,31 @@ describe('RefreshQuotesUseCase', () => {
 
     expect(provider.fetchQuote).not.toHaveBeenCalled();
     expect(result.updated).toBe(0);
+  });
+
+  // RQ-06
+  it('records failure when provider is not configured (no API key)', async () => {
+    const stock = createMockStock({ market: Market.US, symbol: 'AAPL' });
+    const stockRepo = createMockStockRepo();
+    stockRepo.findHeldByUser.mockResolvedValue([stock]);
+
+    const txRepo = createMockTransactionRepo();
+    txRepo.findByUserAndStock.mockResolvedValue([
+      createMockTransaction({ quantity: 10 }),
+    ]);
+
+    const quoteRepo = createMockQuoteRepo();
+    const provider = createProvider({
+      supports: (m) => m === Market.US,
+      isAvailable: false,
+      unavailableReason: 'FINNHUB_API_KEY is not configured',
+    });
+
+    const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, [provider]);
+    const result = await useCase.execute('user-1');
+
+    expect(provider.fetchQuote).not.toHaveBeenCalled();
+    expect(result.updated).toBe(0);
+    expect(result.failed[0].reason).toBe('FINNHUB_API_KEY is not configured');
   });
 });

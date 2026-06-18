@@ -33,6 +33,15 @@ export class RefreshQuotesUseCase {
         continue;
       }
 
+      if (!provider.isAvailable()) {
+        failed.push({
+          stockId: stock.id,
+          symbol: stock.symbol,
+          reason: provider.unavailableReason() ?? 'Market data provider not configured',
+        });
+        continue;
+      }
+
       try {
         const quote = await provider.fetchQuote(stock);
         await this.quoteRepo.upsert({

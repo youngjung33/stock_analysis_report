@@ -12,7 +12,7 @@
 
 - Node.js 20+
 - npm 10+
-- [Finnhub API Key](https://finnhub.io/) (미국 종목 시세)
+- [Finnhub API Key](https://finnhub.io/register) — **미국 종목** 시세 갱신 시에만 필요 (한국 종목은 키 없이 동작)
 
 ## 설치
 
@@ -25,7 +25,7 @@ npm run build -w @sar/shared
 
 ```bash
 cp apps/api/.env.example apps/api/.env
-# FINNHUB_API_KEY 등 값 수정
+# 미국 종목 사용 시: FINNHUB_API_KEY만 실제 키로 교체 (한국만 쓰면 그대로 두어도 됨)
 ```
 
 ```bash
