@@ -1,11 +1,21 @@
-import { Navigate } from 'react-router-dom';
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { useLoginScreen } from '../../hooks/screens/useLoginScreen';
 
 export function MobileLoginPage() {
   const screen = useLoginScreen();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (screen.isAuthenticated) {
+      router.replace('/');
+    }
+  }, [screen.isAuthenticated, router]);
 
   if (screen.isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return null;
   }
 
   return (

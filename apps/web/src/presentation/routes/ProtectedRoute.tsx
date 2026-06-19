@@ -1,8 +1,11 @@
-import { Navigate, Outlet } from 'react-router-dom';
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../hooks/useAuth';
 
-export function ProtectedRoute() {
+export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
 
   if (isLoading) {
     return (
@@ -13,8 +16,9 @@ export function ProtectedRoute() {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    router.replace('/login');
+    return null;
   }
 
-  return <Outlet />;
+  return <>{children}</>;
 }

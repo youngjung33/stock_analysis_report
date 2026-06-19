@@ -1,8 +1,9 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { vi, type Mock } from 'vitest';
+import { BadRequestError, NotFoundError } from '@server/http/errors';
 import { Market, TransactionType } from '@sar/shared';
-import { CreateTransactionUseCase } from '@api/domain/usecases/transactions/create-transaction.use-case';
-import { DeleteTransactionUseCase } from '@api/domain/usecases/transactions/delete-transaction.use-case';
-import { ListTransactionsUseCase } from '@api/domain/usecases/transactions/list-transactions.use-case';
+import { CreateTransactionUseCase } from '@server/domain/usecases/transactions/create-transaction.use-case';
+import { DeleteTransactionUseCase } from '@server/domain/usecases/transactions/delete-transaction.use-case';
+import { ListTransactionsUseCase } from '@server/domain/usecases/transactions/list-transactions.use-case';
 import {
   createMockStock,
   createMockStockRepo,
@@ -27,7 +28,7 @@ describe('CreateTransactionUseCase', () => {
         price: 100,
         tradedAt: new Date(),
       }),
-    ).rejects.toThrow(BadRequestException);
+    ).rejects.toThrow(BadRequestError);
   });
 
   // CT-04
@@ -46,7 +47,7 @@ describe('CreateTransactionUseCase', () => {
         price: 0,
         tradedAt: new Date(),
       }),
-    ).rejects.toThrow(BadRequestException);
+    ).rejects.toThrow(BadRequestError);
   });
 
   // CT-01
@@ -121,7 +122,7 @@ describe('CreateTransactionUseCase', () => {
         price: 100,
         tradedAt: new Date(),
       }),
-    ).rejects.toThrow(BadRequestException);
+    ).rejects.toThrow(BadRequestError);
   });
 });
 
@@ -166,7 +167,7 @@ describe('DeleteTransactionUseCase', () => {
 
     const useCase = new DeleteTransactionUseCase(txRepo);
 
-    await expect(useCase.execute('user-1', 'tx-1')).rejects.toThrow(NotFoundException);
+    await expect(useCase.execute('user-1', 'tx-1')).rejects.toThrow(NotFoundError);
   });
 
   it('throws NotFound when transaction does not exist', async () => {
@@ -175,6 +176,6 @@ describe('DeleteTransactionUseCase', () => {
 
     const useCase = new DeleteTransactionUseCase(txRepo);
 
-    await expect(useCase.execute('user-1', 'missing')).rejects.toThrow(NotFoundException);
+    await expect(useCase.execute('user-1', 'missing')).rejects.toThrow(NotFoundError);
   });
 });

@@ -4,8 +4,8 @@ import {
   IAuthRepository,
   IPortfolioRepository,
   ITransactionRepository,
-} from '@web/domain/repositories';
-import { Dashboard, LoginResult, RefreshQuoteResult, Transaction } from '@web/domain/models';
+} from '@/client/domain/repositories';
+import { Dashboard, LoginResult, RefreshQuoteResult, Transaction } from '@/client/domain/models';
 
 export function createFakeAuthRepository(
   overrides: Partial<IAuthRepository> = {},

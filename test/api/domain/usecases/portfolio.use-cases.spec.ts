@@ -1,5 +1,6 @@
+import { vi, type Mock } from 'vitest';
 import { Market, TransactionType } from '@sar/shared';
-import { GetDashboardUseCase } from '@api/domain/usecases/portfolio/get-dashboard.use-case';
+import { GetDashboardUseCase } from '@server/domain/usecases/portfolio/get-dashboard.use-case';
 import {
   createMockQuoteRepo,
   createMockStock,

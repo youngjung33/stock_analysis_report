@@ -1,22 +1,18 @@
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
 import path from 'path';
-
-const webRoot = path.resolve(__dirname);
-const monorepoRoot = path.resolve(__dirname, '../..');
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  root: monorepoRoot,
-  plugins: [react()],
+  test: {
+    environment: 'node',
+    include: ['../../test/**/*.spec.ts'],
+    globals: true,
+  },
   resolve: {
     alias: {
-      '@': path.join(webRoot, 'src'),
-      '@sar/shared': path.join(monorepoRoot, 'packages/shared/src/index.ts'),
-      '@web': path.join(webRoot, 'src'),
+      '@': path.resolve(__dirname, './src'),
+      '@/client': path.resolve(__dirname, './src/client'),
+      '@server': path.resolve(__dirname, './src/server'),
+      '@sar/shared': path.resolve(__dirname, '../../packages/shared/src/index.ts'),
     },
-  },
-  test: {
-    environment: 'jsdom',
-    include: ['test/web/**/*.spec.ts'],
   },
 });

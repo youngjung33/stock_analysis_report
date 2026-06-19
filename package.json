@@ -2,16 +2,18 @@
   "name": "stock-analysis-report",
   "private": true,
   "workspaces": [
-    "apps/*",
+    "apps/web",
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev:api & npm run dev:web",
-    "dev:web": "npm run dev -w @sar/web",
-    "dev:api": "npm run dev -w @sar/api",
-    "build": "npm run build -w @sar/api && npm run build -w @sar/web",
-    "test": "npm run test -w @sar/api && npm run test -w @sar/web",
-    "lint": "npm run lint -w @sar/web && npm run lint -w @sar/api"
+    "dev": "npm run dev -w @sar/web",
+    "build": "npm run build -w @sar/shared && npm run build -w @sar/web",
+    "start": "npm run start -w @sar/web",
+    "test": "npm run test -w @sar/web",
+    "lint": "npm run lint -w @sar/web",
+    "db:migrate": "npm run db:migrate -w @sar/web",
+    "db:push": "npm run db:push -w @sar/web",
+    "db:seed": "npm run db:seed -w @sar/web"
   },
   "devDependencies": {
     "prettier": "^3.5.3"

@@ -1,7 +1,8 @@
-import { UnauthorizedException } from '@nestjs/common';
-import { LoginUseCase } from '@api/domain/usecases/auth/login.use-case';
-import { LogoutUseCase } from '@api/domain/usecases/auth/logout.use-case';
-import { RefreshTokenUseCase } from '@api/domain/usecases/auth/refresh-token.use-case';
+import { vi, type Mock } from 'vitest';
+import { UnauthorizedError } from '@server/http/errors';
+import { LoginUseCase } from '@server/domain/usecases/auth/login.use-case';
+import { LogoutUseCase } from '@server/domain/usecases/auth/logout.use-case';
+import { RefreshTokenUseCase } from '@server/domain/usecases/auth/refresh-token.use-case';
 import {
   createMockPasswordHasher,
   createMockRefreshTokenRepo,
@@ -26,7 +27,7 @@ describe('LoginUseCase', () => {
 
     await expect(
       useCase.execute({ username: 'admin', password: 'wrong' }),
-    ).rejects.toThrow(UnauthorizedException);
+    ).rejects.toThrow(UnauthorizedError);
   });
 
   // AU-03
@@ -67,7 +68,7 @@ describe('LoginUseCase', () => {
 
     await expect(
       useCase.execute({ username: 'unknown', password: 'secret' }),
-    ).rejects.toThrow(UnauthorizedException);
+    ).rejects.toThrow(UnauthorizedError);
   });
 });
 
@@ -100,7 +101,7 @@ describe('RefreshTokenUseCase', () => {
 
     const useCase = new RefreshTokenUseCase(refreshRepo, createMockTokenService());
 
-    await expect(useCase.execute('bad-token')).rejects.toThrow(UnauthorizedException);
+    await expect(useCase.execute('bad-token')).rejects.toThrow(UnauthorizedError);
   });
 
   it('throws Unauthorized for expired refresh token', async () => {
@@ -116,7 +117,7 @@ describe('RefreshTokenUseCase', () => {
 
     const useCase = new RefreshTokenUseCase(refreshRepo, createMockTokenService());
 
-    await expect(useCase.execute('expired-token')).rejects.toThrow(UnauthorizedException);
+    await expect(useCase.execute('expired-token')).rejects.toThrow(UnauthorizedError);
   });
 });
 

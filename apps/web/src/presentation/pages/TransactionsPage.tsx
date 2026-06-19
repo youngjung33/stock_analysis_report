@@ -1,3 +1,5 @@
+'use client';
+
 import { useIsMobile } from '../hooks/useBreakpoint';
 import { DesktopTransactionsPage } from '../desktop/pages/TransactionsPage';
 import { MobileTransactionsPage } from '../mobile/pages/TransactionsPage';

@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
 
 interface Props {
   username?: string;
@@ -13,11 +15,11 @@ export function DesktopNavMenu({ username, onRefresh, refreshing, onLogout, acti
     <nav className="flex items-center gap-3" aria-label="주 메뉴">
       {username && <span className="hidden text-sm text-slate-500 lg:inline">{username}</span>}
       {active === 'dashboard' ? (
-        <Link to="/transactions" className="text-sm text-indigo-400 hover:text-indigo-300">
+        <Link href="/transactions" className="text-sm text-indigo-400 hover:text-indigo-300">
           거래 관리
         </Link>
       ) : (
-        <Link to="/" className="text-sm text-indigo-400 hover:text-indigo-300">
+        <Link href="/" className="text-sm text-indigo-400 hover:text-indigo-300">
           대시보드
         </Link>
       )}

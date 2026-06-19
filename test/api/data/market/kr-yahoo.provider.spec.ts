@@ -1,19 +1,20 @@
+import { vi, type Mock } from 'vitest';
 import { Market } from '@sar/shared';
-import { KrYahooMarketProvider } from '@api/data/market/kr-yahoo.provider';
-import * as yahooClient from '@api/data/market/yahoo-chart.client';
+import { KrYahooMarketProvider } from '@server/data/market/kr-yahoo.provider';
+import * as yahooClient from '@server/data/market/yahoo-chart.client';
 
 describe('KrYahooMarketProvider', () => {
   const provider = new KrYahooMarketProvider();
 
   beforeEach(() => {
-    jest.spyOn(yahooClient, 'fetchYahooChartQuote').mockResolvedValue({
+    vi.spyOn(yahooClient, 'fetchYahooChartQuote').mockResolvedValue({
       currentPrice: 72000,
       changePercent: 1.2,
     });
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('supports KR market only', () => {

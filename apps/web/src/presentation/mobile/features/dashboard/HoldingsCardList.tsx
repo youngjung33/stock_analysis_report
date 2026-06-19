@@ -1,4 +1,4 @@
-import { DashboardHolding } from '../../../../domain/models';
+import { DashboardHolding } from '@/client/domain/models';
 import { formatNumber, formatPercent, pnlClass } from '../../../shared/formatters';
 
 interface Props {

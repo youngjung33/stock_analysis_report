@@ -1,5 +1,6 @@
+import { vi, type Mock } from 'vitest';
 import { Market } from '@sar/shared';
-import { RefreshQuotesUseCase } from '@api/domain/usecases/market/refresh-quotes.use-case';
+import { RefreshQuotesUseCase } from '@server/domain/usecases/market/refresh-quotes.use-case';
 import {
   createMockQuoteRepo,
   createMockStock,
@@ -12,22 +13,22 @@ function createProvider(options: {
   supports?: (market: Market) => boolean;
   isAvailable?: boolean;
   unavailableReason?: string | null;
-  fetchQuote?: jest.Mock;
+  fetchQuote?: Mock;
 }) {
   return {
-    supports: jest.fn((market: Market) => options.supports?.(market) ?? true),
-    isAvailable: jest.fn(() => options.isAvailable ?? true),
-    unavailableReason: jest.fn(() => options.unavailableReason ?? null),
+    supports: vi.fn((market: Market) => options.supports?.(market) ?? true),
+    isAvailable: vi.fn(() => options.isAvailable ?? true),
+    unavailableReason: vi.fn(() => options.unavailableReason ?? null),
     fetchQuote:
       options.fetchQuote ??
-      jest.fn().mockResolvedValue({ currentPrice: 180, changePercent: 1 }),
+      vi.fn().mockResolvedValue({ currentPrice: 180, changePercent: 1 }),
   };
 }
 
 describe('RefreshQuotesUseCase', () => {
   // RQ-01
   it('fetches quote and upserts for held US stock', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     const stock = createMockStock({ market: Market.US });
     const stockRepo = createMockStockRepo();
@@ -43,14 +44,14 @@ describe('RefreshQuotesUseCase', () => {
 
     const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, [provider]);
     const resultPromise = useCase.execute('user-1');
-    await jest.runAllTimersAsync();
+    await vi.runAllTimersAsync();
     const result = await resultPromise;
 
     expect(provider.fetchQuote).toHaveBeenCalledWith(stock);
     expect(quoteRepo.upsert).toHaveBeenCalled();
     expect(result.updated).toBe(1);
 
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // RQ-02
@@ -99,7 +100,7 @@ describe('RefreshQuotesUseCase', () => {
     const quoteRepo = createMockQuoteRepo();
     const provider = createProvider({
       supports: () => true,
-      fetchQuote: jest.fn().mockRejectedValue(new Error('API down')),
+      fetchQuote: vi.fn().mockRejectedValue(new Error('API down')),
     });
 
     const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, [provider]);

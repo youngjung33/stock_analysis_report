@@ -1,5 +1,6 @@
+import { vi, type Mock } from 'vitest';
 import { Market } from '@sar/shared';
-import { resolveCurrency, resolveYahooSymbol } from '@api/domain/services/stock-symbol.resolver';
+import { resolveCurrency, resolveYahooSymbol } from '@server/domain/services/stock-symbol.resolver';
 
 describe('StockSymbolResolver', () => {
   // SS-01

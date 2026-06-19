@@ -8,12 +8,12 @@ interface Props {
 export function MobileTransactionCardList({ refreshKey }: Props) {
   const { data, isLoading, handleDelete } = useTransactionList(refreshKey);
 
-  if (isLoading) return <p className="text-sm text-slate-400">ê±°ë˜ ?´ì—­ ë¡œë”© ì¤?..</p>;
+  if (isLoading) return <p className="text-sm text-slate-400">?? ?? ?? ?...</p>;
 
   if (!data?.length) {
     return (
       <div className="rounded-xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-400">
-        ?±ë¡??ê±°ë˜ê°€ ?†ìŠµ?ˆë‹¤.
+        ??? ??? ????.
       </div>
     );
   }
@@ -33,26 +33,26 @@ export function MobileTransactionCardList({ refreshKey }: Props) {
             <span
               className={`text-xs font-medium ${tx.type === 'BUY' ? 'text-emerald-400' : 'text-rose-400'}`}
             >
-              {tx.type === 'BUY' ? 'ë§¤ìˆ˜' : 'ë§¤ë„'}
+              {tx.type === 'BUY' ? '??' : '??'}
             </span>
           </div>
           <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
             <div>
-              <dt className="text-slate-500">?¼ì</dt>
+              <dt className="text-slate-500">??</dt>
               <dd className="text-slate-200">
                 {new Date(tx.tradedAt).toLocaleDateString('ko-KR')}
               </dd>
             </div>
             <div>
-              <dt className="text-slate-500">?˜ëŸ‰</dt>
+              <dt className="text-slate-500">??</dt>
               <dd className="text-slate-200">{tx.quantity}</dd>
             </div>
             <div>
-              <dt className="text-slate-500">?¨ê?</dt>
+              <dt className="text-slate-500">??</dt>
               <dd className="text-slate-200">{formatNumber(tx.price, tx.stock?.currency)}</dd>
             </div>
             <div>
-              <dt className="text-slate-500">ë©”ëª¨</dt>
+              <dt className="text-slate-500">??</dt>
               <dd className="text-slate-400">{tx.memo ?? '-'}</dd>
             </div>
           </dl>
@@ -61,7 +61,7 @@ export function MobileTransactionCardList({ refreshKey }: Props) {
             onClick={() => handleDelete(tx.id)}
             className="mt-3 text-sm text-rose-400 hover:text-rose-300"
           >
-            ?? œ
+            ??
           </button>
         </li>
       ))}

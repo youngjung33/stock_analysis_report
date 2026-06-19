@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getErrorMessage } from '../../../domain/errors/app-error';
+import { getErrorMessage } from '@/client/domain/errors/app-error';
 import { useAuth } from '../useAuth';
 import { useDashboard } from '../useDashboard';
 

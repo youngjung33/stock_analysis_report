@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  username      String         @unique
+  passwordHash  String
+  createdAt     DateTime       @default(now())
+  refreshTokens RefreshToken[]
+  transactions  Transaction[]
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Stock {
+  id           String        @id @default(uuid())
+  symbol       String
+  name         String
+  market       String
+  currency     String
+  yahooSymbol  String?
+  createdAt    DateTime      @default(now())
+  transactions Transaction[]
+  quote        StockQuote?
+
+  @@unique([symbol, market])
+}
+
+model Transaction {
+  id        String   @id @default(uuid())
+  userId    String
+  stockId   String
+  type      String
+  quantity  Float
+  price     Float
+  tradedAt  DateTime
+  memo      String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stock     Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([stockId])
+}
+
+model StockQuote {
+  stockId       String   @id
+  currentPrice  Float
+  changePercent Float?
+  fetchedAt     DateTime
+  stock         Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+}

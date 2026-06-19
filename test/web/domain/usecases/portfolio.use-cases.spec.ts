@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { GetDashboardUseCase } from '@web/domain/usecases/portfolio/get-dashboard.use-case';
-import { RefreshQuotesUseCase } from '@web/domain/usecases/portfolio/refresh-quotes.use-case';
+import { GetDashboardUseCase } from '@/client/domain/usecases/portfolio/get-dashboard.use-case';
+import { RefreshQuotesUseCase } from '@/client/domain/usecases/portfolio/refresh-quotes.use-case';
 import { createFakePortfolioRepository } from '../../mocks/fake-repositories';
 
 describe('GetDashboardUseCase', () => {

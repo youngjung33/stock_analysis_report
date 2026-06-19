@@ -1,4 +1,4 @@
-import { DashboardSummary } from '../../../../domain/models';
+import { DashboardSummary } from '@/client/domain/models';
 import { formatNumber, pnlClass } from '../../../shared/formatters';
 
 interface Props {

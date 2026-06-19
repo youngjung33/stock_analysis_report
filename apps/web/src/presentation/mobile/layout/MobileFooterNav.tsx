@@ -1,9 +1,12 @@
-import { Link, useLocation } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export function MobileFooterNav() {
-  const location = useLocation();
-  const isDashboard = location.pathname === '/';
-  const isTransactions = location.pathname === '/transactions';
+  const pathname = usePathname();
+  const isDashboard = pathname === '/';
+  const isTransactions = pathname === '/transactions';
 
   const linkClass = (active: boolean) =>
     active ? 'text-indigo-400' : 'text-slate-500';
@@ -15,13 +18,13 @@ export function MobileFooterNav() {
     >
       <div className="grid grid-cols-2 gap-1 px-2 py-2">
         <Link
-          to="/"
+          href="/"
           className={`flex flex-col items-center rounded-lg py-2.5 text-xs font-medium ${linkClass(isDashboard)}`}
         >
           대시보드
         </Link>
         <Link
-          to="/transactions"
+          href="/transactions"
           className={`flex flex-col items-center rounded-lg py-2.5 text-xs font-medium ${linkClass(isTransactions)}`}
         >
           거래

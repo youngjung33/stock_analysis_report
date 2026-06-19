@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { AppError } from '@web/domain/errors/app-error';
-import { LoginUseCase } from '@web/domain/usecases/auth/login.use-case';
-import { LogoutUseCase } from '@web/domain/usecases/auth/logout.use-case';
-import { RefreshSessionUseCase } from '@web/domain/usecases/auth/refresh-session.use-case';
+import { AppError } from '@/client/domain/errors/app-error';
+import { LoginUseCase } from '@/client/domain/usecases/auth/login.use-case';
+import { LogoutUseCase } from '@/client/domain/usecases/auth/logout.use-case';
+import { RefreshSessionUseCase } from '@/client/domain/usecases/auth/refresh-session.use-case';
 import { createFakeAuthRepository } from '../../mocks/fake-repositories';
 
 describe('LoginUseCase', () => {

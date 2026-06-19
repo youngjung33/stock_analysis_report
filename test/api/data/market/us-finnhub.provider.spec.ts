@@ -1,6 +1,7 @@
+import { vi, type Mock } from 'vitest';
 import { Market } from '@sar/shared';
-import { MarketDataConfig } from '@api/data/market/market-data.config';
-import { UsFinnhubMarketProvider } from '@api/data/market/us-finnhub.provider';
+import { MarketDataConfig } from '@server/data/market/market-data.config';
+import { UsFinnhubMarketProvider } from '@server/data/market/us-finnhub.provider';
 
 function createProvider(apiKey: string | null): UsFinnhubMarketProvider {
   const config = {
@@ -12,7 +13,7 @@ function createProvider(apiKey: string | null): UsFinnhubMarketProvider {
 
 describe('UsFinnhubMarketProvider', () => {
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('supports US market only', () => {
@@ -35,10 +36,10 @@ describe('UsFinnhubMarketProvider', () => {
 
   it('fetches quote from Finnhub when configured', async () => {
     const provider = createProvider('test-key');
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ c: 150.5, dp: 2.1 }),
-    }) as jest.Mock;
+    }) as Mock;
 
     const quote = await provider.fetchQuote({
       id: '1',

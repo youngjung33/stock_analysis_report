@@ -1,6 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { Market, TransactionType } from '@sar/shared';
-import { getErrorMessage } from '../../../domain/errors/app-error';
+import { getErrorMessage } from '@/client/domain/errors/app-error';
 import { useServices } from '../useServices';
 
 export function useTransactionForm(onSuccess: () => void) {

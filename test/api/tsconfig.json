@@ -1,10 +1,10 @@
 {
-  "extends": "../../apps/api/tsconfig.json",
+  "extends": "../../apps/web/tsconfig.json",
   "compilerOptions": {
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "@api/*": ["../../apps/api/src/*"],
+      "@server/*": ["../../apps/web/src/server/*"],
       "@sar/shared": ["../../packages/shared/src/index.ts"]
     }
   },

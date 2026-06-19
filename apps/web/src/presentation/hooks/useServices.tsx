@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { AppServices } from '../../domain/services.types';
+import { AppServices } from '@/client/domain/services.types';
 
 const ServicesContext = createContext<AppServices | null>(null);
 

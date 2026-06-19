@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { Market, TransactionType } from '@sar/shared';
 import {
   IMarketDataProvider,
@@ -8,8 +9,8 @@ import {
   ITokenService,
   ITransactionRepository,
   IUserRepository,
-} from '@api/domain/repositories';
-import { StockEntity, TransactionEntity, UserEntity } from '@api/domain/entities';
+} from '@server/domain/repositories';
+import { StockEntity, TransactionEntity, UserEntity } from '@server/domain/entities';
 
 export function createMockUser(overrides: Partial<UserEntity> = {}): UserEntity {
   return {
@@ -53,87 +54,87 @@ export function createMockTransaction(
 
 export function createMockUserRepo(
   overrides: Partial<IUserRepository> = {},
-): jest.Mocked<IUserRepository> {
+): IUserRepository {
   return {
-    findByUsername: jest.fn(),
-    findById: jest.fn(),
-    create: jest.fn(),
-    count: jest.fn(),
+    findByUsername: vi.fn(),
+    findById: vi.fn(),
+    create: vi.fn(),
+    count: vi.fn(),
     ...overrides,
-  } as jest.Mocked<IUserRepository>;
+  };
 }
 
 export function createMockRefreshTokenRepo(
   overrides: Partial<IRefreshTokenRepository> = {},
-): jest.Mocked<IRefreshTokenRepository> {
+): IRefreshTokenRepository {
   return {
-    create: jest.fn(),
-    findValidByHash: jest.fn(),
-    revoke: jest.fn(),
-    revokeAllForUser: jest.fn(),
+    create: vi.fn(),
+    findValidByHash: vi.fn(),
+    revoke: vi.fn(),
+    revokeAllForUser: vi.fn(),
     ...overrides,
-  } as jest.Mocked<IRefreshTokenRepository>;
+  };
 }
 
-export function createMockPasswordHasher(
-  valid = true,
-): jest.Mocked<IPasswordHasher> {
+export function createMockPasswordHasher(valid = true): IPasswordHasher {
   return {
-    hash: jest.fn(),
-    compare: jest.fn().mockResolvedValue(valid),
-  } as jest.Mocked<IPasswordHasher>;
+    hash: vi.fn(),
+    compare: vi.fn().mockResolvedValue(valid),
+  };
 }
 
-export function createMockTokenService(): jest.Mocked<ITokenService> {
+export function createMockTokenService(): ITokenService {
   return {
-    generateAccessToken: jest.fn().mockReturnValue('access-token'),
-    generateRefreshToken: jest.fn().mockReturnValue('refresh-token'),
-    verifyAccessToken: jest.fn(),
-    hashRefreshToken: jest.fn().mockReturnValue('token-hash'),
-  } as jest.Mocked<ITokenService>;
+    generateAccessToken: vi.fn().mockReturnValue('access-token'),
+    generateRefreshToken: vi.fn().mockReturnValue('refresh-token'),
+    verifyAccessToken: vi.fn(),
+    hashRefreshToken: vi.fn().mockReturnValue('token-hash'),
+  };
 }
 
 export function createMockStockRepo(
   overrides: Partial<IStockRepository> = {},
-): jest.Mocked<IStockRepository> {
+): IStockRepository {
   return {
-    findBySymbolAndMarket: jest.fn(),
-    findById: jest.fn(),
-    create: jest.fn(),
-    findHeldByUser: jest.fn(),
+    findBySymbolAndMarket: vi.fn(),
+    findById: vi.fn(),
+    create: vi.fn(),
+    findHeldByUser: vi.fn(),
     ...overrides,
-  } as jest.Mocked<IStockRepository>;
+  };
 }
 
 export function createMockTransactionRepo(
   overrides: Partial<ITransactionRepository> = {},
-): jest.Mocked<ITransactionRepository> {
+): ITransactionRepository {
   return {
-    create: jest.fn(),
-    findByUser: jest.fn(),
-    findById: jest.fn(),
-    delete: jest.fn(),
-    findByUserAndStock: jest.fn(),
+    create: vi.fn(),
+    findByUser: vi.fn(),
+    findById: vi.fn(),
+    delete: vi.fn(),
+    findByUserAndStock: vi.fn(),
     ...overrides,
-  } as jest.Mocked<ITransactionRepository>;
+  };
 }
 
 export function createMockQuoteRepo(
   overrides: Partial<IStockQuoteRepository> = {},
-): jest.Mocked<IStockQuoteRepository> {
+): IStockQuoteRepository {
   return {
-    upsert: jest.fn(),
-    findByStockIds: jest.fn(),
+    upsert: vi.fn(),
+    findByStockIds: vi.fn(),
     ...overrides,
-  } as jest.Mocked<IStockQuoteRepository>;
+  };
 }
 
 export function createMockMarketProvider(
   market: Market,
   quote = { currentPrice: 150, changePercent: 2.5 },
-): jest.Mocked<IMarketDataProvider> {
+): IMarketDataProvider {
   return {
-    supports: jest.fn().mockReturnValue(true),
-    fetchQuote: jest.fn().mockResolvedValue(quote),
-  } as unknown as jest.Mocked<IMarketDataProvider>;
+    supports: vi.fn().mockReturnValue(true),
+    isAvailable: vi.fn().mockReturnValue(true),
+    unavailableReason: vi.fn().mockReturnValue(null),
+    fetchQuote: vi.fn().mockResolvedValue(quote),
+  };
 }

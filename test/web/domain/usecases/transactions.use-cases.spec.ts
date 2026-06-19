@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { TransactionType } from '@sar/shared';
-import { AppError } from '@web/domain/errors/app-error';
-import { CreateTransactionUseCase } from '@web/domain/usecases/transactions/create-transaction.use-case';
-import { DeleteTransactionUseCase } from '@web/domain/usecases/transactions/delete-transaction.use-case';
-import { ListTransactionsUseCase } from '@web/domain/usecases/transactions/list-transactions.use-case';
+import { AppError } from '@/client/domain/errors/app-error';
+import { CreateTransactionUseCase } from '@/client/domain/usecases/transactions/create-transaction.use-case';
+import { DeleteTransactionUseCase } from '@/client/domain/usecases/transactions/delete-transaction.use-case';
+import { ListTransactionsUseCase } from '@/client/domain/usecases/transactions/list-transactions.use-case';
 import {
   createFakeTransactionRepository,
   sampleTransactionInput,

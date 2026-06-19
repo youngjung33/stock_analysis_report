@@ -1,6 +1,7 @@
+import { vi, type Mock } from 'vitest';
 import { TransactionType } from '@sar/shared';
-import { InvalidPositionError } from '@api/domain/errors/domain.errors';
-import { computePosition } from '@api/domain/services/position-calculator';
+import { InvalidPositionError } from '@server/domain/errors/domain.errors';
+import { computePosition } from '@server/domain/services/position-calculator';
 
 describe('PositionCalculator', () => {
   const d = (s: string) => new Date(s);
