@@ -4,7 +4,7 @@ import { useIsMobile } from '../hooks/useBreakpoint';
 import { DesktopTransactionsPage } from '../desktop/pages/TransactionsPage';
 import { MobileTransactionsPage } from '../mobile/pages/TransactionsPage';
 
-export function TransactionsPage() {
+export function TransactionsView() {
   const isMobile = useIsMobile();
   return isMobile ? <MobileTransactionsPage /> : <DesktopTransactionsPage />;
 }

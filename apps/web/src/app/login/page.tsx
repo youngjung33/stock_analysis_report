@@ -1,7 +1,7 @@
 'use client';
 
-import { LoginPage } from '@/presentation/pages/LoginPage';
+import { LoginView } from '@/presentation/views/LoginView';
 
 export default function LoginRoutePage() {
-  return <LoginPage />;
+  return <LoginView />;
 }

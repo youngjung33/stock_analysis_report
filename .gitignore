@@ -48,6 +48,3 @@ Thumbs.db
 packages/shared/src/*.js
 packages/shared/src/*.d.ts
 packages/shared/src/*.js.map
-
-# Legacy Nest API 빌드 (폴더 삭제 전)
-apps/api/dist/
