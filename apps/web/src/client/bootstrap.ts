@@ -12,13 +12,12 @@ import {
   authRepository,
   portfolioRepository,
   transactionRepository,
-} from './data/repositories/api.repositories';
+} from './data/repositories/routing.repositories';
 
 export function wireAppServices(): AppServices {
   return {
     loginUseCase: new LoginUseCase(authRepository),
-    refreshSessionUseCase: new RefreshSessionUseCase(authRepository),
-    logoutUseCase: new LogoutUseCase(authRepository),
+    refreshSessionUseCase: new RefreshSessionUseCase(authRepository),    logoutUseCase: new LogoutUseCase(authRepository),
     createTransactionUseCase: new CreateTransactionUseCase(transactionRepository),
     listTransactionsUseCase: new ListTransactionsUseCase(transactionRepository),
     deleteTransactionUseCase: new DeleteTransactionUseCase(transactionRepository),

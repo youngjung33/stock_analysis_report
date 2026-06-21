@@ -2,11 +2,12 @@ import { FormEvent, useState } from 'react';
 import { useAuth } from '../useAuth';
 
 export function useLoginScreen() {
-  const { login, isAuthenticated } = useAuth();
+  const { login, loginAsGuest, isAuthenticated } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [guestLoading, setGuestLoading] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -21,6 +22,18 @@ export function useLoginScreen() {
     }
   }
 
+  async function handleGuestLogin() {
+    setError('');
+    setGuestLoading(true);
+    try {
+      await loginAsGuest();
+    } catch {
+      setError('비회원 로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setGuestLoading(false);
+    }
+  }
+
   return {
     isAuthenticated,
     username,
@@ -29,6 +42,8 @@ export function useLoginScreen() {
     setPassword,
     error,
     loading,
+    guestLoading,
     handleSubmit,
+    handleGuestLogin,
   };
 }

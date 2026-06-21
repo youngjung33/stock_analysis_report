@@ -1,3 +1,4 @@
+import { FetchQuotesUseCase } from './domain/usecases/market/fetch-quotes.use-case';
 import { LoginUseCase } from './domain/usecases/auth/login.use-case';
 import { LogoutUseCase } from './domain/usecases/auth/logout.use-case';
 import { RefreshTokenUseCase } from './domain/usecases/auth/refresh-token.use-case';
@@ -19,6 +20,7 @@ import {
 
 export interface ServerServices {
   loginUseCase: LoginUseCase;
+  fetchQuotesUseCase: FetchQuotesUseCase;
   refreshTokenUseCase: RefreshTokenUseCase;
   logoutUseCase: LogoutUseCase;
   createTransactionUseCase: CreateTransactionUseCase;
@@ -44,6 +46,7 @@ export function getServerServices(): ServerServices {
 
   cached = {
     loginUseCase: new LoginUseCase(userRepo, refreshRepo, passwordHasher, tokenService),
+    fetchQuotesUseCase: new FetchQuotesUseCase(marketProviders),
     refreshTokenUseCase: new RefreshTokenUseCase(refreshRepo, tokenService),
     logoutUseCase: new LogoutUseCase(refreshRepo, tokenService),
     createTransactionUseCase: new CreateTransactionUseCase(stockRepo, txRepo),

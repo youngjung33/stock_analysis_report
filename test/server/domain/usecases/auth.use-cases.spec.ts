@@ -1,8 +1,7 @@
 import { vi, type Mock } from 'vitest';
 import { UnauthorizedError } from '@server/http/errors';
 import { LoginUseCase } from '@server/domain/usecases/auth/login.use-case';
-import { LogoutUseCase } from '@server/domain/usecases/auth/logout.use-case';
-import { RefreshTokenUseCase } from '@server/domain/usecases/auth/refresh-token.use-case';
+import { LogoutUseCase } from '@server/domain/usecases/auth/logout.use-case';import { RefreshTokenUseCase } from '@server/domain/usecases/auth/refresh-token.use-case';
 import {
   createMockPasswordHasher,
   createMockRefreshTokenRepo,

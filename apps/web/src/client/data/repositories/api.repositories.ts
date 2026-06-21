@@ -49,7 +49,3 @@ export class ApiPortfolioRepository implements IPortfolioRepository {
     return data;
   }
 }
-
-export const authRepository = new ApiAuthRepository();
-export const transactionRepository = new ApiTransactionRepository();
-export const portfolioRepository = new ApiPortfolioRepository();

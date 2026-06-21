@@ -9,7 +9,7 @@ export function MobileDashboardPage() {
   return (
     <MobileLayout
       title="대시보드"
-      subtitle={`${screen.username}님`}
+      subtitle={`${screen.displayName}님`}
       onLogout={() => screen.logout()}
       headerActions={
         <button
@@ -22,6 +22,12 @@ export function MobileDashboardPage() {
         </button>
       }
     >
+      {screen.isGuest && (
+        <p className="mb-4 rounded-lg border border-amber-900/50 bg-amber-950/40 px-3 py-2 text-xs text-amber-200/90">
+          비회원 모드 — 탭을 닫으면 데이터가 사라집니다.
+        </p>
+      )}
+
       {screen.refreshMessage && (
         <p className="mb-4 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-slate-300">
           {screen.refreshMessage}

@@ -4,7 +4,7 @@ import { useAuth } from '../useAuth';
 import { useDashboard } from '../useDashboard';
 
 export function useDashboardScreen() {
-  const { username, logout } = useAuth();
+  const { username, isGuest, logout } = useAuth();
   const { data, isLoading, error, refresh } = useDashboard();
   const [refreshMessage, setRefreshMessage] = useState('');
   const [refreshing, setRefreshing] = useState(false);
@@ -28,6 +28,8 @@ export function useDashboardScreen() {
 
   return {
     username,
+    displayName: isGuest ? '비회원' : username,
+    isGuest,
     logout,
     data,
     isLoading,
