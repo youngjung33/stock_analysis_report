@@ -11,12 +11,14 @@ import {
 
 function createProvider(options: {
   supports?: (market: Market) => boolean;
+  label?: string;
   isAvailable?: boolean;
   unavailableReason?: string | null;
   fetchQuote?: Mock;
 }) {
   return {
     supports: vi.fn((market: Market) => options.supports?.(market) ?? true),
+    label: vi.fn(() => options.label ?? 'Test Provider'),
     isAvailable: vi.fn(() => options.isAvailable ?? true),
     unavailableReason: vi.fn(() => options.unavailableReason ?? null),
     fetchQuote:
@@ -50,6 +52,8 @@ describe('RefreshQuotesUseCase', () => {
     expect(provider.fetchQuote).toHaveBeenCalledWith(stock);
     expect(quoteRepo.upsert).toHaveBeenCalled();
     expect(result.updated).toBe(1);
+    expect(result.succeeded).toHaveLength(1);
+    expect(result.succeeded[0].symbol).toBe(stock.symbol);
 
     vi.useRealTimers();
   });
@@ -109,6 +113,7 @@ describe('RefreshQuotesUseCase', () => {
     expect(result.updated).toBe(0);
     expect(result.failed).toHaveLength(1);
     expect(result.failed[0].reason).toBe('API down');
+    expect(result.failed[0].reasonCode).toBe('fetch_error');
   });
 
   // RQ-04
@@ -129,7 +134,7 @@ describe('RefreshQuotesUseCase', () => {
     const result = await useCase.execute('user-1');
 
     expect(result.updated).toBe(0);
-    expect(result.failed[0].reason).toBe('No provider for market');
+    expect(result.failed[0].reasonCode).toBe('no_provider');
   });
 
   // RQ-05
@@ -166,7 +171,7 @@ describe('RefreshQuotesUseCase', () => {
     const provider = createProvider({
       supports: (m) => m === Market.US,
       isAvailable: false,
-      unavailableReason: 'FINNHUB_API_KEY is not configured',
+      unavailableReason: 'FINNHUB_API_KEY가 설정되지 않았습니다.',
     });
 
     const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, [provider]);
@@ -174,6 +179,7 @@ describe('RefreshQuotesUseCase', () => {
 
     expect(provider.fetchQuote).not.toHaveBeenCalled();
     expect(result.updated).toBe(0);
-    expect(result.failed[0].reason).toBe('FINNHUB_API_KEY is not configured');
+    expect(result.failed[0].reason).toBe('FINNHUB_API_KEY가 설정되지 않았습니다.');
+    expect(result.failed[0].reasonCode).toBe('not_configured');
   });
 });

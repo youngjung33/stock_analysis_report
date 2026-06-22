@@ -2,6 +2,7 @@ import { Market } from '@sar/shared';
 import { RefreshQuoteResult } from '../../entities';
 import { IMarketDataProvider } from '../../repositories';
 import { resolveYahooSymbol } from '../../services/stock-symbol.resolver';
+import { fetchQuoteForStock } from './quote-fetch.helpers';
 
 export interface FetchQuoteStockInput {
   stockId: string;
@@ -20,9 +21,11 @@ export class FetchQuotesUseCase {
       changePercent: number | null;
       fetchedAt: string;
     }[];
+    succeeded: RefreshQuoteResult['succeeded'];
     failed: RefreshQuoteResult['failed'];
   }> {
     const failed: RefreshQuoteResult['failed'] = [];
+    const succeeded: RefreshQuoteResult['succeeded'] = [];
     const quotes: {
       stockId: string;
       currentPrice: number;
@@ -32,23 +35,9 @@ export class FetchQuotesUseCase {
     let updated = 0;
 
     for (const stock of stocks) {
-      const provider = this.marketProviders.find((p) => p.supports(stock.market));
-      if (!provider) {
-        failed.push({ stockId: stock.stockId, symbol: stock.symbol, reason: 'No provider for market' });
-        continue;
-      }
-
-      if (!provider.isAvailable()) {
-        failed.push({
-          stockId: stock.stockId,
-          symbol: stock.symbol,
-          reason: provider.unavailableReason() ?? 'Market data provider not configured',
-        });
-        continue;
-      }
-
-      try {
-        const quote = await provider.fetchQuote({
+      const quote = await fetchQuoteForStock(
+        this.marketProviders,
+        {
           id: stock.stockId,
           symbol: stock.symbol,
           name: stock.symbol,
@@ -56,29 +45,27 @@ export class FetchQuotesUseCase {
           currency: stock.market === Market.KR ? 'KRW' : 'USD',
           yahooSymbol: resolveYahooSymbol(stock.symbol, stock.market),
           createdAt: new Date(),
-        });
-        const fetchedAt = new Date().toISOString();
-        quotes.push({
-          stockId: stock.stockId,
-          currentPrice: quote.currentPrice,
-          changePercent: quote.changePercent,
-          fetchedAt,
-        });
-        updated += 1;
+        },
+        failed,
+      );
+      if (!quote) continue;
 
-        if (stock.market === Market.US) {
-          await sleep(1100);
-        }
-      } catch (err) {
-        failed.push({
-          stockId: stock.stockId,
-          symbol: stock.symbol,
-          reason: err instanceof Error ? err.message : 'Unknown error',
-        });
+      const fetchedAt = new Date().toISOString();
+      quotes.push({
+        stockId: stock.stockId,
+        currentPrice: quote.currentPrice,
+        changePercent: quote.changePercent,
+        fetchedAt,
+      });
+      succeeded.push({ stockId: stock.stockId, symbol: stock.symbol, market: stock.market });
+      updated += 1;
+
+      if (stock.market === Market.US) {
+        await sleep(1100);
       }
     }
 
-    return { updated, quotes, failed };
+    return { updated, quotes, succeeded, failed };
   }
 }
 

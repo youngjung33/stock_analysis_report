@@ -9,7 +9,7 @@ export function DesktopHoldingsTable({ holdings }: Props) {
   if (holdings.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-slate-700 p-8 text-center text-slate-400">
-        ?? ??? ????. ??? ??? ???.
+        보유 종목이 없습니다. 거래를 등록해 보세요.
       </div>
     );
   }
@@ -19,15 +19,15 @@ export function DesktopHoldingsTable({ holdings }: Props) {
       <table className="min-w-full text-left text-sm">
         <thead className="bg-slate-900 text-slate-400">
           <tr>
-            <th className="px-4 py-3">??</th>
-            <th className="px-4 py-3">??</th>
-            <th className="px-4 py-3">??</th>
-            <th className="px-4 py-3">??</th>
-            <th className="px-4 py-3">???</th>
-            <th className="px-4 py-3">??</th>
-            <th className="px-4 py-3">????</th>
-            <th className="px-4 py-3">?????</th>
-            <th className="px-4 py-3">????</th>
+            <th className="px-4 py-3">종목</th>
+            <th className="px-4 py-3">시장</th>
+            <th className="px-4 py-3">수량</th>
+            <th className="px-4 py-3">평단</th>
+            <th className="px-4 py-3">현재가</th>
+            <th className="px-4 py-3">등락</th>
+            <th className="px-4 py-3">평가금액</th>
+            <th className="px-4 py-3">미실현손익</th>
+            <th className="px-4 py-3">실현손익</th>
           </tr>
         </thead>
         <tbody>

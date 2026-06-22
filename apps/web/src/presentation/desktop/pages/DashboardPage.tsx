@@ -1,4 +1,7 @@
 import { useDashboardScreen } from '../../hooks/screens/useDashboardScreen';
+import { MarketStatusBanner } from '../../components/MarketStatusBanner';
+import { QuoteRefreshNoticeBox } from '../../components/QuoteRefreshNoticeBox';
+import { FeaturedQuotesSection } from '../../components/FeaturedQuotesSection';
 import { DesktopSummaryCards } from '../features/dashboard/SummaryCards';
 import { DesktopHoldingsTable } from '../features/dashboard/HoldingsTable';
 import { DesktopLayout } from '../layout/DesktopLayout';
@@ -27,11 +30,12 @@ export function DesktopDashboardPage() {
             비회원 모드입니다. 거래 데이터는 서버에 저장되지 않으며, 탭을 닫으면 사라집니다.
           </p>
         )}
-        {screen.refreshMessage && (
-          <p className="rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-sm text-slate-300">
-            {screen.refreshMessage}
-          </p>
+
+        {!screen.marketStatusLoading && screen.marketProviders.length > 0 && (
+          <MarketStatusBanner providers={screen.marketProviders} />
         )}
+
+        {screen.refreshNotice && <QuoteRefreshNoticeBox notice={screen.refreshNotice} />}
 
         {screen.data?.lastRefreshedAt && (
           <p className="text-sm text-slate-500">
@@ -48,6 +52,11 @@ export function DesktopDashboardPage() {
             <DesktopHoldingsTable holdings={screen.data.holdings} />
           </>
         )}
+
+        <FeaturedQuotesSection
+          data={screen.featuredQuotes}
+          isLoading={screen.featuredQuotesLoading}
+        />
       </main>
     </DesktopLayout>
   );

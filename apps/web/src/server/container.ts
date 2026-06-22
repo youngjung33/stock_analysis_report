@@ -1,4 +1,6 @@
+import { GetFeaturedQuotesUseCase } from './domain/usecases/market/get-featured-quotes.use-case';
 import { FetchQuotesUseCase } from './domain/usecases/market/fetch-quotes.use-case';
+import { GetMarketStatusUseCase } from './domain/usecases/market/get-market-status.use-case';
 import { LoginUseCase } from './domain/usecases/auth/login.use-case';
 import { LogoutUseCase } from './domain/usecases/auth/logout.use-case';
 import { RefreshTokenUseCase } from './domain/usecases/auth/refresh-token.use-case';
@@ -20,7 +22,6 @@ import {
 
 export interface ServerServices {
   loginUseCase: LoginUseCase;
-  fetchQuotesUseCase: FetchQuotesUseCase;
   refreshTokenUseCase: RefreshTokenUseCase;
   logoutUseCase: LogoutUseCase;
   createTransactionUseCase: CreateTransactionUseCase;
@@ -28,6 +29,9 @@ export interface ServerServices {
   deleteTransactionUseCase: DeleteTransactionUseCase;
   getDashboardUseCase: GetDashboardUseCase;
   refreshQuotesUseCase: RefreshQuotesUseCase;
+  fetchQuotesUseCase: FetchQuotesUseCase;
+  getFeaturedQuotesUseCase: GetFeaturedQuotesUseCase;
+  getMarketStatusUseCase: GetMarketStatusUseCase;
 }
 
 let cached: ServerServices | null = null;
@@ -43,10 +47,12 @@ export function getServerServices(): ServerServices {
   const passwordHasher = new BcryptPasswordHasher();
   const tokenService = new JwtTokenService();
   const marketProviders = [new UsFinnhubMarketProvider(), new KrYahooMarketProvider()];
+  const fetchQuotesUseCase = new FetchQuotesUseCase(marketProviders);
 
   cached = {
     loginUseCase: new LoginUseCase(userRepo, refreshRepo, passwordHasher, tokenService),
-    fetchQuotesUseCase: new FetchQuotesUseCase(marketProviders),
+    fetchQuotesUseCase,
+    getFeaturedQuotesUseCase: new GetFeaturedQuotesUseCase(fetchQuotesUseCase),
     refreshTokenUseCase: new RefreshTokenUseCase(refreshRepo, tokenService),
     logoutUseCase: new LogoutUseCase(refreshRepo, tokenService),
     createTransactionUseCase: new CreateTransactionUseCase(stockRepo, txRepo),
@@ -54,6 +60,7 @@ export function getServerServices(): ServerServices {
     deleteTransactionUseCase: new DeleteTransactionUseCase(txRepo),
     getDashboardUseCase: new GetDashboardUseCase(stockRepo, txRepo, quoteRepo),
     refreshQuotesUseCase: new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, marketProviders),
+    getMarketStatusUseCase: new GetMarketStatusUseCase(marketProviders),
   };
 
   return cached;

@@ -6,13 +6,12 @@ import {
   jsonData,
   setRefreshCookie,
 } from '@/server/http/route-utils';
-import { UnauthorizedError } from '@/server/http/errors';
 
 export async function POST(req: NextRequest) {
   try {
     const refreshToken = getRefreshToken(req);
     if (!refreshToken) {
-      throw new UnauthorizedError('Refresh token missing');
+      return jsonData({ accessToken: null, username: null });
     }
 
     const { refreshTokenUseCase } = getServerServices();

@@ -1,12 +1,4 @@
-export enum Market {
-  KR = 'KR',
-  US = 'US',
-}
-
-export enum TransactionType {
-  BUY = 'BUY',
-  SELL = 'SELL',
-}
+export { Market, TransactionType } from './enums';
 
 export const REFRESH_TOKEN_COOKIE = 'refreshToken';
 
@@ -19,3 +11,10 @@ export function isGuestUsername(username: string | null | undefined): boolean {
 export { computePosition } from './position-calculator';
 export type { PositionState, PositionTransaction } from './position-calculator';
 export { resolveCurrency, resolveYahooSymbol } from './stock-symbol';
+export {
+  FEATURED_KR_STOCKS,
+  FEATURED_US_STOCKS,
+  FEATURED_STOCKS,
+  featuredStockId,
+} from './featured-stocks';
+export type { FeaturedStock } from './featured-stocks';

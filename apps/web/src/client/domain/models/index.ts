@@ -57,12 +57,47 @@ export interface Dashboard {
 
 export interface RefreshQuoteResult {
   updated: number;
-  failed: { stockId: string; symbol: string; reason: string }[];
+  succeeded: { stockId: string; symbol: string; market: Market }[];
+  failed: {
+    stockId: string;
+    symbol: string;
+    market: Market;
+    reason: string;
+    reasonCode: 'not_configured' | 'fetch_error' | 'no_provider';
+  }[];
+}
+
+export interface MarketProviderStatus {
+  market: Market;
+  label: string;
+  available: boolean;
+  setupHint: string | null;
+}
+
+export interface FeaturedStockQuote {
+  symbol: string;
+  name: string;
+  market: Market;
+  currency: string;
+  currentPrice: number | null;
+  changePercent: number | null;
+  unavailableReason: string | null;
+}
+
+export interface FeaturedQuotesResult {
+  kr: FeaturedStockQuote[];
+  us: FeaturedStockQuote[];
+  fetchedAt: string;
 }
 
 export interface LoginResult {
   accessToken: string;
   username: string;
+}
+
+export interface SessionResult {
+  accessToken: string | null;
+  username: string | null;
 }
 
 export interface CreateTransactionInput {

@@ -1,4 +1,4 @@
-import { TransactionType } from './index';
+import { TransactionType } from './enums';
 
 export interface PositionState {
   quantity: number;

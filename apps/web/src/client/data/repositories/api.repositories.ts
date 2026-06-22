@@ -1,4 +1,4 @@
-import { CreateTransactionInput, LoginResult } from '../../domain/models';
+import { CreateTransactionInput, LoginResult, SessionResult } from '../../domain/models';
 import { IAuthRepository, IPortfolioRepository, ITransactionRepository } from '../../domain/repositories';
 import { apiClient } from '../api/client';
 import { tokenStorage } from '../auth/token-storage';
@@ -10,10 +10,14 @@ export class ApiAuthRepository implements IAuthRepository {
     return data;
   }
 
-  async refresh(): Promise<LoginResult> {
-    const { data } = await apiClient.post<LoginResult>('/auth/refresh');
+  async refresh(): Promise<LoginResult | null> {
+    const { data } = await apiClient.post<SessionResult>('/auth/refresh');
+    if (!data.accessToken || !data.username) {
+      tokenStorage.setAccessToken(null);
+      return null;
+    }
     tokenStorage.setAccessToken(data.accessToken);
-    return data;
+    return { accessToken: data.accessToken, username: data.username };
   }
 
   async logout(): Promise<void> {

@@ -67,6 +67,7 @@ export function createFakePortfolioRepository(
     } satisfies Dashboard),
     refreshQuotes: vi.fn().mockResolvedValue({
       updated: 0,
+      succeeded: [],
       failed: [],
     } satisfies RefreshQuoteResult),
     ...overrides,

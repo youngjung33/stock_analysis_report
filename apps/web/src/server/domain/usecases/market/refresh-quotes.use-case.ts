@@ -1,3 +1,4 @@
+import { Market } from '@sar/shared';
 import { RefreshQuoteResult } from '../../entities';
 import {
   IMarketDataProvider,
@@ -6,6 +7,7 @@ import {
   ITransactionRepository,
 } from '../../repositories';
 import { computePosition } from '../../services/position-calculator';
+import { fetchQuoteForStock } from './quote-fetch.helpers';
 
 export class RefreshQuotesUseCase {
   constructor(
@@ -18,6 +20,7 @@ export class RefreshQuotesUseCase {
   async execute(userId: string): Promise<RefreshQuoteResult> {
     const stocks = await this.stockRepo.findHeldByUser(userId);
     const failed: RefreshQuoteResult['failed'] = [];
+    const succeeded: RefreshQuoteResult['succeeded'] = [];
     let updated = 0;
 
     for (const stock of stocks) {
@@ -25,44 +28,24 @@ export class RefreshQuotesUseCase {
       const position = computePosition(txs);
       if (position.quantity <= 0) continue;
 
-      const provider = this.marketProviders.find((p) => p.supports(stock.market));
-      if (!provider) {
-        failed.push({ stockId: stock.id, symbol: stock.symbol, reason: 'No provider for market' });
-        continue;
-      }
+      const quote = await fetchQuoteForStock(this.marketProviders, stock, failed);
+      if (!quote) continue;
 
-      if (!provider.isAvailable()) {
-        failed.push({
-          stockId: stock.id,
-          symbol: stock.symbol,
-          reason: provider.unavailableReason() ?? 'Market data provider not configured',
-        });
-        continue;
-      }
+      await this.quoteRepo.upsert({
+        stockId: stock.id,
+        currentPrice: quote.currentPrice,
+        changePercent: quote.changePercent,
+        fetchedAt: new Date(),
+      });
+      succeeded.push({ stockId: stock.id, symbol: stock.symbol, market: stock.market as Market });
+      updated += 1;
 
-      try {
-        const quote = await provider.fetchQuote(stock);
-        await this.quoteRepo.upsert({
-          stockId: stock.id,
-          currentPrice: quote.currentPrice,
-          changePercent: quote.changePercent,
-          fetchedAt: new Date(),
-        });
-        updated += 1;
-
-        if (stock.market === 'US') {
-          await sleep(1100);
-        }
-      } catch (err) {
-        failed.push({
-          stockId: stock.id,
-          symbol: stock.symbol,
-          reason: err instanceof Error ? err.message : 'Unknown error',
-        });
+      if (stock.market === 'US') {
+        await sleep(1100);
       }
     }
 
-    return { updated, failed };
+    return { updated, succeeded, failed };
   }
 }
 

@@ -9,6 +9,10 @@ export class KrYahooMarketProvider implements IMarketDataProvider {
     return market === Market.KR;
   }
 
+  label(): string {
+    return '한국 주식 (Yahoo Finance)';
+  }
+
   isAvailable(): boolean {
     return true;
   }

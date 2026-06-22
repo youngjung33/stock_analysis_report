@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     refreshSessionUseCase
       .execute()
-      .then((result) => setUsername(result.username))
+      .then((result) => setUsername(result?.username ?? null))
       .catch(() => setUsername(null))
       .finally(() => setIsLoading(false));
   }, [refreshSessionUseCase, authSession]);

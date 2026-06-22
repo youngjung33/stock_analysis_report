@@ -1,26 +1,33 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
+import { buildQuoteRefreshNotice, QuoteRefreshNotice } from '@/client/domain/services/quote-notice';
 import { useAuth } from '../useAuth';
 import { useDashboard } from '../useDashboard';
+import { useFeaturedQuotes } from '../useFeaturedQuotes';
+import { useMarketStatus } from '../useMarketStatus';
 
 export function useDashboardScreen() {
   const { username, isGuest, logout } = useAuth();
   const { data, isLoading, error, refresh } = useDashboard();
-  const [refreshMessage, setRefreshMessage] = useState('');
+  const marketStatus = useMarketStatus();
+  const featuredQuotes = useFeaturedQuotes();
+  const queryClient = useQueryClient();
+  const [refreshNotice, setRefreshNotice] = useState<QuoteRefreshNotice | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   async function handleRefresh() {
     setRefreshing(true);
-    setRefreshMessage('');
+    setRefreshNotice(null);
     try {
       const result = await refresh();
-      const failMsg =
-        result.failed.length > 0
-          ? ` (실패 ${result.failed.length}건: ${result.failed.map((f) => f.symbol).join(', ')})`
-          : '';
-      setRefreshMessage(`${result.updated}개 종목 시세 갱신 완료${failMsg}`);
+      setRefreshNotice(buildQuoteRefreshNotice(result));
+      await queryClient.invalidateQueries({ queryKey: ['featured-quotes'] });
     } catch (err) {
-      setRefreshMessage(getErrorMessage(err, '시세 갱신에 실패했습니다.'));
+      setRefreshNotice({
+        variant: 'error',
+        lines: [getErrorMessage(err, '시세 갱신에 실패했습니다.')],
+      });
     } finally {
       setRefreshing(false);
     }
@@ -34,7 +41,11 @@ export function useDashboardScreen() {
     data,
     isLoading,
     error,
-    refreshMessage,
+    marketProviders: marketStatus.data ?? [],
+    marketStatusLoading: marketStatus.isLoading,
+    featuredQuotes: featuredQuotes.data,
+    featuredQuotesLoading: featuredQuotes.isLoading,
+    refreshNotice,
     refreshing,
     handleRefresh,
   };

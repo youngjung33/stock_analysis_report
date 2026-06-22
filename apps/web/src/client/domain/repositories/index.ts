@@ -9,7 +9,7 @@ import {
 
 export interface IAuthRepository {
   login(username: string, password: string): Promise<LoginResult>;
-  refresh(): Promise<LoginResult>;
+  refresh(): Promise<LoginResult | null>;
   logout(): Promise<void>;
 }
 

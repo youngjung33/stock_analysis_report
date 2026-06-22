@@ -67,6 +67,8 @@ export interface ITokenService {
 
 export interface IMarketDataProvider {
   supports(market: Market): boolean;
+  /** Provider display name for UI (e.g. "한국 주식 (Yahoo Finance)"). */
+  label(): string;
   /** false when env/API key is missing — fetchQuote must not be called. */
   isAvailable(): boolean;
   unavailableReason(): string | null;

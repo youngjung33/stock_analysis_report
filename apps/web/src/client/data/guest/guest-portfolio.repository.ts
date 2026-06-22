@@ -111,16 +111,17 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
     }
 
     if (stocks.size === 0) {
-      return { updated: 0, failed: [] };
+      return { updated: 0, succeeded: [], failed: [] };
     }
 
     const { data } = await apiClient.post<{
       updated: number;
       quotes: { stockId: string; currentPrice: number; changePercent: number | null; fetchedAt: string }[];
+      succeeded: RefreshQuoteResult['succeeded'];
       failed: RefreshQuoteResult['failed'];
     }>('/market/quotes', { stocks: [...stocks.values()] });
 
     saveGuestQuotes(data.quotes);
-    return { updated: data.updated, failed: data.failed };
+    return { updated: data.updated, succeeded: data.succeeded, failed: data.failed };
   }
 }

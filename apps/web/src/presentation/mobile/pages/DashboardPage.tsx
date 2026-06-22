@@ -1,4 +1,7 @@
 import { useDashboardScreen } from '../../hooks/screens/useDashboardScreen';
+import { MarketStatusBanner } from '../../components/MarketStatusBanner';
+import { QuoteRefreshNoticeBox } from '../../components/QuoteRefreshNoticeBox';
+import { FeaturedQuotesSection } from '../../components/FeaturedQuotesSection';
 import { MobileSummaryCards } from '../features/dashboard/SummaryCards';
 import { MobileHoldingsCardList } from '../features/dashboard/HoldingsCardList';
 import { MobileLayout } from '../layout/MobileLayout';
@@ -28,10 +31,16 @@ export function MobileDashboardPage() {
         </p>
       )}
 
-      {screen.refreshMessage && (
-        <p className="mb-4 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-slate-300">
-          {screen.refreshMessage}
-        </p>
+      {!screen.marketStatusLoading && screen.marketProviders.length > 0 && (
+        <div className="mb-4">
+          <MarketStatusBanner providers={screen.marketProviders} />
+        </div>
+      )}
+
+      {screen.refreshNotice && (
+        <div className="mb-4">
+          <QuoteRefreshNoticeBox notice={screen.refreshNotice} />
+        </div>
       )}
 
       {screen.data?.lastRefreshedAt && (
@@ -49,6 +58,14 @@ export function MobileDashboardPage() {
           <MobileHoldingsCardList holdings={screen.data.holdings} />
         </div>
       )}
+
+      <div className="mt-6">
+        <FeaturedQuotesSection
+          data={screen.featuredQuotes}
+          isLoading={screen.featuredQuotesLoading}
+          compact
+        />
+      </div>
     </MobileLayout>
   );
 }

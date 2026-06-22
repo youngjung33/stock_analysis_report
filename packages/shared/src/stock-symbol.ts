@@ -1,4 +1,4 @@
-import { Market } from './index';
+import { Market } from './enums';
 
 export function resolveYahooSymbol(symbol: string, market: Market): string | null {
   if (market === Market.US) return symbol.toUpperCase();
