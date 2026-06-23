@@ -16,5 +16,13 @@ export {
   FEATURED_US_STOCKS,
   FEATURED_STOCKS,
   featuredStockId,
+  findFeaturedStock,
 } from './featured-stocks';
 export type { FeaturedStock } from './featured-stocks';
+export {
+  QUOTE_CHART_RANGES,
+  QUOTE_RANGE_LABELS,
+  QUOTE_CHART_RANGE_HINT,
+  isQuoteChartRange,
+} from './chart-range';
+export type { QuoteChartRange } from './chart-range';

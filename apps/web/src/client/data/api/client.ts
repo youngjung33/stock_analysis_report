@@ -41,7 +41,8 @@ apiClient.interceptors.response.use(
       original.url?.includes('/auth/refresh') ||
       original.url?.includes('/market/quotes') ||
       original.url?.includes('/market/status') ||
-      original.url?.includes('/market/featured')
+      original.url?.includes('/market/featured') ||
+      original.url?.includes('/market/quote')
     ) {
       return Promise.reject(error);
     }

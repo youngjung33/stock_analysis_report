@@ -9,6 +9,6 @@ export function useFeaturedQuotes() {
       const { data } = await apiClient.get<FeaturedQuotesResult>('/market/featured');
       return data;
     },
-    staleTime: 5 * 60_000,
+    staleTime: 60_000,
   });
 }

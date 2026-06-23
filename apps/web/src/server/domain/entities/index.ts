@@ -115,6 +115,22 @@ export interface FeaturedQuotesResult {
   fetchedAt: string;
 }
 
+export interface StockPricePoint {
+  timestamp: string;
+  close: number;
+}
+
+export interface StockQuoteSnapshot {
+  symbol: string;
+  market: Market;
+  currency: string;
+  range: import('@sar/shared').QuoteChartRange;
+  currentPrice: number;
+  changePercent: number | null;
+  fetchedAt: string;
+  points: StockPricePoint[];
+}
+
 export interface AuthTokens {
   accessToken: string;
   refreshToken: string;

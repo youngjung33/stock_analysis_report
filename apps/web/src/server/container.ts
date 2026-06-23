@@ -1,4 +1,5 @@
 import { GetFeaturedQuotesUseCase } from './domain/usecases/market/get-featured-quotes.use-case';
+import { GetStockQuoteUseCase } from './domain/usecases/market/get-stock-quote.use-case';
 import { FetchQuotesUseCase } from './domain/usecases/market/fetch-quotes.use-case';
 import { GetMarketStatusUseCase } from './domain/usecases/market/get-market-status.use-case';
 import { LoginUseCase } from './domain/usecases/auth/login.use-case';
@@ -31,6 +32,7 @@ export interface ServerServices {
   refreshQuotesUseCase: RefreshQuotesUseCase;
   fetchQuotesUseCase: FetchQuotesUseCase;
   getFeaturedQuotesUseCase: GetFeaturedQuotesUseCase;
+  getStockQuoteUseCase: GetStockQuoteUseCase;
   getMarketStatusUseCase: GetMarketStatusUseCase;
 }
 
@@ -53,6 +55,7 @@ export function getServerServices(): ServerServices {
     loginUseCase: new LoginUseCase(userRepo, refreshRepo, passwordHasher, tokenService),
     fetchQuotesUseCase,
     getFeaturedQuotesUseCase: new GetFeaturedQuotesUseCase(fetchQuotesUseCase),
+    getStockQuoteUseCase: new GetStockQuoteUseCase(),
     refreshTokenUseCase: new RefreshTokenUseCase(refreshRepo, tokenService),
     logoutUseCase: new LogoutUseCase(refreshRepo, tokenService),
     createTransactionUseCase: new CreateTransactionUseCase(stockRepo, txRepo),

@@ -53,10 +53,7 @@ export function DesktopDashboardPage() {
           </>
         )}
 
-        <FeaturedQuotesSection
-          data={screen.featuredQuotes}
-          isLoading={screen.featuredQuotesLoading}
-        />
+        <FeaturedQuotesSection />
       </main>
     </DesktopLayout>
   );

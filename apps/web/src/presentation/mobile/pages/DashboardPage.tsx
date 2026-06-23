@@ -60,11 +60,7 @@ export function MobileDashboardPage() {
       )}
 
       <div className="mt-6">
-        <FeaturedQuotesSection
-          data={screen.featuredQuotes}
-          isLoading={screen.featuredQuotesLoading}
-          compact
-        />
+        <FeaturedQuotesSection compact />
       </div>
     </MobileLayout>
   );

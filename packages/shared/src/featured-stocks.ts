@@ -31,3 +31,7 @@ export const FEATURED_STOCKS: FeaturedStock[] = [...FEATURED_KR_STOCKS, ...FEATU
 export function featuredStockId(symbol: string, market: Market): string {
   return `featured-${market}-${symbol}`;
 }
+
+export function findFeaturedStock(symbol: string, market: Market): FeaturedStock | undefined {
+  return FEATURED_STOCKS.find((s) => s.symbol === symbol && s.market === market);
+}

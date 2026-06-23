@@ -10,6 +10,8 @@ describe('KrYahooMarketProvider', () => {
     vi.spyOn(yahooClient, 'fetchYahooChartQuote').mockResolvedValue({
       currentPrice: 72000,
       changePercent: 1.2,
+      range: '1d',
+      points: [],
     });
   });
 
