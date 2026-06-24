@@ -1,6 +1,7 @@
 import { useDashboardScreen } from '../../hooks/screens/useDashboardScreen';
 import { MarketStatusBanner } from '../../components/MarketStatusBanner';
 import { QuoteRefreshNoticeBox } from '../../components/QuoteRefreshNoticeBox';
+import { MarketSentimentSummarySection } from '../../components/MarketSentimentSummarySection';
 import { FeaturedQuotesSection } from '../../components/FeaturedQuotesSection';
 import { MobileSummaryCards } from '../features/dashboard/SummaryCards';
 import { MobileHoldingsCardList } from '../features/dashboard/HoldingsCardList';
@@ -59,7 +60,8 @@ export function MobileDashboardPage() {
         </div>
       )}
 
-      <div className="mt-6">
+      <div className="mt-6 space-y-6">
+        <MarketSentimentSummarySection compact />
         <FeaturedQuotesSection compact />
       </div>
     </MobileLayout>

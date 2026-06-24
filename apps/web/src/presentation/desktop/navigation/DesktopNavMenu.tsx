@@ -7,7 +7,7 @@ interface Props {
   onRefresh?: () => void;
   refreshing?: boolean;
   onLogout: () => void;
-  active: 'dashboard' | 'transactions';
+  active: 'dashboard' | 'transactions' | 'market';
 }
 
 export function DesktopNavMenu({ username, onRefresh, refreshing, onLogout, active }: Props) {
@@ -15,15 +15,34 @@ export function DesktopNavMenu({ username, onRefresh, refreshing, onLogout, acti
     <nav className="flex items-center gap-3" aria-label="주 메뉴">
       {username && <span className="hidden text-sm text-slate-500 lg:inline">{username}</span>}
       {active === 'dashboard' ? (
-        <Link href="/transactions" className="text-sm text-indigo-400 hover:text-indigo-300">
-          거래 관리
-        </Link>
+        <>
+          <Link href="/market/analysis" className="text-sm text-indigo-400 hover:text-indigo-300">
+            시장 분석
+          </Link>
+          <Link href="/transactions" className="text-sm text-indigo-400 hover:text-indigo-300">
+            거래 관리
+          </Link>
+        </>
+      ) : active === 'market' ? (
+        <>
+          <Link href="/" className="text-sm text-indigo-400 hover:text-indigo-300">
+            대시보드
+          </Link>
+          <Link href="/transactions" className="text-sm text-indigo-400 hover:text-indigo-300">
+            거래 관리
+          </Link>
+        </>
       ) : (
-        <Link href="/" className="text-sm text-indigo-400 hover:text-indigo-300">
-          대시보드
-        </Link>
+        <>
+          <Link href="/" className="text-sm text-indigo-400 hover:text-indigo-300">
+            대시보드
+          </Link>
+          <Link href="/market/analysis" className="text-sm text-indigo-400 hover:text-indigo-300">
+            시장 분석
+          </Link>
+        </>
       )}
-      {onRefresh && (
+      {onRefresh && active === 'dashboard' && (
         <button
           type="button"
           onClick={onRefresh}

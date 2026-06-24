@@ -1,4 +1,5 @@
 import { GetFeaturedQuotesUseCase } from './domain/usecases/market/get-featured-quotes.use-case';
+import { GetMarketAnalysisUseCase } from './domain/usecases/market/get-market-analysis.use-case';
 import { GetStockQuoteUseCase } from './domain/usecases/market/get-stock-quote.use-case';
 import { FetchQuotesUseCase } from './domain/usecases/market/fetch-quotes.use-case';
 import { GetMarketStatusUseCase } from './domain/usecases/market/get-market-status.use-case';
@@ -34,6 +35,7 @@ export interface ServerServices {
   getFeaturedQuotesUseCase: GetFeaturedQuotesUseCase;
   getStockQuoteUseCase: GetStockQuoteUseCase;
   getMarketStatusUseCase: GetMarketStatusUseCase;
+  getMarketAnalysisUseCase: GetMarketAnalysisUseCase;
 }
 
 let cached: ServerServices | null = null;
@@ -50,11 +52,12 @@ export function getServerServices(): ServerServices {
   const tokenService = new JwtTokenService();
   const marketProviders = [new UsFinnhubMarketProvider(), new KrYahooMarketProvider()];
   const fetchQuotesUseCase = new FetchQuotesUseCase(marketProviders);
+  const getFeaturedQuotesUseCase = new GetFeaturedQuotesUseCase(fetchQuotesUseCase);
 
   cached = {
     loginUseCase: new LoginUseCase(userRepo, refreshRepo, passwordHasher, tokenService),
     fetchQuotesUseCase,
-    getFeaturedQuotesUseCase: new GetFeaturedQuotesUseCase(fetchQuotesUseCase),
+    getFeaturedQuotesUseCase,
     getStockQuoteUseCase: new GetStockQuoteUseCase(),
     refreshTokenUseCase: new RefreshTokenUseCase(refreshRepo, tokenService),
     logoutUseCase: new LogoutUseCase(refreshRepo, tokenService),
@@ -64,6 +67,7 @@ export function getServerServices(): ServerServices {
     getDashboardUseCase: new GetDashboardUseCase(stockRepo, txRepo, quoteRepo),
     refreshQuotesUseCase: new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, marketProviders),
     getMarketStatusUseCase: new GetMarketStatusUseCase(marketProviders),
+    getMarketAnalysisUseCase: new GetMarketAnalysisUseCase(getFeaturedQuotesUseCase),
   };
 
   return cached;

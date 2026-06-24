@@ -1,6 +1,7 @@
 import { useDashboardScreen } from '../../hooks/screens/useDashboardScreen';
 import { MarketStatusBanner } from '../../components/MarketStatusBanner';
 import { QuoteRefreshNoticeBox } from '../../components/QuoteRefreshNoticeBox';
+import { MarketSentimentSummarySection } from '../../components/MarketSentimentSummarySection';
 import { FeaturedQuotesSection } from '../../components/FeaturedQuotesSection';
 import { DesktopSummaryCards } from '../features/dashboard/SummaryCards';
 import { DesktopHoldingsTable } from '../features/dashboard/HoldingsTable';
@@ -53,6 +54,7 @@ export function DesktopDashboardPage() {
           </>
         )}
 
+        <MarketSentimentSummarySection />
         <FeaturedQuotesSection />
       </main>
     </DesktopLayout>

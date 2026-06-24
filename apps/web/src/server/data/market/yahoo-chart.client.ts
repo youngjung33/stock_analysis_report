@@ -21,6 +21,9 @@ interface YahooChartResult {
   indicators?: {
     quote?: Array<{
       close?: (number | null)[];
+      volume?: (number | null)[];
+      high?: (number | null)[];
+      low?: (number | null)[];
     }>;
   };
 }
@@ -143,4 +146,69 @@ export async function fetchYahooChartQuote(
     basePrice > 0 ? ((currentPrice - basePrice) / basePrice) * 100 : null;
 
   return { currentPrice, changePercent, range, points };
+}
+
+export interface YahooChartSeries {
+  symbol: string;
+  closes: number[];
+  volumes: number[];
+  highs: number[];
+  lows: number[];
+  changePercent1d: number | null;
+}
+
+function seriesFromResult(symbol: string, result: YahooChartResult): YahooChartSeries {
+  const timestamps = result.timestamp ?? [];
+  const quote = result.indicators?.quote?.[0];
+  const closes: number[] = [];
+  const volumes: number[] = [];
+  const highs: number[] = [];
+  const lows: number[] = [];
+
+  const len = timestamps.length;
+  for (let i = 0; i < len; i++) {
+    const close = quote?.close?.[i];
+    if (close === null || close === undefined || close <= 0) continue;
+    closes.push(close);
+    volumes.push(quote?.volume?.[i] ?? 0);
+    highs.push(quote?.high?.[i] ?? close);
+    lows.push(quote?.low?.[i] ?? close);
+  }
+
+  const meta = result.meta;
+  const current = meta?.regularMarketPrice ?? closes.at(-1);
+  const prev = meta?.chartPreviousClose ?? closes.at(-2);
+  const changePercent1d =
+    current && prev && prev > 0 ? ((current - prev) / prev) * 100 : null;
+
+  return { symbol, closes, volumes, highs, lows, changePercent1d };
+}
+
+/** 지수·종목 일봉 시계열 (기술적 분석용) */
+export async function fetchYahooChartSeries(
+  symbol: string,
+  yahooRange = '1y',
+  interval = '1d',
+): Promise<YahooChartSeries> {
+  const url = `${YAHOO_CHART_BASE}/${encodeURIComponent(symbol)}?interval=${interval}&range=${yahooRange}`;
+  const res = await fetch(url, {
+    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; StockAnalysisReport/1.0)' },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Yahoo Finance API error: ${res.status}`);
+  }
+
+  const data = (await res.json()) as YahooChartResponse;
+  const result = data.chart?.result?.[0];
+  if (!result) {
+    throw new Error(`No chart series from Yahoo Finance for ${symbol}`);
+  }
+
+  const series = seriesFromResult(symbol, result);
+  if (series.closes.length < 2) {
+    throw new Error(`Insufficient chart data from Yahoo Finance for ${symbol}`);
+  }
+
+  return series;
 }
