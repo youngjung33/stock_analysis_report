@@ -72,6 +72,9 @@ export interface DashboardSummary {
   totalUnrealizedPnl: number | null;
   totalRealizedPnl: number;
   holdingsCount: number;
+  /** 당일 시세 등락 기준 평가 변화 (전일 종가 대비) */
+  todayPnl: number | null;
+  todayPnlPercent: number | null;
 }
 
 export interface DashboardResult {

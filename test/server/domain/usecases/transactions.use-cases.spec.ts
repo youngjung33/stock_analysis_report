@@ -50,6 +50,25 @@ describe('CreateTransactionUseCase', () => {
     ).rejects.toThrow(BadRequestError);
   });
 
+  it('rejects missing stock name for new stock', async () => {
+    const useCase = new CreateTransactionUseCase(
+      createMockStockRepo(),
+      createMockTransactionRepo(),
+    );
+    await expect(
+      useCase.execute({
+        userId: 'user-1',
+        stockSymbol: 'AAPL',
+        market: Market.US,
+        name: '',
+        type: TransactionType.BUY,
+        quantity: 10,
+        price: 100,
+        tradedAt: new Date(),
+      }),
+    ).rejects.toThrow(BadRequestError);
+  });
+
   // CT-01
   it('creates stock and transaction for new BUY', async () => {
     const stockRepo = createMockStockRepo();
@@ -64,6 +83,7 @@ describe('CreateTransactionUseCase', () => {
       userId: 'user-1',
       stockSymbol: 'AAPL',
       market: Market.US,
+      name: 'Apple Inc.',
       type: TransactionType.BUY,
       quantity: 10,
       price: 100,
@@ -88,6 +108,7 @@ describe('CreateTransactionUseCase', () => {
       userId: 'user-1',
       stockSymbol: 'AAPL',
       market: Market.US,
+      name: 'Apple Inc.',
       type: TransactionType.BUY,
       quantity: 5,
       price: 100,
@@ -117,6 +138,7 @@ describe('CreateTransactionUseCase', () => {
         userId: 'user-1',
         stockSymbol: 'AAPL',
         market: Market.US,
+        name: 'Apple Inc.',
         type: TransactionType.SELL,
         quantity: 10,
         price: 100,

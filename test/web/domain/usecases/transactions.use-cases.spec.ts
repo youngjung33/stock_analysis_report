@@ -41,6 +41,11 @@ describe('CreateTransactionUseCase', () => {
       AppError,
     );
   });
+
+  it('throws AppError when name is missing', () => {
+    const useCase = new CreateTransactionUseCase(createFakeTransactionRepository());
+    expect(() => useCase.execute({ ...sampleTransactionInput, name: '' })).toThrow(AppError);
+  });
 });
 
 describe('ListTransactionsUseCase', () => {

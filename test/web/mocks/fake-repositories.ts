@@ -44,6 +44,7 @@ export function createFakeTransactionRepository(
 export const sampleTransactionInput = {
   stockSymbol: 'AAPL',
   market: Market.US,
+  name: 'Apple Inc.',
   type: TransactionType.BUY,
   quantity: 10,
   price: 100,

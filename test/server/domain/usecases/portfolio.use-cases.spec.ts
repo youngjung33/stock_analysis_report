@@ -37,6 +37,8 @@ describe('GetDashboardUseCase', () => {
     expect(result.holdings).toHaveLength(1);
     expect(result.summary.totalMarketValue).toBe(1500);
     expect(result.holdings[0].unrealizedPnl).toBe(500);
+    expect(result.summary.todayPnl).toBeCloseTo(71.43, 1);
+    expect(result.summary.todayPnlPercent).toBeCloseTo(5, 1);
   });
 
   // DA-02
@@ -58,6 +60,7 @@ describe('GetDashboardUseCase', () => {
 
     expect(result.holdings[0].currentPrice).toBeNull();
     expect(result.summary.totalMarketValue).toBeNull();
+    expect(result.summary.todayPnl).toBeNull();
   });
 
   // DA-03

@@ -1,5 +1,5 @@
 import { DashboardSummary } from '@/client/domain/models';
-import { formatNumber, pnlClass } from '../../../shared/formatters';
+import { formatNumber, formatTodayChange, pnlClass } from '../../../shared/formatters';
 
 interface Props {
   summary: DashboardSummary;
@@ -7,8 +7,14 @@ interface Props {
 
 export function MobileSummaryCards({ summary }: Props) {
   const cards = [
-    { id: 'cost-basis', label: '매입금액', value: formatNumber(summary.totalCostBasis) },
     { id: 'market-value', label: '평가금액', value: formatNumber(summary.totalMarketValue) },
+    {
+      id: 'today-pnl',
+      label: '오늘 변화',
+      value: formatTodayChange(summary.todayPnl, summary.todayPnlPercent),
+      className: pnlClass(summary.todayPnl),
+    },
+    { id: 'cost-basis', label: '매입금액', value: formatNumber(summary.totalCostBasis) },
     {
       id: 'unrealized-pnl',
       label: '미실현',

@@ -12,6 +12,10 @@ import {
 
 export class GuestTransactionRepository implements ITransactionRepository {
   async create(input: CreateTransactionInput): Promise<Transaction> {
+    if (!input.name?.trim()) {
+      throw new AppError('종목을 검색해서 선택해 주세요.');
+    }
+
     const stock = createGuestStock(input.stockSymbol, input.market, input.name);
 
     if (input.type === TransactionType.SELL) {

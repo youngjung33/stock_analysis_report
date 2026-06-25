@@ -1,4 +1,4 @@
-import { Market } from '@sar/shared';
+import { Market, aggregatePortfolioTodayPnl } from '@sar/shared';
 import { DashboardResult } from '../../entities';
 import {
   IStockQuoteRepository,
@@ -77,6 +77,12 @@ export class GetDashboardUseCase {
       });
     }
 
+    const hasHoldings = holdings.length > 0;
+    const today =
+      hasHoldings && hasAllQuotes
+        ? aggregatePortfolioTodayPnl(holdings)
+        : { todayPnl: null, todayPnlPercent: null };
+
     return {
       summary: {
         totalCostBasis,
@@ -84,6 +90,8 @@ export class GetDashboardUseCase {
         totalUnrealizedPnl: hasAllQuotes ? totalUnrealizedPnl : null,
         totalRealizedPnl,
         holdingsCount: holdings.length,
+        todayPnl: today.todayPnl,
+        todayPnlPercent: today.todayPnlPercent,
       },
       holdings,
       lastRefreshedAt,

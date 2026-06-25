@@ -14,6 +14,7 @@ export async function POST(req: NextRequest) {
       stockSymbol: body.stockSymbol,
       market: body.market as Market,
       name: body.name,
+      yahooSymbol: body.yahooSymbol,
       type: body.type as TransactionType,
       quantity: Number(body.quantity),
       price: Number(body.price),

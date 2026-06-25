@@ -79,7 +79,8 @@ export interface CreateTransactionInput {
   userId: string;
   stockSymbol: string;
   market: Market;
-  name?: string;
+  name: string;
+  yahooSymbol?: string;
   type: TransactionType;
   quantity: number;
   price: number;

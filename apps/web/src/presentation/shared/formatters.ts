@@ -11,6 +11,16 @@ function formatPercent(value: number | null | undefined): string {
   return `${sign}${value.toFixed(2)}%`;
 }
 
+function formatTodayChange(
+  pnl: number | null | undefined,
+  percent: number | null | undefined,
+): string {
+  if (pnl === null || pnl === undefined) return '-';
+  const amount = formatNumber(pnl);
+  if (percent === null || percent === undefined) return amount;
+  return `${amount} (${formatPercent(percent)})`;
+}
+
 function pnlClass(value: number | null | undefined): string {
   if (value === null || value === undefined) return 'text-slate-300';
   if (value > 0) return 'text-emerald-400';
@@ -18,4 +28,4 @@ function pnlClass(value: number | null | undefined): string {
   return 'text-slate-300';
 }
 
-export { formatNumber, formatPercent, pnlClass };
+export { formatNumber, formatPercent, formatTodayChange, pnlClass };

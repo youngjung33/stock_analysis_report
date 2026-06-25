@@ -10,7 +10,18 @@ export function isGuestUsername(username: string | null | undefined): boolean {
 
 export { computePosition } from './position-calculator';
 export type { PositionState, PositionTransaction } from './position-calculator';
+export {
+  aggregatePortfolioTodayPnl,
+  computeHoldingTodayPnl,
+} from './portfolio-today-pnl';
+export type { TodayPnlHoldingInput } from './portfolio-today-pnl';
 export { resolveCurrency, resolveYahooSymbol } from './stock-symbol';
+export {
+  dedupeSearchResults,
+  parseYahooSearchQuote,
+  searchFeaturedStocks,
+} from './stock-search';
+export type { StockSearchResult, YahooSearchQuote } from './stock-search';
 export {
   FEATURED_KR_STOCKS,
   FEATURED_US_STOCKS,

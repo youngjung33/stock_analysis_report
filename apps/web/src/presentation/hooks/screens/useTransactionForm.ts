@@ -1,13 +1,12 @@
 import { FormEvent, useState } from 'react';
-import { Market, TransactionType } from '@sar/shared';
+import { Market, StockSearchResult, TransactionType } from '@sar/shared';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
 import { useServices } from '../useServices';
 
 export function useTransactionForm(onSuccess: () => void) {
   const { createTransactionUseCase } = useServices();
-  const [stockSymbol, setStockSymbol] = useState('');
+  const [selectedStock, setSelectedStock] = useState<StockSearchResult | null>(null);
   const [market, setMarket] = useState<Market>(Market.KR);
-  const [name, setName] = useState('');
   const [type, setType] = useState<TransactionType>(TransactionType.BUY);
   const [quantity, setQuantity] = useState('');
   const [price, setPrice] = useState('');
@@ -16,23 +15,34 @@ export function useTransactionForm(onSuccess: () => void) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  function handleMarketChange(next: Market) {
+    setMarket(next);
+    setSelectedStock(null);
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError('');
+
+    if (!selectedStock) {
+      setError('종목을 검색해서 선택해 주세요.');
+      return;
+    }
+
     setLoading(true);
     try {
       await createTransactionUseCase.execute({
-        stockSymbol,
-        market,
-        name: name || undefined,
+        stockSymbol: selectedStock.symbol,
+        market: selectedStock.market,
+        name: selectedStock.name,
+        yahooSymbol: selectedStock.yahooSymbol,
         type,
         quantity: Number(quantity),
         price: Number(price),
         tradedAt: new Date(tradedAt).toISOString(),
         memo: memo || undefined,
       });
-      setStockSymbol('');
-      setName('');
+      setSelectedStock(null);
       setQuantity('');
       setPrice('');
       setMemo('');
@@ -45,12 +55,10 @@ export function useTransactionForm(onSuccess: () => void) {
   }
 
   return {
-    stockSymbol,
-    setStockSymbol,
+    selectedStock,
+    setSelectedStock,
     market,
-    setMarket,
-    name,
-    setName,
+    handleMarketChange,
     type,
     setType,
     quantity,

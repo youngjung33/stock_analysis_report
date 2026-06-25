@@ -20,18 +20,22 @@ export class CreateTransactionUseCase {
       throw new BadRequestError('Quantity and price must be positive');
     }
 
-    let stock = await this.stockRepo.findBySymbolAndMarket(
-      input.stockSymbol.toUpperCase(),
-      input.market,
-    );
+    if (!input.name?.trim()) {
+      throw new BadRequestError('종목을 검색해서 선택해 주세요.');
+    }
+
+    const symbol = input.stockSymbol.toUpperCase();
+
+    let stock = await this.stockRepo.findBySymbolAndMarket(symbol, input.market);
 
     if (!stock) {
       stock = await this.stockRepo.create({
-        symbol: input.stockSymbol.toUpperCase(),
-        name: input.name ?? input.stockSymbol.toUpperCase(),
+        symbol,
+        name: input.name.trim(),
         market: input.market,
         currency: resolveCurrency(input.market),
-        yahooSymbol: resolveYahooSymbol(input.stockSymbol, input.market),
+        yahooSymbol:
+          input.yahooSymbol ?? resolveYahooSymbol(input.stockSymbol, input.market),
       });
     }
 

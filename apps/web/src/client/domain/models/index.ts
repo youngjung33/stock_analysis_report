@@ -47,6 +47,8 @@ export interface DashboardSummary {
   totalUnrealizedPnl: number | null;
   totalRealizedPnl: number;
   holdingsCount: number;
+  todayPnl: number | null;
+  todayPnlPercent: number | null;
 }
 
 export interface Dashboard {
@@ -120,7 +122,8 @@ export interface SessionResult {
 export interface CreateTransactionInput {
   stockSymbol: string;
   market: Market;
-  name?: string;
+  name: string;
+  yahooSymbol?: string;
   type: TransactionType;
   quantity: number;
   price: number;

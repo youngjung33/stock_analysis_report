@@ -1,5 +1,6 @@
-import { Market, TransactionType } from '@sar/shared';
+import { TransactionType } from '@sar/shared';
 import { useTransactionForm } from '../../../hooks/screens/useTransactionForm';
+import { StockSearchField } from '../../../shared/StockSearchField';
 
 interface Props {
   onSuccess: () => void;
@@ -13,53 +14,43 @@ export function DesktopTransactionForm({ onSuccess }: Props) {
       onSubmit={form.handleSubmit}
       className="space-y-4 rounded-xl border border-slate-800 bg-slate-900/60 p-6"
     >
-      <h2 className="text-lg font-semibold text-white">?? ??</h2>
+      <h2 className="text-lg font-semibold text-white">거래 등록</h2>
       {form.error && <p className="text-sm text-rose-400">{form.error}</p>}
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="block">
-          <span className="text-sm text-slate-400">?? ??</span>
-          <input
-            className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
-            value={form.stockSymbol}
-            onChange={(e) => form.setStockSymbol(e.target.value)}
-            placeholder="005930 ?? AAPL"
-            required
+        <div className="sm:col-span-2">
+          <StockSearchField
+            market={form.market}
+            selected={form.selectedStock}
+            onSelect={form.setSelectedStock}
+            onClear={() => form.setSelectedStock(null)}
+            onMarketChange={form.handleMarketChange}
           />
-        </label>
+        </div>
+
         <label className="block">
-          <span className="text-sm text-slate-400">??? (??)</span>
-          <input
-            className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
-            value={form.name}
-            onChange={(e) => form.setName(e.target.value)}
-            placeholder="????"
-          />
-        </label>
-        <label className="block">
-          <span className="text-sm text-slate-400">??</span>
-          <select
-            className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
-            value={form.market}
-            onChange={(e) => form.setMarket(e.target.value as Market)}
-          >
-            <option value={Market.KR}>?? (KR)</option>
-            <option value={Market.US}>?? (US)</option>
-          </select>
-        </label>
-        <label className="block">
-          <span className="text-sm text-slate-400">??</span>
+          <span className="text-sm text-slate-400">거래 유형</span>
           <select
             className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
             value={form.type}
             onChange={(e) => form.setType(e.target.value as TransactionType)}
           >
-            <option value={TransactionType.BUY}>??</option>
-            <option value={TransactionType.SELL}>??</option>
+            <option value={TransactionType.BUY}>매수</option>
+            <option value={TransactionType.SELL}>매도</option>
           </select>
         </label>
         <label className="block">
-          <span className="text-sm text-slate-400">??</span>
+          <span className="text-sm text-slate-400">거래일</span>
+          <input
+            type="date"
+            className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
+            value={form.tradedAt}
+            onChange={(e) => form.setTradedAt(e.target.value)}
+            required
+          />
+        </label>
+        <label className="block">
+          <span className="text-sm text-slate-400">수량</span>
           <input
             type="number"
             step="any"
@@ -71,7 +62,7 @@ export function DesktopTransactionForm({ onSuccess }: Props) {
           />
         </label>
         <label className="block">
-          <span className="text-sm text-slate-400">??</span>
+          <span className="text-sm text-slate-400">단가</span>
           <input
             type="number"
             step="any"
@@ -82,18 +73,8 @@ export function DesktopTransactionForm({ onSuccess }: Props) {
             required
           />
         </label>
-        <label className="block">
-          <span className="text-sm text-slate-400">???</span>
-          <input
-            type="date"
-            className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
-            value={form.tradedAt}
-            onChange={(e) => form.setTradedAt(e.target.value)}
-            required
-          />
-        </label>
         <label className="block sm:col-span-2">
-          <span className="text-sm text-slate-400">?? (??)</span>
+          <span className="text-sm text-slate-400">메모 (선택)</span>
           <input
             className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
             value={form.memo}
@@ -104,10 +85,10 @@ export function DesktopTransactionForm({ onSuccess }: Props) {
 
       <button
         type="submit"
-        disabled={form.loading}
+        disabled={form.loading || !form.selectedStock}
         className="rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
       >
-        {form.loading ? '?? ?...' : '??'}
+        {form.loading ? '등록 중...' : '등록'}
       </button>
     </form>
   );

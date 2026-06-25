@@ -1,4 +1,4 @@
-import { Market, computePosition } from '@sar/shared';
+import { Market, aggregatePortfolioTodayPnl, computePosition } from '@sar/shared';
 import { Dashboard, RefreshQuoteResult } from '../../domain/models';
 import { IPortfolioRepository } from '../../domain/repositories';
 import { apiClient } from '../api/client';
@@ -83,6 +83,10 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
     }
 
     const hasHoldings = holdings.length > 0;
+    const today =
+      hasHoldings && hasAllQuotes
+        ? aggregatePortfolioTodayPnl(holdings)
+        : { todayPnl: null, todayPnlPercent: null };
 
     return {
       summary: {
@@ -91,6 +95,8 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
         totalUnrealizedPnl: !hasHoldings ? 0 : hasAllQuotes ? totalUnrealizedPnl : null,
         totalRealizedPnl,
         holdingsCount: holdings.length,
+        todayPnl: !hasHoldings ? 0 : today.todayPnl,
+        todayPnlPercent: !hasHoldings ? 0 : today.todayPnlPercent,
       },
       holdings,
       lastRefreshedAt,
