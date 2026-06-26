@@ -23,6 +23,13 @@ export {
 } from './stock-search';
 export type { StockSearchResult, YahooSearchQuote } from './stock-search';
 export {
+  dedupeCatalogEntries,
+  parseKrxBaseInfoRows,
+  parseNasdaqListedTxt,
+  parseOtherListedTxt,
+} from './stock-catalog';
+export type { KrxStockBaseInfoRow, StockCatalogEntry } from './stock-catalog';
+export {
   FEATURED_KR_STOCKS,
   FEATURED_US_STOCKS,
   FEATURED_STOCKS,

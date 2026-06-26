@@ -13,7 +13,9 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "fetch:stocks": "tsx scripts/fetch-stocks.ts",
+    "db:import-stocks": "tsx scripts/import-stocks.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",

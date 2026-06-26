@@ -67,3 +67,18 @@ model StockQuote {
   fetchedAt     DateTime
   stock         Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
 }
+
+/// 종목 검색용 마스터 (fetch:stocks → JSON → Supabase 임포트)
+model StockCatalog {
+  id          String   @id @default(uuid())
+  symbol      String
+  name        String
+  market      String
+  board       String
+  yahooSymbol String
+  isActive    Boolean  @default(true)
+  syncedAt    DateTime @default(now())
+
+  @@unique([symbol, market])
+  @@index([market, isActive])
+}

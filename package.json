@@ -13,7 +13,9 @@
     "lint": "npm run lint -w @sar/web",
     "db:migrate": "npm run db:migrate -w @sar/web",
     "db:push": "npm run db:push -w @sar/web",
-    "db:seed": "npm run db:seed -w @sar/web"
+    "db:seed": "npm run db:seed -w @sar/web",
+    "fetch:stocks": "npm run fetch:stocks -w @sar/web",
+    "db:import-stocks": "npm run db:import-stocks -w @sar/web"
   },
   "devDependencies": {
     "prettier": "^3.5.3"
