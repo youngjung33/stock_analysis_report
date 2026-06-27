@@ -1,5 +1,4 @@
 import { Market } from './enums';
-import { resolveYahooSymbol } from './stock-symbol';
 
 /** Supabase / MCP 임포트용 종목 마스터 JSON 한 줄 형식 */
 export interface StockCatalogEntry {
@@ -8,12 +7,6 @@ export interface StockCatalogEntry {
   market: Market;
   board: string;
   yahooSymbol: string;
-}
-
-export interface KrxStockBaseInfoRow {
-  ISU_SRT_CD?: string;
-  ISU_NM?: string;
-  ISU_ABBRV?: string;
 }
 
 const US_BOARD_BY_EXCHANGE: Record<string, string> = {
@@ -74,27 +67,78 @@ export function parseOtherListedTxt(text: string): StockCatalogEntry[] {
   return results;
 }
 
-/** KRX Open API 종목 기본정보 OutBlock_1 파싱 */
-export function parseKrxBaseInfoRows(
-  rows: KrxStockBaseInfoRow[],
-  board: 'KOSPI' | 'KOSDAQ',
-): StockCatalogEntry[] {
+function stripHtmlCell(html: string): string {
+  return html
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function extractKindTableRows(html: string): string[][] {
+  const rows: string[][] = [];
+  const trRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+  let trMatch: RegExpExecArray | null;
+
+  while ((trMatch = trRegex.exec(html)) !== null) {
+    const cells: string[] = [];
+    const tdRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
+    let tdMatch: RegExpExecArray | null;
+    while ((tdMatch = tdRegex.exec(trMatch[1])) !== null) {
+      cells.push(stripHtmlCell(tdMatch[1]));
+    }
+    if (cells.length >= 3) rows.push(cells);
+  }
+
+  return rows;
+}
+
+function mapKindBoard(marketType: string): 'KOSPI' | 'KOSDAQ' | null {
+  const normalized = marketType.replace(/\s/g, '').toLowerCase();
+  if (
+    normalized.includes('코스피') ||
+    normalized === 'kospi' ||
+    normalized.includes('유가')
+  ) {
+    return 'KOSPI';
+  }
+  if (normalized.includes('코스닥') || normalized === 'kosdaq') return 'KOSDAQ';
+  return null;
+}
+
+function normalizeKrSymbol(raw: string): string | null {
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  if (/^\d+$/.test(trimmed)) return trimmed.padStart(6, '0');
+  return trimmed.toUpperCase();
+}
+
+/** KIND 상장법인 목록 HTML (엑셀 다운로드) 파싱 — 코스피·코스닥만 */
+export function parseKindCorpListHtml(html: string): StockCatalogEntry[] {
   const results: StockCatalogEntry[] = [];
 
-  for (const row of rows) {
-    const symbol = row.ISU_SRT_CD?.trim();
-    const name = (row.ISU_NM ?? row.ISU_ABBRV)?.trim();
-    if (!symbol || !name) continue;
+  for (const cells of extractKindTableRows(html)) {
+    const name = cells[0]?.trim();
+    const board = mapKindBoard(cells[1] ?? '');
+    const symbol = normalizeKrSymbol(cells[2] ?? '');
+    if (!name || !board || !symbol) continue;
+
+    const yahooSymbol =
+      board === 'KOSDAQ' ? `${symbol.replace(/\.(KS|KQ)$/i, '')}.KQ` : `${symbol.replace(/\.(KS|KQ)$/i, '')}.KS`;
+
     results.push({
-      symbol,
+      symbol: symbol.replace(/\.(KS|KQ)$/i, ''),
       name,
       market: Market.KR,
       board,
-      yahooSymbol: resolveYahooSymbol(symbol, Market.KR) ?? `${symbol}.KS`,
+      yahooSymbol,
     });
   }
 
-  return results;
+  return dedupeCatalogEntries(results);
 }
 
 export function dedupeCatalogEntries(entries: StockCatalogEntry[]): StockCatalogEntry[] {

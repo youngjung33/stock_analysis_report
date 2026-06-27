@@ -1,57 +1,56 @@
 #!/usr/bin/env tsx
 /**
- * 외부 소스에서 종목 목록을 받아 로컬 txt/json으로 저장합니다.
- * 생성 파일은 git에 올리지 않습니다 (data/stock-catalog/ 는 .gitignore).
+ * 외부 원본 파일(txt/html) → 로컬 json 저장.
+ * 원본 SHA256 해시가 같으면 재다운로드 skip, json은 파싱 결과 해시로 skip.
  *
  * 사용:
  *   npm run fetch:stocks
  *
- * 한국 종목(KRX)은 KRX_OPEN_API_KEY 환경변수가 필요합니다.
- * https://openapi.krx.co.kr 에서 발급 · 주식(종목 기본정보) 서비스 승인
+ * - 미국: NASDAQ Trader txt 2개
+ * - 한국: KIND 상장법인 HTML 1개 (API 키 불필요)
  */
 import path from 'node:path';
-import type { StockCatalogEntry } from '@sar/shared';
 import {
   ensureCatalogDirs,
   fetchKrStockCatalog,
   fetchUsStockCatalog,
+  readJsonEntries,
   STOCK_CATALOG_DIR,
-  STOCK_CATALOG_RAW_DIR,
   writeJson,
-  writeText,
+  writeJsonIfUnchanged,
 } from './stock-catalog-fetch';
 
 async function main() {
   await ensureCatalogDirs();
 
-  console.log('미국 종목 다운로드 (NASDAQ Trader txt)...');
+  console.log('미국 종목 (NASDAQ Trader txt)...');
   const us = await fetchUsStockCatalog();
-  await writeText(path.join(STOCK_CATALOG_RAW_DIR, 'nasdaqlisted.txt'), us.nasdaqTxt);
-  await writeText(path.join(STOCK_CATALOG_RAW_DIR, 'otherlisted.txt'), us.otherTxt);
-  await writeJson(path.join(STOCK_CATALOG_DIR, 'us-stocks.json'), us.entries);
-  console.log(`  us-stocks.json: ${us.entries.length}종`);
+  const usChanged = await writeJsonIfUnchanged(
+    path.join(STOCK_CATALOG_DIR, 'us-stocks.json'),
+    us.entries,
+    'us-stocks.json',
+  );
 
-  let krEntries: StockCatalogEntry[] = [];
-  const krxKey = process.env.KRX_OPEN_API_KEY?.trim();
+  console.log('한국 종목 (KIND 상장법인 HTML)...');
+  const kr = await fetchKrStockCatalog();
+  const krChanged = await writeJsonIfUnchanged(
+    path.join(STOCK_CATALOG_DIR, 'kr-stocks.json'),
+    kr.entries,
+    'kr-stocks.json',
+  );
 
-  if (krxKey) {
-    console.log('한국 종목 다운로드 (KRX Open API)...');
-    try {
-      krEntries = await fetchKrStockCatalog(krxKey);
-      await writeJson(path.join(STOCK_CATALOG_DIR, 'kr-stocks.json'), krEntries);
-      console.log(`  kr-stocks.json: ${krEntries.length}종`);
-    } catch (err) {
-      console.error('  KRX 다운로드 실패:', err instanceof Error ? err.message : err);
-      console.error('  KRX_OPEN_API_KEY · 서비스 승인(종목 기본정보)을 확인하세요.');
-    }
+  if (usChanged || krChanged) {
+    const usEntries = usChanged
+      ? us.entries
+      : await readJsonEntries(path.join(STOCK_CATALOG_DIR, 'us-stocks.json'));
+    const krEntries = krChanged
+      ? kr.entries
+      : await readJsonEntries(path.join(STOCK_CATALOG_DIR, 'kr-stocks.json'));
+    await writeJson(path.join(STOCK_CATALOG_DIR, 'all-stocks.json'), [...usEntries, ...krEntries]);
+    console.log(`  all-stocks.json: ${usEntries.length + krEntries.length}종 저장`);
   } else {
-    console.log('한국 종목: KRX_OPEN_API_KEY 없음 → kr-stocks.json 생략');
-    console.log('  openapi.krx.co.kr 에서 키 발급 후 다시 실행하세요.');
+    console.log('  all-stocks.json: 변경 없음 (json hash skip)');
   }
-
-  const all = [...us.entries, ...krEntries];
-  await writeJson(path.join(STOCK_CATALOG_DIR, 'all-stocks.json'), all);
-  console.log(`  all-stocks.json: ${all.length}종`);
 
   console.log('');
   console.log(`저장 위치: ${STOCK_CATALOG_DIR}`);
