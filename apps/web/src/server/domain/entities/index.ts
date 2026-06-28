@@ -64,6 +64,11 @@ export interface DashboardHolding {
   unrealizedPnlPercent: number | null;
   realizedPnl: number;
   costBasis: number;
+  costBasisKrw: number;
+  marketValueKrw: number | null;
+  unrealizedPnlKrw: number | null;
+  realizedPnlKrw: number;
+  weightPercent: number | null;
 }
 
 export interface DashboardSummary {
@@ -75,12 +80,25 @@ export interface DashboardSummary {
   /** 당일 시세 등락 기준 평가 변화 (전일 종가 대비) */
   todayPnl: number | null;
   todayPnlPercent: number | null;
+  totalCostBasisKrw: number;
+  totalMarketValueKrw: number | null;
+  totalUnrealizedPnlKrw: number | null;
+  totalRealizedPnlKrw: number;
+  todayPnlKrw: number | null;
+  todayPnlPercentKrw: number | null;
+  usdKrwRate: number | null;
+  hasUsdHoldings: boolean;
+  allocationByMarket: import('@sar/shared').AllocationByMarket;
 }
 
 export interface DashboardResult {
   summary: DashboardSummary;
   holdings: DashboardHolding[];
   lastRefreshedAt: Date | null;
+}
+
+export interface HoldingResult extends DashboardHolding {
+  usdKrwRate: number | null;
 }
 
 export interface MarketProviderStatus {
@@ -142,4 +160,63 @@ export interface AuthTokens {
 export interface JwtPayload {
   sub: string;
   username: string;
+}
+
+export interface CorporateActionEntity {
+  id: string;
+  userId: string;
+  stockId: string;
+  type: import('@sar/shared').CorporateActionType;
+  effectiveAt: Date;
+  cashAmount: number | null;
+  splitRatio: number | null;
+  targetStockId: string | null;
+  targetQuantity: number | null;
+  targetPrice: number | null;
+  memo: string | null;
+  createdAt: Date;
+  stock?: StockEntity;
+  targetStock?: StockEntity | null;
+}
+
+export interface WatchlistItemEntity {
+  id: string;
+  userId: string;
+  symbol: string;
+  name: string;
+  market: Market;
+  createdAt: Date;
+}
+
+export interface PortfolioAnalysisResult {
+  portfolioReturns: {
+    period: import('@sar/shared').PortfolioPeriod;
+    label: string;
+    returnPercent: number | null;
+    coveragePercent: number;
+  }[];
+  holdingReturns: {
+    symbol: string;
+    market: Market;
+    periodReturns: Partial<Record<import('@sar/shared').PortfolioPeriod, number | null>>;
+  }[];
+  benchmarkComparisons: {
+    period: import('@sar/shared').PortfolioPeriod;
+    label: string;
+    portfolioReturn: number | null;
+    benchmarkName: string;
+    benchmarkReturn: number | null;
+    alpha: number | null;
+  }[];
+  holdingsInsights: {
+    symbol: string;
+    market: Market;
+    name: string;
+    rsi14: number | null;
+    rsiLabel: string;
+    news: { title: string; url: string; source: string }[];
+  }[];
+  fxRate: number | null;
+  asOf: string;
+  allocationByMarket: import('@sar/shared').AllocationByMarket;
 }

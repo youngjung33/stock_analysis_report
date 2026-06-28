@@ -3,6 +3,7 @@ import { LogoutUseCase } from './usecases/auth/logout.use-case';
 import { RefreshSessionUseCase } from './usecases/auth/refresh-session.use-case';
 import { IAuthSessionPort } from './repositories';
 import { GetDashboardUseCase } from './usecases/portfolio/get-dashboard.use-case';
+import { GetHoldingBySymbolUseCase } from './usecases/portfolio/get-holding-by-symbol.use-case';
 import { RefreshQuotesUseCase } from './usecases/portfolio/refresh-quotes.use-case';
 import { CreateTransactionUseCase } from './usecases/transactions/create-transaction.use-case';
 import { DeleteTransactionUseCase } from './usecases/transactions/delete-transaction.use-case';
@@ -16,6 +17,7 @@ export interface AppServices {
   listTransactionsUseCase: ListTransactionsUseCase;
   deleteTransactionUseCase: DeleteTransactionUseCase;
   getDashboardUseCase: GetDashboardUseCase;
+  getHoldingBySymbolUseCase: GetHoldingBySymbolUseCase;
   refreshQuotesUseCase: RefreshQuotesUseCase;
   authSession: IAuthSessionPort;
 }

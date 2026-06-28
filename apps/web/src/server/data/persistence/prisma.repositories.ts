@@ -5,6 +5,8 @@ import {
   StockQuoteEntity,
   TransactionEntity,
   UserEntity,
+  CorporateActionEntity,
+  WatchlistItemEntity,
 } from '../../domain/entities';
 import {
   IRefreshTokenRepository,
@@ -12,6 +14,8 @@ import {
   IStockRepository,
   ITransactionRepository,
   IUserRepository,
+  ICorporateActionRepository,
+  IWatchlistRepository,
 } from '../../domain/repositories';
 import { prisma as defaultPrisma } from './prisma.service';
 
@@ -202,5 +206,84 @@ export class PrismaStockQuoteRepository implements IStockQuoteRepository {
     return this.prisma.stockQuote.findMany({
       where: { stockId: { in: stockIds } },
     });
+  }
+}
+
+export class PrismaCorporateActionRepository implements ICorporateActionRepository {
+  constructor(private readonly prisma: PrismaClient = defaultPrisma) {}
+
+  async findByUser(userId: string) {
+    const rows = await this.prisma.corporateAction.findMany({
+      where: { userId },
+      include: { stock: true, targetStock: true },
+      orderBy: { effectiveAt: 'desc' },
+    });
+    return rows.map((row) => ({
+      ...row,
+      type: row.type as CorporateActionEntity['type'],
+      stock: mapStock(row.stock),
+      targetStock: row.targetStock ? mapStock(row.targetStock) : null,
+    }));
+  }
+
+  async findByUserAndStock(userId: string, stockId: string) {
+    const rows = await this.prisma.corporateAction.findMany({
+      where: { userId, stockId },
+      orderBy: { effectiveAt: 'asc' },
+    });
+    return rows.map((row) => ({
+      ...row,
+      type: row.type as CorporateActionEntity['type'],
+    }));
+  }
+
+  async create(data: Omit<CorporateActionEntity, 'id' | 'createdAt' | 'stock' | 'targetStock'>) {
+    const created = await this.prisma.corporateAction.create({
+      data: {
+        userId: data.userId,
+        stockId: data.stockId,
+        type: data.type,
+        effectiveAt: data.effectiveAt,
+        cashAmount: data.cashAmount,
+        splitRatio: data.splitRatio,
+        targetStockId: data.targetStockId,
+        targetQuantity: data.targetQuantity,
+        targetPrice: data.targetPrice,
+        memo: data.memo,
+      },
+    });
+    return { ...created, type: created.type as CorporateActionEntity['type'] };
+  }
+
+  async delete(id: string, userId: string) {
+    await this.prisma.corporateAction.deleteMany({ where: { id, userId } });
+  }
+}
+
+export class PrismaWatchlistRepository implements IWatchlistRepository {
+  constructor(private readonly prisma: PrismaClient = defaultPrisma) {}
+
+  async findByUser(userId: string) {
+    const rows = await this.prisma.watchlistItem.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+    });
+    return rows.map((row) => ({ ...row, market: row.market as Market }));
+  }
+
+  async create(data: Omit<WatchlistItemEntity, 'id' | 'createdAt'>) {
+    const created = await this.prisma.watchlistItem.create({ data });
+    return { ...created, market: created.market as Market };
+  }
+
+  async delete(id: string, userId: string) {
+    await this.prisma.watchlistItem.deleteMany({ where: { id, userId } });
+  }
+
+  async findByUserSymbolMarket(userId: string, symbol: string, market: Market) {
+    const row = await this.prisma.watchlistItem.findUnique({
+      where: { userId_symbol_market: { userId, symbol, market } },
+    });
+    return row ? { ...row, market: row.market as Market } : null;
   }
 }

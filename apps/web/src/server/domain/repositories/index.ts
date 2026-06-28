@@ -5,6 +5,8 @@ import {
   StockQuoteEntity,
   TransactionEntity,
   UserEntity,
+  CorporateActionEntity,
+  WatchlistItemEntity,
 } from '../entities';
 import { Market, TransactionType } from '@sar/shared';
 
@@ -51,6 +53,20 @@ export interface ITransactionRepository {
 export interface IStockQuoteRepository {
   upsert(quote: StockQuoteEntity): Promise<StockQuoteEntity>;
   findByStockIds(stockIds: string[]): Promise<StockQuoteEntity[]>;
+}
+
+export interface ICorporateActionRepository {
+  findByUser(userId: string): Promise<(CorporateActionEntity & { stock: StockEntity; targetStock: StockEntity | null })[]>;
+  findByUserAndStock(userId: string, stockId: string): Promise<CorporateActionEntity[]>;
+  create(data: Omit<CorporateActionEntity, 'id' | 'createdAt' | 'stock' | 'targetStock'>): Promise<CorporateActionEntity>;
+  delete(id: string, userId: string): Promise<void>;
+}
+
+export interface IWatchlistRepository {
+  findByUser(userId: string): Promise<WatchlistItemEntity[]>;
+  create(data: Omit<WatchlistItemEntity, 'id' | 'createdAt'>): Promise<WatchlistItemEntity>;
+  delete(id: string, userId: string): Promise<void>;
+  findByUserSymbolMarket(userId: string, symbol: string, market: Market): Promise<WatchlistItemEntity | null>;
 }
 
 export interface IPasswordHasher {

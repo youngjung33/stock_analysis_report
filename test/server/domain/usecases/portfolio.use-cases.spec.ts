@@ -3,11 +3,16 @@ import { Market, TransactionType } from '@sar/shared';
 import { GetDashboardUseCase } from '@server/domain/usecases/portfolio/get-dashboard.use-case';
 import {
   createMockQuoteRepo,
+  createMockCorpActionRepo,
   createMockStock,
   createMockStockRepo,
   createMockTransaction,
   createMockTransactionRepo,
 } from '../../mocks/repositories.mock';
+
+vi.mock('@server/data/market/usd-krw.client', () => ({
+  fetchUsdKrwRate: vi.fn().mockResolvedValue(1300),
+}));
 
 describe('GetDashboardUseCase', () => {
   // DA-01
@@ -31,7 +36,8 @@ describe('GetDashboardUseCase', () => {
       },
     ]);
 
-    const useCase = new GetDashboardUseCase(stockRepo, txRepo, quoteRepo);
+    const corpActionRepo = createMockCorpActionRepo();
+    const useCase = new GetDashboardUseCase(stockRepo, txRepo, quoteRepo, corpActionRepo);
     const result = await useCase.execute('user-1');
 
     expect(result.holdings).toHaveLength(1);
@@ -55,7 +61,8 @@ describe('GetDashboardUseCase', () => {
     const quoteRepo = createMockQuoteRepo();
     quoteRepo.findByStockIds.mockResolvedValue([]);
 
-    const useCase = new GetDashboardUseCase(stockRepo, txRepo, quoteRepo);
+    const corpActionRepo = createMockCorpActionRepo();
+    const useCase = new GetDashboardUseCase(stockRepo, txRepo, quoteRepo, corpActionRepo);
     const result = await useCase.execute('user-1');
 
     expect(result.holdings[0].currentPrice).toBeNull();
@@ -78,7 +85,8 @@ describe('GetDashboardUseCase', () => {
     const quoteRepo = createMockQuoteRepo();
     quoteRepo.findByStockIds.mockResolvedValue([]);
 
-    const useCase = new GetDashboardUseCase(stockRepo, txRepo, quoteRepo);
+    const corpActionRepo = createMockCorpActionRepo();
+    const useCase = new GetDashboardUseCase(stockRepo, txRepo, quoteRepo, corpActionRepo);
     const result = await useCase.execute('user-1');
 
     expect(result.holdings).toHaveLength(0);
@@ -112,12 +120,51 @@ describe('GetDashboardUseCase', () => {
       { stockId: 'stock-kr', currentPrice: 250, changePercent: 2, fetchedAt: new Date() },
     ]);
 
-    const useCase = new GetDashboardUseCase(stockRepo, txRepo, quoteRepo);
+    const corpActionRepo = createMockCorpActionRepo();
+    const useCase = new GetDashboardUseCase(stockRepo, txRepo, quoteRepo, corpActionRepo);
     const result = await useCase.execute('user-1');
 
     expect(result.holdings).toHaveLength(2);
     expect(result.summary.totalMarketValue).toBe(10 * 150 + 5 * 250);
     expect(result.summary.holdingsCount).toBe(2);
+  });
+
+  // DA-06
+  it('computes KRW summary for mixed KR and US holdings', async () => {
+    const usStock = createMockStock({ id: 'stock-us', symbol: 'AAPL', market: Market.US });
+    const krStock = createMockStock({
+      id: 'stock-kr',
+      symbol: '005930',
+      market: Market.KR,
+      currency: 'KRW',
+    });
+
+    const stockRepo = createMockStockRepo();
+    stockRepo.findHeldByUser.mockResolvedValue([usStock, krStock]);
+
+    const txRepo = createMockTransactionRepo();
+    txRepo.findByUserAndStock.mockImplementation(async (_userId, stockId) => {
+      if (stockId === 'stock-us') {
+        return [createMockTransaction({ stockId, quantity: 10, price: 100 })];
+      }
+      return [createMockTransaction({ stockId, quantity: 5, price: 200_000 })];
+    });
+
+    const quoteRepo = createMockQuoteRepo();
+    quoteRepo.findByStockIds.mockResolvedValue([
+      { stockId: 'stock-us', currentPrice: 150, changePercent: 1, fetchedAt: new Date() },
+      { stockId: 'stock-kr', currentPrice: 250_000, changePercent: 2, fetchedAt: new Date() },
+    ]);
+
+    const corpActionRepo = createMockCorpActionRepo();
+    const useCase = new GetDashboardUseCase(stockRepo, txRepo, quoteRepo, corpActionRepo);
+    const result = await useCase.execute('user-1');
+
+    expect(result.summary.hasUsdHoldings).toBe(true);
+    expect(result.summary.usdKrwRate).toBe(1300);
+    expect(result.summary.totalMarketValueKrw).toBe(10 * 150 * 1300 + 5 * 250_000);
+    expect(result.holdings[0].marketValueKrw).toBe(10 * 150 * 1300);
+    expect(result.holdings[1].marketValueKrw).toBe(5 * 250_000);
   });
 
   // DA-05
@@ -138,7 +185,8 @@ describe('GetDashboardUseCase', () => {
       { stockId: 'stock-us', currentPrice: 150, changePercent: 1, fetchedAt: new Date() },
     ]);
 
-    const useCase = new GetDashboardUseCase(stockRepo, txRepo, quoteRepo);
+    const corpActionRepo = createMockCorpActionRepo();
+    const useCase = new GetDashboardUseCase(stockRepo, txRepo, quoteRepo, corpActionRepo);
     const result = await useCase.execute('user-1');
 
     expect(result.holdings).toHaveLength(2);

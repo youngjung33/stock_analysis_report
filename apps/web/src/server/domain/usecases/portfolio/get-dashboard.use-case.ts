@@ -1,17 +1,19 @@
-import { Market, aggregatePortfolioTodayPnl } from '@sar/shared';
+import { Market, aggregatePortfolioTodayPnl, aggregateKrwSummary, applyCorporateActions, computeAllocation, enrichHoldingKrw } from '@sar/shared';
 import { DashboardResult } from '../../entities';
 import {
+  ICorporateActionRepository,
   IStockQuoteRepository,
   IStockRepository,
   ITransactionRepository,
 } from '../../repositories';
-import { computePosition } from '../../services/position-calculator';
+import { fetchUsdKrwRate } from '../../../data/market/usd-krw.client';
 
 export class GetDashboardUseCase {
   constructor(
     private readonly stockRepo: IStockRepository,
     private readonly transactionRepo: ITransactionRepository,
     private readonly quoteRepo: IStockQuoteRepository,
+    private readonly corpActionRepo: ICorporateActionRepository,
   ) {}
 
   async execute(userId: string): Promise<DashboardResult> {
@@ -20,7 +22,7 @@ export class GetDashboardUseCase {
     const quotes = await this.quoteRepo.findByStockIds(stockIds);
     const quoteMap = new Map(quotes.map((q) => [q.stockId, q]));
 
-    const holdings = [];
+    const rawHoldings = [];
     let totalCostBasis = 0;
     let totalMarketValue = 0;
     let totalUnrealizedPnl = 0;
@@ -30,7 +32,23 @@ export class GetDashboardUseCase {
 
     for (const stock of stocks) {
       const txs = await this.transactionRepo.findByUserAndStock(userId, stock.id);
-      const position = computePosition(txs);
+      const actions = await this.corpActionRepo.findByUserAndStock(userId, stock.id);
+      const position = applyCorporateActions(
+        txs.map((tx) => ({
+          type: tx.type,
+          quantity: tx.quantity,
+          price: tx.price,
+          tradedAt: tx.tradedAt,
+        })),
+        actions.map((a) => ({
+          type: a.type,
+          effectiveAt: a.effectiveAt,
+          cashAmount: a.cashAmount,
+          splitRatio: a.splitRatio,
+          targetQuantity: a.targetQuantity,
+          targetPrice: a.targetPrice,
+        })),
+      );
 
       if (position.quantity <= 0) continue;
 
@@ -59,7 +77,7 @@ export class GetDashboardUseCase {
       if (marketValue !== null) totalMarketValue += marketValue;
       if (unrealizedPnl !== null) totalUnrealizedPnl += unrealizedPnl;
 
-      holdings.push({
+      rawHoldings.push({
         stockId: stock.id,
         symbol: stock.symbol,
         name: stock.name,
@@ -77,11 +95,31 @@ export class GetDashboardUseCase {
       });
     }
 
-    const hasHoldings = holdings.length > 0;
+    const hasHoldings = rawHoldings.length > 0;
     const today =
       hasHoldings && hasAllQuotes
-        ? aggregatePortfolioTodayPnl(holdings)
+        ? aggregatePortfolioTodayPnl(rawHoldings)
         : { todayPnl: null, todayPnlPercent: null };
+
+    const hasUsdHoldings = rawHoldings.some((h) => h.currency === 'USD');
+    const usdKrwRate = hasUsdHoldings ? await fetchUsdKrwRate() : null;
+
+    const krwSummary = aggregateKrwSummary(rawHoldings, usdKrwRate, hasAllQuotes);
+    const allocation = computeAllocation(
+      rawHoldings.map((h) => ({
+        symbol: h.symbol,
+        name: h.name,
+        market: h.market,
+        marketValueKrw: enrichHoldingKrw(h, usdKrwRate).marketValueKrw,
+      })),
+    );
+    const weightMap = new Map(allocation.items.map((i) => [`${i.symbol}:${i.market}`, i.weightPercent]));
+
+    const holdings = rawHoldings.map((h) => ({
+      ...h,
+      ...enrichHoldingKrw(h, usdKrwRate),
+      weightPercent: weightMap.get(`${h.symbol}:${h.market}`) ?? null,
+    }));
 
     return {
       summary: {
@@ -92,6 +130,15 @@ export class GetDashboardUseCase {
         holdingsCount: holdings.length,
         todayPnl: today.todayPnl,
         todayPnlPercent: today.todayPnlPercent,
+        totalCostBasisKrw: krwSummary.totalCostBasisKrw,
+        totalMarketValueKrw: krwSummary.totalMarketValueKrw,
+        totalUnrealizedPnlKrw: krwSummary.totalUnrealizedPnlKrw,
+        totalRealizedPnlKrw: krwSummary.totalRealizedPnlKrw,
+        todayPnlKrw: krwSummary.todayPnlKrw,
+        todayPnlPercentKrw: krwSummary.todayPnlPercentKrw,
+        usdKrwRate: krwSummary.usdKrwRate,
+        hasUsdHoldings: krwSummary.hasUsdHoldings,
+        allocationByMarket: allocation.allocationByMarket,
       },
       holdings,
       lastRefreshedAt,

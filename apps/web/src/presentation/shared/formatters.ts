@@ -14,9 +14,10 @@ function formatPercent(value: number | null | undefined): string {
 function formatTodayChange(
   pnl: number | null | undefined,
   percent: number | null | undefined,
+  currency?: string,
 ): string {
   if (pnl === null || pnl === undefined) return '-';
-  const amount = formatNumber(pnl);
+  const amount = formatNumber(pnl, currency);
   if (percent === null || percent === undefined) return amount;
   return `${amount} (${formatPercent(percent)})`;
 }

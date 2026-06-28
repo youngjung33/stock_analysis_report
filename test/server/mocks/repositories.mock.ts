@@ -9,6 +9,7 @@ import {
   ITokenService,
   ITransactionRepository,
   IUserRepository,
+  ICorporateActionRepository,
 } from '@server/domain/repositories';
 import { StockEntity, TransactionEntity, UserEntity } from '@server/domain/entities';
 
@@ -123,6 +124,18 @@ export function createMockQuoteRepo(
   return {
     upsert: vi.fn(),
     findByStockIds: vi.fn(),
+    ...overrides,
+  };
+}
+
+export function createMockCorpActionRepo(
+  overrides: Partial<ICorporateActionRepository> = {},
+): ICorporateActionRepository {
+  return {
+    findByUser: vi.fn().mockResolvedValue([]),
+    findByUserAndStock: vi.fn().mockResolvedValue([]),
+    create: vi.fn(),
+    delete: vi.fn(),
     ...overrides,
   };
 }

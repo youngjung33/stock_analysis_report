@@ -1,5 +1,5 @@
-import { Market, TransactionType } from '@sar/shared';
-import { Stock, Transaction } from '../../domain/models';
+import { Market, TransactionType, CorporateActionType } from '@sar/shared';
+import { Stock, Transaction, WatchlistItem } from '../../domain/models';
 
 const STORAGE_KEY = 'sar_guest_data';
 
@@ -13,10 +13,12 @@ export interface GuestQuote {
 interface GuestStore {
   transactions: Transaction[];
   quotes: Record<string, GuestQuote>;
+  watchlist: WatchlistItem[];
+  corporateActions: GuestCorporateAction[];
 }
 
 function emptyStore(): GuestStore {
-  return { transactions: [], quotes: {} };
+  return { transactions: [], quotes: {}, watchlist: [], corporateActions: [] };
 }
 
 function readStore(): GuestStore {
@@ -24,7 +26,13 @@ function readStore(): GuestStore {
   const raw = sessionStorage.getItem(STORAGE_KEY);
   if (!raw) return emptyStore();
   try {
-    return JSON.parse(raw) as GuestStore;
+    const parsed = JSON.parse(raw) as Partial<GuestStore>;
+    return {
+      transactions: parsed.transactions ?? [],
+      quotes: parsed.quotes ?? {},
+      watchlist: parsed.watchlist ?? [],
+      corporateActions: parsed.corporateActions ?? [],
+    };
   } catch {
     return emptyStore();
   }
@@ -89,4 +97,94 @@ export function guestTransactionsForStock(stockId: string, type?: TransactionTyp
   const txs = listGuestTransactions().filter((tx) => tx.stockId === stockId);
   if (!type) return txs;
   return txs.filter((tx) => tx.type === type);
+}
+
+export interface GuestCorporateAction {
+  id: string;
+  stockId: string;
+  symbol: string;
+  market: Market;
+  type: CorporateActionType;
+  effectiveAt: string;
+  cashAmount?: number;
+  splitRatio?: number;
+  targetSymbol?: string;
+  targetMarket?: Market;
+  targetName?: string;
+  targetQuantity?: number;
+  targetPrice?: number;
+  memo?: string;
+}
+
+export function listGuestCorporateActions(): GuestCorporateAction[] {
+  return readStore().corporateActions ?? [];
+}
+
+export function saveGuestCorporateAction(input: {
+  stockSymbol: string;
+  name: string;
+  market: Market;
+  type: CorporateActionType;
+  effectiveAt: string;
+  cashAmount?: number;
+  splitRatio?: number;
+  targetSymbol?: string;
+  targetMarket?: Market;
+  targetName?: string;
+  targetQuantity?: number;
+  targetPrice?: number;
+  memo?: string;
+}): void {
+  const store = readStore();
+  const stock = createGuestStock(input.stockSymbol, input.market, input.name);
+  store.corporateActions.unshift({
+    id: `guest-ca-${Date.now()}`,
+    stockId: stock.id,
+    symbol: stock.symbol,
+    market: stock.market,
+    type: input.type,
+    effectiveAt: input.effectiveAt,
+    cashAmount: input.cashAmount,
+    splitRatio: input.splitRatio,
+    targetSymbol: input.targetSymbol,
+    targetMarket: input.targetMarket,
+    targetName: input.targetName,
+    targetQuantity: input.targetQuantity,
+    targetPrice: input.targetPrice,
+    memo: input.memo,
+  });
+  writeStore(store);
+}
+
+export function getGuestWatchlist(): WatchlistItem[] {
+  return readStore().watchlist ?? [];
+}
+
+export function saveGuestWatchlistItem(input: {
+  symbol: string;
+  name: string;
+  market: Market;
+}): WatchlistItem {
+  const store = readStore();
+  const existing = store.watchlist.find(
+    (w) => w.symbol === input.symbol && w.market === input.market,
+  );
+  if (existing) return existing;
+
+  const item: WatchlistItem = {
+    id: `guest-wl-${Date.now()}`,
+    symbol: input.symbol.toUpperCase(),
+    name: input.name,
+    market: input.market,
+    createdAt: new Date().toISOString(),
+  };
+  store.watchlist.unshift(item);
+  writeStore(store);
+  return item;
+}
+
+export function removeGuestWatchlistItem(id: string): void {
+  const store = readStore();
+  store.watchlist = store.watchlist.filter((w) => w.id !== id);
+  writeStore(store);
 }

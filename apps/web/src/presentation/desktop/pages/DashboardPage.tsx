@@ -5,11 +5,20 @@ import { MarketSentimentSummarySection } from '../../components/MarketSentimentS
 import { FeaturedQuotesSection } from '../../components/FeaturedQuotesSection';
 import { DesktopSummaryCards } from '../features/dashboard/SummaryCards';
 import { DesktopHoldingsTable } from '../features/dashboard/HoldingsTable';
+import { AllocationSection } from '../../components/AllocationSection';
+import {
+  BenchmarkComparisonRow,
+  PeriodReturnsCard,
+  PortfolioInsightsSection,
+} from '../../components/PortfolioAnalysisSections';
+import { WatchlistSection } from '../../components/WatchlistSection';
+import { usePortfolioAnalysis } from '../../hooks/usePortfolioAnalysis';
 import { DesktopLayout } from '../layout/DesktopLayout';
 import { DesktopNavMenu } from '../navigation/DesktopNavMenu';
 
 export function DesktopDashboardPage() {
   const screen = useDashboardScreen();
+  const analysis = usePortfolioAnalysis();
 
   return (
     <DesktopLayout
@@ -50,7 +59,28 @@ export function DesktopDashboardPage() {
         {screen.data && (
           <>
             <DesktopSummaryCards summary={screen.data.summary} />
+            <AllocationSection
+              items={screen.data.holdings
+                .filter((h) => h.weightPercent !== null && h.marketValueKrw !== null)
+                .map((h) => ({
+                  symbol: h.symbol,
+                  name: h.name,
+                  market: h.market,
+                  marketValueKrw: h.marketValueKrw as number,
+                  weightPercent: h.weightPercent as number,
+                }))}
+              allocationByMarket={screen.data.summary.allocationByMarket}
+            />
             <DesktopHoldingsTable holdings={screen.data.holdings} />
+            <PeriodReturnsCard analysis={analysis.data} isLoading={analysis.isLoading} />
+            <BenchmarkComparisonRow analysis={analysis.data} />
+            <PortfolioInsightsSection analysis={analysis.data} isLoading={analysis.isLoading} />
+            <WatchlistSection
+              holdingSymbols={screen.data.holdings.map((h) => ({
+                symbol: h.symbol,
+                market: h.market,
+              }))}
+            />
           </>
         )}
 

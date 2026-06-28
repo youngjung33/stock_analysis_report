@@ -40,6 +40,9 @@ export const portfolioRepository: IPortfolioRepository = {
   getDashboard() {
     return pickPortfolioRepo().getDashboard();
   },
+  getHolding(symbol, market) {
+    return pickPortfolioRepo().getHolding(symbol, market);
+  },
   refreshQuotes() {
     return pickPortfolioRepo().refreshQuotes();
   },

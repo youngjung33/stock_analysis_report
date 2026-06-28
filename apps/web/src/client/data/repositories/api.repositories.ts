@@ -48,6 +48,14 @@ export class ApiPortfolioRepository implements IPortfolioRepository {
     return data;
   }
 
+  async getHolding(symbol: string, market: import('@sar/shared').Market) {
+    const { data } = await apiClient.get<{ holding: import('../../domain/models').PortfolioHolding | null }>(
+      '/portfolio/holding',
+      { params: { symbol, market } },
+    );
+    return data.holding;
+  }
+
   async refreshQuotes() {
     const { data } = await apiClient.post('/market/refresh');
     return data;

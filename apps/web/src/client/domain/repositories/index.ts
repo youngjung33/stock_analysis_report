@@ -2,6 +2,7 @@ import {
   CreateTransactionInput,
   Dashboard,
   LoginResult,
+  PortfolioHolding,
   RefreshQuoteResult,
   Transaction,
   User,
@@ -21,6 +22,7 @@ export interface ITransactionRepository {
 
 export interface IPortfolioRepository {
   getDashboard(): Promise<Dashboard>;
+  getHolding(symbol: string, market: import('@sar/shared').Market): Promise<PortfolioHolding | null>;
   refreshQuotes(): Promise<RefreshQuoteResult>;
 }
 

@@ -1,0 +1,77 @@
+export type PortfolioPeriod = '1mo' | '3mo' | 'ytd' | 'max';
+
+export const PORTFOLIO_PERIODS: PortfolioPeriod[] = ['1mo', '3mo', 'ytd', 'max'];
+
+export const PERIOD_LABELS: Record<PortfolioPeriod, string> = {
+  '1mo': '1M',
+  '3mo': '3M',
+  ytd: 'YTD',
+  max: '전체',
+};
+
+export interface PeriodReturnInput {
+  weightPercent: number;
+  returnPercent: number | null;
+}
+
+export interface PortfolioPeriodReturn {
+  period: PortfolioPeriod;
+  returnPercent: number | null;
+  coveragePercent: number;
+}
+
+export function computeWeightedPeriodReturn(inputs: PeriodReturnInput[]): {
+  returnPercent: number | null;
+  coveragePercent: number;
+} {
+  const eligible = inputs.filter((i) => i.returnPercent !== null && i.weightPercent > 0);
+  if (eligible.length === 0) return { returnPercent: null, coveragePercent: 0 };
+
+  const totalWeight = eligible.reduce((s, i) => s + i.weightPercent, 0);
+  if (totalWeight <= 0) return { returnPercent: null, coveragePercent: 0 };
+
+  const weighted = eligible.reduce(
+    (s, i) => s + (i.weightPercent / totalWeight) * (i.returnPercent as number),
+    0,
+  );
+
+  const fullWeight = inputs.reduce((s, i) => s + i.weightPercent, 0);
+  const coveragePercent = fullWeight > 0 ? (totalWeight / fullWeight) * 100 : 0;
+
+  return { returnPercent: weighted, coveragePercent };
+}
+
+export function computeMaxTotalReturn(
+  totalMarketValueKrw: number | null,
+  totalCostBasisKrw: number,
+  totalRealizedPnlKrw: number,
+): number | null {
+  if (totalCostBasisKrw <= 0 || totalMarketValueKrw === null) return null;
+  return ((totalMarketValueKrw + totalRealizedPnlKrw - totalCostBasisKrw) / totalCostBasisKrw) * 100;
+}
+
+export function periodReturnFromCloses(closes: number[], period: PortfolioPeriod): number | null {
+  if (closes.length < 2) return null;
+  const current = closes[closes.length - 1];
+  if (current <= 0) return null;
+
+  if (period === 'max') {
+    const first = closes[0];
+    if (first <= 0) return null;
+    return ((current - first) / first) * 100;
+  }
+
+  if (period === 'ytd') {
+    const yearStart = new Date().getFullYear();
+    // closes don't have dates here — caller passes trimmed series
+    const first = closes[0];
+    if (first <= 0) return null;
+    return ((current - first) / first) * 100;
+  }
+
+  const bars = period === '1mo' ? 21 : 63;
+  const idx = Math.max(0, closes.length - 1 - bars);
+  const base = closes[idx];
+  if (base <= 0) return null;
+  return ((current - base) / base) * 100;
+}

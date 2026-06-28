@@ -39,6 +39,11 @@ export interface DashboardHolding {
   unrealizedPnlPercent: number | null;
   realizedPnl: number;
   costBasis: number;
+  costBasisKrw: number;
+  marketValueKrw: number | null;
+  unrealizedPnlKrw: number | null;
+  realizedPnlKrw: number;
+  weightPercent: number | null;
 }
 
 export interface DashboardSummary {
@@ -49,12 +54,81 @@ export interface DashboardSummary {
   holdingsCount: number;
   todayPnl: number | null;
   todayPnlPercent: number | null;
+  totalCostBasisKrw: number;
+  totalMarketValueKrw: number | null;
+  totalUnrealizedPnlKrw: number | null;
+  totalRealizedPnlKrw: number;
+  todayPnlKrw: number | null;
+  todayPnlPercentKrw: number | null;
+  usdKrwRate: number | null;
+  hasUsdHoldings: boolean;
+  allocationByMarket: import('@sar/shared').AllocationByMarket;
 }
 
 export interface Dashboard {
   summary: DashboardSummary;
   holdings: DashboardHolding[];
   lastRefreshedAt: string | null;
+}
+
+export interface PortfolioHolding extends DashboardHolding {
+  usdKrwRate?: number | null;
+}
+
+export interface PortfolioAnalysisResult {
+  portfolioReturns: {
+    period: import('@sar/shared').PortfolioPeriod;
+    label: string;
+    returnPercent: number | null;
+    coveragePercent: number;
+  }[];
+  holdingReturns: {
+    symbol: string;
+    market: Market;
+    periodReturns: Partial<Record<import('@sar/shared').PortfolioPeriod, number | null>>;
+  }[];
+  benchmarkComparisons: {
+    period: import('@sar/shared').PortfolioPeriod;
+    label: string;
+    portfolioReturn: number | null;
+    benchmarkName: string;
+    benchmarkReturn: number | null;
+    alpha: number | null;
+  }[];
+  holdingsInsights: {
+    symbol: string;
+    market: Market;
+    name: string;
+    rsi14: number | null;
+    rsiLabel: string;
+    news: { title: string; url: string; source: string }[];
+  }[];
+  fxRate: number | null;
+  asOf: string;
+  allocationByMarket: import('@sar/shared').AllocationByMarket;
+}
+
+export interface WatchlistItem {
+  id: string;
+  symbol: string;
+  name: string;
+  market: Market;
+  createdAt: string;
+}
+
+export interface CorporateAction {
+  id: string;
+  stockId: string;
+  type: import('@sar/shared').CorporateActionType;
+  effectiveAt: string;
+  cashAmount: number | null;
+  splitRatio: number | null;
+  targetStockId: string | null;
+  targetQuantity: number | null;
+  targetPrice: number | null;
+  memo: string | null;
+  stock?: Stock;
+  targetStock?: Stock | null;
 }
 
 export interface RefreshQuoteResult {

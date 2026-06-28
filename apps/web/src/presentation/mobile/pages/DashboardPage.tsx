@@ -5,10 +5,19 @@ import { MarketSentimentSummarySection } from '../../components/MarketSentimentS
 import { FeaturedQuotesSection } from '../../components/FeaturedQuotesSection';
 import { MobileSummaryCards } from '../features/dashboard/SummaryCards';
 import { MobileHoldingsCardList } from '../features/dashboard/HoldingsCardList';
+import { AllocationSection } from '../../components/AllocationSection';
+import {
+  BenchmarkComparisonRow,
+  PeriodReturnsCard,
+  PortfolioInsightsSection,
+} from '../../components/PortfolioAnalysisSections';
+import { WatchlistSection } from '../../components/WatchlistSection';
+import { usePortfolioAnalysis } from '../../hooks/usePortfolioAnalysis';
 import { MobileLayout } from '../layout/MobileLayout';
 
 export function MobileDashboardPage() {
   const screen = useDashboardScreen();
+  const analysis = usePortfolioAnalysis();
 
   return (
     <MobileLayout
@@ -56,7 +65,28 @@ export function MobileDashboardPage() {
       {screen.data && (
         <div className="space-y-4">
           <MobileSummaryCards summary={screen.data.summary} />
+          <AllocationSection
+            items={screen.data.holdings
+              .filter((h) => h.weightPercent !== null && h.marketValueKrw !== null)
+              .map((h) => ({
+                symbol: h.symbol,
+                name: h.name,
+                market: h.market,
+                marketValueKrw: h.marketValueKrw as number,
+                weightPercent: h.weightPercent as number,
+              }))}
+            allocationByMarket={screen.data.summary.allocationByMarket}
+          />
           <MobileHoldingsCardList holdings={screen.data.holdings} />
+          <PeriodReturnsCard analysis={analysis.data} isLoading={analysis.isLoading} />
+          <BenchmarkComparisonRow analysis={analysis.data} />
+          <PortfolioInsightsSection analysis={analysis.data} isLoading={analysis.isLoading} />
+          <WatchlistSection
+            holdingSymbols={screen.data.holdings.map((h) => ({
+              symbol: h.symbol,
+              market: h.market,
+            }))}
+          />
         </div>
       )}
 

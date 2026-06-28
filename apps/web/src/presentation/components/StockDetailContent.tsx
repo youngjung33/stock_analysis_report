@@ -10,6 +10,8 @@ import {
   resolveCurrency,
 } from '@sar/shared';
 import { useStockQuote } from '../hooks/useStockQuote';
+import { usePortfolioHolding } from '../hooks/usePortfolioHolding';
+import { MyHoldingPanel } from '../components/MyHoldingPanel';
 import { StockRangeSelector } from '../components/StockRangeSelector';
 import { StockPriceChart } from '../components/StockPriceChart';
 import { formatNumber, formatPercent, pnlClass } from '../shared/formatters';
@@ -23,6 +25,7 @@ export function StockDetailContent({ symbol, market }: Props) {
   const stock = findFeaturedStock(symbol, market);
   const [range, setRange] = useState<QuoteChartRange>('1d');
   const { data, isLoading, isError, isFetching } = useStockQuote(symbol, market, range);
+  const { data: holding, isLoading: holdingLoading } = usePortfolioHolding(symbol, market);
 
   const currency = stock ? resolveCurrency(stock.market) : resolveCurrency(market);
   const title = stock?.name ?? symbol;
@@ -42,6 +45,13 @@ export function StockDetailContent({ symbol, market }: Props) {
           {symbol} · {market === Market.KR ? '한국' : '미국'}
         </p>
       </div>
+
+      <MyHoldingPanel
+        symbol={symbol}
+        market={market}
+        holding={holding}
+        isLoading={holdingLoading}
+      />
 
       <section className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 sm:p-6">
         <h2 className="text-sm font-semibold text-white">기간별 시세</h2>

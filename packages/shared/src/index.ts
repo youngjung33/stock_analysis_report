@@ -15,6 +15,30 @@ export {
   computeHoldingTodayPnl,
 } from './portfolio-today-pnl';
 export type { TodayPnlHoldingInput } from './portfolio-today-pnl';
+export {
+  aggregateKrwSummary,
+  convertToKrw,
+  enrichHoldingKrw,
+} from './portfolio-fx';
+export type {
+  HoldingFxInput,
+  HoldingKrwFields,
+  KrwDashboardSummary,
+} from './portfolio-fx';
+export { computeAllocation } from './portfolio-allocation';
+export type { AllocationByMarket, AllocationHoldingInput, AllocationItem, AllocationResult } from './portfolio-allocation';
+export {
+  PORTFOLIO_PERIODS,
+  PERIOD_LABELS,
+  computeMaxTotalReturn,
+  computeWeightedPeriodReturn,
+  periodReturnFromCloses,
+} from './portfolio-period-returns';
+export type { PeriodReturnInput, PortfolioPeriod, PortfolioPeriodReturn } from './portfolio-period-returns';
+export { blendBenchmarkReturn, compareToBenchmark, selectBlendedBenchmark } from './portfolio-benchmark';
+export type { BenchmarkComparison } from './portfolio-benchmark';
+export { applyCorporateActions } from './corporate-actions';
+export type { CorporateActionInput, CorporateActionType } from './corporate-actions';
 export { resolveCurrency, resolveYahooSymbol } from './stock-symbol';
 export {
   dedupeSearchResults,
