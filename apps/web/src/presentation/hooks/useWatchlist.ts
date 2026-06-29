@@ -2,43 +2,25 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Market } from '@sar/shared';
-import { apiClient } from '@/client/data/api/client';
-import { WatchlistItem } from '@/client/domain/models';
-import { guestSession } from '@/client/data/guest/guest-session';
-import { getGuestWatchlist, removeGuestWatchlistItem, saveGuestWatchlistItem } from '@/client/data/guest/guest-storage';
-
-async function fetchWatchlist(): Promise<WatchlistItem[]> {
-  if (guestSession.isActive()) return getGuestWatchlist();
-  const { data } = await apiClient.get<{ items: WatchlistItem[] }>('/watchlist');
-  return data.items;
-}
+import { useServices } from './useServices';
 
 export function useWatchlist(holdingSymbols: { symbol: string; market: Market }[] = []) {
+  const { listWatchlistUseCase, addWatchlistUseCase, removeWatchlistUseCase } = useServices();
   const queryClient = useQueryClient();
+
   const query = useQuery({
     queryKey: ['watchlist'],
-    queryFn: fetchWatchlist,
+    queryFn: () => listWatchlistUseCase.execute(),
   });
 
   const addMutation = useMutation({
-    mutationFn: async (input: { symbol: string; name: string; market: Market }) => {
-      if (guestSession.isActive()) {
-        return saveGuestWatchlistItem(input);
-      }
-      const { data } = await apiClient.post<{ item: WatchlistItem }>('/watchlist', input);
-      return data.item;
-    },
+    mutationFn: (input: { symbol: string; name: string; market: Market }) =>
+      addWatchlistUseCase.execute(input),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['watchlist'] }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      if (guestSession.isActive()) {
-        removeGuestWatchlistItem(id);
-        return;
-      }
-      await apiClient.delete(`/watchlist/${id}`);
-    },
+    mutationFn: (id: string) => removeWatchlistUseCase.execute(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['watchlist'] }),
   });
 

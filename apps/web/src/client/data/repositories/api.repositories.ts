@@ -1,5 +1,23 @@
-import { CreateTransactionInput, LoginResult, SessionResult } from '../../domain/models';
-import { IAuthRepository, IPortfolioRepository, ITransactionRepository } from '../../domain/repositories';
+import { Market, QuoteChartRange } from '@sar/shared';
+import {
+  CreateTransactionInput,
+  FeaturedQuotesResult,
+  LoginResult,
+  MarketProviderStatus,
+  PortfolioAnalysisResult,
+  SessionResult,
+  StockQuoteSnapshot,
+  WatchlistItem,
+} from '../../domain/models';
+import {
+  CreateCorporateActionInput,
+  IAuthRepository,
+  ICorporateActionRepository,
+  IMarketRepository,
+  IPortfolioRepository,
+  ITransactionRepository,
+  IWatchlistRepository,
+} from '../../domain/repositories';
 import { apiClient } from '../api/client';
 import { tokenStorage } from '../auth/token-storage';
 
@@ -48,7 +66,7 @@ export class ApiPortfolioRepository implements IPortfolioRepository {
     return data;
   }
 
-  async getHolding(symbol: string, market: import('@sar/shared').Market) {
+  async getHolding(symbol: string, market: Market) {
     const { data } = await apiClient.get<{ holding: import('../../domain/models').PortfolioHolding | null }>(
       '/portfolio/holding',
       { params: { symbol, market } },
@@ -56,8 +74,71 @@ export class ApiPortfolioRepository implements IPortfolioRepository {
     return data.holding;
   }
 
+  async getAnalysis() {
+    const { data } = await apiClient.get<PortfolioAnalysisResult>('/portfolio/analysis');
+    return data;
+  }
+
   async refreshQuotes() {
     const { data } = await apiClient.post('/market/refresh');
     return data;
+  }
+}
+
+export class ApiMarketRepository implements IMarketRepository {
+  async getFeaturedQuotes() {
+    const { data } = await apiClient.get<FeaturedQuotesResult>('/market/featured');
+    return data;
+  }
+
+  async getStockQuote(symbol: string, market: Market, range: QuoteChartRange) {
+    const { data } = await apiClient.get<StockQuoteSnapshot>('/market/quote', {
+      params: { symbol, market, range },
+    });
+    return data;
+  }
+
+  async getMarketStatus() {
+    const { data } = await apiClient.get<MarketProviderStatus[]>('/market/status');
+    return data;
+  }
+
+  async getMarketAnalysis() {
+    const { data } = await apiClient.get<import('@sar/shared').MarketAnalysisReport>('/market/analysis');
+    return data;
+  }
+
+  async searchStocks(query: string, market: Market) {
+    const { data } = await apiClient.get<import('@sar/shared').StockSearchResult[]>('/market/search', {
+      params: { q: query, market },
+    });
+    return data;
+  }
+
+  async getFxRate() {
+    const { data } = await apiClient.get<{ usdKrwRate: number | null; fetchedAt: string }>('/market/fx');
+    return data;
+  }
+}
+
+export class ApiWatchlistRepository implements IWatchlistRepository {
+  async list() {
+    const { data } = await apiClient.get<{ items: WatchlistItem[] }>('/watchlist');
+    return data.items;
+  }
+
+  async add(input: { symbol: string; name: string; market: Market }) {
+    const { data } = await apiClient.post<{ item: WatchlistItem }>('/watchlist', input);
+    return data.item;
+  }
+
+  async remove(id: string) {
+    await apiClient.delete(`/watchlist/${id}`);
+  }
+}
+
+export class ApiCorporateActionRepository implements ICorporateActionRepository {
+  async create(input: CreateCorporateActionInput) {
+    await apiClient.post('/corporate-actions', input);
   }
 }

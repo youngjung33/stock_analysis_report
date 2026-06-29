@@ -1,14 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { MarketAnalysisReport } from '@sar/shared';
-import { apiClient } from '@/client/data/api/client';
+import { useServices } from './useServices';
 
 export function useMarketAnalysis() {
+  const { getMarketAnalysisUseCase } = useServices();
+
   return useQuery({
     queryKey: ['market-analysis'],
-    queryFn: async () => {
-      const { data } = await apiClient.get<MarketAnalysisReport>('/market/analysis');
-      return data;
-    },
+    queryFn: () => getMarketAnalysisUseCase.execute(),
     staleTime: 5 * 60_000,
   });
 }

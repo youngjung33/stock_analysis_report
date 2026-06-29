@@ -12,13 +12,17 @@ import {
   SectorSeriesInput,
   buildMarketAnalysisReport,
 } from '@sar/shared';
-import { fetchFinnhubMarketNews } from '../../../data/market/finnhub-news.client';
-import { fetchGoogleNewsRss } from '../../../data/market/google-news-rss.client';
-import { fetchYahooChartSeries, YahooChartSeries } from '../../../data/market/yahoo-chart.client';
+import { ChartSeriesData } from '../../ports/market-data.ports';
+import { IChartSeriesProvider, INewsProvider } from '../../ports/market-data.ports';
 import { GetFeaturedQuotesUseCase } from './get-featured-quotes.use-case';
 
+/** 시장 심층 분석 리포트 생성 use case */
 export class GetMarketAnalysisUseCase {
-  constructor(private readonly getFeaturedQuotesUseCase: GetFeaturedQuotesUseCase) {}
+  constructor(
+    private readonly getFeaturedQuotesUseCase: GetFeaturedQuotesUseCase,
+    private readonly chartSeriesProvider: IChartSeriesProvider,
+    private readonly newsProvider: INewsProvider,
+  ) {}
 
   async execute(): Promise<MarketAnalysisReport> {
     const featured = await this.getFeaturedQuotesUseCase.execute();
@@ -34,13 +38,13 @@ export class GetMarketAnalysisUseCase {
     ];
 
     const [seriesResults, krNews, usNewsGoogle, finnhubNews] = await Promise.all([
-      Promise.allSettled(allSymbols.map((sym) => fetchYahooChartSeries(sym))),
-      fetchGoogleNewsRss('코스피+증시+주식', Market.KR, 'ko', 'KR', 6).catch(() => []),
-      fetchGoogleNewsRss('US+stock+market+S&P', Market.US, 'en-US', 'US', 6).catch(() => []),
-      fetchFinnhubMarketNews('general', 6).catch(() => []),
+      Promise.allSettled(allSymbols.map((sym) => this.chartSeriesProvider.fetchSeries(sym))),
+      this.newsProvider.fetchGoogleNews('코스피+증시+주식', Market.KR, 'ko', 'KR', 6).catch(() => []),
+      this.newsProvider.fetchGoogleNews('US+stock+market+S&P', Market.US, 'en-US', 'US', 6).catch(() => []),
+      this.newsProvider.fetchFinnhubMarketNews('general', 6).catch(() => []),
     ]);
 
-    const seriesMap = new Map<string, YahooChartSeries>();
+    const seriesMap = new Map<string, ChartSeriesData>();
     allSymbols.forEach((sym, i) => {
       const result = seriesResults[i];
       if (result.status === 'fulfilled') {
@@ -115,13 +119,7 @@ export class GetMarketAnalysisUseCase {
     const news: NewsAnalysisInput[] = [
       ...krNews.map((n) => ({ ...n, market: Market.KR as Market | 'global' })),
       ...usNewsGoogle.map((n) => ({ ...n, market: Market.US as Market | 'global' })),
-      ...finnhubNews.map((n) => ({
-        title: n.headline,
-        source: n.source,
-        publishedAt: new Date(n.datetime * 1000).toISOString(),
-        url: n.url,
-        market: 'global' as const,
-      })),
+      ...finnhubNews.map((n) => ({ ...n, market: 'global' as const })),
     ];
 
     return buildMarketAnalysisReport({

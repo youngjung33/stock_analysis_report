@@ -69,6 +69,11 @@ export interface IWatchlistRepository {
   findByUserSymbolMarket(userId: string, symbol: string, market: Market): Promise<WatchlistItemEntity | null>;
 }
 
+export interface IStockCatalogRepository {
+  countByMarket(market: Market): Promise<number>;
+  search(query: string, market: Market, limit?: number): Promise<import('@sar/shared').StockSearchResult[]>;
+}
+
 export interface IPasswordHasher {
   hash(plain: string): Promise<string>;
   compare(plain: string, hash: string): Promise<boolean>;

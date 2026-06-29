@@ -1,14 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { MarketProviderStatus } from '@/client/domain/models';
-import { apiClient } from '@/client/data/api/client';
+import { useServices } from './useServices';
 
 export function useMarketStatus() {
+  const { getMarketStatusUseCase } = useServices();
+
   return useQuery({
     queryKey: ['market-status'],
-    queryFn: async () => {
-      const { data } = await apiClient.get<MarketProviderStatus[]>('/market/status');
-      return data;
-    },
+    queryFn: () => getMarketStatusUseCase.execute(),
     staleTime: 60_000,
   });
 }

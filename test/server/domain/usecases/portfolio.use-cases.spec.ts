@@ -4,15 +4,12 @@ import { GetDashboardUseCase } from '@server/domain/usecases/portfolio/get-dashb
 import {
   createMockQuoteRepo,
   createMockCorpActionRepo,
+  createMockFxRateProvider,
   createMockStock,
   createMockStockRepo,
   createMockTransaction,
   createMockTransactionRepo,
 } from '../../mocks/repositories.mock';
-
-vi.mock('@server/data/market/usd-krw.client', () => ({
-  fetchUsdKrwRate: vi.fn().mockResolvedValue(1300),
-}));
 
 describe('GetDashboardUseCase', () => {
   // DA-01
@@ -37,7 +34,13 @@ describe('GetDashboardUseCase', () => {
     ]);
 
     const corpActionRepo = createMockCorpActionRepo();
-    const useCase = new GetDashboardUseCase(stockRepo, txRepo, quoteRepo, corpActionRepo);
+    const useCase = new GetDashboardUseCase(
+      stockRepo,
+      txRepo,
+      quoteRepo,
+      corpActionRepo,
+      createMockFxRateProvider(),
+    );
     const result = await useCase.execute('user-1');
 
     expect(result.holdings).toHaveLength(1);
@@ -62,7 +65,13 @@ describe('GetDashboardUseCase', () => {
     quoteRepo.findByStockIds.mockResolvedValue([]);
 
     const corpActionRepo = createMockCorpActionRepo();
-    const useCase = new GetDashboardUseCase(stockRepo, txRepo, quoteRepo, corpActionRepo);
+    const useCase = new GetDashboardUseCase(
+      stockRepo,
+      txRepo,
+      quoteRepo,
+      corpActionRepo,
+      createMockFxRateProvider(),
+    );
     const result = await useCase.execute('user-1');
 
     expect(result.holdings[0].currentPrice).toBeNull();
@@ -86,7 +95,13 @@ describe('GetDashboardUseCase', () => {
     quoteRepo.findByStockIds.mockResolvedValue([]);
 
     const corpActionRepo = createMockCorpActionRepo();
-    const useCase = new GetDashboardUseCase(stockRepo, txRepo, quoteRepo, corpActionRepo);
+    const useCase = new GetDashboardUseCase(
+      stockRepo,
+      txRepo,
+      quoteRepo,
+      corpActionRepo,
+      createMockFxRateProvider(),
+    );
     const result = await useCase.execute('user-1');
 
     expect(result.holdings).toHaveLength(0);
@@ -121,7 +136,13 @@ describe('GetDashboardUseCase', () => {
     ]);
 
     const corpActionRepo = createMockCorpActionRepo();
-    const useCase = new GetDashboardUseCase(stockRepo, txRepo, quoteRepo, corpActionRepo);
+    const useCase = new GetDashboardUseCase(
+      stockRepo,
+      txRepo,
+      quoteRepo,
+      corpActionRepo,
+      createMockFxRateProvider(),
+    );
     const result = await useCase.execute('user-1');
 
     expect(result.holdings).toHaveLength(2);
@@ -157,7 +178,13 @@ describe('GetDashboardUseCase', () => {
     ]);
 
     const corpActionRepo = createMockCorpActionRepo();
-    const useCase = new GetDashboardUseCase(stockRepo, txRepo, quoteRepo, corpActionRepo);
+    const useCase = new GetDashboardUseCase(
+      stockRepo,
+      txRepo,
+      quoteRepo,
+      corpActionRepo,
+      createMockFxRateProvider(),
+    );
     const result = await useCase.execute('user-1');
 
     expect(result.summary.hasUsdHoldings).toBe(true);
@@ -186,7 +213,13 @@ describe('GetDashboardUseCase', () => {
     ]);
 
     const corpActionRepo = createMockCorpActionRepo();
-    const useCase = new GetDashboardUseCase(stockRepo, txRepo, quoteRepo, corpActionRepo);
+    const useCase = new GetDashboardUseCase(
+      stockRepo,
+      txRepo,
+      quoteRepo,
+      corpActionRepo,
+      createMockFxRateProvider(),
+    );
     const result = await useCase.execute('user-1');
 
     expect(result.holdings).toHaveLength(2);

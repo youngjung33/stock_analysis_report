@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import crypto from 'crypto';
 import { ITokenService } from '../../domain/repositories';
-import { UnauthorizedError } from '../../http/errors';
+import { AuthenticationError } from '../../domain/errors/domain.errors';
 
 export class JwtTokenService implements ITokenService {
   generateAccessToken(payload: { sub: string; username: string }): string {
@@ -24,7 +24,7 @@ export class JwtTokenService implements ITokenService {
       if (!secret) throw new Error('JWT_ACCESS_SECRET is not configured');
       return jwt.verify(token, secret) as { sub: string; username: string };
     } catch {
-      throw new UnauthorizedError('Invalid access token');
+      throw new AuthenticationError('Invalid access token');
     }
   }
 

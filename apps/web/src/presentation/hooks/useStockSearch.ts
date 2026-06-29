@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Market, StockSearchResult } from '@sar/shared';
-import { apiClient } from '@/client/data/api/client';
+import { Market } from '@sar/shared';
+import { useServices } from './useServices';
 
 export function useStockSearch(market: Market) {
+  const { searchStocksUseCase } = useServices();
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<StockSearchResult[]>([]);
+  const [results, setResults] = useState<import('@sar/shared').StockSearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -23,9 +24,7 @@ export function useStockSearch(market: Market) {
 
     const timer = setTimeout(async () => {
       try {
-        const { data } = await apiClient.get<StockSearchResult[]>('/market/search', {
-          params: { q: trimmed, market },
-        });
+        const data = await searchStocksUseCase.execute(trimmed, market);
         if (!cancelled) setResults(data);
       } catch {
         if (!cancelled) {
@@ -41,7 +40,7 @@ export function useStockSearch(market: Market) {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [query, market]);
+  }, [query, market, searchStocksUseCase]);
 
   const reset = useCallback(() => {
     setQuery('');

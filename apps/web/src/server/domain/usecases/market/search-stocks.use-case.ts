@@ -4,11 +4,15 @@ import {
   dedupeSearchResults,
   searchFeaturedStocks,
 } from '@sar/shared';
-import { PrismaStockCatalogRepository } from '../../../data/persistence/stock-catalog.repository';
-import { fetchYahooStockSearch } from '../../../data/market/yahoo-search.client';
+import { IStockCatalogRepository } from '../../repositories';
+import { IRemoteStockSearchProvider } from '../../ports/market-data.ports';
 
+/** 종목 검색 — DB catalog 우선, 없으면 Yahoo fallback */
 export class SearchStocksUseCase {
-  constructor(private readonly catalogRepo = new PrismaStockCatalogRepository()) {}
+  constructor(
+    private readonly catalogRepo: IStockCatalogRepository,
+    private readonly remoteSearch: IRemoteStockSearchProvider,
+  ) {}
 
   async execute(query: string, market: Market): Promise<StockSearchResult[]> {
     const trimmed = query.trim();
@@ -23,9 +27,9 @@ export class SearchStocksUseCase {
     let remote: StockSearchResult[] = [];
 
     try {
-      remote = await fetchYahooStockSearch(trimmed, market);
+      remote = await this.remoteSearch.search(trimmed, market);
     } catch {
-      // DB 마스터 없을 때 Yahoo fallback
+      // DB 마스터 없을 때 Yahoo fallback 실패 시 featured만 반환
     }
 
     return dedupeSearchResults([...featured, ...remote]).slice(0, 15);

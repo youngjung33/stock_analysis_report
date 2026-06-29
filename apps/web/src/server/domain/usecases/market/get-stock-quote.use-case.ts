@@ -1,15 +1,18 @@
 import { Market, QuoteChartRange, resolveCurrency, resolveYahooSymbol } from '@sar/shared';
 import { StockQuoteSnapshot } from '../../entities';
-import { fetchYahooChartQuote } from '../../../data/market/yahoo-chart.client';
+import { IChartQuoteProvider } from '../../ports/market-data.ports';
 
+/** 종목 기간별 시세·차트 조회 use case */
 export class GetStockQuoteUseCase {
+  constructor(private readonly chartQuoteProvider: IChartQuoteProvider) {}
+
   async execute(input: {
     symbol: string;
     market: Market;
     range: QuoteChartRange;
   }): Promise<StockQuoteSnapshot> {
     const yahooSymbol = resolveYahooSymbol(input.symbol, input.market) ?? input.symbol.toUpperCase();
-    const quote = await fetchYahooChartQuote(yahooSymbol, input.range);
+    const quote = await this.chartQuoteProvider.fetchQuote(yahooSymbol, input.range);
 
     return {
       symbol: input.symbol.toUpperCase(),

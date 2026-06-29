@@ -1,17 +1,14 @@
-import { vi } from 'vitest';
 import { Market, TransactionType } from '@sar/shared';
 import { GetHoldingBySymbolUseCase } from '@server/domain/usecases/portfolio/get-holding-by-symbol.use-case';
 import {
+  createMockCorpActionRepo,
+  createMockFxRateProvider,
   createMockQuoteRepo,
   createMockStock,
   createMockStockRepo,
   createMockTransaction,
   createMockTransactionRepo,
 } from '../../mocks/repositories.mock';
-
-vi.mock('@server/data/market/usd-krw.client', () => ({
-  fetchUsdKrwRate: vi.fn().mockResolvedValue(1300),
-}));
 
 describe('GetHoldingBySymbolUseCase', () => {
   it('returns holding for symbol with open position', async () => {
@@ -29,7 +26,13 @@ describe('GetHoldingBySymbolUseCase', () => {
       { stockId: stock.id, currentPrice: 150, changePercent: 2, fetchedAt: new Date() },
     ]);
 
-    const useCase = new GetHoldingBySymbolUseCase(stockRepo, txRepo, quoteRepo);
+    const useCase = new GetHoldingBySymbolUseCase(
+      stockRepo,
+      txRepo,
+      quoteRepo,
+      createMockCorpActionRepo(),
+      createMockFxRateProvider(),
+    );
     const result = await useCase.execute('user-1', stock.symbol, Market.US);
 
     expect(result).not.toBeNull();
@@ -46,6 +49,8 @@ describe('GetHoldingBySymbolUseCase', () => {
       stockRepo,
       createMockTransactionRepo(),
       createMockQuoteRepo(),
+      createMockCorpActionRepo(),
+      createMockFxRateProvider(),
     );
     const result = await useCase.execute('user-1', 'UNKNOWN', Market.US);
     expect(result).toBeNull();
@@ -66,6 +71,8 @@ describe('GetHoldingBySymbolUseCase', () => {
       stockRepo,
       txRepo,
       createMockQuoteRepo(),
+      createMockCorpActionRepo(),
+      createMockFxRateProvider(),
     );
     const result = await useCase.execute('user-1', stock.symbol, Market.US);
     expect(result).toBeNull();

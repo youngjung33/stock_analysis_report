@@ -4,7 +4,7 @@ import {
   ITokenService,
   IUserRepository,
 } from '../../repositories';
-import { UnauthorizedError } from '../../../http/errors';
+import { AuthenticationError } from '../../errors/domain.errors';
 
 export interface LoginInput {
   username: string;
@@ -24,12 +24,12 @@ export class LoginUseCase {
   ): Promise<{ accessToken: string; refreshToken: string; username: string }> {
     const user = await this.userRepo.findByUsername(input.username);
     if (!user) {
-      throw new UnauthorizedError('Invalid credentials');
+      throw new AuthenticationError('Invalid credentials');
     }
 
     const valid = await this.passwordHasher.compare(input.password, user.passwordHash);
     if (!valid) {
-      throw new UnauthorizedError('Invalid credentials');
+      throw new AuthenticationError('Invalid credentials');
     }
 
     const accessToken = this.tokenService.generateAccessToken({

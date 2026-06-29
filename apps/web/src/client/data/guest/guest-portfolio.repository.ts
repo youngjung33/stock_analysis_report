@@ -242,4 +242,8 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
     saveGuestQuotes(data.quotes);
     return { updated: data.updated, succeeded: data.succeeded, failed: data.failed };
   }
+
+  async getAnalysis(): Promise<import('../../domain/models').PortfolioAnalysisResult> {
+    throw new Error('Guest mode does not support portfolio analysis');
+  }
 }

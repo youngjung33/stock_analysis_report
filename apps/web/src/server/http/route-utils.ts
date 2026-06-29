@@ -1,20 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { REFRESH_TOKEN_COOKIE } from '@sar/shared';
+import { getServerServices } from '../container';
+import {
+  AuthenticationError,
+  DomainError,
+  EntityNotFoundError,
+  ValidationError,
+} from '../domain/errors/domain.errors';
 import { HttpError } from './errors';
-import { JwtTokenService } from '../data/auth/token.service';
 
 export interface AuthUser {
   userId: string;
   username: string;
 }
 
-const tokenService = new JwtTokenService();
-
 export function jsonData<T>(data: T, init?: ResponseInit) {
   return NextResponse.json(data, init);
 }
 
+/** DomainError → HTTP status 매핑 */
 export function handleRouteError(error: unknown) {
+  if (error instanceof AuthenticationError) {
+    return NextResponse.json({ message: error.message }, { status: 401 });
+  }
+  if (error instanceof ValidationError) {
+    return NextResponse.json({ message: error.message }, { status: 400 });
+  }
+  if (error instanceof EntityNotFoundError) {
+    return NextResponse.json({ message: error.message }, { status: 404 });
+  }
+  if (error instanceof DomainError) {
+    return NextResponse.json({ message: error.message }, { status: 400 });
+  }
   if (error instanceof HttpError) {
     return NextResponse.json({ message: error.message }, { status: error.statusCode });
   }
@@ -47,12 +64,14 @@ export function clearRefreshCookie(res: NextResponse) {
   });
 }
 
+/** Bearer JWT 검증 — composition root의 ITokenService 사용 */
 export function requireAuth(req: NextRequest): AuthUser {
   const header = req.headers.get('authorization');
   if (!header?.startsWith('Bearer ')) {
-    throw new HttpError('Unauthorized', 401);
+    throw new AuthenticationError('Unauthorized');
   }
   const token = header.slice(7);
+  const { tokenService } = getServerServices();
   const payload = tokenService.verifyAccessToken(token);
   return { userId: payload.sub, username: payload.username };
 }

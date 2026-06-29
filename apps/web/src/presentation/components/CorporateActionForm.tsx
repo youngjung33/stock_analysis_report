@@ -2,9 +2,7 @@
 
 import { useState } from 'react';
 import { CorporateActionType, Market, StockSearchResult } from '@sar/shared';
-import { apiClient } from '@/client/data/api/client';
-import { guestSession } from '@/client/data/guest/guest-session';
-import { saveGuestCorporateAction } from '@/client/data/guest/guest-storage';
+import { useServices } from '../hooks/useServices';
 import { StockSearchField } from '../shared/StockSearchField';
 
 interface Props {
@@ -12,6 +10,7 @@ interface Props {
 }
 
 export function CorporateActionForm({ onSuccess }: Props) {
+  const { createCorporateActionUseCase } = useServices();
   const [type, setType] = useState<CorporateActionType>('DIVIDEND');
   const [market, setMarket] = useState<Market>(Market.KR);
   const [selectedStock, setSelectedStock] = useState<StockSearchResult | null>(null);
@@ -36,7 +35,7 @@ export function CorporateActionForm({ onSuccess }: Props) {
     setSubmitting(true);
     setError(null);
     try {
-      const payload = {
+      await createCorporateActionUseCase.execute({
         stockSymbol: selectedStock.symbol,
         name: selectedStock.name,
         market: selectedStock.market,
@@ -50,13 +49,7 @@ export function CorporateActionForm({ onSuccess }: Props) {
         targetQuantity: targetQuantity ? Number(targetQuantity) : undefined,
         targetPrice: targetPrice ? Number(targetPrice) : undefined,
         memo: memo || undefined,
-      };
-
-      if (guestSession.isActive()) {
-        saveGuestCorporateAction(payload);
-      } else {
-        await apiClient.post('/corporate-actions', payload);
-      }
+      });
       onSuccess?.();
       setCashAmount('');
       setMemo('');

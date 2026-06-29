@@ -1,17 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { Market, QuoteChartRange } from '@sar/shared';
-import { StockQuoteSnapshot } from '@/client/domain/models';
-import { apiClient } from '@/client/data/api/client';
+import { useServices } from './useServices';
 
 export function useStockQuote(symbol: string, market: Market, range: QuoteChartRange) {
+  const { getStockQuoteUseCase } = useServices();
+
   return useQuery({
     queryKey: ['stock-quote', symbol, market, range],
-    queryFn: async () => {
-      const { data } = await apiClient.get<StockQuoteSnapshot>('/market/quote', {
-        params: { symbol, market, range },
-      });
-      return data;
-    },
+    queryFn: () => getStockQuoteUseCase.execute(symbol, market, range),
     enabled: Boolean(symbol && market),
   });
 }

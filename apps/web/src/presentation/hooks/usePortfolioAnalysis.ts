@@ -1,19 +1,16 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '@/client/data/api/client';
-import { PortfolioAnalysisResult } from '@/client/domain/models';
+import { useServices } from './useServices';
 import { useAuth } from './useAuth';
 
 export function usePortfolioAnalysis() {
+  const { getPortfolioAnalysisUseCase } = useServices();
   const { isGuest } = useAuth();
 
   return useQuery({
     queryKey: ['portfolio', 'analysis'],
-    queryFn: async () => {
-      const { data } = await apiClient.get<PortfolioAnalysisResult>('/portfolio/analysis');
-      return data;
-    },
+    queryFn: () => getPortfolioAnalysisUseCase.execute(),
     enabled: !isGuest,
     staleTime: 60_000,
   });

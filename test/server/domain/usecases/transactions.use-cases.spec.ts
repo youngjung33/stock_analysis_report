@@ -1,5 +1,5 @@
 import { vi, type Mock } from 'vitest';
-import { BadRequestError, NotFoundError } from '@server/http/errors';
+import { ValidationError, EntityNotFoundError } from '@server/domain/errors/domain.errors';
 import { Market, TransactionType } from '@sar/shared';
 import { CreateTransactionUseCase } from '@server/domain/usecases/transactions/create-transaction.use-case';
 import { DeleteTransactionUseCase } from '@server/domain/usecases/transactions/delete-transaction.use-case';
@@ -28,7 +28,7 @@ describe('CreateTransactionUseCase', () => {
         price: 100,
         tradedAt: new Date(),
       }),
-    ).rejects.toThrow(BadRequestError);
+    ).rejects.toThrow(ValidationError);
   });
 
   // CT-04
@@ -47,7 +47,7 @@ describe('CreateTransactionUseCase', () => {
         price: 0,
         tradedAt: new Date(),
       }),
-    ).rejects.toThrow(BadRequestError);
+    ).rejects.toThrow(ValidationError);
   });
 
   it('rejects missing stock name for new stock', async () => {
@@ -66,7 +66,7 @@ describe('CreateTransactionUseCase', () => {
         price: 100,
         tradedAt: new Date(),
       }),
-    ).rejects.toThrow(BadRequestError);
+    ).rejects.toThrow(ValidationError);
   });
 
   // CT-01
@@ -144,7 +144,7 @@ describe('CreateTransactionUseCase', () => {
         price: 100,
         tradedAt: new Date(),
       }),
-    ).rejects.toThrow(BadRequestError);
+    ).rejects.toThrow(ValidationError);
   });
 });
 
@@ -189,7 +189,7 @@ describe('DeleteTransactionUseCase', () => {
 
     const useCase = new DeleteTransactionUseCase(txRepo);
 
-    await expect(useCase.execute('user-1', 'tx-1')).rejects.toThrow(NotFoundError);
+    await expect(useCase.execute('user-1', 'tx-1')).rejects.toThrow(EntityNotFoundError);
   });
 
   it('throws NotFound when transaction does not exist', async () => {
@@ -198,6 +198,6 @@ describe('DeleteTransactionUseCase', () => {
 
     const useCase = new DeleteTransactionUseCase(txRepo);
 
-    await expect(useCase.execute('user-1', 'missing')).rejects.toThrow(NotFoundError);
+    await expect(useCase.execute('user-1', 'missing')).rejects.toThrow(EntityNotFoundError);
   });
 });

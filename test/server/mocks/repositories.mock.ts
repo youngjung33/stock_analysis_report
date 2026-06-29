@@ -11,6 +11,7 @@ import {
   IUserRepository,
   ICorporateActionRepository,
 } from '@server/domain/repositories';
+import { IFxRateProvider } from '@server/domain/ports/market-data.ports';
 import { StockEntity, TransactionEntity, UserEntity } from '@server/domain/entities';
 
 export function createMockUser(overrides: Partial<UserEntity> = {}): UserEntity {
@@ -137,6 +138,12 @@ export function createMockCorpActionRepo(
     create: vi.fn(),
     delete: vi.fn(),
     ...overrides,
+  };
+}
+
+export function createMockFxRateProvider(rate = 1300): IFxRateProvider {
+  return {
+    fetchUsdKrwRate: vi.fn().mockResolvedValue(rate),
   };
 }
 

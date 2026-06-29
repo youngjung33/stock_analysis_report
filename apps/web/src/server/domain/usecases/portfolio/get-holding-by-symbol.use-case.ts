@@ -1,18 +1,21 @@
-import { Market, enrichHoldingKrw } from '@sar/shared';
+import { Market, applyCorporateActions, enrichHoldingKrw } from '@sar/shared';
 import { HoldingResult } from '../../entities';
 import {
+  ICorporateActionRepository,
   IStockQuoteRepository,
   IStockRepository,
   ITransactionRepository,
 } from '../../repositories';
-import { fetchUsdKrwRate } from '../../../data/market/usd-krw.client';
-import { computePosition } from '../../services/position-calculator';
+import { IFxRateProvider } from '../../ports/market-data.ports';
 
+/** symbol+market 기준 단일 보유 조회 use case */
 export class GetHoldingBySymbolUseCase {
   constructor(
     private readonly stockRepo: IStockRepository,
     private readonly transactionRepo: ITransactionRepository,
     private readonly quoteRepo: IStockQuoteRepository,
+    private readonly corpActionRepo: ICorporateActionRepository,
+    private readonly fxRateProvider: IFxRateProvider,
   ) {}
 
   async execute(userId: string, symbol: string, market: Market): Promise<HoldingResult | null> {
@@ -20,7 +23,23 @@ export class GetHoldingBySymbolUseCase {
     if (!stock) return null;
 
     const txs = await this.transactionRepo.findByUserAndStock(userId, stock.id);
-    const position = computePosition(txs);
+    const actions = await this.corpActionRepo.findByUserAndStock(userId, stock.id);
+    const position = applyCorporateActions(
+      txs.map((tx) => ({
+        type: tx.type,
+        quantity: tx.quantity,
+        price: tx.price,
+        tradedAt: tx.tradedAt,
+      })),
+      actions.map((a) => ({
+        type: a.type,
+        effectiveAt: a.effectiveAt,
+        cashAmount: a.cashAmount,
+        splitRatio: a.splitRatio,
+        targetQuantity: a.targetQuantity,
+        targetPrice: a.targetPrice,
+      })),
+    );
     if (position.quantity <= 0) return null;
 
     const quotes = await this.quoteRepo.findByStockIds([stock.id]);
@@ -36,7 +55,8 @@ export class GetHoldingBySymbolUseCase {
         ? ((currentPrice - position.averageCost) / position.averageCost) * 100
         : null;
 
-    const usdKrwRate = stock.currency === 'USD' ? await fetchUsdKrwRate() : null;
+    const usdKrwRate =
+      stock.currency === 'USD' ? await this.fxRateProvider.fetchUsdKrwRate() : null;
     const base = {
       stockId: stock.id,
       symbol: stock.symbol,

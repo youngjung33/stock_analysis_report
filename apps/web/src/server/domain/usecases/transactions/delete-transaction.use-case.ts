@@ -1,5 +1,5 @@
 import { ITransactionRepository } from '../../repositories';
-import { NotFoundError } from '../../../http/errors';
+import { EntityNotFoundError } from '../../errors/domain.errors';
 
 export class DeleteTransactionUseCase {
   constructor(private readonly transactionRepo: ITransactionRepository) {}
@@ -7,7 +7,7 @@ export class DeleteTransactionUseCase {
   async execute(userId: string, txId: string): Promise<void> {
     const tx = await this.transactionRepo.findById(txId);
     if (!tx || tx.userId !== userId) {
-      throw new NotFoundError('Transaction not found');
+      throw new EntityNotFoundError('Transaction not found');
     }
     await this.transactionRepo.delete(txId);
   }

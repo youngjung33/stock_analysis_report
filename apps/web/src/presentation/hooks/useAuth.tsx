@@ -4,8 +4,6 @@ import { useCallback, useEffect, useMemo, useState, createContext, useContext } 
 import { useQueryClient } from '@tanstack/react-query';
 import { GUEST_DISPLAY_NAME, isGuestUsername } from '@sar/shared';
 import { tokenStorage } from '@/client/data/auth/token-storage';
-import { clearGuestStore } from '@/client/data/guest/guest-storage';
-import { guestSession } from '@/client/data/guest/guest-session';
 import { useServices } from './useServices';
 
 interface AuthContextValue {
@@ -21,7 +19,14 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { loginUseCase, refreshSessionUseCase, logoutUseCase, authSession } = useServices();
+  const {
+    loginUseCase,
+    refreshSessionUseCase,
+    logoutUseCase,
+    authSession,
+    guestSession,
+    guestStore,
+  } = useServices();
   const queryClient = useQueryClient();
   const [username, setUsername] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,7 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(async () => {
     if (guestSession.isActive()) {
       guestSession.clear();
-      clearGuestStore();
+      guestStore.clear();
       setUsername(null);
       await queryClient.clear();
       return;
@@ -41,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUsername(null);
       await queryClient.clear();
     }
-  }, [logoutUseCase, queryClient]);
+  }, [logoutUseCase, queryClient, guestSession, guestStore]);
 
   useEffect(() => {
     authSession.onUnauthorized(() => {
@@ -61,17 +66,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .then((result) => setUsername(result?.username ?? null))
       .catch(() => setUsername(null))
       .finally(() => setIsLoading(false));
-  }, [refreshSessionUseCase, authSession]);
+  }, [refreshSessionUseCase, authSession, guestSession]);
 
   const login = useCallback(
     async (user: string, password: string) => {
       guestSession.clear();
-      clearGuestStore();
+      guestStore.clear();
       const result = await loginUseCase.execute(user, password);
       setUsername(result.username);
       await queryClient.clear();
     },
-    [loginUseCase, queryClient],
+    [loginUseCase, queryClient, guestSession, guestStore],
   );
 
   const loginAsGuest = useCallback(async () => {
@@ -82,11 +87,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // ignore
       }
     }
-    clearGuestStore();
+    guestStore.clear();
     guestSession.activate();
     setUsername(GUEST_DISPLAY_NAME);
     await queryClient.clear();
-  }, [logoutUseCase, queryClient]);
+  }, [logoutUseCase, queryClient, guestSession, guestStore]);
 
   const value = useMemo(
     () => ({

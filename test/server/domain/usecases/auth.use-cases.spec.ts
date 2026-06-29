@@ -1,5 +1,5 @@
 import { vi, type Mock } from 'vitest';
-import { UnauthorizedError } from '@server/http/errors';
+import { AuthenticationError } from '@server/domain/errors/domain.errors';
 import { LoginUseCase } from '@server/domain/usecases/auth/login.use-case';
 import { LogoutUseCase } from '@server/domain/usecases/auth/logout.use-case';import { RefreshTokenUseCase } from '@server/domain/usecases/auth/refresh-token.use-case';
 import {
@@ -26,7 +26,7 @@ describe('LoginUseCase', () => {
 
     await expect(
       useCase.execute({ username: 'admin', password: 'wrong' }),
-    ).rejects.toThrow(UnauthorizedError);
+    ).rejects.toThrow(AuthenticationError);
   });
 
   // AU-03
@@ -67,7 +67,7 @@ describe('LoginUseCase', () => {
 
     await expect(
       useCase.execute({ username: 'unknown', password: 'secret' }),
-    ).rejects.toThrow(UnauthorizedError);
+    ).rejects.toThrow(AuthenticationError);
   });
 });
 
@@ -100,7 +100,7 @@ describe('RefreshTokenUseCase', () => {
 
     const useCase = new RefreshTokenUseCase(refreshRepo, createMockTokenService());
 
-    await expect(useCase.execute('bad-token')).rejects.toThrow(UnauthorizedError);
+    await expect(useCase.execute('bad-token')).rejects.toThrow(AuthenticationError);
   });
 
   it('throws Unauthorized for expired refresh token', async () => {
@@ -116,7 +116,7 @@ describe('RefreshTokenUseCase', () => {
 
     const useCase = new RefreshTokenUseCase(refreshRepo, createMockTokenService());
 
-    await expect(useCase.execute('expired-token')).rejects.toThrow(UnauthorizedError);
+    await expect(useCase.execute('expired-token')).rejects.toThrow(AuthenticationError);
   });
 });
 

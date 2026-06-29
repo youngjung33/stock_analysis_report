@@ -1,12 +1,13 @@
-import { fetchUsdKrwRate } from '@/server/data/market/usd-krw.client';
+import { getServerServices } from '@/server/container';
 import { handleRouteError, jsonData } from '@/server/http/route-utils';
 
 export const maxDuration = 10;
 
 export async function GET() {
   try {
-    const usdKrwRate = await fetchUsdKrwRate();
-    return jsonData({ usdKrwRate, fetchedAt: new Date().toISOString() });
+    const { getFxRateUseCase } = getServerServices();
+    const result = await getFxRateUseCase.execute();
+    return jsonData(result);
   } catch (error) {
     return handleRouteError(error);
   }

@@ -1,8 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { Market, StockSearchResult } from '@sar/shared';
 import { prisma as defaultPrisma } from './prisma.service';
+import { IStockCatalogRepository } from '../../domain/repositories';
 
-export class PrismaStockCatalogRepository {
+export class PrismaStockCatalogRepository implements IStockCatalogRepository {
   constructor(private readonly prisma: PrismaClient = defaultPrisma) {}
 
   async countByMarket(market: Market): Promise<number> {

@@ -22,10 +22,13 @@ import {
   IStockRepository,
   ITransactionRepository,
 } from '../../repositories';
-import { fetchUsdKrwRate } from '../../../data/market/usd-krw.client';
-import { fetchGoogleNewsRss } from '../../../data/market/google-news-rss.client';
-import { fetchYahooChartSeries } from '../../../data/market/yahoo-chart.client';
+import {
+  IFxRateProvider,
+  IChartSeriesProvider,
+  INewsProvider,
+} from '../../ports/market-data.ports';
 
+/** Yahoo chart range per portfolio period */
 const PERIOD_YAHOO_RANGE: Record<PortfolioPeriod, string> = {
   '1mo': '3mo',
   '3mo': '6mo',
@@ -40,12 +43,16 @@ function rsiLabel(value: number | null): string {
   return '중립';
 }
 
+/** 포트폴리오 기간수익률·벤치마크·RSI/뉴스 인사이트 use case */
 export class GetPortfolioAnalysisUseCase {
   constructor(
     private readonly stockRepo: IStockRepository,
     private readonly transactionRepo: ITransactionRepository,
     private readonly quoteRepo: IStockQuoteRepository,
     private readonly corpActionRepo: ICorporateActionRepository,
+    private readonly fxRateProvider: IFxRateProvider,
+    private readonly chartSeriesProvider: IChartSeriesProvider,
+    private readonly newsProvider: INewsProvider,
   ) {}
 
   async execute(
@@ -112,7 +119,7 @@ export class GetPortfolioAnalysisUseCase {
     }
 
     const hasUsdHoldings = rawHoldings.some((h) => h.currency === 'USD');
-    const usdKrwRate = hasUsdHoldings ? await fetchUsdKrwRate() : null;
+    const usdKrwRate = hasUsdHoldings ? await this.fxRateProvider.fetchUsdKrwRate() : null;
     const enriched = rawHoldings.map((h) => ({
       ...h,
       ...enrichHoldingKrw(h, usdKrwRate),
@@ -151,7 +158,10 @@ export class GetPortfolioAnalysisUseCase {
             periods
               .filter((p) => p !== 'max')
               .map(async (p) => {
-                const series = await fetchYahooChartSeries(h.yahooSymbol!, PERIOD_YAHOO_RANGE[p]);
+                const series = await this.chartSeriesProvider.fetchSeries(
+                  h.yahooSymbol!,
+                  PERIOD_YAHOO_RANGE[p],
+                );
                 return { period: p, closes: series.closes };
               }),
           );
@@ -218,8 +228,8 @@ export class GetPortfolioAnalysisUseCase {
 
         try {
           const [krSeries, usSeries] = await Promise.all([
-            fetchYahooChartSeries(krBenchmark.yahooSymbol, PERIOD_YAHOO_RANGE[pr.period]),
-            fetchYahooChartSeries(usBenchmark.yahooSymbol, PERIOD_YAHOO_RANGE[pr.period]),
+            this.chartSeriesProvider.fetchSeries(krBenchmark.yahooSymbol, PERIOD_YAHOO_RANGE[pr.period]),
+            this.chartSeriesProvider.fetchSeries(usBenchmark.yahooSymbol, PERIOD_YAHOO_RANGE[pr.period]),
           ]);
           const krRet = periodReturnFromCloses(krSeries.closes, pr.period);
           const usRet = periodReturnFromCloses(usSeries.closes, pr.period);
@@ -255,7 +265,7 @@ export class GetPortfolioAnalysisUseCase {
 
           if (h.yahooSymbol) {
             try {
-              const series = await fetchYahooChartSeries(h.yahooSymbol, '6mo');
+              const series = await this.chartSeriesProvider.fetchSeries(h.yahooSymbol, '6mo');
               rsi14 = rsi(series.closes, 14);
             } catch {
               rsi14 = null;
@@ -263,7 +273,7 @@ export class GetPortfolioAnalysisUseCase {
           }
 
           try {
-            const items = await fetchGoogleNewsRss(
+            const items = await this.newsProvider.fetchGoogleNews(
               `${h.name} ${h.symbol}`,
               h.market,
               h.market === Market.KR ? 'ko' : 'en-US',

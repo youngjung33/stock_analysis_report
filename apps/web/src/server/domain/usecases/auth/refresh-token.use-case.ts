@@ -1,5 +1,5 @@
 import { IRefreshTokenRepository, ITokenService } from '../../repositories';
-import { UnauthorizedError } from '../../../http/errors';
+import { AuthenticationError } from '../../errors/domain.errors';
 
 export class RefreshTokenUseCase {
   constructor(
@@ -14,7 +14,7 @@ export class RefreshTokenUseCase {
     const stored = await this.refreshTokenRepo.findValidByHash(tokenHash);
 
     if (!stored || stored.expiresAt < new Date()) {
-      throw new UnauthorizedError('Invalid refresh token');
+      throw new AuthenticationError('Invalid refresh token');
     }
 
     await this.refreshTokenRepo.revoke(stored.id);

@@ -7,7 +7,7 @@ import {
 } from '../../repositories';
 import { computePosition } from '../../services/position-calculator';
 import { resolveCurrency, resolveYahooSymbol } from '../../services/stock-symbol.resolver';
-import { BadRequestError } from '../../../http/errors';
+import { ValidationError } from '../../errors/domain.errors';
 
 export class CreateTransactionUseCase {
   constructor(
@@ -17,11 +17,11 @@ export class CreateTransactionUseCase {
 
   async execute(input: CreateTransactionInput): Promise<TransactionEntity> {
     if (input.quantity <= 0 || input.price <= 0) {
-      throw new BadRequestError('Quantity and price must be positive');
+      throw new ValidationError('Quantity and price must be positive');
     }
 
     if (!input.name?.trim()) {
-      throw new BadRequestError('종목을 검색해서 선택해 주세요.');
+      throw new ValidationError('종목을 검색해서 선택해 주세요.');
     }
 
     const symbol = input.stockSymbol.toUpperCase();
@@ -43,7 +43,7 @@ export class CreateTransactionUseCase {
       const existing = await this.transactionRepo.findByUserAndStock(input.userId, stock.id);
       const held = computePosition(existing).quantity;
       if (input.quantity > held) {
-        throw new BadRequestError(`Insufficient holdings. Current: ${held}`);
+        throw new ValidationError(`Insufficient holdings. Current: ${held}`);
       }
     }
 

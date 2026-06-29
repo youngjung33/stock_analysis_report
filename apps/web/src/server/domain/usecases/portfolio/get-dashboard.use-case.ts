@@ -6,14 +6,16 @@ import {
   IStockRepository,
   ITransactionRepository,
 } from '../../repositories';
-import { fetchUsdKrwRate } from '../../../data/market/usd-krw.client';
+import { IFxRateProvider } from '../../ports/market-data.ports';
 
+/** 포트폴리오 대시보드 집계 use case */
 export class GetDashboardUseCase {
   constructor(
     private readonly stockRepo: IStockRepository,
     private readonly transactionRepo: ITransactionRepository,
     private readonly quoteRepo: IStockQuoteRepository,
     private readonly corpActionRepo: ICorporateActionRepository,
+    private readonly fxRateProvider: IFxRateProvider,
   ) {}
 
   async execute(userId: string): Promise<DashboardResult> {
@@ -102,7 +104,7 @@ export class GetDashboardUseCase {
         : { todayPnl: null, todayPnlPercent: null };
 
     const hasUsdHoldings = rawHoldings.some((h) => h.currency === 'USD');
-    const usdKrwRate = hasUsdHoldings ? await fetchUsdKrwRate() : null;
+    const usdKrwRate = hasUsdHoldings ? await this.fxRateProvider.fetchUsdKrwRate() : null;
 
     const krwSummary = aggregateKrwSummary(rawHoldings, usdKrwRate, hasAllQuotes);
     const allocation = computeAllocation(
