@@ -24,6 +24,7 @@ import { CreateTransactionUseCase } from './domain/usecases/transactions/create-
 import { DeleteTransactionUseCase } from './domain/usecases/transactions/delete-transaction.use-case';
 import { ListTransactionsUseCase } from './domain/usecases/transactions/list-transactions.use-case';
 import { authSessionAdapter } from './data/auth/auth-session.adapter';
+import { tokenStorageAdapter } from './data/auth/token-storage.adapter';
 import { guestSessionAdapter, guestStoreAdapter } from './data/guest/guest-session.adapter';
 import {
   authRepository,
@@ -59,5 +60,6 @@ export function wireAppServices(): AppServices {
     authSession: authSessionAdapter,
     guestSession: guestSessionAdapter,
     guestStore: guestStoreAdapter,
+    tokenStorage: tokenStorageAdapter,
   };
 }

@@ -18,13 +18,13 @@ import { GuestPortfolioRepository } from '../guest/guest-portfolio.repository';
 import { GuestTransactionRepository } from '../guest/guest-transaction.repository';
 
 const guestTransactionRepository = new GuestTransactionRepository();
-const guestPortfolioRepository = new GuestPortfolioRepository();
 const guestWatchlistRepository = new GuestWatchlistRepository();
 const guestCorporateActionRepository = new GuestCorporateActionRepository();
 
 const apiTransactionRepository = new ApiTransactionRepository();
 const apiPortfolioRepository = new ApiPortfolioRepository();
 const apiMarketRepository = new ApiMarketRepository();
+const guestPortfolioRepository = new GuestPortfolioRepository(apiMarketRepository);
 const apiWatchlistRepository = new ApiWatchlistRepository();
 const apiCorporateActionRepository = new ApiCorporateActionRepository();
 

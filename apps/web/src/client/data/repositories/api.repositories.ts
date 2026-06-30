@@ -5,6 +5,7 @@ import {
   LoginResult,
   MarketProviderStatus,
   PortfolioAnalysisResult,
+  RefreshQuoteResult,
   SessionResult,
   StockQuoteSnapshot,
   WatchlistItem,
@@ -117,6 +118,16 @@ export class ApiMarketRepository implements IMarketRepository {
 
   async getFxRate() {
     const { data } = await apiClient.get<{ usdKrwRate: number | null; fetchedAt: string }>('/market/fx');
+    return data;
+  }
+
+  async fetchBatchQuotes(stocks: { stockId: string; symbol: string; market: Market }[]) {
+    const { data } = await apiClient.post<{
+      updated: number;
+      quotes: { stockId: string; currentPrice: number; changePercent: number | null; fetchedAt: string }[];
+      succeeded: RefreshQuoteResult['succeeded'];
+      failed: RefreshQuoteResult['failed'];
+    }>('/market/quotes', { stocks });
     return data;
   }
 }

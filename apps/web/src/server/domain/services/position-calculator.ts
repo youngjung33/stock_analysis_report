@@ -1,44 +1,20 @@
-import { TransactionType } from '@sar/shared';
+import {
+  computePosition as computeSharedPosition,
+  PositionState,
+  PositionTransaction,
+} from '@sar/shared';
 import { InvalidPositionError } from '../errors/domain.errors';
 
-export interface PositionState {
-  quantity: number;
-  averageCost: number;
-  realizedPnl: number;
-  costBasis: number;
-}
+export type { PositionState, PositionTransaction };
 
-export interface PositionTransaction {
-  type: TransactionType;
-  quantity: number;
-  price: number;
-  tradedAt: Date;
-}
-
+/** @sar/shared computePosition 래퍼 — 도메인 에러로 매핑 */
 export function computePosition(transactions: PositionTransaction[]): PositionState {
-  const sorted = [...transactions].sort(
-    (a, b) => new Date(a.tradedAt).getTime() - new Date(b.tradedAt).getTime(),
-  );
-
-  let quantity = 0;
-  let totalCost = 0;
-  let realizedPnl = 0;
-
-  for (const tx of sorted) {
-    if (tx.type === TransactionType.BUY) {
-      totalCost += tx.quantity * tx.price;
-      quantity += tx.quantity;
-    } else {
-      if (tx.quantity > quantity) {
-        throw new InvalidPositionError('Invalid sell quantity in history');
-      }
-      const avgCost = quantity > 0 ? totalCost / quantity : 0;
-      realizedPnl += (tx.price - avgCost) * tx.quantity;
-      totalCost -= avgCost * tx.quantity;
-      quantity -= tx.quantity;
+  try {
+    return computeSharedPosition(transactions);
+  } catch (error) {
+    if (error instanceof Error && error.message === 'Invalid sell quantity in history') {
+      throw new InvalidPositionError(error.message);
     }
+    throw error;
   }
-
-  const averageCost = quantity > 0 ? totalCost / quantity : 0;
-  return { quantity, averageCost, realizedPnl, costBasis: totalCost };
 }

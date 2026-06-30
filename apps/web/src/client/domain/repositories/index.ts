@@ -62,6 +62,14 @@ export interface IMarketRepository {
   getMarketAnalysis(): Promise<MarketAnalysisReport>;
   searchStocks(query: string, market: Market): Promise<StockSearchResult[]>;
   getFxRate(): Promise<{ usdKrwRate: number | null; fetchedAt: string }>;
+  fetchBatchQuotes(
+    stocks: { stockId: string; symbol: string; market: Market }[],
+  ): Promise<{
+    updated: number;
+    quotes: { stockId: string; currentPrice: number; changePercent: number | null; fetchedAt: string }[];
+    succeeded: RefreshQuoteResult['succeeded'];
+    failed: RefreshQuoteResult['failed'];
+  }>;
 }
 
 export interface IWatchlistRepository {
@@ -86,6 +94,10 @@ export interface IGuestStorePort {
 
 export interface IAuthSessionPort {
   onUnauthorized(callback: () => void): void;
+}
+
+export interface ITokenStoragePort {
+  getAccessToken(): string | null;
 }
 
 export interface AuthState {

@@ -1,7 +1,6 @@
 import { Market, aggregatePortfolioTodayPnl, aggregateKrwSummary, applyCorporateActions, computeAllocation, enrichHoldingKrw } from '@sar/shared';
 import { Dashboard, PortfolioHolding, RefreshQuoteResult } from '../../domain/models';
-import { IPortfolioRepository } from '../../domain/repositories';
-import { apiClient } from '../api/client';
+import { IMarketRepository, IPortfolioRepository } from '../../domain/repositories';
 import {
   getGuestQuotes,
   guestTransactionsForStock,
@@ -10,16 +9,17 @@ import {
   saveGuestQuotes,
 } from './guest-storage';
 
-async function fetchGuestUsdKrwRate(): Promise<number | null> {
-  try {
-    const { data } = await apiClient.get<{ usdKrwRate: number | null }>('/market/fx');
-    return data.usdKrwRate;
-  } catch {
-    return null;
-  }
-}
-
 export class GuestPortfolioRepository implements IPortfolioRepository {
+  constructor(private readonly marketRepo: IMarketRepository) {}
+
+  private async fetchUsdKrwRate(): Promise<number | null> {
+    try {
+      const { usdKrwRate } = await this.marketRepo.getFxRate();
+      return usdKrwRate;
+    } catch {
+      return null;
+    }
+  }
   async getDashboard(): Promise<Dashboard> {
     const txs = listGuestTransactions();
     const stockIds = [...new Set(txs.map((tx) => tx.stockId))];
@@ -108,7 +108,7 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
         : { todayPnl: null, todayPnlPercent: null };
 
     const hasUsdHoldings = rawHoldings.some((h) => h.currency === 'USD');
-    const usdKrwRate = hasUsdHoldings ? await fetchGuestUsdKrwRate() : null;
+    const usdKrwRate = hasUsdHoldings ? await this.fetchUsdKrwRate() : null;
     const krwSummary = aggregateKrwSummary(rawHoldings, usdKrwRate, hasAllQuotes);
     const allocation = computeAllocation(
       rawHoldings.map((h) => ({
@@ -189,7 +189,7 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
         ? ((currentPrice - position.averageCost) / position.averageCost) * 100
         : null;
 
-    const usdKrwRate = sample.currency === 'USD' ? await fetchGuestUsdKrwRate() : null;
+    const usdKrwRate = sample.currency === 'USD' ? await this.fetchUsdKrwRate() : null;
     const base = {
       stockId,
       symbol: sample.symbol,
@@ -232,12 +232,7 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
       return { updated: 0, succeeded: [], failed: [] };
     }
 
-    const { data } = await apiClient.post<{
-      updated: number;
-      quotes: { stockId: string; currentPrice: number; changePercent: number | null; fetchedAt: string }[];
-      succeeded: RefreshQuoteResult['succeeded'];
-      failed: RefreshQuoteResult['failed'];
-    }>('/market/quotes', { stocks: [...stocks.values()] });
+    const data = await this.marketRepo.fetchBatchQuotes([...stocks.values()]);
 
     saveGuestQuotes(data.quotes);
     return { updated: data.updated, succeeded: data.succeeded, failed: data.failed };

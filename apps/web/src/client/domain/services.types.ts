@@ -6,6 +6,7 @@ import {
   IAuthSessionPort,
   IGuestSessionPort,
   IGuestStorePort,
+  ITokenStoragePort,
 } from './repositories';
 import {
   AddWatchlistUseCase,
@@ -52,4 +53,5 @@ export interface AppServices {
   authSession: IAuthSessionPort;
   guestSession: IGuestSessionPort;
   guestStore: IGuestStorePort;
+  tokenStorage: ITokenStoragePort;
 }

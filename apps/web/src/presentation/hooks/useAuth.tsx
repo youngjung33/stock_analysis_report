@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState, createContext, useContext } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { GUEST_DISPLAY_NAME, isGuestUsername } from '@sar/shared';
-import { tokenStorage } from '@/client/data/auth/token-storage';
 import { useServices } from './useServices';
 
 interface AuthContextValue {
@@ -26,6 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     authSession,
     guestSession,
     guestStore,
+    tokenStorage,
   } = useServices();
   const queryClient = useQueryClient();
   const [username, setUsername] = useState<string | null>(null);
@@ -91,7 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     guestSession.activate();
     setUsername(GUEST_DISPLAY_NAME);
     await queryClient.clear();
-  }, [logoutUseCase, queryClient, guestSession, guestStore]);
+  }, [logoutUseCase, queryClient, guestSession, guestStore, tokenStorage]);
 
   const value = useMemo(
     () => ({
