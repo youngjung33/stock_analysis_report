@@ -1,3 +1,6 @@
+/**
+ * 포트폴리오 자산 배분 — 종목별·시장별(KR/US) 비중 계산.
+ */
 import { Market } from './enums';
 
 export interface AllocationHoldingInput {
@@ -25,6 +28,7 @@ export interface AllocationResult {
   allocationByMarket: AllocationByMarket;
 }
 
+/** 시장가치(KRW) 기준 종목·시장 배분 비율 계산 */
 export function computeAllocation(holdings: AllocationHoldingInput[]): AllocationResult {
   const eligible = holdings.filter(
     (h): h is AllocationHoldingInput & { marketValueKrw: number } =>

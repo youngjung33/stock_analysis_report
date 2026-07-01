@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 import { Market, TransactionType } from '@sar/shared';
+import { IMarketDataProvider } from '@server/domain/ports/market-data.port';
 import {
-  IMarketDataProvider,
   IPasswordHasher,
   IRefreshTokenRepository,
   IStockQuoteRepository,
@@ -11,7 +11,6 @@ import {
   IUserRepository,
   ICorporateActionRepository,
 } from '@server/domain/repositories';
-import { IFxRateProvider } from '@server/domain/ports/market-data.ports';
 import { StockEntity, TransactionEntity, UserEntity } from '@server/domain/entities';
 
 export function createMockUser(overrides: Partial<UserEntity> = {}): UserEntity {
@@ -141,20 +140,38 @@ export function createMockCorpActionRepo(
   };
 }
 
-export function createMockFxRateProvider(rate = 1300): IFxRateProvider {
+export function createMockMarketData(
+  overrides: Partial<IMarketDataProvider> = {},
+  rate = 1300,
+): IMarketDataProvider {
   return {
+    supports: vi.fn(() => true),
+    label: vi.fn((market: Market) =>
+      market === Market.KR ? '한국 주식 (Yahoo Finance)' : '미국 주식 (Finnhub)',
+    ),
+    isAvailable: vi.fn(() => true),
+    unavailableReason: vi.fn(() => null),
+    fetchStockQuote: vi.fn().mockResolvedValue({ currentPrice: 150, changePercent: 2.5 }),
     fetchUsdKrwRate: vi.fn().mockResolvedValue(rate),
+    fetchChartQuote: vi.fn(),
+    fetchChartSeries: vi.fn(),
+    fetchGoogleNews: vi.fn().mockResolvedValue([]),
+    fetchFinnhubMarketNews: vi.fn().mockResolvedValue([]),
+    searchRemoteStocks: vi.fn().mockResolvedValue([]),
+    ...overrides,
   };
 }
+
+/** @deprecated createMockMarketData 사용 */
+export const createMockFxRateProvider = (rate = 1300) =>
+  createMockMarketData({}, rate);
 
 export function createMockMarketProvider(
   market: Market,
   quote = { currentPrice: 150, changePercent: 2.5 },
 ): IMarketDataProvider {
-  return {
-    supports: vi.fn().mockReturnValue(true),
-    isAvailable: vi.fn().mockReturnValue(true),
-    unavailableReason: vi.fn().mockReturnValue(null),
-    fetchQuote: vi.fn().mockResolvedValue(quote),
-  };
+  return createMockMarketData({
+    supports: vi.fn((m: Market) => m === market),
+    fetchStockQuote: vi.fn().mockResolvedValue(quote),
+  });
 }

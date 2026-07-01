@@ -1,6 +1,6 @@
 import { Market } from '@sar/shared';
 import { RefreshQuoteResult } from '../../entities';
-import { IMarketDataProvider } from '../../repositories';
+import { IMarketDataProvider } from '../../ports/market-data.port';
 import { resolveYahooSymbol } from '../../services/stock-symbol.resolver';
 import { fetchQuoteForStock } from './quote-fetch.helpers';
 
@@ -10,9 +10,11 @@ export interface FetchQuoteStockInput {
   market: Market;
 }
 
+/** 다종목 시세 일괄 조회 use case (게스트 quotes API) */
 export class FetchQuotesUseCase {
-  constructor(private readonly marketProviders: IMarketDataProvider[]) {}
+  constructor(private readonly marketData: IMarketDataProvider) {}
 
+  /** body 종목 목록별 KR/US 시세 fetch — US는 rate limit sleep */
   async execute(stocks: FetchQuoteStockInput[]): Promise<{
     updated: number;
     quotes: {
@@ -36,7 +38,7 @@ export class FetchQuotesUseCase {
 
     for (const stock of stocks) {
       const quote = await fetchQuoteForStock(
-        this.marketProviders,
+        this.marketData,
         {
           id: stock.stockId,
           symbol: stock.symbol,
@@ -60,6 +62,7 @@ export class FetchQuotesUseCase {
       succeeded.push({ stockId: stock.stockId, symbol: stock.symbol, market: stock.market });
       updated += 1;
 
+      // Finnhub free tier rate limit
       if (stock.market === Market.US) {
         await sleep(1100);
       }

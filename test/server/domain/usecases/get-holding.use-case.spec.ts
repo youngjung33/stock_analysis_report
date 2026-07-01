@@ -2,7 +2,7 @@ import { Market, TransactionType } from '@sar/shared';
 import { GetHoldingBySymbolUseCase } from '@server/domain/usecases/portfolio/get-holding-by-symbol.use-case';
 import {
   createMockCorpActionRepo,
-  createMockFxRateProvider,
+  createMockMarketData,
   createMockQuoteRepo,
   createMockStock,
   createMockStockRepo,
@@ -31,7 +31,7 @@ describe('GetHoldingBySymbolUseCase', () => {
       txRepo,
       quoteRepo,
       createMockCorpActionRepo(),
-      createMockFxRateProvider(),
+      createMockMarketData(),
     );
     const result = await useCase.execute('user-1', stock.symbol, Market.US);
 
@@ -50,7 +50,7 @@ describe('GetHoldingBySymbolUseCase', () => {
       createMockTransactionRepo(),
       createMockQuoteRepo(),
       createMockCorpActionRepo(),
-      createMockFxRateProvider(),
+      createMockMarketData(),
     );
     const result = await useCase.execute('user-1', 'UNKNOWN', Market.US);
     expect(result).toBeNull();
@@ -72,7 +72,7 @@ describe('GetHoldingBySymbolUseCase', () => {
       txRepo,
       createMockQuoteRepo(),
       createMockCorpActionRepo(),
-      createMockFxRateProvider(),
+      createMockMarketData(),
     );
     const result = await useCase.execute('user-1', stock.symbol, Market.US);
     expect(result).toBeNull();

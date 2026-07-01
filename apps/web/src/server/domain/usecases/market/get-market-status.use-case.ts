@@ -1,16 +1,17 @@
 import { Market } from '@sar/shared';
 import { MarketProviderStatus } from '../../entities';
-import { IMarketDataProvider } from '../../repositories';
+import { IMarketDataProvider } from '../../ports/market-data.port';
 
+/** KR/US 시세 제공자(Finnhub·Yahoo) 설정 상태 조회 use case */
 export class GetMarketStatusUseCase {
-  constructor(private readonly marketProviders: IMarketDataProvider[]) {}
+  constructor(private readonly marketData: IMarketDataProvider) {}
 
+  /** 시장별 available · setupHint 목록 */
   execute(): MarketProviderStatus[] {
     const markets = [Market.KR, Market.US];
 
     return markets.map((market) => {
-      const provider = this.marketProviders.find((p) => p.supports(market));
-      if (!provider) {
+      if (!this.marketData.supports(market)) {
         return {
           market,
           label: market === Market.KR ? '한국 주식' : '미국 주식',
@@ -21,9 +22,9 @@ export class GetMarketStatusUseCase {
 
       return {
         market,
-        label: provider.label(),
-        available: provider.isAvailable(),
-        setupHint: provider.unavailableReason(),
+        label: this.marketData.label(market),
+        available: this.marketData.isAvailable(market),
+        setupHint: this.marketData.unavailableReason(market),
       };
     });
   }

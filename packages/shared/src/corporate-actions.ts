@@ -1,3 +1,6 @@
+/**
+ * 기업 행사 — 배당·분할·합병 등을 거래 이력에 반영.
+ */
 import { Market, TransactionType } from './enums';
 import { PositionState, PositionTransaction, computePosition } from './position-calculator';
 
@@ -12,6 +15,7 @@ export interface CorporateActionInput {
   targetPrice?: number | null;
 }
 
+/** 기업 행사(배당·분할·합병)를 거래에 적용해 포지션 재계산 */
 export function applyCorporateActions(
   transactions: PositionTransaction[],
   actions: CorporateActionInput[],

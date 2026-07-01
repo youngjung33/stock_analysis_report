@@ -1,30 +1,53 @@
 import { Market, QuoteChartRange, StockSearchResult } from '@sar/shared';
+import { StockEntity } from '../../domain/entities';
 import {
   ChartQuoteData,
   ChartSeriesData,
-  IChartQuoteProvider,
-  IChartSeriesProvider,
-  IFxRateProvider,
-  INewsProvider,
-  IRemoteStockSearchProvider,
+  IMarketDataProvider,
   NewsItemData,
-} from '../../domain/ports/market-data.ports';
+} from '../../domain/ports/market-data.port';
 import { fetchFinnhubMarketNews } from './finnhub-news.client';
 import { fetchGoogleNewsRss } from './google-news-rss.client';
 import { fetchUsdKrwRate } from './usd-krw.client';
 import { fetchYahooChartQuote, fetchYahooChartSeries } from './yahoo-chart.client';
 import { fetchYahooStockSearch } from './yahoo-search.client';
+import { KrYahooMarketProvider } from './kr-yahoo.provider';
+import { UsFinnhubMarketProvider } from './us-finnhub.provider';
 
-/** Yahoo KRW=X 환율 adapter */
-export class YahooFxRateProvider implements IFxRateProvider {
+/** KR/US 시세 adapter — 단일 IMarketDataProvider 구현체 */
+export class MarketDataProvider implements IMarketDataProvider {
+  private readonly kr = new KrYahooMarketProvider();
+  private readonly us = new UsFinnhubMarketProvider();
+
+  private quoteAdapter(market: Market) {
+    return market === Market.KR ? this.kr : this.us;
+  }
+
+  supports(market: Market) {
+    return this.quoteAdapter(market).supports(market);
+  }
+
+  label(market: Market) {
+    return this.quoteAdapter(market).label();
+  }
+
+  isAvailable(market: Market) {
+    return this.quoteAdapter(market).isAvailable();
+  }
+
+  unavailableReason(market: Market) {
+    return this.quoteAdapter(market).unavailableReason();
+  }
+
+  fetchStockQuote(stock: StockEntity) {
+    return this.quoteAdapter(stock.market as Market).fetchQuote(stock);
+  }
+
   fetchUsdKrwRate() {
     return fetchUsdKrwRate();
   }
-}
 
-/** Yahoo 차트 시세 adapter */
-export class YahooChartQuoteProvider implements IChartQuoteProvider {
-  async fetchQuote(symbol: string, range: QuoteChartRange): Promise<ChartQuoteData> {
+  async fetchChartQuote(symbol: string, range: QuoteChartRange): Promise<ChartQuoteData> {
     const quote = await fetchYahooChartQuote(symbol, range);
     return {
       currentPrice: quote.currentPrice,
@@ -32,11 +55,8 @@ export class YahooChartQuoteProvider implements IChartQuoteProvider {
       points: quote.points,
     };
   }
-}
 
-/** Yahoo 일봉 시계열 adapter */
-export class YahooChartSeriesProvider implements IChartSeriesProvider {
-  async fetchSeries(
+  async fetchChartSeries(
     symbol: string,
     yahooRange = '1y',
     interval = '1d',
@@ -51,10 +71,7 @@ export class YahooChartSeriesProvider implements IChartSeriesProvider {
       changePercent1d: series.changePercent1d,
     };
   }
-}
 
-/** Google RSS + Finnhub 뉴스 adapter */
-export class ExternalNewsProvider implements INewsProvider {
   async fetchGoogleNews(
     query: string,
     market: Market | 'global',
@@ -85,11 +102,8 @@ export class ExternalNewsProvider implements INewsProvider {
       market: 'global' as const,
     }));
   }
-}
 
-/** Yahoo 종목 검색 adapter */
-export class YahooRemoteStockSearchProvider implements IRemoteStockSearchProvider {
-  search(query: string, market: Market): Promise<StockSearchResult[]> {
+  searchRemoteStocks(query: string, market: Market): Promise<StockSearchResult[]> {
     return fetchYahooStockSearch(query, market);
   }
 }

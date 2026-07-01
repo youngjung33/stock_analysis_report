@@ -5,6 +5,7 @@ import { IMarketRepository } from '../../repositories';
 export class GetFeaturedQuotesUseCase {
   constructor(private readonly marketRepo: IMarketRepository) {}
 
+  /** marketRepo.getFeaturedQuotes — kr/us 대표 시세 */
   execute() {
     return this.marketRepo.getFeaturedQuotes();
   }
@@ -14,6 +15,7 @@ export class GetFeaturedQuotesUseCase {
 export class GetStockQuoteUseCase {
   constructor(private readonly marketRepo: IMarketRepository) {}
 
+  /** symbol·market·range 기준 시세·차트 스냅샷 */
   execute(symbol: string, market: Market, range: QuoteChartRange) {
     return this.marketRepo.getStockQuote(symbol, market, range);
   }
@@ -23,6 +25,7 @@ export class GetStockQuoteUseCase {
 export class GetMarketStatusUseCase {
   constructor(private readonly marketRepo: IMarketRepository) {}
 
+  /** marketRepo.getMarketStatus — KR/US 제공자 상태 */
   execute() {
     return this.marketRepo.getMarketStatus();
   }
@@ -32,6 +35,7 @@ export class GetMarketStatusUseCase {
 export class GetMarketAnalysisUseCase {
   constructor(private readonly marketRepo: IMarketRepository) {}
 
+  /** marketRepo.getMarketAnalysis — MarketAnalysisReport */
   execute() {
     return this.marketRepo.getMarketAnalysis();
   }
@@ -41,6 +45,7 @@ export class GetMarketAnalysisUseCase {
 export class SearchStocksUseCase {
   constructor(private readonly marketRepo: IMarketRepository) {}
 
+  /** query·market 기준 종목 검색 결과 */
   execute(query: string, market: Market) {
     return this.marketRepo.searchStocks(query, market);
   }
@@ -50,6 +55,7 @@ export class SearchStocksUseCase {
 export class GetFxRateUseCase {
   constructor(private readonly marketRepo: IMarketRepository) {}
 
+  /** marketRepo.getFxRate — usdKrwRate·fetchedAt */
   execute() {
     return this.marketRepo.getFxRate();
   }

@@ -9,12 +9,14 @@ import { computePosition } from '../../services/position-calculator';
 import { resolveCurrency, resolveYahooSymbol } from '../../services/stock-symbol.resolver';
 import { ValidationError } from '../../errors/domain.errors';
 
+/** 매수/매도 거래 등록 use case */
 export class CreateTransactionUseCase {
   constructor(
     private readonly stockRepo: IStockRepository,
     private readonly transactionRepo: ITransactionRepository,
   ) {}
 
+  /** 종목·수량·단가 검증 후 거래 생성 — 매도 시 보유량 확인 */
   async execute(input: CreateTransactionInput): Promise<TransactionEntity> {
     if (input.quantity <= 0 || input.price <= 0) {
       throw new ValidationError('Quantity and price must be positive');

@@ -28,14 +28,7 @@ import { ListTransactionsUseCase } from './domain/usecases/transactions/list-tra
 import { ITokenService } from './domain/repositories';
 import { BcryptPasswordHasher } from './data/auth/password-hasher';
 import { JwtTokenService } from './data/auth/token.service';
-import { KrYahooMarketProvider, UsFinnhubMarketProvider } from './data/market';
-import {
-  ExternalNewsProvider,
-  YahooChartQuoteProvider,
-  YahooChartSeriesProvider,
-  YahooFxRateProvider,
-  YahooRemoteStockSearchProvider,
-} from './data/market/market-data.adapters';
+import { MarketDataProvider } from './data/market/market-data.provider';
 import { PrismaStockCatalogRepository } from './data/persistence/stock-catalog.repository';
 import {
   PrismaCorporateActionRepository,
@@ -89,15 +82,9 @@ export function getServerServices(): ServerServices {
   const catalogRepo = new PrismaStockCatalogRepository();
   const passwordHasher = new BcryptPasswordHasher();
   const tokenService = new JwtTokenService();
-  const marketProviders = [new UsFinnhubMarketProvider(), new KrYahooMarketProvider()];
+  const marketData = new MarketDataProvider();
 
-  const fxRateProvider = new YahooFxRateProvider();
-  const chartQuoteProvider = new YahooChartQuoteProvider();
-  const chartSeriesProvider = new YahooChartSeriesProvider();
-  const newsProvider = new ExternalNewsProvider();
-  const remoteStockSearch = new YahooRemoteStockSearchProvider();
-
-  const fetchQuotesUseCase = new FetchQuotesUseCase(marketProviders);
+  const fetchQuotesUseCase = new FetchQuotesUseCase(marketData);
   const getFeaturedQuotesUseCase = new GetFeaturedQuotesUseCase(fetchQuotesUseCase);
 
   cached = {
@@ -105,7 +92,7 @@ export function getServerServices(): ServerServices {
     loginUseCase: new LoginUseCase(userRepo, refreshRepo, passwordHasher, tokenService),
     fetchQuotesUseCase,
     getFeaturedQuotesUseCase,
-    getStockQuoteUseCase: new GetStockQuoteUseCase(chartQuoteProvider),
+    getStockQuoteUseCase: new GetStockQuoteUseCase(marketData),
     refreshTokenUseCase: new RefreshTokenUseCase(refreshRepo, tokenService),
     logoutUseCase: new LogoutUseCase(refreshRepo, tokenService),
     createTransactionUseCase: new CreateTransactionUseCase(stockRepo, txRepo),
@@ -116,33 +103,27 @@ export function getServerServices(): ServerServices {
       txRepo,
       quoteRepo,
       corpActionRepo,
-      fxRateProvider,
+      marketData,
     ),
     getHoldingBySymbolUseCase: new GetHoldingBySymbolUseCase(
       stockRepo,
       txRepo,
       quoteRepo,
       corpActionRepo,
-      fxRateProvider,
+      marketData,
     ),
     getPortfolioAnalysisUseCase: new GetPortfolioAnalysisUseCase(
       stockRepo,
       txRepo,
       quoteRepo,
       corpActionRepo,
-      fxRateProvider,
-      chartSeriesProvider,
-      newsProvider,
+      marketData,
     ),
-    refreshQuotesUseCase: new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, marketProviders),
-    getMarketStatusUseCase: new GetMarketStatusUseCase(marketProviders),
-    getMarketAnalysisUseCase: new GetMarketAnalysisUseCase(
-      getFeaturedQuotesUseCase,
-      chartSeriesProvider,
-      newsProvider,
-    ),
-    searchStocksUseCase: new SearchStocksUseCase(catalogRepo, remoteStockSearch),
-    getFxRateUseCase: new GetFxRateUseCase(fxRateProvider),
+    refreshQuotesUseCase: new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, marketData),
+    getMarketStatusUseCase: new GetMarketStatusUseCase(marketData),
+    getMarketAnalysisUseCase: new GetMarketAnalysisUseCase(getFeaturedQuotesUseCase, marketData),
+    searchStocksUseCase: new SearchStocksUseCase(catalogRepo, marketData),
+    getFxRateUseCase: new GetFxRateUseCase(marketData),
     listCorporateActionsUseCase: new ListCorporateActionsUseCase(corpActionRepo),
     createCorporateActionUseCase: new CreateCorporateActionUseCase(stockRepo, corpActionRepo),
     deleteCorporateActionUseCase: new DeleteCorporateActionUseCase(corpActionRepo),

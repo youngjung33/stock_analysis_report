@@ -22,11 +22,7 @@ import {
   IStockRepository,
   ITransactionRepository,
 } from '../../repositories';
-import {
-  IFxRateProvider,
-  IChartSeriesProvider,
-  INewsProvider,
-} from '../../ports/market-data.ports';
+import { IMarketDataProvider } from '../../ports/market-data.port';
 
 /** Yahoo chart range per portfolio period */
 const PERIOD_YAHOO_RANGE: Record<PortfolioPeriod, string> = {
@@ -50,11 +46,10 @@ export class GetPortfolioAnalysisUseCase {
     private readonly transactionRepo: ITransactionRepository,
     private readonly quoteRepo: IStockQuoteRepository,
     private readonly corpActionRepo: ICorporateActionRepository,
-    private readonly fxRateProvider: IFxRateProvider,
-    private readonly chartSeriesProvider: IChartSeriesProvider,
-    private readonly newsProvider: INewsProvider,
+    private readonly marketData: IMarketDataProvider,
   ) {}
 
+  /** 기간별 수익률·벤치마크·RSI/뉴스 인사이트 PortfolioAnalysisResult 반환 */
   async execute(
     userId: string,
     periods: PortfolioPeriod[] = PORTFOLIO_PERIODS,
@@ -119,7 +114,7 @@ export class GetPortfolioAnalysisUseCase {
     }
 
     const hasUsdHoldings = rawHoldings.some((h) => h.currency === 'USD');
-    const usdKrwRate = hasUsdHoldings ? await this.fxRateProvider.fetchUsdKrwRate() : null;
+    const usdKrwRate = hasUsdHoldings ? await this.marketData.fetchUsdKrwRate() : null;
     const enriched = rawHoldings.map((h) => ({
       ...h,
       ...enrichHoldingKrw(h, usdKrwRate),
@@ -158,7 +153,7 @@ export class GetPortfolioAnalysisUseCase {
             periods
               .filter((p) => p !== 'max')
               .map(async (p) => {
-                const series = await this.chartSeriesProvider.fetchSeries(
+                const series = await this.marketData.fetchChartSeries(
                   h.yahooSymbol!,
                   PERIOD_YAHOO_RANGE[p],
                 );
@@ -228,8 +223,8 @@ export class GetPortfolioAnalysisUseCase {
 
         try {
           const [krSeries, usSeries] = await Promise.all([
-            this.chartSeriesProvider.fetchSeries(krBenchmark.yahooSymbol, PERIOD_YAHOO_RANGE[pr.period]),
-            this.chartSeriesProvider.fetchSeries(usBenchmark.yahooSymbol, PERIOD_YAHOO_RANGE[pr.period]),
+            this.marketData.fetchChartSeries(krBenchmark.yahooSymbol, PERIOD_YAHOO_RANGE[pr.period]),
+            this.marketData.fetchChartSeries(usBenchmark.yahooSymbol, PERIOD_YAHOO_RANGE[pr.period]),
           ]);
           const krRet = periodReturnFromCloses(krSeries.closes, pr.period);
           const usRet = periodReturnFromCloses(usSeries.closes, pr.period);
@@ -265,7 +260,7 @@ export class GetPortfolioAnalysisUseCase {
 
           if (h.yahooSymbol) {
             try {
-              const series = await this.chartSeriesProvider.fetchSeries(h.yahooSymbol, '6mo');
+              const series = await this.marketData.fetchChartSeries(h.yahooSymbol, '6mo');
               rsi14 = rsi(series.closes, 14);
             } catch {
               rsi14 = null;
@@ -273,7 +268,7 @@ export class GetPortfolioAnalysisUseCase {
           }
 
           try {
-            const items = await this.newsProvider.fetchGoogleNews(
+            const items = await this.marketData.fetchGoogleNews(
               `${h.name} ${h.symbol}`,
               h.market,
               h.market === Market.KR ? 'ko' : 'en-US',

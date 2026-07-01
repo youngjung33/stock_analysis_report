@@ -1,3 +1,6 @@
+/**
+ * 포트폴리오 기간 수익률 — 가중·종가·누적 수익 계산.
+ */
 export type PortfolioPeriod = '1mo' | '3mo' | 'ytd' | 'max';
 
 export const PORTFOLIO_PERIODS: PortfolioPeriod[] = ['1mo', '3mo', 'ytd', 'max'];
@@ -20,6 +23,7 @@ export interface PortfolioPeriodReturn {
   coveragePercent: number;
 }
 
+/** 종목별 가중 평균 기간 수익률 및 데이터 커버리지(%) 계산 */
 export function computeWeightedPeriodReturn(inputs: PeriodReturnInput[]): {
   returnPercent: number | null;
   coveragePercent: number;
@@ -41,6 +45,7 @@ export function computeWeightedPeriodReturn(inputs: PeriodReturnInput[]): {
   return { returnPercent: weighted, coveragePercent };
 }
 
+/** 전체 보유(MAX) 누적 수익률 — (시가+실현손익-원가)/원가 */
 export function computeMaxTotalReturn(
   totalMarketValueKrw: number | null,
   totalCostBasisKrw: number,
@@ -50,6 +55,7 @@ export function computeMaxTotalReturn(
   return ((totalMarketValueKrw + totalRealizedPnlKrw - totalCostBasisKrw) / totalCostBasisKrw) * 100;
 }
 
+/** 종가 시계열과 기간으로 수익률(%) 산출 */
 export function periodReturnFromCloses(closes: number[], period: PortfolioPeriod): number | null {
   if (closes.length < 2) return null;
   const current = closes[closes.length - 1];

@@ -4,6 +4,7 @@ import { IPortfolioRepository } from '../../repositories';
 export class GetPortfolioAnalysisUseCase {
   constructor(private readonly repo: IPortfolioRepository) {}
 
+  /** repo.getAnalysis — PortfolioAnalysisResult 반환 */
   execute() {
     return this.repo.getAnalysis();
   }

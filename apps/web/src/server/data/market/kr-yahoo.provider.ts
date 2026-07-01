@@ -1,10 +1,10 @@
 import { Market } from '@sar/shared';
 import { StockEntity } from '../../domain/entities';
-import { IMarketDataProvider } from '../../domain/repositories';
 import { resolveYahooSymbol } from '../../domain/services/stock-symbol.resolver';
 import { fetchYahooChartQuote } from './yahoo-chart.client';
 
-export class KrYahooMarketProvider implements IMarketDataProvider {
+/** KR 종목 Yahoo 시세 (MarketDataProvider 내부 adapter) */
+export class KrYahooMarketProvider {
   supports(market: Market): boolean {
     return market === Market.KR;
   }

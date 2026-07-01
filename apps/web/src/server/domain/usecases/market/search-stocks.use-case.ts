@@ -5,15 +5,16 @@ import {
   searchFeaturedStocks,
 } from '@sar/shared';
 import { IStockCatalogRepository } from '../../repositories';
-import { IRemoteStockSearchProvider } from '../../ports/market-data.ports';
+import { IMarketDataProvider } from '../../ports/market-data.port';
 
 /** 종목 검색 — DB catalog 우선, 없으면 Yahoo fallback */
 export class SearchStocksUseCase {
   constructor(
     private readonly catalogRepo: IStockCatalogRepository,
-    private readonly remoteSearch: IRemoteStockSearchProvider,
+    private readonly marketData: IMarketDataProvider,
   ) {}
 
+  /** query·market 기준 종목 검색 — catalog 우선, 없으면 Yahoo fallback */
   async execute(query: string, market: Market): Promise<StockSearchResult[]> {
     const trimmed = query.trim();
     if (trimmed.length < 1) return [];
@@ -27,7 +28,7 @@ export class SearchStocksUseCase {
     let remote: StockSearchResult[] = [];
 
     try {
-      remote = await this.remoteSearch.search(trimmed, market);
+      remote = await this.marketData.searchRemoteStocks(trimmed, market);
     } catch {
       // DB 마스터 없을 때 Yahoo fallback 실패 시 featured만 반환
     }

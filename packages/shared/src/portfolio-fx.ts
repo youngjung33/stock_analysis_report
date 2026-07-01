@@ -1,6 +1,10 @@
+/**
+ * 포트폴리오 통화 환산 — USD/KRW 변환 및 KRW 기준 보유·대시보드 집계.
+ */
 import { Market } from './enums';
 import { aggregatePortfolioTodayPnl, TodayPnlHoldingInput } from './portfolio-today-pnl';
 
+/** 금액을 KRW로 환산 (KRW는 그대로, USD는 환율 적용) */
 export function convertToKrw(
   amount: number | null | undefined,
   currency: string,
@@ -45,6 +49,7 @@ export interface KrwDashboardSummary {
   hasUsdHoldings: boolean;
 }
 
+/** 보유 종목에 원화(KRW) 금액 필드 부여 */
 export function enrichHoldingKrw(
   holding: HoldingFxInput,
   usdKrwRate: number | null,
@@ -58,6 +63,7 @@ export function enrichHoldingKrw(
   };
 }
 
+/** 보유 목록을 KRW 기준 대시보드 요약으로 집계 */
 export function aggregateKrwSummary(
   holdings: HoldingFxInput[],
   usdKrwRate: number | null,

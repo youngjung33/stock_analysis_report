@@ -6,7 +6,7 @@ import {
   IStockRepository,
   ITransactionRepository,
 } from '../../repositories';
-import { IFxRateProvider } from '../../ports/market-data.ports';
+import { IMarketDataProvider } from '../../ports/market-data.port';
 
 /** symbol+market 기준 단일 보유 조회 use case */
 export class GetHoldingBySymbolUseCase {
@@ -15,9 +15,10 @@ export class GetHoldingBySymbolUseCase {
     private readonly transactionRepo: ITransactionRepository,
     private readonly quoteRepo: IStockQuoteRepository,
     private readonly corpActionRepo: ICorporateActionRepository,
-    private readonly fxRateProvider: IFxRateProvider,
+    private readonly marketData: IMarketDataProvider,
   ) {}
 
+  /** symbol·market 기준 단일 보유 HoldingResult — 없으면 null */
   async execute(userId: string, symbol: string, market: Market): Promise<HoldingResult | null> {
     const stock = await this.stockRepo.findBySymbolAndMarket(symbol, market);
     if (!stock) return null;
@@ -56,7 +57,7 @@ export class GetHoldingBySymbolUseCase {
         : null;
 
     const usdKrwRate =
-      stock.currency === 'USD' ? await this.fxRateProvider.fetchUsdKrwRate() : null;
+      stock.currency === 'USD' ? await this.marketData.fetchUsdKrwRate() : null;
     const base = {
       stockId: stock.id,
       symbol: stock.symbol,

@@ -1,5 +1,4 @@
 import {
-  QuoteResult,
   RefreshTokenEntity,
   StockEntity,
   StockQuoteEntity,
@@ -17,7 +16,6 @@ export const TRANSACTION_REPOSITORY = Symbol('TRANSACTION_REPOSITORY');
 export const STOCK_QUOTE_REPOSITORY = Symbol('STOCK_QUOTE_REPOSITORY');
 export const PASSWORD_HASHER = Symbol('PASSWORD_HASHER');
 export const TOKEN_SERVICE = Symbol('TOKEN_SERVICE');
-export const MARKET_DATA_PROVIDERS = Symbol('MARKET_DATA_PROVIDERS');
 
 export interface IUserRepository {
   findByUsername(username: string): Promise<UserEntity | null>;
@@ -84,16 +82,6 @@ export interface ITokenService {
   generateRefreshToken(): string;
   verifyAccessToken(token: string): { sub: string; username: string };
   hashRefreshToken(token: string): string;
-}
-
-export interface IMarketDataProvider {
-  supports(market: Market): boolean;
-  /** Provider display name for UI (e.g. "한국 주식 (Yahoo Finance)"). */
-  label(): string;
-  /** false when env/API key is missing — fetchQuote must not be called. */
-  isAvailable(): boolean;
-  unavailableReason(): string | null;
-  fetchQuote(stock: StockEntity): Promise<QuoteResult>;
 }
 
 export interface CreateTransactionInput {

@@ -1,3 +1,6 @@
+/**
+ * 포트폴리오 벤치마크 — 지수 대비 수익·혼합 벤치마크 비교.
+ */
 import { AllocationByMarket } from './portfolio-allocation';
 import { INDEX_BENCHMARKS } from './market-benchmarks';
 import { Market } from './enums';
@@ -9,6 +12,7 @@ export interface BenchmarkComparison {
   alpha: number | null;
 }
 
+/** 포트폴리오 수익과 벤치마크 수익 비교(알파 포함) */
 export function compareToBenchmark(
   portfolioReturn: number | null,
   benchmarkReturn: number | null,
@@ -26,6 +30,7 @@ export function compareToBenchmark(
   };
 }
 
+/** KR/US 배분에 따른 혼합 벤치마크 가중·지수 선택 */
 export function selectBlendedBenchmark(allocation: AllocationByMarket): {
   krWeight: number;
   usWeight: number;
@@ -42,6 +47,7 @@ export function selectBlendedBenchmark(allocation: AllocationByMarket): {
   return { krWeight, usWeight, krBenchmark, usBenchmark };
 }
 
+/** KR·US 벤치마크 수익률 가중 평균 */
 export function blendBenchmarkReturn(
   krReturn: number | null,
   usReturn: number | null,

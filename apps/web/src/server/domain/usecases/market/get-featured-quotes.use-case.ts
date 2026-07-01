@@ -8,9 +8,11 @@ import {
 import { FeaturedQuotesResult } from '../../entities';
 import { FetchQuotesUseCase } from './fetch-quotes.use-case';
 
+/** KR/US 대표 종목 시세 조회 use case */
 export class GetFeaturedQuotesUseCase {
   constructor(private readonly fetchQuotesUseCase: FetchQuotesUseCase) {}
 
+  /** FEATURED 종목 시세 fetch — kr/us 섹션·fetchedAt 반환 */
   async execute(): Promise<FeaturedQuotesResult> {
     const inputs = [...FEATURED_KR_STOCKS, ...FEATURED_US_STOCKS].map((stock) => ({
       stockId: featuredStockId(stock.symbol, stock.market),

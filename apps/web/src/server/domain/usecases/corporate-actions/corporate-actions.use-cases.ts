@@ -19,12 +19,14 @@ export interface CreateCorporateActionInput {
   memo?: string;
 }
 
+/** 기업행위(배당·분할·합병 등) 등록 use case */
 export class CreateCorporateActionUseCase {
   constructor(
     private readonly stockRepo: IStockRepository,
     private readonly corpActionRepo: ICorporateActionRepository,
   ) {}
 
+  /** 종목·대상종목 resolve 후 기업행위 레코드 생성 */
   async execute(input: CreateCorporateActionInput): Promise<CorporateActionEntity> {
     let stock = await this.stockRepo.findBySymbolAndMarket(input.stockSymbol, input.market);
     if (!stock) {
@@ -67,17 +69,21 @@ export class CreateCorporateActionUseCase {
   }
 }
 
+/** 사용자 기업행위 목록 조회 use case */
 export class ListCorporateActionsUseCase {
   constructor(private readonly corpActionRepo: ICorporateActionRepository) {}
 
+  /** userId 기준 기업행위 목록 반환 */
   execute(userId: string) {
     return this.corpActionRepo.findByUser(userId);
   }
 }
 
+/** 기업행위 삭제 use case */
 export class DeleteCorporateActionUseCase {
   constructor(private readonly corpActionRepo: ICorporateActionRepository) {}
 
+  /** id·userId 일치 기업행위 삭제 */
   execute(id: string, userId: string) {
     return this.corpActionRepo.delete(id, userId);
   }

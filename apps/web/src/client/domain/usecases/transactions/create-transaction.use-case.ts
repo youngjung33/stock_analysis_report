@@ -17,9 +17,11 @@ function validateTransactionInput(input: CreateTransactionInput): void {
   }
 }
 
+/** 거래 등록 API 호출 use case */
 export class CreateTransactionUseCase {
   constructor(private readonly repo: ITransactionRepository) {}
 
+  /** 클라이언트 검증 후 repo.create */
   execute(input: CreateTransactionInput) {
     validateTransactionInput(input);
     return this.repo.create(input);

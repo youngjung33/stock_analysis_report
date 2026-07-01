@@ -1,4 +1,5 @@
 import { Market, QuoteChartRange, StockSearchResult } from '@sar/shared';
+import { QuoteResult, StockEntity } from '../entities';
 
 /** 차트 시세 한 점 (종가·시각) */
 export interface ChartPricePoint {
@@ -32,23 +33,23 @@ export interface NewsItemData {
   market: Market | 'global';
 }
 
-/** USD/KRW 환율 조회 port */
-export interface IFxRateProvider {
+/**
+ * 외부 시장 데이터 단일 port.
+ * Yahoo · Finnhub · Google RSS — use case는 이 interface만 의존한다.
+ */
+export interface IMarketDataProvider {
+  supports(market: Market): boolean;
+  label(market: Market): string;
+  isAvailable(market: Market): boolean;
+  unavailableReason(market: Market): string | null;
+  /** 보유·Featured 종목 현재가 (KR=Yahoo, US=Finnhub) */
+  fetchStockQuote(stock: StockEntity): Promise<QuoteResult>;
+  /** USD/KRW 환율 (Yahoo KRW=X) */
   fetchUsdKrwRate(): Promise<number | null>;
-}
-
-/** Yahoo 기간별 차트 시세 port */
-export interface IChartQuoteProvider {
-  fetchQuote(symbol: string, range: QuoteChartRange): Promise<ChartQuoteData>;
-}
-
-/** Yahoo 일봉 시계열 port */
-export interface IChartSeriesProvider {
-  fetchSeries(symbol: string, yahooRange?: string, interval?: string): Promise<ChartSeriesData>;
-}
-
-/** Google RSS · Finnhub 뉴스 port */
-export interface INewsProvider {
+  /** 종목 기간별 차트 시세 */
+  fetchChartQuote(symbol: string, range: QuoteChartRange): Promise<ChartQuoteData>;
+  /** 일봉 시계열 (벤치마크·RSI·시장 분석) */
+  fetchChartSeries(symbol: string, yahooRange?: string, interval?: string): Promise<ChartSeriesData>;
   fetchGoogleNews(
     query: string,
     market: Market | 'global',
@@ -60,9 +61,6 @@ export interface INewsProvider {
     category: 'general' | 'forex' | 'crypto' | 'merger',
     limit?: number,
   ): Promise<NewsItemData[]>;
-}
-
-/** Yahoo 종목 검색 fallback port */
-export interface IRemoteStockSearchProvider {
-  search(query: string, market: Market): Promise<StockSearchResult[]>;
+  /** DB catalog 없을 때 Yahoo 종목 검색 fallback */
+  searchRemoteStocks(query: string, market: Market): Promise<StockSearchResult[]>;
 }

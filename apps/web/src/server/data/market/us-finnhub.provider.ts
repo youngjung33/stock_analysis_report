@@ -1,12 +1,12 @@
 import { Market } from '@sar/shared';
 import { StockEntity } from '../../domain/entities';
-import { IMarketDataProvider } from '../../domain/repositories';
 import { MarketDataConfig } from './market-data.config';
 
 const FINNHUB_QUOTE_URL = 'https://finnhub.io/api/v1/quote';
 const FINNHUB_REGISTER_URL = 'https://finnhub.io/register';
 
-export class UsFinnhubMarketProvider implements IMarketDataProvider {
+/** US 종목 Finnhub 시세 (MarketDataProvider 내부 adapter) */
+export class UsFinnhubMarketProvider {
   constructor(private readonly marketDataConfig = new MarketDataConfig()) {}
 
   supports(market: Market): boolean {

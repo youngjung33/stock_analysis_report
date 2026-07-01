@@ -1,6 +1,6 @@
 import { Market } from '@sar/shared';
 import type { RefreshQuoteResult } from '../../entities';
-import type { IMarketDataProvider } from '../../repositories';
+import type { IMarketDataProvider } from '../../ports/market-data.port';
 import type { StockEntity } from '../../entities';
 
 type QuoteFailure = RefreshQuoteResult['failed'][number];
@@ -9,13 +9,6 @@ interface QuoteStock {
   id: string;
   symbol: string;
   market: Market;
-}
-
-export function findMarketProvider(
-  providers: IMarketDataProvider[],
-  market: Market,
-): IMarketDataProvider | undefined {
-  return providers.find((p) => p.supports(market));
 }
 
 export function recordQuoteFailure(
@@ -34,12 +27,13 @@ export function recordQuoteFailure(
 }
 
 export async function fetchQuoteForStock(
-  providers: IMarketDataProvider[],
+  marketData: IMarketDataProvider,
   stock: StockEntity,
   failed: QuoteFailure[],
 ): Promise<{ currentPrice: number; changePercent: number | null } | null> {
-  const provider = findMarketProvider(providers, stock.market as Market);
-  if (!provider) {
+  const market = stock.market as Market;
+
+  if (!marketData.supports(market)) {
     recordQuoteFailure(
       failed,
       stock,
@@ -49,18 +43,18 @@ export async function fetchQuoteForStock(
     return null;
   }
 
-  if (!provider.isAvailable()) {
+  if (!marketData.isAvailable(market)) {
     recordQuoteFailure(
       failed,
       stock,
-      provider.unavailableReason() ?? '시세 API가 설정되지 않았습니다.',
+      marketData.unavailableReason(market) ?? '시세 API가 설정되지 않았습니다.',
       'not_configured',
     );
     return null;
   }
 
   try {
-    return await provider.fetchQuote(stock);
+    return await marketData.fetchStockQuote(stock);
   } catch (err) {
     recordQuoteFailure(
       failed,

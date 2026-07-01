@@ -2,30 +2,13 @@ import { vi, type Mock } from 'vitest';
 import { Market } from '@sar/shared';
 import { RefreshQuotesUseCase } from '@server/domain/usecases/market/refresh-quotes.use-case';
 import {
+  createMockMarketData,
   createMockQuoteRepo,
   createMockStock,
   createMockStockRepo,
   createMockTransaction,
   createMockTransactionRepo,
 } from '../../mocks/repositories.mock';
-
-function createProvider(options: {
-  supports?: (market: Market) => boolean;
-  label?: string;
-  isAvailable?: boolean;
-  unavailableReason?: string | null;
-  fetchQuote?: Mock;
-}) {
-  return {
-    supports: vi.fn((market: Market) => options.supports?.(market) ?? true),
-    label: vi.fn(() => options.label ?? 'Test Provider'),
-    isAvailable: vi.fn(() => options.isAvailable ?? true),
-    unavailableReason: vi.fn(() => options.unavailableReason ?? null),
-    fetchQuote:
-      options.fetchQuote ??
-      vi.fn().mockResolvedValue({ currentPrice: 180, changePercent: 1 }),
-  };
-}
 
 describe('RefreshQuotesUseCase', () => {
   // RQ-01
@@ -42,14 +25,16 @@ describe('RefreshQuotesUseCase', () => {
     ]);
 
     const quoteRepo = createMockQuoteRepo();
-    const provider = createProvider({ supports: (m) => m === Market.US });
+    const marketData = createMockMarketData({
+      supports: vi.fn((m) => m === Market.US),
+    });
 
-    const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, [provider]);
+    const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, marketData);
     const resultPromise = useCase.execute('user-1');
     await vi.runAllTimersAsync();
     const result = await resultPromise;
 
-    expect(provider.fetchQuote).toHaveBeenCalledWith(stock);
+    expect(marketData.fetchStockQuote).toHaveBeenCalledWith(stock);
     expect(quoteRepo.upsert).toHaveBeenCalled();
     expect(result.updated).toBe(1);
     expect(result.succeeded).toHaveLength(1);
@@ -76,17 +61,14 @@ describe('RefreshQuotesUseCase', () => {
     ]);
 
     const quoteRepo = createMockQuoteRepo();
-    const krProvider = createProvider({ supports: (m) => m === Market.KR });
-    const usProvider = createProvider({ supports: (m) => m === Market.US });
+    const marketData = createMockMarketData({
+      supports: vi.fn((m) => m === Market.KR || m === Market.US),
+    });
 
-    const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, [
-      usProvider,
-      krProvider,
-    ]);
+    const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, marketData);
     const result = await useCase.execute('user-1');
 
-    expect(krProvider.fetchQuote).toHaveBeenCalledWith(stock);
-    expect(usProvider.fetchQuote).not.toHaveBeenCalled();
+    expect(marketData.fetchStockQuote).toHaveBeenCalledWith(stock);
     expect(result.updated).toBe(1);
   });
 
@@ -102,12 +84,11 @@ describe('RefreshQuotesUseCase', () => {
     ]);
 
     const quoteRepo = createMockQuoteRepo();
-    const provider = createProvider({
-      supports: () => true,
-      fetchQuote: vi.fn().mockRejectedValue(new Error('API down')),
+    const marketData = createMockMarketData({
+      fetchStockQuote: vi.fn().mockRejectedValue(new Error('API down')),
     });
 
-    const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, [provider]);
+    const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, marketData);
     const result = await useCase.execute('user-1');
 
     expect(result.updated).toBe(0);
@@ -128,9 +109,11 @@ describe('RefreshQuotesUseCase', () => {
     ]);
 
     const quoteRepo = createMockQuoteRepo();
-    const provider = createProvider({ supports: () => false });
+    const marketData = createMockMarketData({
+      supports: vi.fn(() => false),
+    });
 
-    const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, [provider]);
+    const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, marketData);
     const result = await useCase.execute('user-1');
 
     expect(result.updated).toBe(0);
@@ -147,12 +130,12 @@ describe('RefreshQuotesUseCase', () => {
     txRepo.findByUserAndStock.mockResolvedValue([]);
 
     const quoteRepo = createMockQuoteRepo();
-    const provider = createProvider({});
+    const marketData = createMockMarketData({});
 
-    const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, [provider]);
+    const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, marketData);
     const result = await useCase.execute('user-1');
 
-    expect(provider.fetchQuote).not.toHaveBeenCalled();
+    expect(marketData.fetchStockQuote).not.toHaveBeenCalled();
     expect(result.updated).toBe(0);
   });
 
@@ -168,16 +151,16 @@ describe('RefreshQuotesUseCase', () => {
     ]);
 
     const quoteRepo = createMockQuoteRepo();
-    const provider = createProvider({
-      supports: (m) => m === Market.US,
-      isAvailable: false,
-      unavailableReason: 'FINNHUB_API_KEY가 설정되지 않았습니다.',
+    const marketData = createMockMarketData({
+      supports: vi.fn((m) => m === Market.US),
+      isAvailable: vi.fn((m) => m !== Market.US),
+      unavailableReason: vi.fn(() => 'FINNHUB_API_KEY가 설정되지 않았습니다.'),
     });
 
-    const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, [provider]);
+    const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, marketData);
     const result = await useCase.execute('user-1');
 
-    expect(provider.fetchQuote).not.toHaveBeenCalled();
+    expect(marketData.fetchStockQuote).not.toHaveBeenCalled();
     expect(result.updated).toBe(0);
     expect(result.failed[0].reason).toBe('FINNHUB_API_KEY가 설정되지 않았습니다.');
     expect(result.failed[0].reasonCode).toBe('not_configured');

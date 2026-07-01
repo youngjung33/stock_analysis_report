@@ -5,6 +5,7 @@ import { IWatchlistRepository } from '../../repositories';
 export class ListWatchlistUseCase {
   constructor(private readonly watchlistRepo: IWatchlistRepository) {}
 
+  /** watchlistRepo.list — 관심종목 배열 반환 */
   execute() {
     return this.watchlistRepo.list();
   }
@@ -14,6 +15,7 @@ export class ListWatchlistUseCase {
 export class AddWatchlistUseCase {
   constructor(private readonly watchlistRepo: IWatchlistRepository) {}
 
+  /** watchlistRepo.add — 추가된 항목 반환 */
   execute(input: { symbol: string; name: string; market: Market }) {
     return this.watchlistRepo.add(input);
   }
@@ -23,6 +25,7 @@ export class AddWatchlistUseCase {
 export class RemoveWatchlistUseCase {
   constructor(private readonly watchlistRepo: IWatchlistRepository) {}
 
+  /** watchlistRepo.remove — id 기준 삭제 */
   execute(id: string) {
     return this.watchlistRepo.remove(id);
   }

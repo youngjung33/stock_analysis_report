@@ -11,6 +11,7 @@ export interface LoginInput {
   password: string;
 }
 
+/** 사용자 인증 후 access/refresh 토큰 발급 use case */
 export class LoginUseCase {
   constructor(
     private readonly userRepo: IUserRepository,
@@ -19,6 +20,7 @@ export class LoginUseCase {
     private readonly tokenService: ITokenService,
   ) {}
 
+  /** 유효한 자격증명이면 accessToken·refreshToken·username 반환 */
   async execute(
     input: LoginInput,
   ): Promise<{ accessToken: string; refreshToken: string; username: string }> {

@@ -6,7 +6,7 @@ import {
   IStockRepository,
   ITransactionRepository,
 } from '../../repositories';
-import { IFxRateProvider } from '../../ports/market-data.ports';
+import { IMarketDataProvider } from '../../ports/market-data.port';
 
 /** 포트폴리오 대시보드 집계 use case */
 export class GetDashboardUseCase {
@@ -15,9 +15,10 @@ export class GetDashboardUseCase {
     private readonly transactionRepo: ITransactionRepository,
     private readonly quoteRepo: IStockQuoteRepository,
     private readonly corpActionRepo: ICorporateActionRepository,
-    private readonly fxRateProvider: IFxRateProvider,
+    private readonly marketData: IMarketDataProvider,
   ) {}
 
+  /** userId 보유 종목 집계 — summary·holdings·lastRefreshedAt 반환 */
   async execute(userId: string): Promise<DashboardResult> {
     const stocks = await this.stockRepo.findHeldByUser(userId);
     const stockIds = stocks.map((s) => s.id);
@@ -104,7 +105,7 @@ export class GetDashboardUseCase {
         : { todayPnl: null, todayPnlPercent: null };
 
     const hasUsdHoldings = rawHoldings.some((h) => h.currency === 'USD');
-    const usdKrwRate = hasUsdHoldings ? await this.fxRateProvider.fetchUsdKrwRate() : null;
+    const usdKrwRate = hasUsdHoldings ? await this.marketData.fetchUsdKrwRate() : null;
 
     const krwSummary = aggregateKrwSummary(rawHoldings, usdKrwRate, hasAllQuotes);
     const allocation = computeAllocation(
