@@ -11,13 +11,18 @@ out/
 .next/
 .vercel/
 
-# Environment (examples만 커밋)
+# Environment (로컬 전용)
 .env
 .env.*
-!.env.example
 !.env*.example
 
-# Prisma / SQLite (Supabase는 원격 DB — 로컬 sqlite 잔여물)
+# Prisma / DB (스키마·마이그레이션 — git에 올리지 않음)
+apps/web/prisma/migrations/
+apps/web/prisma/schema.prisma
+apps/web/prisma/seed.ts
+apps/web/.env.example
+
+# SQLite 잔여물
 *.db
 *.db-journal
 
