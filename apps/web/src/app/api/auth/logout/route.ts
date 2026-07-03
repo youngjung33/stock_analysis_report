@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import {
+  clearAccessCookie,
   clearRefreshCookie,
   getRefreshToken,
   handleRouteError,
@@ -14,6 +15,7 @@ export async function POST(req: NextRequest) {
     await logoutUseCase.execute(refreshToken);
 
     const res = jsonData({ success: true });
+    clearAccessCookie(res);
     clearRefreshCookie(res);
     return res;
   } catch (error) {

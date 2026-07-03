@@ -4,6 +4,7 @@ import {
   getRefreshToken,
   handleRouteError,
   jsonData,
+  setAccessCookie,
   setRefreshCookie,
 } from '@/server/http/route-utils';
 
@@ -11,13 +12,14 @@ export async function POST(req: NextRequest) {
   try {
     const refreshToken = getRefreshToken(req);
     if (!refreshToken) {
-      return jsonData({ accessToken: null, username: null });
+      return jsonData({ username: null });
     }
 
     const { refreshTokenUseCase } = getServerServices();
     const result = await refreshTokenUseCase.execute(refreshToken);
 
-    const res = jsonData({ accessToken: result.accessToken, username: result.username });
+    const res = jsonData({ username: result.username });
+    setAccessCookie(res, result.accessToken);
     setRefreshCookie(res, result.refreshToken);
     return res;
   } catch (error) {

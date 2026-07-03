@@ -184,12 +184,10 @@ export interface FeaturedQuotesResult {
 }
 
 export interface LoginResult {
-  accessToken: string;
   username: string;
 }
 
 export interface SessionResult {
-  accessToken: string | null;
   username: string | null;
 }
 

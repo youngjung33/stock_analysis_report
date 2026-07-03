@@ -1,4 +1,5 @@
 import {
+  CorporateAction,
   CreateTransactionInput,
   Dashboard,
   FeaturedQuotesResult,
@@ -80,6 +81,8 @@ export interface IWatchlistRepository {
 
 export interface ICorporateActionRepository {
   create(input: CreateCorporateActionInput): Promise<void>;
+  list(): Promise<CorporateAction[]>;
+  delete(id: string): Promise<void>;
 }
 
 export interface IGuestSessionPort {

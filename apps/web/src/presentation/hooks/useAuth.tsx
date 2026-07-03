@@ -25,7 +25,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     authSession,
     guestSession,
     guestStore,
-    tokenStorage,
   } = useServices();
   const queryClient = useQueryClient();
   const [username, setUsername] = useState<string | null>(null);
@@ -80,18 +79,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const loginAsGuest = useCallback(async () => {
-    if (tokenStorage.getAccessToken()) {
-      try {
-        await logoutUseCase.execute();
-      } catch {
-        // ignore
-      }
+    try {
+      await logoutUseCase.execute();
+    } catch {
+      // ignore — 비회원 전환 시 기존 세션 정리
     }
     guestStore.clear();
     guestSession.activate();
     setUsername(GUEST_DISPLAY_NAME);
     await queryClient.clear();
-  }, [logoutUseCase, queryClient, guestSession, guestStore, tokenStorage]);
+  }, [logoutUseCase, queryClient, guestSession, guestStore]);
 
   const value = useMemo(
     () => ({

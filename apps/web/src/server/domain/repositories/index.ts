@@ -1,3 +1,4 @@
+import { AccessTokenPayload } from '../auth.types';
 import {
   RefreshTokenEntity,
   StockEntity,
@@ -80,7 +81,7 @@ export interface IPasswordHasher {
 export interface ITokenService {
   generateAccessToken(payload: { sub: string; username: string }): string;
   generateRefreshToken(): string;
-  verifyAccessToken(token: string): { sub: string; username: string };
+  verifyAccessToken(token: string): AccessTokenPayload;
   hashRefreshToken(token: string): string;
 }
 

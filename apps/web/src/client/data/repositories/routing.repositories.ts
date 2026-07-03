@@ -91,6 +91,12 @@ export const corporateActionRepository: ICorporateActionRepository = {
   create(input) {
     return pickCorporateActionRepo().create(input);
   },
+  list() {
+    return pickCorporateActionRepo().list();
+  },
+  delete(id) {
+    return pickCorporateActionRepo().delete(id);
+  },
 };
 
 export {

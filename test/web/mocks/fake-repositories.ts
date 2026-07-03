@@ -12,7 +12,6 @@ export function createFakeAuthRepository(
 ): IAuthRepository {
   return {
     login: vi.fn().mockResolvedValue({
-      accessToken: 'token',
       username: 'admin',
     } satisfies LoginResult),
     refresh: vi.fn(),

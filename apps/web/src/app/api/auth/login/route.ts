@@ -3,6 +3,7 @@ import { getServerServices } from '@/server/container';
 import {
   handleRouteError,
   jsonData,
+  setAccessCookie,
   setRefreshCookie,
 } from '@/server/http/route-utils';
 
@@ -19,7 +20,8 @@ export async function POST(req: NextRequest) {
       password: body.password,
     });
 
-    const res = jsonData({ accessToken: result.accessToken, username: result.username });
+    const res = jsonData({ username: result.username });
+    setAccessCookie(res, result.accessToken);
     setRefreshCookie(res, result.refreshToken);
     return res;
   } catch (error) {

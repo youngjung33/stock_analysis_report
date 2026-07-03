@@ -18,7 +18,7 @@ describe('LoginUseCase', () => {
     const authRepo = createFakeAuthRepository();
     const useCase = new LoginUseCase(authRepo);
     const result = await useCase.execute('admin', 'password');
-    expect(result.accessToken).toBe('token');
+    expect(result.username).toBe('admin');
     expect(authRepo.login).toHaveBeenCalledWith('admin', 'password');
   });
 
@@ -34,11 +34,11 @@ describe('RefreshSessionUseCase', () => {
   // WS-01
   it('delegates to auth repository refresh', async () => {
     const authRepo = createFakeAuthRepository({
-      refresh: vi.fn().mockResolvedValue({ accessToken: 'new-token', username: 'admin' }),
+      refresh: vi.fn().mockResolvedValue({ username: 'admin' }),
     });
     const useCase = new RefreshSessionUseCase(authRepo);
     const result = await useCase.execute();
-    expect(result.accessToken).toBe('new-token');
+    expect(result?.username).toBe('admin');
     expect(authRepo.refresh).toHaveBeenCalled();
   });
 });

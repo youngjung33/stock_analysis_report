@@ -88,8 +88,30 @@ export function createMockTokenService(): ITokenService {
   return {
     generateAccessToken: vi.fn().mockReturnValue('access-token'),
     generateRefreshToken: vi.fn().mockReturnValue('refresh-token'),
-    verifyAccessToken: vi.fn(),
+    verifyAccessToken: vi.fn().mockReturnValue({ sub: 'user-1', username: 'admin', jti: 'jti-1' }),
     hashRefreshToken: vi.fn().mockReturnValue('token-hash'),
+  };
+}
+
+export function createMockWatchlistRepo(
+  overrides: Partial<import('@server/domain/repositories').IWatchlistRepository> = {},
+) {
+  return {
+    findByUser: vi.fn().mockResolvedValue([]),
+    create: vi.fn(),
+    delete: vi.fn(),
+    findByUserSymbolMarket: vi.fn(),
+    ...overrides,
+  };
+}
+
+export function createMockCatalogRepo(
+  overrides: Partial<import('@server/domain/repositories').IStockCatalogRepository> = {},
+) {
+  return {
+    countByMarket: vi.fn().mockResolvedValue(0),
+    search: vi.fn().mockResolvedValue([]),
+    ...overrides,
   };
 }
 

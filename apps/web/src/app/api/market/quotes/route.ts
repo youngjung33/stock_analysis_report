@@ -2,12 +2,14 @@ import { NextRequest } from 'next/server';
 import { Market } from '@sar/shared';
 import { getServerServices } from '@/server/container';
 import { BadRequestError } from '@/server/http/errors';
+import { enforceRateLimit } from '@/server/http/rate-limit';
 import { handleRouteError, jsonData } from '@/server/http/route-utils';
 
 export const maxDuration = 10;
 
 export async function POST(req: NextRequest) {
   try {
+    enforceRateLimit(req, 'market:quotes', 'standard');
     const body = (await req.json()) as {
       stocks?: { stockId?: string; symbol?: string; market?: Market }[];
     };

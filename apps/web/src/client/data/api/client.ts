@@ -1,7 +1,6 @@
 'use client';
 
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { tokenStorage } from '../auth/token-storage';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? '/api';
 
@@ -11,19 +10,11 @@ export const apiClient = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = tokenStorage.getAccessToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
 let isRefreshing = false;
-let refreshQueue: ((token: string | null) => void)[] = [];
+let refreshQueue: ((ok: boolean) => void)[] = [];
 
-function processQueue(token: string | null) {
-  refreshQueue.forEach((cb) => cb(token));
+function processQueue(ok: boolean) {
+  refreshQueue.forEach((cb) => cb(ok));
   refreshQueue = [];
 }
 
@@ -50,12 +41,11 @@ apiClient.interceptors.response.use(
 
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
-        refreshQueue.push((token) => {
-          if (!token) {
+        refreshQueue.push((ok) => {
+          if (!ok) {
             reject(error);
             return;
           }
-          original.headers.Authorization = `Bearer ${token}`;
           resolve(apiClient(original));
         });
       });
@@ -65,13 +55,18 @@ apiClient.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      const { data } = await apiClient.post<{ accessToken: string }>('/auth/refresh');
-      tokenStorage.setAccessToken(data.accessToken);
-      processQueue(data.accessToken);
-      original.headers.Authorization = `Bearer ${data.accessToken}`;
+      const { data } = await apiClient.post<{ username: string | null }>('/auth/refresh');
+      if (!data.username) {
+        processQueue(false);
+        const { tokenStorage } = await import('../auth/token-storage');
+        tokenStorage.triggerUnauthorized();
+        return Promise.reject(error);
+      }
+      processQueue(true);
       return apiClient(original);
     } catch (refreshError) {
-      processQueue(null);
+      processQueue(false);
+      const { tokenStorage } = await import('../auth/token-storage');
       tokenStorage.triggerUnauthorized();
       return Promise.reject(refreshError);
     } finally {

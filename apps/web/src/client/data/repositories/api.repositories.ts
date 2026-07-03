@@ -1,5 +1,6 @@
 import { Market, QuoteChartRange } from '@sar/shared';
 import {
+  CorporateAction,
   CreateTransactionInput,
   FeaturedQuotesResult,
   LoginResult,
@@ -25,23 +26,20 @@ import { tokenStorage } from '../auth/token-storage';
 export class ApiAuthRepository implements IAuthRepository {
   async login(username: string, password: string): Promise<LoginResult> {
     const { data } = await apiClient.post<LoginResult>('/auth/login', { username, password });
-    tokenStorage.setAccessToken(data.accessToken);
     return data;
   }
 
   async refresh(): Promise<LoginResult | null> {
     const { data } = await apiClient.post<SessionResult>('/auth/refresh');
-    if (!data.accessToken || !data.username) {
-      tokenStorage.setAccessToken(null);
+    if (!data.username) {
       return null;
     }
-    tokenStorage.setAccessToken(data.accessToken);
-    return { accessToken: data.accessToken, username: data.username };
+    return { username: data.username };
   }
 
   async logout(): Promise<void> {
     await apiClient.post('/auth/logout');
-    tokenStorage.setAccessToken(null);
+    tokenStorage.triggerUnauthorized();
   }
 }
 
@@ -151,5 +149,14 @@ export class ApiWatchlistRepository implements IWatchlistRepository {
 export class ApiCorporateActionRepository implements ICorporateActionRepository {
   async create(input: CreateCorporateActionInput) {
     await apiClient.post('/corporate-actions', input);
+  }
+
+  async list() {
+    const { data } = await apiClient.get<{ items: CorporateAction[] }>('/corporate-actions');
+    return data.items;
+  }
+
+  async delete(id: string) {
+    await apiClient.delete(`/corporate-actions/${id}`);
   }
 }

@@ -2,12 +2,14 @@ import { NextRequest } from 'next/server';
 import { Market, isQuoteChartRange, QUOTE_CHART_RANGE_HINT } from '@sar/shared';
 import { getServerServices } from '@/server/container';
 import { BadRequestError } from '@/server/http/errors';
+import { enforceRateLimit } from '@/server/http/rate-limit';
 import { handleRouteError, jsonData } from '@/server/http/route-utils';
 
 export const maxDuration = 10;
 
 export async function GET(req: NextRequest) {
   try {
+    enforceRateLimit(req, 'market:quote', 'standard');
     const symbol = req.nextUrl.searchParams.get('symbol')?.trim();
     const market = req.nextUrl.searchParams.get('market') as Market | null;
     const rangeParam = req.nextUrl.searchParams.get('range') ?? '1d';
