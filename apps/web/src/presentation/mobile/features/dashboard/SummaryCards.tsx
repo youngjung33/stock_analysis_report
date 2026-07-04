@@ -1,4 +1,5 @@
 import { DashboardSummary } from '@/client/domain/models';
+import { Surface } from '../../../design-system';
 import { formatNumber, formatTodayChange, pnlClass } from '../../../shared/formatters';
 
 interface Props {
@@ -64,17 +65,19 @@ export function MobileSummaryCards({ summary }: Props) {
           USD/KRW {summary.usdKrwRate.toLocaleString(undefined, { maximumFractionDigits: 2 })} 기준
         </p>
       )}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-4">
         {cards.map((card) => (
-          <div
+          <Surface
             key={card.id}
-            className={`rounded-xl border border-slate-800 bg-slate-900/60 p-3 ${card.id === 'holdings-count' ? 'col-span-2' : ''}`}
+            variant="card"
+            as="div"
+            className={card.id === 'holdings-count' ? 'col-span-2' : undefined}
           >
-            <p className="text-xs text-slate-400">{card.label}</p>
-            <p className={`mt-1 text-base font-semibold ${card.className ?? 'text-white'}`}>
+            <p className="text-xs text-muted-foreground">{card.label}</p>
+            <p className={`mt-2 text-base font-semibold ${card.className ?? 'text-foreground'}`}>
               {card.value}
             </p>
-          </div>
+          </Surface>
         ))}
       </div>
     </div>

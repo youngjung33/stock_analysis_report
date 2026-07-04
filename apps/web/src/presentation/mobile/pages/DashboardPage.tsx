@@ -13,87 +13,78 @@ import {
 } from '../../components/PortfolioAnalysisSections';
 import { WatchlistSection } from '../../components/WatchlistSection';
 import { usePortfolioAnalysis } from '../../hooks/usePortfolioAnalysis';
-import { MobileLayout } from '../layout/MobileLayout';
+import { AppShell, RefreshQuotesButton } from '../../layout';
+import { PageStack } from '../../design-system';
 
 export function MobileDashboardPage() {
   const screen = useDashboardScreen();
   const analysis = usePortfolioAnalysis();
 
   return (
-    <MobileLayout
+    <AppShell
       title="대시보드"
       subtitle={`${screen.displayName}님`}
-      onLogout={() => screen.logout()}
       headerActions={
-        <button
-          type="button"
+        <RefreshQuotesButton
+          compact
           onClick={screen.handleRefresh}
-          disabled={screen.refreshing}
-          className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium hover:bg-emerald-500 disabled:opacity-50"
-        >
-          {screen.refreshing ? '갱신 중' : '갱신'}
-        </button>
+          loading={screen.refreshing}
+        />
       }
     >
-      {screen.isGuest && (
-        <p className="mb-4 rounded-lg border border-amber-900/50 bg-amber-950/40 px-3 py-2 text-xs text-amber-200/90">
-          비회원 모드 — 탭을 닫으면 데이터가 사라집니다.
-        </p>
-      )}
+      <PageStack>
+        {screen.isGuest && (
+          <p className="rounded-xl border border-amber-900/40 bg-amber-950/30 px-4 py-3 text-xs text-amber-200/90">
+            비회원 모드 — 탭을 닫으면 데이터가 사라집니다.
+          </p>
+        )}
 
-      {!screen.marketStatusLoading && screen.marketProviders.length > 0 && (
-        <div className="mb-4">
+        {!screen.marketStatusLoading && screen.marketProviders.length > 0 && (
           <MarketStatusBanner providers={screen.marketProviders} />
-        </div>
-      )}
+        )}
 
-      {screen.refreshNotice && (
-        <div className="mb-4">
-          <QuoteRefreshNoticeBox notice={screen.refreshNotice} />
-        </div>
-      )}
+        {screen.refreshNotice && <QuoteRefreshNoticeBox notice={screen.refreshNotice} />}
 
-      {screen.data?.lastRefreshedAt && (
-        <p className="mb-4 text-xs text-slate-500">
-          마지막 갱신: {new Date(screen.data.lastRefreshedAt).toLocaleString('ko-KR')}
-        </p>
-      )}
+        {screen.data?.lastRefreshedAt && (
+          <p className="text-xs text-muted-foreground">
+            마지막 갱신: {new Date(screen.data.lastRefreshedAt).toLocaleString('ko-KR')}
+          </p>
+        )}
 
-      {screen.isLoading && <p className="text-sm text-slate-400">대시보드 로딩 중...</p>}
-      {screen.error && <p className="text-sm text-rose-400">대시보드를 불러오지 못했습니다.</p>}
+        {screen.isLoading && <p className="text-sm text-muted-foreground">대시보드 로딩 중...</p>}
+        {screen.error && <p className="text-sm text-danger">대시보드를 불러오지 못했습니다.</p>}
 
-      {screen.data && (
-        <div className="space-y-4">
-          <MobileSummaryCards summary={screen.data.summary} />
-          <AllocationSection
-            items={screen.data.holdings
-              .filter((h) => h.weightPercent !== null && h.marketValueKrw !== null)
-              .map((h) => ({
+        {screen.data && (
+          <>
+            <MobileSummaryCards summary={screen.data.summary} />
+            <AllocationSection
+              items={screen.data.holdings
+                .filter((h) => h.weightPercent !== null && h.marketValueKrw !== null)
+                .map((h) => ({
+                  symbol: h.symbol,
+                  name: h.name,
+                  market: h.market,
+                  marketValueKrw: h.marketValueKrw as number,
+                  weightPercent: h.weightPercent as number,
+                }))}
+              allocationByMarket={screen.data.summary.allocationByMarket}
+            />
+            <MobileHoldingsCardList holdings={screen.data.holdings} />
+            <PeriodReturnsCard analysis={analysis.data} isLoading={analysis.isLoading} />
+            <BenchmarkComparisonRow analysis={analysis.data} />
+            <PortfolioInsightsSection analysis={analysis.data} isLoading={analysis.isLoading} />
+            <WatchlistSection
+              holdingSymbols={screen.data.holdings.map((h) => ({
                 symbol: h.symbol,
-                name: h.name,
                 market: h.market,
-                marketValueKrw: h.marketValueKrw as number,
-                weightPercent: h.weightPercent as number,
               }))}
-            allocationByMarket={screen.data.summary.allocationByMarket}
-          />
-          <MobileHoldingsCardList holdings={screen.data.holdings} />
-          <PeriodReturnsCard analysis={analysis.data} isLoading={analysis.isLoading} />
-          <BenchmarkComparisonRow analysis={analysis.data} />
-          <PortfolioInsightsSection analysis={analysis.data} isLoading={analysis.isLoading} />
-          <WatchlistSection
-            holdingSymbols={screen.data.holdings.map((h) => ({
-              symbol: h.symbol,
-              market: h.market,
-            }))}
-          />
-        </div>
-      )}
+            />
+          </>
+        )}
 
-      <div className="mt-6 space-y-6">
         <MarketSentimentSummarySection compact />
         <FeaturedQuotesSection compact />
-      </div>
-    </MobileLayout>
+      </PageStack>
+    </AppShell>
   );
 }

@@ -6,6 +6,7 @@ import { Market, StockSearchResult } from '@sar/shared';
 import { stockDetailHref } from '../shared/stock-routes';
 import { StockSearchField } from '../shared/StockSearchField';
 import { useWatchlist } from '../hooks/useWatchlist';
+import { Surface } from '../design-system';
 
 interface Props {
   holdingSymbols: { symbol: string; market: Market }[];
@@ -17,11 +18,11 @@ export function WatchlistSection({ holdingSymbols }: Props) {
   const { items, isLoading, add, remove, isHeld } = useWatchlist(holdingSymbols);
 
   return (
-    <section className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 sm:p-6">
-      <h2 className="text-sm font-semibold text-white">관심종목</h2>
-      <p className="mt-1 text-xs text-slate-500">보유와 별도로 추적할 종목을 등록하세요.</p>
+    <Surface>
+      <h2 className="text-base font-semibold tracking-tight">관심종목</h2>
+      <p className="mt-2 text-sm text-muted-foreground">보유와 별도로 추적할 종목을 등록하세요.</p>
 
-      <div className="mt-4 max-w-xl">
+      <div className="mt-6 max-w-xl">
         <StockSearchField
           market={market}
           selected={selected}
@@ -40,11 +41,11 @@ export function WatchlistSection({ holdingSymbols }: Props) {
       ) : items.length === 0 ? (
         <p className="mt-4 text-sm text-slate-500">등록된 관심종목이 없습니다.</p>
       ) : (
-        <ul className="mt-4 space-y-2">
+        <ul className="mt-6 space-y-3">
           {items.map((item) => (
             <li
               key={item.id}
-              className="flex items-center justify-between gap-2 rounded-lg border border-slate-800 px-3 py-2"
+              className="flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/20 px-4 py-3"
             >
               <div className="min-w-0">
                 <Link
@@ -71,6 +72,6 @@ export function WatchlistSection({ holdingSymbols }: Props) {
           ))}
         </ul>
       )}
-    </section>
+    </Surface>
   );
 }

@@ -1,0 +1,46 @@
+import type { LucideIcon } from 'lucide-react';
+import { ArrowLeftRight, LayoutDashboard, LineChart } from 'lucide-react';
+
+export type NavSectionId = 'dashboard' | 'transactions' | 'market';
+
+export interface AppNavItem {
+  id: NavSectionId;
+  href: string;
+  label: string;
+  shortLabel: string;
+  icon: LucideIcon;
+  /** pathname prefix match (exact if ends without *) */
+  match: (pathname: string) => boolean;
+}
+
+export const APP_NAV_ITEMS: AppNavItem[] = [
+  {
+    id: 'dashboard',
+    href: '/',
+    label: '대시보드',
+    shortLabel: '홈',
+    icon: LayoutDashboard,
+    match: (pathname) => pathname === '/' || pathname.startsWith('/stocks'),
+  },
+  {
+    id: 'transactions',
+    href: '/transactions',
+    label: '거래 관리',
+    shortLabel: '거래',
+    icon: ArrowLeftRight,
+    match: (pathname) => pathname.startsWith('/transactions'),
+  },
+  {
+    id: 'market',
+    href: '/market/analysis',
+    label: '시장 분석',
+    shortLabel: '시장',
+    icon: LineChart,
+    match: (pathname) => pathname.startsWith('/market'),
+  },
+];
+
+export const APP_BRAND = {
+  name: 'SAR Portfolio',
+  tagline: 'Stock Analysis Report',
+};

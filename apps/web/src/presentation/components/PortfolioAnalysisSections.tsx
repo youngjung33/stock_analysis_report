@@ -1,6 +1,7 @@
 'use client';
 
 import { PortfolioAnalysisResult } from '@/client/domain/models';
+import { Surface } from '../design-system';
 import { formatPercent, pnlClass } from '../shared/formatters';
 
 interface Props {
@@ -11,31 +12,33 @@ interface Props {
 export function PeriodReturnsCard({ analysis, isLoading }: Props) {
   if (isLoading) {
     return (
-      <section className="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
-        <p className="text-sm text-slate-400">기간 수익률 불러오는 중...</p>
-      </section>
+      <Surface>
+        <p className="text-sm text-muted-foreground">기간 수익률 불러오는 중...</p>
+      </Surface>
     );
   }
 
   if (!analysis || analysis.portfolioReturns.length === 0) return null;
 
   return (
-    <section className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 sm:p-6">
-      <h2 className="text-sm font-semibold text-white">기간 수익률 (원화 가중)</h2>
-      <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <Surface>
+      <h2 className="text-base font-semibold tracking-tight">기간 수익률 (원화 가중)</h2>
+      <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {analysis.portfolioReturns.map((item) => (
-          <div key={item.period} className="rounded-lg border border-slate-800 bg-slate-900/50 p-3">
-            <p className="text-xs text-slate-500">{item.label}</p>
-            <p className={`mt-1 text-lg font-semibold ${pnlClass(item.returnPercent)}`}>
+          <Surface key={item.period} variant="card" as="div">
+            <p className="text-xs text-muted-foreground">{item.label}</p>
+            <p className={`mt-2 text-lg font-semibold ${pnlClass(item.returnPercent)}`}>
               {formatPercent(item.returnPercent)}
             </p>
             {item.coveragePercent < 100 && item.returnPercent !== null && (
-              <p className="mt-1 text-xs text-slate-600">커버리지 {item.coveragePercent.toFixed(0)}%</p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                커버리지 {item.coveragePercent.toFixed(0)}%
+              </p>
             )}
-          </div>
+          </Surface>
         ))}
       </div>
-    </section>
+    </Surface>
   );
 }
 
@@ -43,16 +46,16 @@ export function BenchmarkComparisonRow({ analysis }: { analysis: PortfolioAnalys
   if (!analysis || analysis.benchmarkComparisons.length === 0) return null;
 
   return (
-    <section className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 sm:p-6">
-      <h2 className="text-sm font-semibold text-white">벤치마크 대비</h2>
-      <ul className="mt-3 space-y-2 text-sm">
+    <Surface>
+      <h2 className="text-base font-semibold tracking-tight">벤치마크 대비</h2>
+      <ul className="mt-5 space-y-3 text-sm">
         {analysis.benchmarkComparisons.map((row) => (
-          <li key={row.period} className="flex flex-wrap items-center gap-x-2 text-slate-300">
-            <span className="font-medium text-white">{row.label}</span>
+          <li key={row.period} className="flex flex-wrap items-center gap-x-2 text-muted-foreground">
+            <span className="font-medium text-foreground">{row.label}</span>
             <span className={pnlClass(row.portfolioReturn)}>
               포트폴리오 {formatPercent(row.portfolioReturn)}
             </span>
-            <span className="text-slate-500">vs {row.benchmarkName}</span>
+            <span className="text-muted-foreground">vs {row.benchmarkName}</span>
             <span className={pnlClass(row.benchmarkReturn)}>
               {formatPercent(row.benchmarkReturn)}
             </span>
@@ -64,7 +67,7 @@ export function BenchmarkComparisonRow({ analysis }: { analysis: PortfolioAnalys
           </li>
         ))}
       </ul>
-    </section>
+    </Surface>
   );
 }
 
@@ -72,38 +75,38 @@ export function PortfolioInsightsSection({ analysis, isLoading }: Props) {
   if (isLoading) return null;
   if (!analysis || analysis.holdingsInsights.length === 0) {
     return (
-      <section className="rounded-xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-400">
+      <Surface variant="subtle" className="border-dashed text-center text-sm text-muted-foreground">
         보유 종목 인사이트가 없습니다.
-      </section>
+      </Surface>
     );
   }
 
   return (
-    <section className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 sm:p-6">
-      <h2 className="text-sm font-semibold text-white">보유 종목 RSI · 뉴스</h2>
-      <ul className="mt-4 space-y-4">
+    <Surface>
+      <h2 className="text-base font-semibold tracking-tight">보유 종목 RSI · 뉴스</h2>
+      <ul className="mt-6 space-y-4">
         {analysis.holdingsInsights.map((item) => (
-          <li key={`${item.symbol}-${item.market}`} className="rounded-lg border border-slate-800 p-3">
+          <li key={`${item.symbol}-${item.market}`} className="rounded-xl border border-border bg-muted/20 p-4 sm:p-5">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-medium text-white">{item.symbol}</span>
-              <span className="text-xs text-slate-500">{item.name}</span>
-              <span className="rounded bg-slate-800 px-2 py-0.5 text-xs text-slate-300">
+              <span className="font-medium text-foreground">{item.symbol}</span>
+              <span className="text-xs text-muted-foreground">{item.name}</span>
+              <span className="rounded-md bg-accent px-2.5 py-1 text-xs text-muted-foreground">
                 RSI {item.rsi14?.toFixed(1) ?? '—'} · {item.rsiLabel}
               </span>
             </div>
             {item.news.length > 0 && (
-              <ul className="mt-2 space-y-1">
+              <ul className="mt-3 space-y-2">
                 {item.news.map((n) => (
                   <li key={n.url}>
                     <a
                       href={n.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-indigo-400 hover:text-indigo-300"
+                      className="text-xs text-primary hover:opacity-80"
                     >
                       {n.title}
                     </a>
-                    <span className="ml-1 text-xs text-slate-600">· {n.source}</span>
+                    <span className="ml-1 text-xs text-muted-foreground">· {n.source}</span>
                   </li>
                 ))}
               </ul>
@@ -111,6 +114,6 @@ export function PortfolioInsightsSection({ analysis, isLoading }: Props) {
           </li>
         ))}
       </ul>
-    </section>
+    </Surface>
   );
 }

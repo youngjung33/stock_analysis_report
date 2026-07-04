@@ -1,52 +1,56 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+// @layer base — Tailwind utilities/components가 reset보다 우선하도록
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 
-* {
-  margin: 0;
-  padding: 0;
-}
+  // :where()로 specificity 0 — p-6, ui-surface 등이 패딩을 덮어쓸 수 있게 함
+  :where(*) {
+    margin: 0;
+    padding: 0;
+  }
 
-html {
-  -webkit-text-size-adjust: 100%;
-}
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
 
-img,
-picture,
-video,
-canvas,
-svg {
-  display: block;
-  max-width: 100%;
-}
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
 
-input,
-button,
-textarea,
-select {
-  font: inherit;
-  color: inherit;
-}
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
 
-button {
-  cursor: pointer;
-  background: none;
-  border: none;
-}
+  button {
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 
-ul,
-ol {
-  list-style: none;
-}
+  ul,
+  ol {
+    list-style: none;
+  }
 
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
 }

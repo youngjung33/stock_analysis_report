@@ -2,8 +2,7 @@
 
 import { Market } from '@sar/shared';
 import { StockDetailContent } from '../../components/StockDetailContent';
-import { MobileLayout } from '../layout/MobileLayout';
-import { useAuth } from '../../hooks/useAuth';
+import { AppShell } from '../../layout';
 
 interface Props {
   symbol: string;
@@ -11,16 +10,9 @@ interface Props {
 }
 
 export function MobileStockDetailPage({ symbol, market }: Props) {
-  const { username, logout } = useAuth();
-
   return (
-    <MobileLayout
-      title="종목 상세"
-      subtitle={username ?? undefined}
-      onLogout={() => logout()}
-      showFooterNav={false}
-    >
+    <AppShell title="종목 상세" subtitle={`${symbol} · ${market}`} maxWidth="3xl">
       <StockDetailContent symbol={symbol} market={market} />
-    </MobileLayout>
+    </AppShell>
   );
 }

@@ -1,4 +1,5 @@
 import { DashboardSummary } from '@/client/domain/models';
+import { Surface } from '../../../design-system';
 import { formatNumber, formatTodayChange, pnlClass } from '../../../shared/formatters';
 
 interface Props {
@@ -61,12 +62,12 @@ export function DesktopSummaryCards({ summary }: Props) {
           USD/KRW {summary.usdKrwRate.toLocaleString(undefined, { maximumFractionDigits: 2 })} 기준 원화 환산
         </p>
       )}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {cards.map((card) => (
-          <div key={card.id} className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-            <p className="text-sm text-slate-400">{card.label}</p>
-            <p className={`mt-2 text-xl font-semibold ${card.className}`}>{card.value}</p>
-          </div>
+          <Surface key={card.id} variant="card" as="div">
+            <p className="text-sm text-muted-foreground">{card.label}</p>
+            <p className={`mt-3 text-xl font-semibold tracking-tight ${card.className}`}>{card.value}</p>
+          </Surface>
         ))}
       </div>
     </div>

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { CorporateActionType, Market, StockSearchResult } from '@sar/shared';
 import { useServices } from '../hooks/useServices';
 import { StockSearchField } from '../shared/StockSearchField';
+import { Surface } from '../design-system';
 
 interface Props {
   onSuccess?: () => void;
@@ -61,9 +62,11 @@ export function CorporateActionForm({ onSuccess }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-xl border border-slate-800 bg-slate-950/40 p-4">
-      <h2 className="text-sm font-semibold text-white">기업행위 등록</h2>
-      <p className="text-xs text-slate-500">배당 · 분할 · 합병을 수동으로 등록합니다.</p>
+    <Surface as="form" variant="section" onSubmit={handleSubmit} className="space-y-5">
+      <div>
+        <h2 className="text-base font-semibold tracking-tight">기업행위 등록</h2>
+        <p className="mt-2 text-sm text-muted-foreground">배당 · 분할 · 합병을 수동으로 등록합니다.</p>
+      </div>
 
       <StockSearchField
         market={market}
@@ -178,6 +181,6 @@ export function CorporateActionForm({ onSuccess }: Props) {
       >
         {submitting ? '등록 중...' : '기업행위 등록'}
       </button>
-    </form>
+    </Surface>
   );
 }

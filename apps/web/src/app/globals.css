@@ -1,1 +1,94 @@
 @import 'tailwindcss';
+
+@theme {
+  --color-background: #09090b;
+  --color-foreground: #fafafa;
+  --color-card: #0c0c0f;
+  --color-card-foreground: #fafafa;
+  --color-muted: #18181b;
+  --color-muted-foreground: #a1a1aa;
+  --color-border: rgb(255 255 255 / 0.08);
+  --color-border-strong: rgb(255 255 255 / 0.12);
+  --color-primary: #6366f1;
+  --color-primary-foreground: #ffffff;
+  --color-accent: #27272a;
+  --color-accent-foreground: #fafafa;
+  --color-success: #10b981;
+  --color-danger: #f43f5e;
+  --color-sidebar: #0a0a0c;
+  --color-sidebar-foreground: #a1a1aa;
+  --color-sidebar-active: rgb(99 102 241 / 0.15);
+  --radius-lg: 0.75rem;
+  --radius-md: 0.5rem;
+  --width-sidebar: 17.5rem;
+  --height-header: 4.25rem;
+  --height-bottom-nav: 4.25rem;
+  --spacing-page-x: 2.5rem;
+  --spacing-page-y: 2.5rem;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* reset 이후에도 패딩이 보장되도록 :where()로 낮은 specificity 유지 */
+@layer components {
+  :where(.ui-page-inner) {
+    padding-inline: 1.25rem;
+    padding-block: 1.75rem;
+  }
+
+  @media (min-width: 640px) {
+    :where(.ui-page-inner) {
+      padding-inline: 2rem;
+      padding-block: 2.25rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    :where(.ui-page-inner) {
+      padding-inline: 2.5rem;
+      padding-block: 2.5rem;
+    }
+  }
+
+  :where(.ui-shell-header-inner) {
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    :where(.ui-shell-header-inner) {
+      padding-inline: 2rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    :where(.ui-shell-header-inner) {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  :where(.ui-surface--section) {
+    padding: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    :where(.ui-surface--section) {
+      padding: 2rem;
+    }
+  }
+
+  :where(.ui-surface--card),
+  :where(.ui-surface--subtle) {
+    padding: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    :where(.ui-surface--card),
+    :where(.ui-surface--subtle) {
+      padding: 1.5rem;
+    }
+  }
+}

@@ -1,6 +1,7 @@
 'use client';
 
 import { AllocationByMarket, AllocationItem, Market } from '@sar/shared';
+import { Surface } from '../design-system';
 import { formatNumber } from '../shared/formatters';
 
 interface Props {
@@ -53,15 +54,15 @@ export function AllocationSection({ items, allocationByMarket }: Props) {
   const hasMixed = allocationByMarket.krPercent > 0 && allocationByMarket.usPercent > 0;
 
   return (
-    <section className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 sm:p-6">
-      <h2 className="text-sm font-semibold text-white">자산 배분 (원화 기준)</h2>
+    <Surface>
+      <h2 className="text-base font-semibold tracking-tight">자산 배분 (원화 기준)</h2>
       {hasMixed && (
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-2 text-sm text-muted-foreground">
           KR {allocationByMarket.krPercent.toFixed(1)}% · US {allocationByMarket.usPercent.toFixed(1)}%
         </p>
       )}
 
-      <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-center">
+      <div className="mt-6 flex flex-col gap-8 lg:flex-row lg:items-center">
         <div className="flex justify-center">
           <DonutChart items={items} />
         </div>
@@ -95,6 +96,6 @@ export function AllocationSection({ items, allocationByMarket }: Props) {
           </table>
         </div>
       </div>
-    </section>
+    </Surface>
   );
 }
