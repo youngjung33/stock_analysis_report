@@ -1,12 +1,27 @@
+import {
+  AppErrorCode,
+  isAppErrorCode,
+  resolveAppErrorMessage,
+  type AppErrorCode as AppErrorCodeType,
+} from '@sar/shared';
+
 export class AppError extends Error {
-  constructor(message: string) {
+  constructor(
+    message: string,
+    public readonly code: AppErrorCodeType = AppErrorCode.INTERNAL,
+  ) {
     super(message);
     this.name = 'AppError';
   }
 }
 
-export function getErrorMessage(error: unknown, fallback = '요청 처리에 실패했습니다.'): string {
+export function getErrorMessage(
+  error: unknown,
+  fallback = resolveAppErrorMessage(AppErrorCode.INTERNAL),
+): string {
   if (error instanceof AppError) return error.message;
-  if (error instanceof Error) return error.message;
+  if (error instanceof Error && error.message) return error.message;
   return fallback;
 }
+
+export { toAppError } from './api-error';

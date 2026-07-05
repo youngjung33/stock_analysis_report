@@ -1,7 +1,6 @@
+import { AppErrorCode } from '@sar/shared';
 import { IRefreshTokenRepository, ITokenService } from '../../repositories';
 import { AuthenticationError } from '../../errors/domain.errors';
-
-/** refresh 토큰으로 access/refresh 토큰 재발급 use case */
 export class RefreshTokenUseCase {
   constructor(
     private readonly refreshTokenRepo: IRefreshTokenRepository,
@@ -16,7 +15,7 @@ export class RefreshTokenUseCase {
     const stored = await this.refreshTokenRepo.findValidByHash(tokenHash);
 
     if (!stored || stored.expiresAt < new Date()) {
-      throw new AuthenticationError('Invalid refresh token');
+      throw new AuthenticationError(AppErrorCode.AUTH_INVALID_REFRESH);
     }
 
     await this.refreshTokenRepo.revoke(stored.id);

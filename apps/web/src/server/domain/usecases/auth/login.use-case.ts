@@ -1,49 +1,42 @@
-import {
-  IPasswordHasher,
-  IRefreshTokenRepository,
-  ITokenService,
-  IUserRepository,
-} from '../../repositories';
-import { AuthenticationError } from '../../errors/domain.errors';
+import { AppErrorCode, validateLoginInput } from '@sar/shared';
+import { IUserRepository } from '../../repositories';
+import { IPasswordHasher } from '../../repositories';
+import { AuthenticationError, ValidationError } from '../../errors/domain.errors';
+import { AuthSessionService } from '../../services/auth-session.service';
 
 export interface LoginInput {
   username: string;
   password: string;
 }
 
-/** 사용자 인증 후 access/refresh 토큰 발급 use case */
+/** 아이디·비밀번호 로그인 — OAuth 전용 계정은 거부 */
 export class LoginUseCase {
   constructor(
     private readonly userRepo: IUserRepository,
-    private readonly refreshTokenRepo: IRefreshTokenRepository,
     private readonly passwordHasher: IPasswordHasher,
-    private readonly tokenService: ITokenService,
+    private readonly authSession: AuthSessionService,
   ) {}
 
-  /** 유효한 자격증명이면 accessToken·refreshToken·username 반환 */
-  async execute(
-    input: LoginInput,
-  ): Promise<{ accessToken: string; refreshToken: string; username: string }> {
-    const user = await this.userRepo.findByUsername(input.username);
+  async execute(input: LoginInput) {
+    const validationError = validateLoginInput(input.username, input.password);
+    if (validationError) {
+      throw new ValidationError(AppErrorCode.AUTH_LOGIN_REQUIRED, validationError);
+    }
+
+    const user = await this.userRepo.findByUsername(input.username.trim());
     if (!user) {
-      throw new AuthenticationError('Invalid credentials');
+      throw new AuthenticationError(AppErrorCode.AUTH_INVALID_CREDENTIALS);
+    }
+
+    if (!user.passwordHash) {
+      throw new AuthenticationError(AppErrorCode.AUTH_SOCIAL_ONLY);
     }
 
     const valid = await this.passwordHasher.compare(input.password, user.passwordHash);
     if (!valid) {
-      throw new AuthenticationError('Invalid credentials');
+      throw new AuthenticationError(AppErrorCode.AUTH_INVALID_CREDENTIALS);
     }
 
-    const accessToken = this.tokenService.generateAccessToken({
-      sub: user.id,
-      username: user.username,
-    });
-    const refreshToken = this.tokenService.generateRefreshToken();
-    const tokenHash = this.tokenService.hashRefreshToken(refreshToken);
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
-    await this.refreshTokenRepo.create({ userId: user.id, tokenHash, expiresAt });
-
-    return { accessToken, refreshToken, username: user.username };
+    return this.authSession.issueForUser(user);
   }
 }

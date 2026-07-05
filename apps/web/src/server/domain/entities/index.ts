@@ -3,7 +3,26 @@ import { Market, TransactionType } from '@sar/shared';
 export interface UserEntity {
   id: string;
   username: string;
-  passwordHash: string;
+  email: string | null;
+  passwordHash: string | null;
+  createdAt: Date;
+}
+
+export interface UserOAuthAccountEntity {
+  id: string;
+  userId: string;
+  provider: string;
+  providerUserId: string;
+  email: string | null;
+  createdAt: Date;
+}
+
+export interface OAuthStateEntity {
+  id: string;
+  state: string;
+  provider: string;
+  redirectUri: string;
+  expiresAt: Date;
   createdAt: Date;
 }
 

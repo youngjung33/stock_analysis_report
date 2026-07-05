@@ -187,6 +187,10 @@ export interface LoginResult {
   username: string;
 }
 
+export interface RegisterResult extends LoginResult {
+  isNewUser: boolean;
+}
+
 export interface SessionResult {
   username: string | null;
 }

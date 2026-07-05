@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import crypto from 'crypto';
+import { AppErrorCode } from '@sar/shared';
 import { ITokenService } from '../../domain/repositories';
 import { AuthenticationError } from '../../domain/errors/domain.errors';
 import { AccessTokenPayload } from '../../domain/auth.types';
@@ -29,7 +30,7 @@ export class JwtTokenService implements ITokenService {
         username: string;
       };
       if (!decoded.sub || !decoded.username) {
-        throw new AuthenticationError('Invalid access token');
+        throw new AuthenticationError(AppErrorCode.AUTH_INVALID_ACCESS);
       }
       return {
         sub: decoded.sub,
@@ -38,7 +39,7 @@ export class JwtTokenService implements ITokenService {
       };
     } catch (error) {
       if (error instanceof AuthenticationError) throw error;
-      throw new AuthenticationError('Invalid access token');
+      throw new AuthenticationError(AppErrorCode.AUTH_INVALID_ACCESS);
     }
   }
 

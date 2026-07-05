@@ -1,4 +1,8 @@
 import { LoginUseCase } from './domain/usecases/auth/login.use-case';
+import { RegisterUseCase } from './domain/usecases/auth/register.use-case';
+import { CheckUsernameAvailabilityUseCase } from './domain/usecases/auth/check-username-availability.use-case';
+import { StartOAuthLoginUseCase } from './domain/usecases/auth/start-oauth-login.use-case';
+import { ListOAuthProvidersUseCase } from './domain/usecases/auth/list-oauth-providers.use-case';
 import { LogoutUseCase } from './domain/usecases/auth/logout.use-case';
 import { RefreshSessionUseCase } from './domain/usecases/auth/refresh-session.use-case';
 import { CreateCorporateActionUseCase } from './domain/usecases/corporate-actions/create-corporate-action.use-case';
@@ -38,6 +42,10 @@ import {
 export function wireAppServices(): AppServices {
   return {
     loginUseCase: new LoginUseCase(authRepository),
+    registerUseCase: new RegisterUseCase(authRepository),
+    checkUsernameAvailabilityUseCase: new CheckUsernameAvailabilityUseCase(authRepository),
+    startOAuthLoginUseCase: new StartOAuthLoginUseCase(authRepository),
+    listOAuthProvidersUseCase: new ListOAuthProvidersUseCase(authRepository),
     refreshSessionUseCase: new RefreshSessionUseCase(authRepository),
     logoutUseCase: new LogoutUseCase(authRepository),
     createTransactionUseCase: new CreateTransactionUseCase(transactionRepository),

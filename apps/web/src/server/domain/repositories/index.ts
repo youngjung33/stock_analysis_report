@@ -5,9 +5,12 @@ import {
   StockQuoteEntity,
   TransactionEntity,
   UserEntity,
+  UserOAuthAccountEntity,
+  OAuthStateEntity,
   CorporateActionEntity,
   WatchlistItemEntity,
 } from '../entities';
+import { OAuthProviderId } from '@sar/shared';
 import { Market, TransactionType } from '@sar/shared';
 
 export const USER_REPOSITORY = Symbol('USER_REPOSITORY');
@@ -20,9 +23,25 @@ export const TOKEN_SERVICE = Symbol('TOKEN_SERVICE');
 
 export interface IUserRepository {
   findByUsername(username: string): Promise<UserEntity | null>;
+  findByEmail(email: string): Promise<UserEntity | null>;
   findById(id: string): Promise<UserEntity | null>;
   create(user: Omit<UserEntity, 'id' | 'createdAt'>): Promise<UserEntity>;
   count(): Promise<number>;
+}
+
+export interface IUserOAuthAccountRepository {
+  findByProviderUserId(
+    provider: OAuthProviderId,
+    providerUserId: string,
+  ): Promise<UserOAuthAccountEntity | null>;
+  create(
+    data: Omit<UserOAuthAccountEntity, 'id' | 'createdAt'>,
+  ): Promise<UserOAuthAccountEntity>;
+}
+
+export interface IOAuthStateRepository {
+  create(data: Omit<OAuthStateEntity, 'id' | 'createdAt'>): Promise<OAuthStateEntity>;
+  consume(state: string, provider: OAuthProviderId): Promise<OAuthStateEntity | null>;
 }
 
 export interface IRefreshTokenRepository {

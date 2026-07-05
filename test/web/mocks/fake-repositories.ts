@@ -1,11 +1,11 @@
 import { vi } from 'vitest';
-import { Market, TransactionType } from '@sar/shared';
+import { Market, OAuthProvider, OAUTH_PROVIDER_META, TransactionType } from '@sar/shared';
 import {
   IAuthRepository,
   IPortfolioRepository,
   ITransactionRepository,
 } from '@/client/domain/repositories';
-import { Dashboard, LoginResult, RefreshQuoteResult, Transaction } from '@/client/domain/models';
+import { Dashboard, LoginResult, RegisterResult, RefreshQuoteResult, Transaction } from '@/client/domain/models';
 
 export function createFakeAuthRepository(
   overrides: Partial<IAuthRepository> = {},
@@ -14,6 +14,19 @@ export function createFakeAuthRepository(
     login: vi.fn().mockResolvedValue({
       username: 'admin',
     } satisfies LoginResult),
+    register: vi.fn().mockResolvedValue({
+      username: 'new_user',
+      isNewUser: true,
+    } satisfies RegisterResult),
+    listOAuthProviders: vi.fn().mockResolvedValue([OAUTH_PROVIDER_META[OAuthProvider.GOOGLE]]),
+    checkUsernameAvailability: vi.fn().mockResolvedValue({
+      available: true,
+      message: '사용 가능한 아이디입니다.',
+    }),
+    startOAuthLogin: vi.fn().mockResolvedValue({
+      authorizationUrl: 'https://oauth.example/authorize',
+      state: 'state-1',
+    }),
     refresh: vi.fn(),
     logout: vi.fn(),
     ...overrides,

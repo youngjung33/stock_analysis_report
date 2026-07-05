@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { AppErrorCode, resolveAppErrorMessage } from '@sar/shared';
 import { HttpError } from './errors';
 
 type Bucket = { count: number; resetAt: number };
@@ -37,7 +38,7 @@ export function enforceRateLimit(
 
   bucket.count += 1;
   if (bucket.count > limit) {
-    throw new HttpError('Too many requests', 429);
+    throw new HttpError(resolveAppErrorMessage(AppErrorCode.RATE_LIMIT), 429, AppErrorCode.RATE_LIMIT);
   }
 }
 

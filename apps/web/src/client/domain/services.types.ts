@@ -1,4 +1,8 @@
 import { LoginUseCase } from './usecases/auth/login.use-case';
+import { RegisterUseCase } from './usecases/auth/register.use-case';
+import { CheckUsernameAvailabilityUseCase } from './usecases/auth/check-username-availability.use-case';
+import { StartOAuthLoginUseCase } from './usecases/auth/start-oauth-login.use-case';
+import { ListOAuthProvidersUseCase } from './usecases/auth/list-oauth-providers.use-case';
 import { LogoutUseCase } from './usecases/auth/logout.use-case';
 import { RefreshSessionUseCase } from './usecases/auth/refresh-session.use-case';
 import { CreateCorporateActionUseCase } from './usecases/corporate-actions/create-corporate-action.use-case';
@@ -31,6 +35,10 @@ import { ListTransactionsUseCase } from './usecases/transactions/list-transactio
 
 export interface AppServices {
   loginUseCase: LoginUseCase;
+  registerUseCase: RegisterUseCase;
+  checkUsernameAvailabilityUseCase: CheckUsernameAvailabilityUseCase;
+  startOAuthLoginUseCase: StartOAuthLoginUseCase;
+  listOAuthProvidersUseCase: ListOAuthProvidersUseCase;
   refreshSessionUseCase: RefreshSessionUseCase;
   logoutUseCase: LogoutUseCase;
   createTransactionUseCase: CreateTransactionUseCase;

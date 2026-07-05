@@ -6,8 +6,13 @@ import { FetchQuotesUseCase } from './domain/usecases/market/fetch-quotes.use-ca
 import { GetMarketStatusUseCase } from './domain/usecases/market/get-market-status.use-case';
 import { SearchStocksUseCase } from './domain/usecases/market/search-stocks.use-case';
 import { LoginUseCase } from './domain/usecases/auth/login.use-case';
+import { RegisterUseCase } from './domain/usecases/auth/register.use-case';
+import { CheckUsernameAvailabilityUseCase } from './domain/usecases/auth/check-username-availability.use-case';
+import { StartOAuthLoginUseCase } from './domain/usecases/auth/start-oauth-login.use-case';
+import { CompleteOAuthLoginUseCase } from './domain/usecases/auth/complete-oauth-login.use-case';
 import { LogoutUseCase } from './domain/usecases/auth/logout.use-case';
 import { RefreshTokenUseCase } from './domain/usecases/auth/refresh-token.use-case';
+import { AuthSessionService } from './domain/services/auth-session.service';
 import { RefreshQuotesUseCase } from './domain/usecases/market/refresh-quotes.use-case';
 import { GetDashboardUseCase } from './domain/usecases/portfolio/get-dashboard.use-case';
 import { GetHoldingBySymbolUseCase } from './domain/usecases/portfolio/get-holding-by-symbol.use-case';
@@ -27,6 +32,11 @@ import { DeleteTransactionUseCase } from './domain/usecases/transactions/delete-
 import { ListTransactionsUseCase } from './domain/usecases/transactions/list-transactions.use-case';
 import { ITokenService } from './domain/repositories';
 import { BcryptPasswordHasher } from './data/auth/password-hasher';
+import { EnvOAuthProviderService } from './data/auth/oauth-provider.service';
+import {
+  PrismaOAuthStateRepository,
+  PrismaUserOAuthAccountRepository,
+} from './data/auth/oauth.repositories';
 import { JwtTokenService } from './data/auth/token.service';
 import { MarketDataProvider } from './data/market/market-data.provider';
 import { PrismaStockCatalogRepository } from './data/persistence/stock-catalog.repository';
@@ -42,7 +52,12 @@ import {
 
 export interface ServerServices {
   tokenService: ITokenService;
+  oauthProvider: EnvOAuthProviderService;
   loginUseCase: LoginUseCase;
+  registerUseCase: RegisterUseCase;
+  checkUsernameAvailabilityUseCase: CheckUsernameAvailabilityUseCase;
+  startOAuthLoginUseCase: StartOAuthLoginUseCase;
+  completeOAuthLoginUseCase: CompleteOAuthLoginUseCase;
   refreshTokenUseCase: RefreshTokenUseCase;
   logoutUseCase: LogoutUseCase;
   createTransactionUseCase: CreateTransactionUseCase;
@@ -82,6 +97,10 @@ export function getServerServices(): ServerServices {
   const catalogRepo = new PrismaStockCatalogRepository();
   const passwordHasher = new BcryptPasswordHasher();
   const tokenService = new JwtTokenService();
+  const oauthProvider = new EnvOAuthProviderService();
+  const oauthAccountRepo = new PrismaUserOAuthAccountRepository();
+  const oauthStateRepo = new PrismaOAuthStateRepository();
+  const authSession = new AuthSessionService(refreshRepo, tokenService);
   const marketData = new MarketDataProvider();
 
   const fetchQuotesUseCase = new FetchQuotesUseCase(marketData);
@@ -89,7 +108,18 @@ export function getServerServices(): ServerServices {
 
   cached = {
     tokenService,
-    loginUseCase: new LoginUseCase(userRepo, refreshRepo, passwordHasher, tokenService),
+    oauthProvider,
+    loginUseCase: new LoginUseCase(userRepo, passwordHasher, authSession),
+    registerUseCase: new RegisterUseCase(userRepo, passwordHasher, authSession),
+    checkUsernameAvailabilityUseCase: new CheckUsernameAvailabilityUseCase(userRepo),
+    startOAuthLoginUseCase: new StartOAuthLoginUseCase(oauthProvider, oauthStateRepo),
+    completeOAuthLoginUseCase: new CompleteOAuthLoginUseCase(
+      userRepo,
+      oauthAccountRepo,
+      oauthStateRepo,
+      oauthProvider,
+      authSession,
+    ),
     fetchQuotesUseCase,
     getFeaturedQuotesUseCase,
     getStockQuoteUseCase: new GetStockQuoteUseCase(marketData),

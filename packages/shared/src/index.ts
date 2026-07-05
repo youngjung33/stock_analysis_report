@@ -9,6 +9,42 @@ export function isGuestUsername(username: string | null | undefined): boolean {
   return username === GUEST_DISPLAY_NAME;
 }
 
+export {
+  AppErrorCode,
+  APP_ERROR_MESSAGES,
+  isAppErrorCode,
+  resolveAppErrorMessage,
+  apiErrorBody,
+} from './app-error-codes';
+export type { ApiErrorBody } from './app-error-codes';
+
+export {
+  OAuthProvider,
+  OAUTH_PROVIDERS,
+  OAUTH_PROVIDER_META,
+  isOAuthProvider,
+  validateRegisterInput,
+  validateRegisterFields,
+  getRegisterValidationError,
+  validateUsernameFormat,
+  validatePasswordFormat,
+  validateLoginInput,
+  proposeUsernameFromOAuthProfile,
+  withUsernameSuffix,
+  AUTH_USERNAME_HINT,
+  AUTH_PASSWORD_HINT,
+  USERNAME_PATTERN,
+  PASSWORD_PATTERN,
+} from './auth';
+export type {
+  OAuthProviderId,
+  OAuthProviderMeta,
+  RegisterInput,
+  RegisterField,
+  RegisterFieldErrors,
+  OAuthUserProfile,
+} from './auth';
+
 export { computePosition } from './position-calculator';
 export type { PositionState, PositionTransaction } from './position-calculator';
 export {

@@ -4,6 +4,7 @@ import {
   Dashboard,
   FeaturedQuotesResult,
   LoginResult,
+  RegisterResult,
   MarketProviderStatus,
   PortfolioAnalysisResult,
   PortfolioHolding,
@@ -17,7 +18,10 @@ import {
   CorporateActionType,
   Market,
   MarketAnalysisReport,
+  OAuthProviderId,
+  OAuthProviderMeta,
   QuoteChartRange,
+  RegisterInput,
   StockSearchResult,
 } from '@sar/shared';
 
@@ -39,6 +43,13 @@ export interface CreateCorporateActionInput {
 
 export interface IAuthRepository {
   login(username: string, password: string): Promise<LoginResult>;
+  register(input: RegisterInput): Promise<RegisterResult>;
+  checkUsernameAvailability(username: string): Promise<{ available: boolean; message: string }>;
+  listOAuthProviders(): Promise<OAuthProviderMeta[]>;
+  startOAuthLogin(
+    provider: OAuthProviderId,
+    redirectUri: string,
+  ): Promise<{ authorizationUrl: string; state: string }>;
   refresh(): Promise<LoginResult | null>;
   logout(): Promise<void>;
 }

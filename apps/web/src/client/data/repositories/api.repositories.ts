@@ -1,9 +1,11 @@
 import { Market, QuoteChartRange } from '@sar/shared';
+import { OAuthProviderId, OAuthProviderMeta, RegisterInput } from '@sar/shared';
 import {
   CorporateAction,
   CreateTransactionInput,
   FeaturedQuotesResult,
   LoginResult,
+  RegisterResult,
   MarketProviderStatus,
   PortfolioAnalysisResult,
   RefreshQuoteResult,
@@ -22,10 +24,50 @@ import {
 } from '../../domain/repositories';
 import { apiClient } from '../api/client';
 import { tokenStorage } from '../auth/token-storage';
+import { AppErrorCode } from '@sar/shared';
+import { toAppError } from '../../domain/errors/api-error';
 
 export class ApiAuthRepository implements IAuthRepository {
   async login(username: string, password: string): Promise<LoginResult> {
-    const { data } = await apiClient.post<LoginResult>('/auth/login', { username, password });
+    try {
+      const { data } = await apiClient.post<LoginResult>('/auth/login', { username, password });
+      return data;
+    } catch (error) {
+      throw toAppError(error, AppErrorCode.AUTH_INVALID_CREDENTIALS);
+    }
+  }
+
+  async register(input: RegisterInput): Promise<RegisterResult> {
+    try {
+      const { data } = await apiClient.post<RegisterResult>('/auth/register', input);
+      return data;
+    } catch (error) {
+      throw toAppError(error, AppErrorCode.INTERNAL);
+    }
+  }
+
+  async checkUsernameAvailability(username: string) {
+    try {
+      const { data } = await apiClient.get<{ available: boolean; message: string }>(
+        '/auth/check-username',
+        { params: { username } },
+      );
+      return data;
+    } catch (error) {
+      throw toAppError(error, AppErrorCode.INTERNAL);
+    }
+  }
+
+  async listOAuthProviders(): Promise<OAuthProviderMeta[]> {
+    const { data } = await apiClient.get<{ providers: OAuthProviderMeta[] }>('/auth/oauth/providers');
+    return data.providers;
+  }
+
+  async startOAuthLogin(provider: OAuthProviderId, redirectUri: string) {
+    const { data } = await apiClient.get<{ authorizationUrl: string; state: string }>(
+      `/auth/oauth/${provider}/start`,
+      { params: { redirectUri } },
+    );
     return data;
   }
 

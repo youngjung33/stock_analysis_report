@@ -29,6 +29,8 @@ apiClient.interceptors.response.use(
 
     if (
       original.url?.includes('/auth/login') ||
+      original.url?.includes('/auth/register') ||
+      original.url?.includes('/auth/check-username') ||
       original.url?.includes('/auth/refresh') ||
       original.url?.includes('/market/quotes') ||
       original.url?.includes('/market/status') ||

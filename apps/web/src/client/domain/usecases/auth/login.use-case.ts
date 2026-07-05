@@ -1,3 +1,4 @@
+import { validateLoginInput } from '@sar/shared';
 import { AppError } from '../../errors/app-error';
 import { IAuthRepository } from '../../repositories';
 
@@ -5,10 +6,10 @@ import { IAuthRepository } from '../../repositories';
 export class LoginUseCase {
   constructor(private readonly authRepo: IAuthRepository) {}
 
-  /** 입력 검증 후 authRepo.login — accessToken 등 반환 */
   execute(username: string, password: string) {
-    if (!username.trim() || !password.trim()) {
-      throw new AppError('아이디와 비밀번호를 입력해 주세요.');
+    const validationError = validateLoginInput(username, password);
+    if (validationError) {
+      throw new AppError(validationError);
     }
     return this.authRepo.login(username, password);
   }

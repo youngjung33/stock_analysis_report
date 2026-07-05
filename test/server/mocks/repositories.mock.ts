@@ -17,6 +17,7 @@ export function createMockUser(overrides: Partial<UserEntity> = {}): UserEntity 
   return {
     id: 'user-1',
     username: 'admin',
+    email: null,
     passwordHash: 'hash',
     createdAt: new Date(),
     ...overrides,
@@ -58,6 +59,7 @@ export function createMockUserRepo(
 ): IUserRepository {
   return {
     findByUsername: vi.fn(),
+    findByEmail: vi.fn(),
     findById: vi.fn(),
     create: vi.fn(),
     count: vi.fn(),

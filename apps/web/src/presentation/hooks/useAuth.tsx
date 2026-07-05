@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, createContext, useContext } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { GUEST_DISPLAY_NAME, isGuestUsername } from '@sar/shared';
+import { GUEST_DISPLAY_NAME, isGuestUsername, OAuthProviderId, RegisterInput } from '@sar/shared';
 import { useServices } from './useServices';
 
 interface AuthContextValue {
@@ -11,6 +11,8 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (username: string, password: string) => Promise<void>;
+  register: (input: RegisterInput) => Promise<void>;
+  startOAuthLogin: (provider: OAuthProviderId, redirectUri: string) => Promise<void>;
   loginAsGuest: () => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -20,6 +22,8 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const {
     loginUseCase,
+    registerUseCase,
+    startOAuthLoginUseCase,
     refreshSessionUseCase,
     logoutUseCase,
     authSession,
@@ -78,6 +82,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [loginUseCase, queryClient, guestSession, guestStore],
   );
 
+  const register = useCallback(
+    async (input: RegisterInput) => {
+      guestSession.clear();
+      guestStore.clear();
+      const result = await registerUseCase.execute(input);
+      setUsername(result.username);
+      await queryClient.clear();
+    },
+    [registerUseCase, queryClient, guestSession, guestStore],
+  );
+
+  const startOAuthLogin = useCallback(
+    async (provider: OAuthProviderId, redirectUri: string) => {
+      guestSession.clear();
+      guestStore.clear();
+      const result = await startOAuthLoginUseCase.execute(provider, redirectUri);
+      window.location.assign(result.authorizationUrl);
+    },
+    [startOAuthLoginUseCase, guestSession, guestStore],
+  );
+
   const loginAsGuest = useCallback(async () => {
     try {
       await logoutUseCase.execute();
@@ -97,10 +122,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isAuthenticated: !!username,
       isLoading,
       login,
+      register,
+      startOAuthLogin,
       loginAsGuest,
       logout,
     }),
-    [username, isLoading, login, loginAsGuest, logout],
+    [username, isLoading, login, register, startOAuthLogin, loginAsGuest, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

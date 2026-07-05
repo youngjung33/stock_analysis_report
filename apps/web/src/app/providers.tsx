@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { wireAppServices } from '@/client/bootstrap';
 import { AuthProvider } from '@/presentation/hooks/useAuth';
 import { ServicesProvider } from '@/presentation/hooks/useServices';
+import { ToastProvider } from '@/presentation/components/Toast';
 
 const queryClient = new QueryClient();
 
@@ -14,7 +15,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <ServicesProvider services={services}>
-        <AuthProvider>{children}</AuthProvider>
+        <ToastProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </ToastProvider>
       </ServicesProvider>
     </QueryClientProvider>
   );

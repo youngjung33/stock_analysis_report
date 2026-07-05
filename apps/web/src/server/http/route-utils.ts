@@ -1,15 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from '@sar/shared';
+import { ACCESS_TOKEN_COOKIE, AppErrorCode, REFRESH_TOKEN_COOKIE } from '@sar/shared';
 import { getServerServices } from '../container';
 import { AccessTokenPayload } from '../domain/auth.types';
-import {
-  AuthenticationError,
-  DomainError,
-  EntityNotFoundError,
-  ValidationError,
-} from '../domain/errors/domain.errors';
-import { HttpError } from './errors';
+import { AuthenticationError } from '../domain/errors/domain.errors';
 
+export { handleRouteError } from './route-error';
 export type { AccessTokenPayload } from '../domain/auth.types';
 
 export interface AuthUser {
@@ -19,27 +14,6 @@ export interface AuthUser {
 
 export function jsonData<T>(data: T, init?: ResponseInit) {
   return NextResponse.json(data, init);
-}
-
-/** DomainError → HTTP status 매핑 */
-export function handleRouteError(error: unknown) {
-  if (error instanceof AuthenticationError) {
-    return NextResponse.json({ message: error.message }, { status: 401 });
-  }
-  if (error instanceof ValidationError) {
-    return NextResponse.json({ message: error.message }, { status: 400 });
-  }
-  if (error instanceof EntityNotFoundError) {
-    return NextResponse.json({ message: error.message }, { status: 404 });
-  }
-  if (error instanceof DomainError) {
-    return NextResponse.json({ message: error.message }, { status: 400 });
-  }
-  if (error instanceof HttpError) {
-    return NextResponse.json({ message: error.message }, { status: error.statusCode });
-  }
-  console.error(error);
-  return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
 }
 
 export function getRefreshToken(req: NextRequest): string | undefined {
@@ -109,7 +83,7 @@ export function extractAccessToken(req: NextRequest): string | null {
 export function requireAuth(req: NextRequest): AuthUser {
   const token = extractAccessToken(req);
   if (!token) {
-    throw new AuthenticationError('Unauthorized');
+    throw new AuthenticationError(AppErrorCode.AUTH_UNAUTHORIZED);
   }
   const { tokenService } = getServerServices();
   const payload = tokenService.verifyAccessToken(token);

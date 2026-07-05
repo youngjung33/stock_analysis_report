@@ -1,0 +1,90 @@
+/** API·클라이언트 공통 에러 코드 */
+export const AppErrorCode = {
+  VALIDATION: 'VALIDATION',
+  NOT_FOUND: 'NOT_FOUND',
+  CONFLICT: 'CONFLICT',
+  INTERNAL: 'INTERNAL',
+  DB_UNAVAILABLE: 'DB_UNAVAILABLE',
+  RATE_LIMIT: 'RATE_LIMIT',
+
+  AUTH_UNAUTHORIZED: 'AUTH_UNAUTHORIZED',
+  AUTH_INVALID_CREDENTIALS: 'AUTH_INVALID_CREDENTIALS',
+  AUTH_SOCIAL_ONLY: 'AUTH_SOCIAL_ONLY',
+  AUTH_INVALID_REFRESH: 'AUTH_INVALID_REFRESH',
+  AUTH_INVALID_ACCESS: 'AUTH_INVALID_ACCESS',
+  AUTH_LOGIN_REQUIRED: 'AUTH_LOGIN_REQUIRED',
+
+  AUTH_USERNAME_INVALID: 'AUTH_USERNAME_INVALID',
+  AUTH_USERNAME_TAKEN: 'AUTH_USERNAME_TAKEN',
+  AUTH_EMAIL_INVALID: 'AUTH_EMAIL_INVALID',
+  AUTH_EMAIL_TAKEN: 'AUTH_EMAIL_TAKEN',
+  AUTH_PASSWORD_INVALID: 'AUTH_PASSWORD_INVALID',
+  AUTH_PASSWORD_MISMATCH: 'AUTH_PASSWORD_MISMATCH',
+  AUTH_REGISTER_FIELDS_REQUIRED: 'AUTH_REGISTER_FIELDS_REQUIRED',
+
+  AUTH_OAUTH_PROVIDER_INVALID: 'AUTH_OAUTH_PROVIDER_INVALID',
+  AUTH_OAUTH_NOT_CONFIGURED: 'AUTH_OAUTH_NOT_CONFIGURED',
+  AUTH_OAUTH_STATE_INVALID: 'AUTH_OAUTH_STATE_INVALID',
+  AUTH_OAUTH_FAILED: 'AUTH_OAUTH_FAILED',
+} as const;
+
+export type AppErrorCode = (typeof AppErrorCode)[keyof typeof AppErrorCode];
+
+export interface ApiErrorBody {
+  code: AppErrorCode;
+  message: string;
+}
+
+/** 코드별 사용자 노출 메시지 (한국어) */
+export const APP_ERROR_MESSAGES: Record<AppErrorCode, string> = {
+  [AppErrorCode.VALIDATION]: '입력값을 확인해 주세요.',
+  [AppErrorCode.NOT_FOUND]: '요청한 정보를 찾을 수 없습니다.',
+  [AppErrorCode.CONFLICT]: '요청을 처리할 수 없습니다. 이미 존재하는 데이터입니다.',
+  [AppErrorCode.INTERNAL]: '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',
+  [AppErrorCode.DB_UNAVAILABLE]:
+    '데이터베이스에 연결할 수 없습니다. 스키마 마이그레이션(db:push) 후 다시 시도해 주세요.',
+  [AppErrorCode.RATE_LIMIT]: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.',
+
+  [AppErrorCode.AUTH_UNAUTHORIZED]: '로그인이 필요합니다.',
+  [AppErrorCode.AUTH_INVALID_CREDENTIALS]: '아이디 또는 비밀번호가 올바르지 않습니다.',
+  [AppErrorCode.AUTH_SOCIAL_ONLY]: '소셜 로그인으로 가입한 계정입니다. 소셜 로그인을 이용해 주세요.',
+  [AppErrorCode.AUTH_INVALID_REFRESH]: '세션이 만료되었습니다. 다시 로그인해 주세요.',
+  [AppErrorCode.AUTH_INVALID_ACCESS]: '인증 정보가 유효하지 않습니다.',
+  [AppErrorCode.AUTH_LOGIN_REQUIRED]: '아이디와 비밀번호를 입력해 주세요.',
+
+  [AppErrorCode.AUTH_USERNAME_INVALID]: '아이디 형식이 올바르지 않습니다.',
+  [AppErrorCode.AUTH_USERNAME_TAKEN]: '이미 사용 중인 아이디입니다.',
+  [AppErrorCode.AUTH_EMAIL_INVALID]: '올바른 이메일 형식이 아닙니다.',
+  [AppErrorCode.AUTH_EMAIL_TAKEN]: '이미 사용 중인 이메일입니다.',
+  [AppErrorCode.AUTH_PASSWORD_INVALID]: '비밀번호 형식이 올바르지 않습니다.',
+  [AppErrorCode.AUTH_PASSWORD_MISMATCH]: '비밀번호 확인이 일치하지 않습니다.',
+  [AppErrorCode.AUTH_REGISTER_FIELDS_REQUIRED]: '회원가입 필수 항목을 모두 입력해 주세요.',
+
+  [AppErrorCode.AUTH_OAUTH_PROVIDER_INVALID]: '지원하지 않는 소셜 로그인입니다.',
+  [AppErrorCode.AUTH_OAUTH_NOT_CONFIGURED]: '소셜 로그인이 아직 설정되지 않았습니다.',
+  [AppErrorCode.AUTH_OAUTH_STATE_INVALID]: '소셜 로그인 인증이 만료되었습니다. 다시 시도해 주세요.',
+  [AppErrorCode.AUTH_OAUTH_FAILED]: '소셜 로그인에 실패했습니다. 다시 시도해 주세요.',
+};
+
+const CODE_SET = new Set<string>(Object.values(AppErrorCode));
+
+export function isAppErrorCode(value: string): value is AppErrorCode {
+  return CODE_SET.has(value);
+}
+
+/** 서버 message 우선, 없으면 코드 기본 문구 */
+export function resolveAppErrorMessage(
+  code: AppErrorCode | string | undefined,
+  serverMessage?: string,
+): string {
+  if (serverMessage?.trim()) return serverMessage.trim();
+  if (code && isAppErrorCode(code)) return APP_ERROR_MESSAGES[code];
+  return APP_ERROR_MESSAGES[AppErrorCode.INTERNAL];
+}
+
+export function apiErrorBody(
+  code: AppErrorCode,
+  message?: string,
+): ApiErrorBody {
+  return { code, message: resolveAppErrorMessage(code, message) };
+}
