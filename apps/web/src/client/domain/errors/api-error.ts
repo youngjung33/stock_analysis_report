@@ -1,28 +1,12 @@
 import {
   AppErrorCode,
-  isAppErrorCode,
   resolveAppErrorMessage,
-  type ApiErrorBody,
+  USER_FACING_SERVER_ERROR_MESSAGE,
   type AppErrorCode as AppErrorCodeType,
 } from '@sar/shared';
 import { AxiosError } from 'axios';
+import { parseApiErrorBody } from './api-error-parse';
 import { AppError } from './app-error';
-
-function parseApiErrorBody(data: unknown): ApiErrorBody | null {
-  if (!data || typeof data !== 'object') return null;
-  const body = data as Partial<ApiErrorBody>;
-  if (typeof body.code !== 'string' || typeof body.message !== 'string') return null;
-  if (!isAppErrorCode(body.code)) {
-    return {
-      code: AppErrorCode.INTERNAL,
-      message: resolveAppErrorMessage(AppErrorCode.INTERNAL, body.message),
-    };
-  }
-  return {
-    code: body.code,
-    message: resolveAppErrorMessage(body.code, body.message),
-  };
-}
 
 export function toAppError(
   error: unknown,
@@ -35,10 +19,9 @@ export function toAppError(
     if (parsed) {
       return new AppError(parsed.message, parsed.code);
     }
-  }
-
-  if (error instanceof Error && error.message) {
-    return new AppError(error.message, fallbackCode);
+    if (error.response) {
+      return new AppError(USER_FACING_SERVER_ERROR_MESSAGE, AppErrorCode.INTERNAL);
+    }
   }
 
   return new AppError(resolveAppErrorMessage(fallbackCode), fallbackCode);

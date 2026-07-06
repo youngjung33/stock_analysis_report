@@ -13,8 +13,10 @@ export {
   AppErrorCode,
   APP_ERROR_MESSAGES,
   isAppErrorCode,
+  isInternalAppErrorCode,
   resolveAppErrorMessage,
   apiErrorBody,
+  USER_FACING_SERVER_ERROR_MESSAGE,
 } from './app-error-codes';
 export type { ApiErrorBody } from './app-error-codes';
 

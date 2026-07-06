@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { AppErrorCode } from '@sar/shared';
+import { AppErrorCode, USER_FACING_SERVER_ERROR_MESSAGE } from '@sar/shared';
 import { Prisma } from '@prisma/client';
 import { ValidationError, ConflictError } from '@server/domain/errors/domain.errors';
 import { handleRouteError } from '@server/http/route-error';
@@ -23,7 +23,7 @@ describe('handleRouteError', () => {
     expect(body.message).toContain('아이디');
   });
 
-  it('maps Prisma P2021 to DB_UNAVAILABLE', async () => {
+  it('maps Prisma P2021 to generic user message without infra details', async () => {
     const prismaError = new Prisma.PrismaClientKnownRequestError('table missing', {
       code: 'P2021',
       clientVersion: '6.0.0',
@@ -32,6 +32,7 @@ describe('handleRouteError', () => {
     expect(res.status).toBe(503);
     const body = await res.json();
     expect(body.code).toBe(AppErrorCode.DB_UNAVAILABLE);
-    expect(body.message).toContain('db:push');
+    expect(body.message).toBe(USER_FACING_SERVER_ERROR_MESSAGE);
+    expect(body.message).not.toContain('db');
   });
 });

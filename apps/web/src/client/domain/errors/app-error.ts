@@ -1,9 +1,11 @@
 import {
   AppErrorCode,
-  isAppErrorCode,
   resolveAppErrorMessage,
+  USER_FACING_SERVER_ERROR_MESSAGE,
   type AppErrorCode as AppErrorCodeType,
 } from '@sar/shared';
+import { AxiosError } from 'axios';
+import { parseApiErrorBody } from './api-error-parse';
 
 export class AppError extends Error {
   constructor(
@@ -17,10 +19,22 @@ export class AppError extends Error {
 
 export function getErrorMessage(
   error: unknown,
-  fallback = resolveAppErrorMessage(AppErrorCode.INTERNAL),
+  fallback = USER_FACING_SERVER_ERROR_MESSAGE,
 ): string {
-  if (error instanceof AppError) return error.message;
-  if (error instanceof Error && error.message) return error.message;
+  if (error instanceof AppError) {
+    return resolveAppErrorMessage(error.code, error.message);
+  }
+
+  if (error instanceof AxiosError) {
+    const parsed = parseApiErrorBody(error.response?.data);
+    if (parsed) {
+      return resolveAppErrorMessage(parsed.code, parsed.message);
+    }
+    if (error.response) {
+      return USER_FACING_SERVER_ERROR_MESSAGE;
+    }
+  }
+
   return fallback;
 }
 

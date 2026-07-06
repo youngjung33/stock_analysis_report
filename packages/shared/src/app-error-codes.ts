@@ -35,14 +35,23 @@ export interface ApiErrorBody {
   message: string;
 }
 
+/** 사용자에게 노출해도 되는 서버/인프라 장애 메시지 (내부 상세 숨김) */
+export const USER_FACING_SERVER_ERROR_MESSAGE =
+  '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+
+/** 사용자에게 인프라·서버 상세를 노출하면 안 되는 코드 */
+const INTERNAL_ERROR_CODES = new Set<AppErrorCode>([
+  AppErrorCode.INTERNAL,
+  AppErrorCode.DB_UNAVAILABLE,
+]);
+
 /** 코드별 사용자 노출 메시지 (한국어) */
 export const APP_ERROR_MESSAGES: Record<AppErrorCode, string> = {
   [AppErrorCode.VALIDATION]: '입력값을 확인해 주세요.',
   [AppErrorCode.NOT_FOUND]: '요청한 정보를 찾을 수 없습니다.',
   [AppErrorCode.CONFLICT]: '요청을 처리할 수 없습니다. 이미 존재하는 데이터입니다.',
-  [AppErrorCode.INTERNAL]: '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',
-  [AppErrorCode.DB_UNAVAILABLE]:
-    '데이터베이스에 연결할 수 없습니다. 스키마 마이그레이션(db:push) 후 다시 시도해 주세요.',
+  [AppErrorCode.INTERNAL]: USER_FACING_SERVER_ERROR_MESSAGE,
+  [AppErrorCode.DB_UNAVAILABLE]: USER_FACING_SERVER_ERROR_MESSAGE,
   [AppErrorCode.RATE_LIMIT]: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.',
 
   [AppErrorCode.AUTH_UNAUTHORIZED]: '로그인이 필요합니다.',
@@ -72,14 +81,28 @@ export function isAppErrorCode(value: string): value is AppErrorCode {
   return CODE_SET.has(value);
 }
 
-/** 서버 message 우선, 없으면 코드 기본 문구 */
+export function isInternalAppErrorCode(code: AppErrorCode): boolean {
+  return INTERNAL_ERROR_CODES.has(code);
+}
+
+/**
+ * 사용자에게 보여줄 메시지.
+ * INTERNAL·DB_UNAVAILABLE 등은 서버 message를 무시하고 일반 안내만 반환.
+ */
 export function resolveAppErrorMessage(
   code: AppErrorCode | string | undefined,
   serverMessage?: string,
 ): string {
+  if (!code || !isAppErrorCode(code)) {
+    return USER_FACING_SERVER_ERROR_MESSAGE;
+  }
+
+  if (isInternalAppErrorCode(code)) {
+    return USER_FACING_SERVER_ERROR_MESSAGE;
+  }
+
   if (serverMessage?.trim()) return serverMessage.trim();
-  if (code && isAppErrorCode(code)) return APP_ERROR_MESSAGES[code];
-  return APP_ERROR_MESSAGES[AppErrorCode.INTERNAL];
+  return APP_ERROR_MESSAGES[code];
 }
 
 export function apiErrorBody(

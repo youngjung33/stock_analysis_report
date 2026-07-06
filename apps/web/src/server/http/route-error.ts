@@ -14,6 +14,33 @@ export function jsonApiError(body: ApiErrorBody, status: number) {
   return NextResponse.json(body, { status });
 }
 
+function logRouteError(error: unknown) {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    console.error('[api] Prisma error', {
+      code: error.code,
+      meta: error.meta,
+      message: error.message,
+    });
+    return;
+  }
+
+  if (error instanceof DomainError) {
+    console.error('[api] domain error', { code: error.code, message: error.message });
+    return;
+  }
+
+  if (error instanceof HttpError) {
+    console.error('[api] http error', {
+      status: error.statusCode,
+      code: error.code,
+      message: error.message,
+    });
+    return;
+  }
+
+  console.error('[api] unhandled error', error);
+}
+
 function mapPrismaError(error: Prisma.PrismaClientKnownRequestError): ApiErrorBody {
   if (error.code === 'P2002') {
     const target = Array.isArray(error.meta?.target)
@@ -29,17 +56,7 @@ function mapPrismaError(error: Prisma.PrismaClientKnownRequestError): ApiErrorBo
     return apiErrorBody(AppErrorCode.CONFLICT);
   }
 
-  if (error.code === 'P2021' || error.code === 'P2022') {
-    return apiErrorBody(
-      AppErrorCode.DB_UNAVAILABLE,
-      '데이터베이스 테이블이 준비되지 않았습니다. npm run db:push 후 다시 시도해 주세요.',
-    );
-  }
-
-  return apiErrorBody(
-    AppErrorCode.DB_UNAVAILABLE,
-    '데이터베이스 요청 중 오류가 발생했습니다.',
-  );
+  return apiErrorBody(AppErrorCode.DB_UNAVAILABLE);
 }
 
 function prismaErrorStatus(code: string): number {
@@ -70,6 +87,7 @@ export function handleRouteError(error: unknown) {
   }
 
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    logRouteError(error);
     const body = mapPrismaError(error);
     return jsonApiError(body, prismaErrorStatus(error.code));
   }
@@ -78,9 +96,10 @@ export function handleRouteError(error: unknown) {
     error instanceof Prisma.PrismaClientInitializationError ||
     error instanceof Prisma.PrismaClientRustPanicError
   ) {
+    logRouteError(error);
     return jsonApiError(apiErrorBody(AppErrorCode.DB_UNAVAILABLE), 503);
   }
 
-  console.error(error);
+  logRouteError(error);
   return jsonApiError(apiErrorBody(AppErrorCode.INTERNAL), 500);
 }
