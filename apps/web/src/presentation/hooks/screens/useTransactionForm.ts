@@ -1,10 +1,14 @@
+'use client';
+
 import { FormEvent, useState } from 'react';
 import { Market, StockSearchResult, TransactionType } from '@sar/shared';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
+import { useToast } from '../../components/Toast';
 import { useServices } from '../useServices';
 
 export function useTransactionForm(onSuccess: () => void) {
   const { createTransactionUseCase } = useServices();
+  const { showError, showSuccess } = useToast();
   const [selectedStock, setSelectedStock] = useState<StockSearchResult | null>(null);
   const [market, setMarket] = useState<Market>(Market.KR);
   const [type, setType] = useState<TransactionType>(TransactionType.BUY);
@@ -12,7 +16,6 @@ export function useTransactionForm(onSuccess: () => void) {
   const [price, setPrice] = useState('');
   const [tradedAt, setTradedAt] = useState(new Date().toISOString().slice(0, 10));
   const [memo, setMemo] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   function handleMarketChange(next: Market) {
@@ -22,10 +25,9 @@ export function useTransactionForm(onSuccess: () => void) {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setError('');
 
     if (!selectedStock) {
-      setError('종목을 검색해서 선택해 주세요.');
+      showError('종목을 검색해서 선택해 주세요.');
       return;
     }
 
@@ -46,9 +48,10 @@ export function useTransactionForm(onSuccess: () => void) {
       setQuantity('');
       setPrice('');
       setMemo('');
+      showSuccess('거래가 등록되었습니다.');
       onSuccess();
     } catch (err) {
-      setError(getErrorMessage(err, '등록 실패'));
+      showError(getErrorMessage(err, '거래 등록에 실패했습니다.'));
     } finally {
       setLoading(false);
     }
@@ -69,7 +72,6 @@ export function useTransactionForm(onSuccess: () => void) {
     setTradedAt,
     memo,
     setMemo,
-    error,
     loading,
     handleSubmit,
   };

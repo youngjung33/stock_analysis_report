@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { AppErrorCode } from '@sar/shared';
 import { getServerServices } from '@/server/container';
+import { enforceRateLimit } from '@/server/http/rate-limit';
 import {
   handleRouteError,
   jsonData,
@@ -12,6 +13,7 @@ import { ValidationError } from '@/server/domain/errors/domain.errors';
 /** 아이디·비밀번호 회원가입 */
 export async function POST(req: NextRequest) {
   try {
+    enforceRateLimit(req, 'auth:register', 'authRegister');
     const body = (await req.json()) as {
       username?: string;
       password?: string;

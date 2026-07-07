@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isOAuthProvider } from '@sar/shared';
 import { getServerServices } from '@/server/container';
+import { logApiError } from '@/server/http/route-error';
 import {
   clearAccessCookie,
   clearRefreshCookie,
@@ -13,8 +14,12 @@ type RouteContext = { params: Promise<{ provider: string }> };
 
 /** OAuth callback — 세션 쿠키 발급 후 앱으로 redirect */
 export async function GET(req: NextRequest, context: RouteContext) {
+  let provider = 'unknown';
+
   try {
-    const { provider } = await context.params;
+    const params = await context.params;
+    provider = params.provider;
+
     if (!isOAuthProvider(provider)) {
       throw new ValidationError('지원하지 않는 OAuth 제공자입니다.');
     }
@@ -24,8 +29,12 @@ export async function GET(req: NextRequest, context: RouteContext) {
     const oauthError = req.nextUrl.searchParams.get('error');
 
     if (oauthError) {
-      const res = NextResponse.redirect(new URL(`/login?oauthError=${oauthError}`, req.url));
-      return res;
+      logApiError(new Error(`OAuth provider returned error: ${oauthError}`), {
+        route: 'oauth/callback',
+        provider,
+        oauthError,
+      });
+      return NextResponse.redirect(new URL(`/login?oauthError=${oauthError}`, req.url));
     }
 
     if (!code || !state) {
@@ -41,6 +50,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
     setRefreshCookie(res, result.refreshToken);
     return res;
   } catch (error) {
+    logApiError(error, { route: 'oauth/callback', provider });
     const res = NextResponse.redirect(new URL('/login?oauthError=auth_failed', req.url));
     clearAccessCookie(res);
     clearRefreshCookie(res);

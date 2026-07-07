@@ -79,13 +79,11 @@ export function StockSearchField({
         />
       </label>
 
-      {search.error && <p className="text-xs text-rose-400">{search.error}</p>}
-
       {search.loading && search.query.trim().length > 0 && (
         <p className="text-xs text-slate-500">검색 중...</p>
       )}
 
-      {!search.loading && search.query.trim().length > 0 && search.results.length === 0 && !search.error && (
+      {!search.loading && search.query.trim().length > 0 && search.results.length === 0 && (
         <p className="text-xs text-slate-500">검색 결과가 없습니다.</p>
       )}
 

@@ -15,7 +15,6 @@ export function MobileTransactionForm({ onSuccess }: Props) {
       className="space-y-3 rounded-xl border border-slate-800 bg-slate-900/60 p-4"
     >
       <h2 className="text-base font-semibold text-white">거래 등록</h2>
-      {form.error && <p className="text-sm text-rose-400">{form.error}</p>}
 
       <StockSearchField
         market={form.market}

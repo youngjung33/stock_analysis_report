@@ -48,7 +48,6 @@ export function DesktopDashboardPage() {
         )}
 
         {screen.isLoading && <p className="text-muted-foreground">대시보드 로딩 중...</p>}
-        {screen.error && <p className="text-danger">대시보드를 불러오지 못했습니다.</p>}
 
         {screen.data && (
           <>

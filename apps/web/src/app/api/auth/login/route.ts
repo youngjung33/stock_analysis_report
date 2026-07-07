@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
+import { enforceRateLimit } from '@/server/http/rate-limit';
 import {
   handleRouteError,
   jsonData,
@@ -9,6 +10,7 @@ import {
 
 export async function POST(req: NextRequest) {
   try {
+    enforceRateLimit(req, 'auth:login', 'authLogin');
     const body = (await req.json()) as { username?: string; password?: string };
     if (!body.username || !body.password) {
       return jsonData({ message: 'username and password required' }, { status: 400 });

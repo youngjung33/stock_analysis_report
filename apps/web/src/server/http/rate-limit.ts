@@ -8,10 +8,18 @@ const buckets = new Map<string, Bucket>();
 
 export type MarketRateLimitTier = 'light' | 'standard' | 'heavy';
 
-const TIER_LIMITS: Record<MarketRateLimitTier, { limit: number; windowMs: number }> = {
+export type AuthRateLimitTier = 'authLogin' | 'authRegister' | 'authCheckUsername' | 'authOAuthStart';
+
+export type RateLimitTier = MarketRateLimitTier | AuthRateLimitTier;
+
+const TIER_LIMITS: Record<RateLimitTier, { limit: number; windowMs: number }> = {
   light: { limit: 120, windowMs: 60_000 },
   standard: { limit: 60, windowMs: 60_000 },
   heavy: { limit: 12, windowMs: 60_000 },
+  authLogin: { limit: 20, windowMs: 60_000 },
+  authRegister: { limit: 10, windowMs: 60_000 },
+  authCheckUsername: { limit: 30, windowMs: 60_000 },
+  authOAuthStart: { limit: 20, windowMs: 60_000 },
 };
 
 function clientIp(req: NextRequest): string {
@@ -24,7 +32,7 @@ function clientIp(req: NextRequest): string {
 export function enforceRateLimit(
   req: NextRequest,
   scope: string,
-  tier: MarketRateLimitTier = 'standard',
+  tier: RateLimitTier = 'standard',
 ): void {
   const { limit, windowMs } = TIER_LIMITS[tier];
   const key = `${scope}:${clientIp(req)}`;

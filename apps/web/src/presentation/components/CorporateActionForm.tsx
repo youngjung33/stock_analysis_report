@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { CorporateActionType, Market, StockSearchResult } from '@sar/shared';
+import { getErrorMessage } from '@/client/domain/errors/app-error';
+import { useToast } from '../components/Toast';
 import { useServices } from '../hooks/useServices';
 import { StockSearchField } from '../shared/StockSearchField';
 import { Surface } from '../design-system';
@@ -12,6 +14,7 @@ interface Props {
 
 export function CorporateActionForm({ onSuccess }: Props) {
   const { createCorporateActionUseCase } = useServices();
+  const { showError, showSuccess } = useToast();
   const [type, setType] = useState<CorporateActionType>('DIVIDEND');
   const [market, setMarket] = useState<Market>(Market.KR);
   const [selectedStock, setSelectedStock] = useState<StockSearchResult | null>(null);
@@ -23,18 +26,16 @@ export function CorporateActionForm({ onSuccess }: Props) {
   const [targetQuantity, setTargetQuantity] = useState('');
   const [targetPrice, setTargetPrice] = useState('');
   const [memo, setMemo] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!selectedStock || !effectiveAt) {
-      setError('종목과 적용일을 입력하세요.');
+      showError('종목과 적용일을 입력하세요.');
       return;
     }
 
     setSubmitting(true);
-    setError(null);
     try {
       await createCorporateActionUseCase.execute({
         stockSymbol: selectedStock.symbol,
@@ -51,11 +52,12 @@ export function CorporateActionForm({ onSuccess }: Props) {
         targetPrice: targetPrice ? Number(targetPrice) : undefined,
         memo: memo || undefined,
       });
+      showSuccess('기업행위가 등록되었습니다.');
       onSuccess?.();
       setCashAmount('');
       setMemo('');
-    } catch {
-      setError('기업행위 등록에 실패했습니다.');
+    } catch (err) {
+      showError(getErrorMessage(err, '기업행위 등록에 실패했습니다.'));
     } finally {
       setSubmitting(false);
     }
@@ -171,8 +173,6 @@ export function CorporateActionForm({ onSuccess }: Props) {
           className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white"
         />
       </div>
-
-      {error && <p className="text-sm text-rose-400">{error}</p>}
 
       <button
         type="submit"

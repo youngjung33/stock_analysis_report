@@ -14,7 +14,12 @@ export function jsonApiError(body: ApiErrorBody, status: number) {
   return NextResponse.json(body, { status });
 }
 
-function logRouteError(error: unknown) {
+/** API route 공통 — 서버 로그 전용 (사용자 응답과 분리) */
+export function logApiError(error: unknown, context?: Record<string, unknown>) {
+  if (context) {
+    console.error('[api]', context);
+  }
+
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     console.error('[api] Prisma error', {
       code: error.code,
@@ -87,7 +92,7 @@ export function handleRouteError(error: unknown) {
   }
 
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    logRouteError(error);
+    logApiError(error);
     const body = mapPrismaError(error);
     return jsonApiError(body, prismaErrorStatus(error.code));
   }
@@ -96,10 +101,10 @@ export function handleRouteError(error: unknown) {
     error instanceof Prisma.PrismaClientInitializationError ||
     error instanceof Prisma.PrismaClientRustPanicError
   ) {
-    logRouteError(error);
+    logApiError(error);
     return jsonApiError(apiErrorBody(AppErrorCode.DB_UNAVAILABLE), 503);
   }
 
-  logRouteError(error);
+  logApiError(error);
   return jsonApiError(apiErrorBody(AppErrorCode.INTERNAL), 500);
 }

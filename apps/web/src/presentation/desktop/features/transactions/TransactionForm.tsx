@@ -15,7 +15,6 @@ export function DesktopTransactionForm({ onSuccess }: Props) {
       className="space-y-4 rounded-xl border border-slate-800 bg-slate-900/60 p-6"
     >
       <h2 className="text-lg font-semibold text-white">거래 등록</h2>
-      {form.error && <p className="text-sm text-rose-400">{form.error}</p>}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">

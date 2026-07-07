@@ -5,10 +5,12 @@ import {
 } from '@sar/shared';
 import { ValidationError } from '../../domain/errors/domain.errors';
 import { IOAuthProviderPort } from '../../domain/ports/oauth-provider.port';
+import { createAppleClientSecret, isAppleOAuthConfigured } from './apple-oauth';
 
 type ProviderConfig = {
   clientId: string;
   clientSecret?: string;
+  resolveClientSecret?: () => string;
   authorizeUrl: string;
   tokenUrl: string;
   scope: string;
@@ -39,9 +41,10 @@ function providerConfig(provider: OAuthProviderId): ProviderConfig | null {
     }
     case OAuthProvider.APPLE: {
       const clientId = env('APPLE_CLIENT_ID');
-      if (!clientId) return null;
+      if (!isAppleOAuthConfigured()) return null;
       return {
-        clientId,
+        clientId: clientId!,
+        resolveClientSecret: createAppleClientSecret,
         authorizeUrl: 'https://appleid.apple.com/auth/authorize',
         tokenUrl: 'https://appleid.apple.com/auth/token',
         scope: 'name email',
@@ -77,6 +80,11 @@ function providerConfig(provider: OAuthProviderId): ProviderConfig | null {
     default:
       return null;
   }
+}
+
+function resolveClientSecret(config: ProviderConfig): string | undefined {
+  if (config.resolveClientSecret) return config.resolveClientSecret();
+  return config.clientSecret;
 }
 
 /** env 기반 OAuth2 provider — authorize URL / code 교환 */
@@ -123,8 +131,10 @@ export class EnvOAuthProviderService implements IOAuthProviderPort {
       redirect_uri: input.redirectUri,
       client_id: config.clientId,
     });
-    if (config.clientSecret) {
-      body.set('client_secret', config.clientSecret);
+
+    const clientSecret = resolveClientSecret(config);
+    if (clientSecret) {
+      body.set('client_secret', clientSecret);
     }
 
     const tokenRes = await fetch(config.tokenUrl, {
