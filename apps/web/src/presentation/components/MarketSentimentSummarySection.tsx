@@ -12,7 +12,7 @@ interface Props {
 }
 
 export function MarketSentimentSummarySection({ compact }: Props) {
-  const { data, isLoading, isError } = useFeaturedQuotes();
+  const { data, isLoading } = useFeaturedQuotes();
 
   const insights = useMemo(() => {
     if (!data) return null;
@@ -39,7 +39,6 @@ export function MarketSentimentSummarySection({ compact }: Props) {
       </div>
 
       {isLoading && <p className="mt-4 text-sm text-slate-400">시세 불러오는 중...</p>}
-      {isError && <p className="mt-4 text-sm text-rose-400">시세를 불러오지 못했습니다.</p>}
 
       {insights && (
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">

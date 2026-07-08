@@ -12,6 +12,7 @@ import {
   sentimentBadgeClass,
 } from '@sar/shared';
 import { useMarketAnalysis } from '../hooks/useMarketAnalysis';
+import { useErrorToast } from '../hooks/useErrorToast';
 import { formatPercent, pnlClass } from '../shared/formatters';
 import { stockDetailHref } from '../shared/stock-routes';
 import {
@@ -142,6 +143,8 @@ function NewsList({ news }: { news: MarketAnalysisReport['news'] }) {
 export function MarketAnalysisDetailSection({ compact }: Props) {
   const { data, isLoading, isError } = useMarketAnalysis();
 
+  useErrorToast(isError, '시장 분석을 불러오지 못했습니다.');
+
   const groupedInsights = useMemo(() => {
     if (!data) return [];
     const map = new Map<AnalysisCategory, AnalysisInsight[]>();
@@ -176,7 +179,6 @@ export function MarketAnalysisDetailSection({ compact }: Props) {
       {isLoading && (
         <p className="text-sm text-slate-400">매크로·지수·섹터·뉴스 분석 중… (최대 25초)</p>
       )}
-      {isError && <p className="text-sm text-rose-400">시장 분석을 불러오지 못했습니다.</p>}
 
       {data && (
         <>

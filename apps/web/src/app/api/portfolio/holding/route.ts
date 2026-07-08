@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
-import { Market } from '@sar/shared';
+import { AppErrorCode, Market } from '@sar/shared';
 import { getServerServices } from '@/server/container';
+import { ValidationError } from '@/server/domain/errors/domain.errors';
 import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
 
 export async function GET(req: NextRequest) {
@@ -10,10 +11,10 @@ export async function GET(req: NextRequest) {
     const marketParam = req.nextUrl.searchParams.get('market');
 
     if (!symbol || !marketParam) {
-      return handleRouteError(new Error('symbol and market are required'));
+      throw new ValidationError(AppErrorCode.VALIDATION, 'symbol과 market이 필요합니다.');
     }
     if (marketParam !== Market.KR && marketParam !== Market.US) {
-      return handleRouteError(new Error('invalid market'));
+      throw new ValidationError(AppErrorCode.VALIDATION, 'market은 KR 또는 US여야 합니다.');
     }
 
     const { getHoldingBySymbolUseCase } = getServerServices();

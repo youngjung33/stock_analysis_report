@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
+import { enforceRateLimit } from '@/server/http/rate-limit';
 import {
   getRefreshToken,
   handleRouteError,
@@ -10,6 +11,7 @@ import {
 
 export async function POST(req: NextRequest) {
   try {
+    enforceRateLimit(req, 'auth:refresh', 'authRefresh');
     const refreshToken = getRefreshToken(req);
     if (!refreshToken) {
       return jsonData({ username: null });

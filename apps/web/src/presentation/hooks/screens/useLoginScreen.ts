@@ -34,6 +34,7 @@ export function useLoginScreen() {
   const [providersLoading, setProvidersLoading] = useState(true);
   const [usernameCheckStatus, setUsernameCheckStatus] = useState<UsernameCheckStatus>('idle');
   const [usernameCheckMessage, setUsernameCheckMessage] = useState('');
+  const [postAuthPath, setPostAuthPath] = useState('/');
 
   useEffect(() => {
     listOAuthProvidersUseCase
@@ -122,14 +123,15 @@ export function useLoginScreen() {
     setLoading(true);
     try {
       if (mode === 'register') {
+        setPostAuthPath('/?welcome=1');
         await register({
           username: username.trim(),
           password,
           passwordConfirm,
           email: email.trim() || null,
         });
-        showSuccess('회원가입이 완료되었습니다. 대시보드로 이동합니다.');
       } else {
+        setPostAuthPath('/');
         await login(username, password);
       }
     } catch (err) {
@@ -168,6 +170,7 @@ export function useLoginScreen() {
     mode,
     setMode: switchMode,
     isAuthenticated,
+    postAuthPath,
     username,
     setUsername: (value: string) => {
       setUsername(value);

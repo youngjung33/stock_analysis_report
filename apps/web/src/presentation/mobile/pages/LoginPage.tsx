@@ -24,9 +24,9 @@ export function MobileLoginPage() {
 
   useEffect(() => {
     if (screen.isAuthenticated) {
-      router.replace('/');
+      router.replace(screen.postAuthPath);
     }
-  }, [screen.isAuthenticated, router]);
+  }, [screen.isAuthenticated, screen.postAuthPath, router]);
 
   useEffect(() => {
     if (!oauthError) return;

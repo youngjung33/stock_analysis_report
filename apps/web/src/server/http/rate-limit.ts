@@ -4,11 +4,21 @@ import { HttpError } from './errors';
 
 type Bucket = { count: number; resetAt: number };
 
+/**
+ * 프로세스 메모리 기반 rate limit.
+ * Vercel serverless는 인스턴스마다 카운터가 분리됩니다.
+ * 트래픽이 늘면 Upstash Redis 등 외부 store로 교체하세요.
+ */
 const buckets = new Map<string, Bucket>();
 
 export type MarketRateLimitTier = 'light' | 'standard' | 'heavy';
 
-export type AuthRateLimitTier = 'authLogin' | 'authRegister' | 'authCheckUsername' | 'authOAuthStart';
+export type AuthRateLimitTier =
+  | 'authLogin'
+  | 'authRegister'
+  | 'authCheckUsername'
+  | 'authOAuthStart'
+  | 'authRefresh';
 
 export type RateLimitTier = MarketRateLimitTier | AuthRateLimitTier;
 
@@ -20,6 +30,7 @@ const TIER_LIMITS: Record<RateLimitTier, { limit: number; windowMs: number }> = 
   authRegister: { limit: 10, windowMs: 60_000 },
   authCheckUsername: { limit: 30, windowMs: 60_000 },
   authOAuthStart: { limit: 20, windowMs: 60_000 },
+  authRefresh: { limit: 60, windowMs: 60_000 },
 };
 
 function clientIp(req: NextRequest): string {

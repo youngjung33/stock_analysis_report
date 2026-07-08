@@ -9,6 +9,7 @@ import {
 } from '@sar/shared';
 import { FeaturedStockQuote } from '@/client/domain/models';
 import { useFeaturedQuotes } from '../hooks/useFeaturedQuotes';
+import { useErrorToast } from '../hooks/useErrorToast';
 import { formatNumber, formatPercent, pnlClass } from '../shared/formatters';
 import { stockDetailHref } from '../shared/stock-routes';
 
@@ -127,7 +128,9 @@ function QuoteTable({
 }
 
 export function FeaturedQuotesSection({ compact }: Props) {
-  const { data, isLoading, isError, error } = useFeaturedQuotes();
+  const { data, isLoading, isError } = useFeaturedQuotes();
+
+  useErrorToast(isError, '주요 종목 시세를 불러오지 못했습니다.');
 
   const krItems = data?.kr ?? (isLoading ? PLACEHOLDER_KR : []);
   const usItems = data?.us ?? (isLoading ? PLACEHOLDER_US : []);
@@ -144,12 +147,6 @@ export function FeaturedQuotesSection({ compact }: Props) {
             </span>
           )}
         </p>
-        {isError && (
-          <p className="mt-2 text-sm text-rose-400">
-            시세를 불러오지 못했습니다.
-            {error instanceof Error && error.message ? ` (${error.message})` : ''}
-          </p>
-        )}
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">

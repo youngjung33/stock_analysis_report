@@ -11,6 +11,7 @@ import {
 } from '@sar/shared';
 import { useStockQuote } from '../hooks/useStockQuote';
 import { usePortfolioHolding } from '../hooks/usePortfolioHolding';
+import { useErrorToast } from '../hooks/useErrorToast';
 import { MyHoldingPanel } from '../components/MyHoldingPanel';
 import { StockRangeSelector } from '../components/StockRangeSelector';
 import { StockPriceChart } from '../components/StockPriceChart';
@@ -26,6 +27,8 @@ export function StockDetailContent({ symbol, market }: Props) {
   const [range, setRange] = useState<QuoteChartRange>('1d');
   const { data, isLoading, isError, isFetching } = useStockQuote(symbol, market, range);
   const { data: holding, isLoading: holdingLoading } = usePortfolioHolding(symbol, market);
+
+  useErrorToast(isError, '종목 시세를 불러오지 못했습니다.');
 
   const currency = stock ? resolveCurrency(stock.market) : resolveCurrency(market);
   const title = stock?.name ?? symbol;
@@ -68,7 +71,7 @@ export function StockDetailContent({ symbol, market }: Props) {
             </div>
           ) : isError || !data ? (
             <div className="flex h-56 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/30">
-              <p className="text-sm text-rose-400">차트를 불러오지 못했습니다.</p>
+              <p className="text-sm text-slate-500">차트 데이터가 없습니다.</p>
             </div>
           ) : (
             <StockPriceChart
@@ -86,7 +89,7 @@ export function StockDetailContent({ symbol, market }: Props) {
             {loading ? (
               <p className="mt-2 text-sm text-slate-400">조회 중...</p>
             ) : isError || !data ? (
-              <p className="mt-2 text-sm text-rose-400">시세를 불러오지 못했습니다.</p>
+              <p className="mt-2 text-sm text-slate-500">—</p>
             ) : (
               <p className="mt-2 text-2xl font-semibold text-white">
                 {formatNumber(data.currentPrice, currency)}
