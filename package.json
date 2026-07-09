@@ -10,6 +10,7 @@
     "build": "npm run build -w @sar/shared && npm run build -w @sar/web",
     "start": "npm run start -w @sar/web",
     "test": "npm run test -w @sar/web",
+    "test:e2e": "npm run test:e2e -w @sar/web",
     "lint": "npm run lint -w @sar/web",
     "db:migrate": "npm run db:migrate -w @sar/web",
     "db:push": "npm run db:push -w @sar/web",

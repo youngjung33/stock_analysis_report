@@ -165,4 +165,33 @@ describe('RefreshQuotesUseCase', () => {
     expect(result.failed[0].reason).toBe('FINNHUB_API_KEY가 설정되지 않았습니다.');
     expect(result.failed[0].reasonCode).toBe('not_configured');
   });
+
+  // RQ-07
+  it('fetches KR stocks in parallel', async () => {
+    const kr1 = createMockStock({ id: 'kr-1', symbol: '005930', market: Market.KR });
+    const kr2 = createMockStock({ id: 'kr-2', symbol: '000660', market: Market.KR });
+    const stockRepo = createMockStockRepo();
+    stockRepo.findHeldByUser.mockResolvedValue([kr1, kr2]);
+
+    const txRepo = createMockTransactionRepo();
+    txRepo.findByUserAndStock.mockImplementation(async (_userId, stockId) => [
+      createMockTransaction({ stockId, quantity: 5 }),
+    ]);
+
+    const quoteRepo = createMockQuoteRepo();
+    const fetchStockQuote = vi.fn().mockResolvedValue({
+      currentPrice: 100,
+      changePercent: 1,
+    });
+    const marketData = createMockMarketData({
+      supports: vi.fn((m) => m === Market.KR),
+      fetchStockQuote,
+    });
+
+    const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, marketData);
+    const result = await useCase.execute('user-1');
+
+    expect(fetchStockQuote).toHaveBeenCalledTimes(2);
+    expect(result.updated).toBe(2);
+  });
 });

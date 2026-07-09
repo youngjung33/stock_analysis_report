@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { AuthFieldHint } from '../../components/auth/AuthFormAlert';
@@ -174,6 +175,14 @@ export function DesktopLoginPage() {
             {isRegister ? '로그인' : '회원가입'}
           </button>
         </p>
+
+        {!isRegister && (
+          <p className="text-center text-sm">
+            <Link href="/forgot-password" className="text-muted-foreground hover:text-primary hover:underline">
+              비밀번호를 잊으셨나요?
+            </Link>
+          </p>
+        )}
 
         <div className="rounded-xl border border-border bg-muted/50 p-4">
           <p className="text-sm font-medium">비회원으로 둘러보기</p>

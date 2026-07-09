@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { QuoteChartRange } from '@sar/shared';
 import { StockPricePoint } from '@/client/domain/models';
 
@@ -28,6 +29,23 @@ function formatAxisDate(timestamp: string, range: QuoteChartRange): string {
   return date.toLocaleDateString('ko-KR', { year: '2-digit', month: 'numeric' });
 }
 
+function formatTooltipDate(timestamp: string, range: QuoteChartRange): string {
+  const date = new Date(timestamp);
+  if (range === '1d') {
+    return date.toLocaleString('ko-KR', {
+      month: 'numeric',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+  return date.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
 function formatPrice(value: number, currency: string): string {
   const formatted = value.toLocaleString(undefined, { maximumFractionDigits: 2 });
   return currency === 'KRW' ? `₩${formatted}` : `$${formatted}`;
@@ -40,7 +58,61 @@ function lineColor(changePercent: number | null): string {
   return '#94a3b8';
 }
 
+function indexFromClientX(svg: SVGSVGElement, clientX: number, pointCount: number, chartWidth: number): number {
+  const rect = svg.getBoundingClientRect();
+  const svgX = ((clientX - rect.left) / rect.width) * WIDTH;
+  const relX = svgX - PAD.left;
+  const ratio = relX / chartWidth;
+  const index = Math.round(ratio * (pointCount - 1));
+  return Math.max(0, Math.min(pointCount - 1, index));
+}
+
 export function StockPriceChart({ points, range, changePercent, currency }: Props) {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  const chartWidth = WIDTH - PAD.left - PAD.right;
+  const chartHeight = HEIGHT - PAD.top - PAD.bottom;
+
+  const updateActiveIndex = useCallback(
+    (clientX: number) => {
+      if (!svgRef.current) return;
+      setActiveIndex(indexFromClientX(svgRef.current, clientX, points.length, chartWidth));
+    },
+    [points.length, chartWidth],
+  );
+
+  useEffect(() => {
+    setActiveIndex(null);
+  }, [points, range]);
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<SVGRectElement>) => {
+      e.currentTarget.setPointerCapture(e.pointerId);
+      updateActiveIndex(e.clientX);
+    },
+    [updateActiveIndex],
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<SVGRectElement>) => {
+      if (e.pointerType === 'mouse' || e.buttons > 0) {
+        updateActiveIndex(e.clientX);
+      }
+    },
+    [updateActiveIndex],
+  );
+
+  const handlePointerUp = useCallback((e: React.PointerEvent<SVGRectElement>) => {
+    e.currentTarget.releasePointerCapture(e.pointerId);
+  }, []);
+
+  const handlePointerLeave = useCallback((e: React.PointerEvent<SVGRectElement>) => {
+    if (e.pointerType === 'mouse') {
+      setActiveIndex(null);
+    }
+  }, []);
+
   if (points.length < 2) {
     return (
       <div className="flex h-56 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/30">
@@ -49,8 +121,6 @@ export function StockPriceChart({ points, range, changePercent, currency }: Prop
     );
   }
 
-  const chartWidth = WIDTH - PAD.left - PAD.right;
-  const chartHeight = HEIGHT - PAD.top - PAD.bottom;
   const closes = points.map((p) => p.close);
   const minClose = Math.min(...closes);
   const maxClose = Math.max(...closes);
@@ -76,11 +146,17 @@ export function StockPriceChart({ points, range, changePercent, currency }: Prop
     { ...coords[coords.length - 1], align: 'end' as const },
   ];
 
+  const active = activeIndex !== null ? coords[activeIndex] : null;
+  const tooltipAlign =
+    active && active.x > WIDTH * 0.72 ? 'right' : active && active.x < WIDTH * 0.28 ? 'left' : 'center';
+
   return (
     <div className="rounded-lg border border-slate-800 bg-slate-900/30 p-2 sm:p-3">
+      <div className="relative">
       <svg
+        ref={svgRef}
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-        className="h-56 w-full"
+        className="h-56 w-full touch-none select-none"
         role="img"
         aria-label="종목 가격 차트"
       >
@@ -104,13 +180,7 @@ export function StockPriceChart({ points, range, changePercent, currency }: Prop
                 strokeDasharray="4 4"
                 strokeOpacity="0.6"
               />
-              <text
-                x={PAD.left - 8}
-                y={y + 4}
-                textAnchor="end"
-                fill="#64748b"
-                fontSize="10"
-              >
+              <text x={PAD.left - 8} y={y + 4} textAnchor="end" fill="#64748b" fontSize="10">
                 {formatPrice(tick, currency)}
               </text>
             </g>
@@ -118,7 +188,30 @@ export function StockPriceChart({ points, range, changePercent, currency }: Prop
         })}
 
         <path d={areaPath} fill={`url(#${gradientId})`} />
-        <path d={linePath} fill="none" stroke={stroke} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+        <path
+          d={linePath}
+          fill="none"
+          stroke={stroke}
+          strokeWidth="2"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+
+        {active && (
+          <g pointerEvents="none">
+            <line
+              x1={active.x}
+              y1={PAD.top}
+              x2={active.x}
+              y2={PAD.top + chartHeight}
+              stroke="#94a3b8"
+              strokeWidth="1"
+              strokeDasharray="3 3"
+              strokeOpacity="0.8"
+            />
+            <circle cx={active.x} cy={active.y} r="5" fill={stroke} stroke="#0f172a" strokeWidth="2" />
+          </g>
+        )}
 
         {xLabels.map(({ point, x, align }, index) => (
           <text
@@ -132,7 +225,42 @@ export function StockPriceChart({ points, range, changePercent, currency }: Prop
             {formatAxisDate(point.timestamp, range)}
           </text>
         ))}
+
+        <rect
+          x={PAD.left}
+          y={PAD.top}
+          width={chartWidth}
+          height={chartHeight}
+          fill="transparent"
+          className="cursor-crosshair"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerLeave={handlePointerLeave}
+          onPointerCancel={handlePointerUp}
+        />
       </svg>
+
+      {active && (
+        <div
+          className="pointer-events-none absolute z-10 whitespace-nowrap rounded-md border border-slate-700/80 bg-slate-950/90 px-2.5 py-1.5 text-xs shadow-lg backdrop-blur-sm sm:px-3 sm:py-2 sm:text-sm"
+          style={{
+            left: `${(active.x / WIDTH) * 100}%`,
+            top: `${(active.y / HEIGHT) * 100}%`,
+            transform:
+              tooltipAlign === 'right'
+                ? 'translate(-100%, calc(-100% - 10px))'
+                : tooltipAlign === 'left'
+                  ? 'translate(0, calc(-100% - 10px))'
+                  : 'translate(-50%, calc(-100% - 10px))',
+          }}
+          aria-live="polite"
+        >
+          <p className="text-slate-400">{formatTooltipDate(active.point.timestamp, range)}</p>
+          <p className="mt-0.5 font-semibold text-white">{formatPrice(active.point.close, currency)}</p>
+        </div>
+      )}
+      </div>
     </div>
   );
 }

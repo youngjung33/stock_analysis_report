@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LogOut } from 'lucide-react';
+import { LogOut, Settings } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { cn } from '../lib/cn';
 import { APP_BRAND, APP_NAV_ITEMS } from './nav-config';
@@ -58,6 +58,15 @@ export function AppSidebar({ className }: Props) {
             {username}
             {isGuest && <span className="ml-1 text-amber-400/90">(비회원)</span>}
           </p>
+        )}
+        {!isGuest && (
+          <Link
+            href="/settings"
+            className="mb-2 flex w-full items-center justify-center gap-2 rounded-lg border border-border-strong px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          >
+            <Settings className="size-4" aria-hidden />
+            계정 설정
+          </Link>
         )}
         <button
           type="button"

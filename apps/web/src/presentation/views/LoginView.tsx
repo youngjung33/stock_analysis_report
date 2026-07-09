@@ -1,10 +1,7 @@
 'use client';
 
-import { useIsMobile } from '../hooks/useBreakpoint';
-import { DesktopLoginPage } from '../desktop/pages/LoginPage';
-import { MobileLoginPage } from '../mobile/pages/LoginPage';
+import { LoginPage } from '../pages/LoginPage';
 
 export function LoginView() {
-  const isMobile = useIsMobile();
-  return isMobile ? <MobileLoginPage /> : <DesktopLoginPage />;
+  return <LoginPage />;
 }

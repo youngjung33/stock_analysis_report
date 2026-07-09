@@ -38,6 +38,8 @@ export {
   USERNAME_PATTERN,
   PASSWORD_PATTERN,
 } from './auth';
+export { AuthTokenType, AUTH_TOKEN_TTL_MS } from './auth-tokens';
+export type { AuthTokenType as AuthTokenTypeId } from './auth-tokens';
 export type {
   OAuthProviderId,
   OAuthProviderMeta,

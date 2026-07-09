@@ -7,6 +7,15 @@ import { LogoutUseCase } from './usecases/auth/logout.use-case';
 import { RefreshSessionUseCase } from './usecases/auth/refresh-session.use-case';
 import { CreateCorporateActionUseCase } from './usecases/corporate-actions/create-corporate-action.use-case';
 import {
+  ChangeEmailUseCase,
+  ChangePasswordUseCase,
+  GetAccountUseCase,
+  RequestEmailVerificationUseCase,
+  RequestPasswordResetUseCase,
+  ResetPasswordUseCase,
+  UnlinkOAuthUseCase,
+} from './usecases/account/account.use-cases';
+import {
   IAuthSessionPort,
   IGuestSessionPort,
   IGuestStorePort,
@@ -58,6 +67,13 @@ export interface AppServices {
   addWatchlistUseCase: AddWatchlistUseCase;
   removeWatchlistUseCase: RemoveWatchlistUseCase;
   createCorporateActionUseCase: CreateCorporateActionUseCase;
+  getAccountUseCase: GetAccountUseCase;
+  changePasswordUseCase: ChangePasswordUseCase;
+  changeEmailUseCase: ChangeEmailUseCase;
+  requestEmailVerificationUseCase: RequestEmailVerificationUseCase;
+  unlinkOAuthUseCase: UnlinkOAuthUseCase;
+  requestPasswordResetUseCase: RequestPasswordResetUseCase;
+  resetPasswordUseCase: ResetPasswordUseCase;
   authSession: IAuthSessionPort;
   guestSession: IGuestSessionPort;
   guestStore: IGuestStorePort;

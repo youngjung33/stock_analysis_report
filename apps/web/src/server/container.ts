@@ -49,6 +49,18 @@ import {
   PrismaUserRepository,
   PrismaWatchlistRepository,
 } from './data/persistence/prisma.repositories';
+import { PrismaAuthTokenRepository } from './data/auth/auth-token.repository';
+import { ConsoleEmailSender } from './data/auth/console-email.sender';
+import {
+  ChangeEmailUseCase,
+  ChangePasswordUseCase,
+  GetAccountUseCase,
+  RequestEmailVerificationUseCase,
+  RequestPasswordResetUseCase,
+  ResetPasswordUseCase,
+  UnlinkOAuthAccountUseCase,
+  VerifyEmailUseCase,
+} from './domain/usecases/account/account.use-cases';
 
 export interface ServerServices {
   tokenService: ITokenService;
@@ -80,6 +92,14 @@ export interface ServerServices {
   listWatchlistUseCase: ListWatchlistUseCase;
   addWatchlistUseCase: AddWatchlistUseCase;
   deleteWatchlistUseCase: DeleteWatchlistUseCase;
+  getAccountUseCase: GetAccountUseCase;
+  changePasswordUseCase: ChangePasswordUseCase;
+  changeEmailUseCase: ChangeEmailUseCase;
+  requestEmailVerificationUseCase: RequestEmailVerificationUseCase;
+  verifyEmailUseCase: VerifyEmailUseCase;
+  requestPasswordResetUseCase: RequestPasswordResetUseCase;
+  resetPasswordUseCase: ResetPasswordUseCase;
+  unlinkOAuthAccountUseCase: UnlinkOAuthAccountUseCase;
 }
 
 let cached: ServerServices | null = null;
@@ -100,6 +120,8 @@ export function getServerServices(): ServerServices {
   const oauthProvider = new EnvOAuthProviderService();
   const oauthAccountRepo = new PrismaUserOAuthAccountRepository();
   const oauthStateRepo = new PrismaOAuthStateRepository();
+  const authTokenRepo = new PrismaAuthTokenRepository();
+  const emailSender = new ConsoleEmailSender();
   const authSession = new AuthSessionService(refreshRepo, tokenService);
   const marketData = new MarketDataProvider();
 
@@ -160,6 +182,22 @@ export function getServerServices(): ServerServices {
     listWatchlistUseCase: new ListWatchlistUseCase(watchlistRepo),
     addWatchlistUseCase: new AddWatchlistUseCase(watchlistRepo),
     deleteWatchlistUseCase: new DeleteWatchlistUseCase(watchlistRepo),
+    getAccountUseCase: new GetAccountUseCase(userRepo, oauthAccountRepo),
+    changePasswordUseCase: new ChangePasswordUseCase(userRepo, passwordHasher),
+    changeEmailUseCase: new ChangeEmailUseCase(userRepo, authTokenRepo, emailSender),
+    requestEmailVerificationUseCase: new RequestEmailVerificationUseCase(
+      userRepo,
+      authTokenRepo,
+      emailSender,
+    ),
+    verifyEmailUseCase: new VerifyEmailUseCase(userRepo, authTokenRepo),
+    requestPasswordResetUseCase: new RequestPasswordResetUseCase(
+      userRepo,
+      authTokenRepo,
+      emailSender,
+    ),
+    resetPasswordUseCase: new ResetPasswordUseCase(userRepo, authTokenRepo, passwordHasher),
+    unlinkOAuthAccountUseCase: new UnlinkOAuthAccountUseCase(userRepo, oauthAccountRepo),
   };
 
   return cached;

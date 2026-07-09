@@ -27,8 +27,18 @@ import { RefreshQuotesUseCase } from './domain/usecases/portfolio/refresh-quotes
 import { CreateTransactionUseCase } from './domain/usecases/transactions/create-transaction.use-case';
 import { DeleteTransactionUseCase } from './domain/usecases/transactions/delete-transaction.use-case';
 import { ListTransactionsUseCase } from './domain/usecases/transactions/list-transactions.use-case';
-import { authSessionAdapter } from './data/auth/auth-session.adapter';
+import { accountRepository } from './data/repositories/account.repository';
+import {
+  ChangeEmailUseCase,
+  ChangePasswordUseCase,
+  GetAccountUseCase,
+  RequestEmailVerificationUseCase,
+  RequestPasswordResetUseCase,
+  ResetPasswordUseCase,
+  UnlinkOAuthUseCase,
+} from './domain/usecases/account/account.use-cases';
 import { tokenStorageAdapter } from './data/auth/token-storage.adapter';
+import { authSessionAdapter } from './data/auth/auth-session.adapter';
 import { guestSessionAdapter, guestStoreAdapter } from './data/guest/guest-session.adapter';
 import {
   authRepository,
@@ -65,6 +75,13 @@ export function wireAppServices(): AppServices {
     addWatchlistUseCase: new AddWatchlistUseCase(watchlistRepository),
     removeWatchlistUseCase: new RemoveWatchlistUseCase(watchlistRepository),
     createCorporateActionUseCase: new CreateCorporateActionUseCase(corporateActionRepository),
+    getAccountUseCase: new GetAccountUseCase(accountRepository),
+    changePasswordUseCase: new ChangePasswordUseCase(accountRepository),
+    changeEmailUseCase: new ChangeEmailUseCase(accountRepository),
+    requestEmailVerificationUseCase: new RequestEmailVerificationUseCase(accountRepository),
+    unlinkOAuthUseCase: new UnlinkOAuthUseCase(accountRepository),
+    requestPasswordResetUseCase: new RequestPasswordResetUseCase(accountRepository),
+    resetPasswordUseCase: new ResetPasswordUseCase(accountRepository),
     authSession: authSessionAdapter,
     guestSession: guestSessionAdapter,
     guestStore: guestStoreAdapter,

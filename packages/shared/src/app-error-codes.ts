@@ -26,6 +26,11 @@ export const AppErrorCode = {
   AUTH_OAUTH_NOT_CONFIGURED: 'AUTH_OAUTH_NOT_CONFIGURED',
   AUTH_OAUTH_STATE_INVALID: 'AUTH_OAUTH_STATE_INVALID',
   AUTH_OAUTH_FAILED: 'AUTH_OAUTH_FAILED',
+
+  AUTH_TOKEN_INVALID: 'AUTH_TOKEN_INVALID',
+  AUTH_CURRENT_PASSWORD_INVALID: 'AUTH_CURRENT_PASSWORD_INVALID',
+  AUTH_OAUTH_UNLINK_FORBIDDEN: 'AUTH_OAUTH_UNLINK_FORBIDDEN',
+  AUTH_EMAIL_REQUIRED: 'AUTH_EMAIL_REQUIRED',
 } as const;
 
 export type AppErrorCode = (typeof AppErrorCode)[keyof typeof AppErrorCode];
@@ -73,6 +78,11 @@ export const APP_ERROR_MESSAGES: Record<AppErrorCode, string> = {
   [AppErrorCode.AUTH_OAUTH_NOT_CONFIGURED]: '소셜 로그인이 아직 설정되지 않았습니다.',
   [AppErrorCode.AUTH_OAUTH_STATE_INVALID]: '소셜 로그인 인증이 만료되었습니다. 다시 시도해 주세요.',
   [AppErrorCode.AUTH_OAUTH_FAILED]: '소셜 로그인에 실패했습니다. 다시 시도해 주세요.',
+
+  [AppErrorCode.AUTH_TOKEN_INVALID]: '링크가 유효하지 않거나 만료되었습니다.',
+  [AppErrorCode.AUTH_CURRENT_PASSWORD_INVALID]: '현재 비밀번호가 올바르지 않습니다.',
+  [AppErrorCode.AUTH_OAUTH_UNLINK_FORBIDDEN]: '다른 로그인 수단을 먼저 설정해 주세요.',
+  [AppErrorCode.AUTH_EMAIL_REQUIRED]: '이메일이 필요합니다.',
 };
 
 const CODE_SET = new Set<string>(Object.values(AppErrorCode));

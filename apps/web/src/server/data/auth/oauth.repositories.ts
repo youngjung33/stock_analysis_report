@@ -22,6 +22,14 @@ export class PrismaUserOAuthAccountRepository implements IUserOAuthAccountReposi
   ): Promise<UserOAuthAccountEntity> {
     return this.prisma.userOAuthAccount.create({ data });
   }
+
+  async findByUserId(userId: string): Promise<UserOAuthAccountEntity[]> {
+    return this.prisma.userOAuthAccount.findMany({ where: { userId }, orderBy: { createdAt: 'asc' } });
+  }
+
+  async deleteByUserAndProvider(userId: string, provider: OAuthProviderId): Promise<void> {
+    await this.prisma.userOAuthAccount.deleteMany({ where: { userId, provider } });
+  }
 }
 
 export class PrismaOAuthStateRepository implements IOAuthStateRepository {

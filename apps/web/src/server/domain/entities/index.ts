@@ -4,7 +4,19 @@ export interface UserEntity {
   id: string;
   username: string;
   email: string | null;
+  emailVerifiedAt: Date | null;
   passwordHash: string | null;
+  createdAt: Date;
+}
+
+export interface AuthTokenEntity {
+  id: string;
+  userId: string;
+  type: string;
+  tokenHash: string;
+  email: string | null;
+  expiresAt: Date;
+  usedAt: Date | null;
   createdAt: Date;
 }
 

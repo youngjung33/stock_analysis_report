@@ -1,9 +1,7 @@
 'use client';
 
-import { useIsMobile } from '../hooks/useBreakpoint';
-import { DesktopStockDetailPage } from '../desktop/pages/StockDetailPage';
-import { MobileStockDetailPage } from '../mobile/pages/StockDetailPage';
 import { Market } from '@sar/shared';
+import { StockDetailPage } from '../pages/StockDetailPage';
 
 interface Props {
   symbol: string;
@@ -11,10 +9,5 @@ interface Props {
 }
 
 export function StockDetailView({ symbol, market }: Props) {
-  const isMobile = useIsMobile();
-  return isMobile ? (
-    <MobileStockDetailPage symbol={symbol} market={market} />
-  ) : (
-    <DesktopStockDetailPage symbol={symbol} market={market} />
-  );
+  return <StockDetailPage symbol={symbol} market={market} />;
 }

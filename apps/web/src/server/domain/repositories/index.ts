@@ -25,8 +25,23 @@ export interface IUserRepository {
   findByUsername(username: string): Promise<UserEntity | null>;
   findByEmail(email: string): Promise<UserEntity | null>;
   findById(id: string): Promise<UserEntity | null>;
-  create(user: Omit<UserEntity, 'id' | 'createdAt'>): Promise<UserEntity>;
+  create(user: Omit<UserEntity, 'id' | 'createdAt' | 'emailVerifiedAt'> & { emailVerifiedAt?: Date | null }): Promise<UserEntity>;
   count(): Promise<number>;
+  updateEmail(userId: string, email: string | null): Promise<UserEntity>;
+  updatePasswordHash(userId: string, passwordHash: string): Promise<UserEntity>;
+  markEmailVerified(userId: string): Promise<UserEntity>;
+}
+
+export interface IAuthTokenRepository {
+  create(data: {
+    userId: string;
+    type: string;
+    tokenHash: string;
+    email?: string | null;
+    expiresAt: Date;
+  }): Promise<import('../entities').AuthTokenEntity>;
+  consumeValid(tokenHash: string, type: string): Promise<import('../entities').AuthTokenEntity | null>;
+  invalidateUserTokens(userId: string, type: string): Promise<void>;
 }
 
 export interface IUserOAuthAccountRepository {
@@ -34,9 +49,11 @@ export interface IUserOAuthAccountRepository {
     provider: OAuthProviderId,
     providerUserId: string,
   ): Promise<UserOAuthAccountEntity | null>;
+  findByUserId(userId: string): Promise<UserOAuthAccountEntity[]>;
   create(
     data: Omit<UserOAuthAccountEntity, 'id' | 'createdAt'>,
   ): Promise<UserOAuthAccountEntity>;
+  deleteByUserAndProvider(userId: string, provider: OAuthProviderId): Promise<void>;
 }
 
 export interface IOAuthStateRepository {

@@ -69,12 +69,40 @@ export class PrismaUserRepository implements IUserRepository {
     return user ? { ...user } : null;
   }
 
-  async create(user: Omit<UserEntity, 'id' | 'createdAt'>): Promise<UserEntity> {
-    return this.prisma.user.create({ data: user });
+  async create(user: Omit<UserEntity, 'id' | 'createdAt' | 'emailVerifiedAt'> & { emailVerifiedAt?: Date | null }) {
+    return this.prisma.user.create({
+      data: {
+        username: user.username,
+        email: user.email,
+        passwordHash: user.passwordHash,
+        emailVerifiedAt: user.emailVerifiedAt ?? null,
+      },
+    });
   }
 
   async count(): Promise<number> {
     return this.prisma.user.count();
+  }
+
+  async updateEmail(userId: string, email: string | null) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { email, emailVerifiedAt: null },
+    });
+  }
+
+  async updatePasswordHash(userId: string, passwordHash: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+  }
+
+  async markEmailVerified(userId: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { emailVerifiedAt: new Date() },
+    });
   }
 }
 
