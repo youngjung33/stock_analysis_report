@@ -1,6 +1,7 @@
 'use client';
 
-import { LogOut } from 'lucide-react';
+import Link from 'next/link';
+import { LogOut, Settings } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { cn } from '../lib/cn';
 
@@ -13,7 +14,7 @@ interface Props {
 }
 
 export function AppHeader({ title, subtitle, actions, className, showMobileLogout = true }: Props) {
-  const { logout } = useAuth();
+  const { logout, isGuest } = useAuth();
 
   return (
     <header
@@ -31,6 +32,15 @@ export function AppHeader({ title, subtitle, actions, className, showMobileLogou
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {actions}
+          {!isGuest && (
+            <Link
+              href="/settings"
+              className="rounded-lg border border-border-strong p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground md:hidden"
+              aria-label="계정 설정"
+            >
+              <Settings className="size-4" />
+            </Link>
+          )}
           {showMobileLogout && (
             <button
               type="button"

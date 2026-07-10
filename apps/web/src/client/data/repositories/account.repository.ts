@@ -2,7 +2,7 @@ import { OAuthProviderId } from '@sar/shared';
 import { AppErrorCode } from '@sar/shared';
 import { apiClient } from '../api/client';
 import { toAppError } from '../../domain/errors/api-error';
-import { AccountProfile, IAccountRepository } from '../../domain/repositories/account.repository';
+import { AccountProfile, EmailVerificationIssued, IAccountRepository } from '../../domain/repositories/account.repository';
 
 export class ApiAccountRepository implements IAccountRepository {
   async getProfile(): Promise<AccountProfile> {
@@ -26,19 +26,35 @@ export class ApiAccountRepository implements IAccountRepository {
     }
   }
 
-  async changeEmail(email: string) {
+  async changeEmail(email: string): Promise<EmailVerificationIssued> {
     try {
-      await apiClient.post('/account/email', { email });
+      const { data } = await apiClient.post<EmailVerificationIssued & { ok: boolean; message: string }>(
+        '/account/email',
+        { email },
+      );
+      return { verificationCode: data.verificationCode };
     } catch (error) {
       throw toAppError(error, AppErrorCode.INTERNAL);
     }
   }
 
-  async requestEmailVerification() {
+  async requestEmailVerification(): Promise<EmailVerificationIssued | null> {
     try {
-      await apiClient.post('/account/verify-email');
+      const { data } = await apiClient.post<EmailVerificationIssued & { ok: boolean; message: string }>(
+        '/account/verify-email',
+      );
+      if (!data.verificationCode) return null;
+      return { verificationCode: data.verificationCode };
     } catch (error) {
       throw toAppError(error, AppErrorCode.INTERNAL);
+    }
+  }
+
+  async confirmEmailVerification(code: string) {
+    try {
+      await apiClient.post('/account/confirm-email', { code });
+    } catch (error) {
+      throw toAppError(error, AppErrorCode.AUTH_TOKEN_INVALID);
     }
   }
 

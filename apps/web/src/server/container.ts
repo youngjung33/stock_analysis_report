@@ -184,12 +184,8 @@ export function getServerServices(): ServerServices {
     deleteWatchlistUseCase: new DeleteWatchlistUseCase(watchlistRepo),
     getAccountUseCase: new GetAccountUseCase(userRepo, oauthAccountRepo),
     changePasswordUseCase: new ChangePasswordUseCase(userRepo, passwordHasher),
-    changeEmailUseCase: new ChangeEmailUseCase(userRepo, authTokenRepo, emailSender),
-    requestEmailVerificationUseCase: new RequestEmailVerificationUseCase(
-      userRepo,
-      authTokenRepo,
-      emailSender,
-    ),
+    changeEmailUseCase: new ChangeEmailUseCase(userRepo, authTokenRepo),
+    requestEmailVerificationUseCase: new RequestEmailVerificationUseCase(userRepo, authTokenRepo),
     verifyEmailUseCase: new VerifyEmailUseCase(userRepo, authTokenRepo),
     requestPasswordResetUseCase: new RequestPasswordResetUseCase(
       userRepo,

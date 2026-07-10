@@ -9,6 +9,7 @@ import { CreateCorporateActionUseCase } from './usecases/corporate-actions/creat
 import {
   ChangeEmailUseCase,
   ChangePasswordUseCase,
+  ConfirmEmailVerificationUseCase,
   GetAccountUseCase,
   RequestEmailVerificationUseCase,
   RequestPasswordResetUseCase,
@@ -71,6 +72,7 @@ export interface AppServices {
   changePasswordUseCase: ChangePasswordUseCase;
   changeEmailUseCase: ChangeEmailUseCase;
   requestEmailVerificationUseCase: RequestEmailVerificationUseCase;
+  confirmEmailVerificationUseCase: ConfirmEmailVerificationUseCase;
   unlinkOAuthUseCase: UnlinkOAuthUseCase;
   requestPasswordResetUseCase: RequestPasswordResetUseCase;
   resetPasswordUseCase: ResetPasswordUseCase;

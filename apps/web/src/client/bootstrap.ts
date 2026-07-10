@@ -31,6 +31,7 @@ import { accountRepository } from './data/repositories/account.repository';
 import {
   ChangeEmailUseCase,
   ChangePasswordUseCase,
+  ConfirmEmailVerificationUseCase,
   GetAccountUseCase,
   RequestEmailVerificationUseCase,
   RequestPasswordResetUseCase,
@@ -79,6 +80,7 @@ export function wireAppServices(): AppServices {
     changePasswordUseCase: new ChangePasswordUseCase(accountRepository),
     changeEmailUseCase: new ChangeEmailUseCase(accountRepository),
     requestEmailVerificationUseCase: new RequestEmailVerificationUseCase(accountRepository),
+    confirmEmailVerificationUseCase: new ConfirmEmailVerificationUseCase(accountRepository),
     unlinkOAuthUseCase: new UnlinkOAuthUseCase(accountRepository),
     requestPasswordResetUseCase: new RequestPasswordResetUseCase(accountRepository),
     resetPasswordUseCase: new ResetPasswordUseCase(accountRepository),

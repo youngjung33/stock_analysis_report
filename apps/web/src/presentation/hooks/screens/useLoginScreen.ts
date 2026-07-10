@@ -74,13 +74,16 @@ export function useLoginScreen() {
         const next = { ...prev };
         if (result.available) {
           delete next.username;
-          showSuccess(result.message);
         } else {
           next.username = result.message;
-          showError(result.message);
         }
         return next;
       });
+      if (result.available) {
+        showSuccess(result.message);
+      } else {
+        showError(result.message);
+      }
     } catch (err) {
       const message = getErrorMessage(err, '아이디 확인에 실패했습니다.');
       setUsernameCheckStatus('unavailable');

@@ -23,11 +23,11 @@ export function SettingsPage() {
                   {screen.profile.email && !screen.profile.emailVerified && (
                     <button
                       type="button"
-                      onClick={screen.handleResendVerification}
+                      onClick={screen.handleRequestVerificationCode}
                       disabled={screen.saving}
                       className="ml-2 text-primary hover:underline"
                     >
-                      인증 메일 재발송
+                      인증 코드 받기
                     </button>
                   )}
                 </p>
@@ -47,9 +47,34 @@ export function SettingsPage() {
                   disabled={screen.saving}
                   className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
                 >
-                  저장 · 인증 메일 발송
+                  저장 · 코드 발급
                 </button>
               </form>
+
+              {screen.profile.email && !screen.profile.emailVerified && (
+                <form onSubmit={screen.handleConfirmVerification} className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                  <label className="block flex-1">
+                    <span className="text-xs text-muted-foreground">인증 코드 (6자리)</span>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={6}
+                      pattern="\d{6}"
+                      className="mt-1 w-full rounded-lg border border-border-strong bg-muted px-3 py-2 text-sm tracking-widest"
+                      value={screen.verificationCode}
+                      onChange={(e) => screen.setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="000000"
+                    />
+                  </label>
+                  <button
+                    type="submit"
+                    disabled={screen.saving || screen.verificationCode.length !== 6}
+                    className="rounded-lg border border-border-strong px-4 py-2 text-sm font-medium hover:bg-accent disabled:opacity-50"
+                  >
+                    인증하기
+                  </button>
+                </form>
+              )}
             </Surface>
 
             {screen.profile.hasPassword && (

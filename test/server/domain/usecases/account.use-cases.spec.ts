@@ -3,6 +3,7 @@ import { AppErrorCode, AuthTokenType } from '@sar/shared';
 import { ValidationError } from '@server/domain/errors/domain.errors';
 import {
   ChangePasswordUseCase,
+  RequestEmailVerificationUseCase,
   RequestPasswordResetUseCase,
   ResetPasswordUseCase,
   VerifyEmailUseCase,
@@ -134,7 +135,12 @@ describe('ResetPasswordUseCase', () => {
 });
 
 describe('VerifyEmailUseCase', () => {
-  it('marks email verified on valid token', async () => {
+  it('rejects non-numeric code', async () => {
+    const useCase = new VerifyEmailUseCase(createMockUserRepo(), createMockAuthTokenRepo());
+    await expect(useCase.execute('abcdef')).rejects.toThrow(ValidationError);
+  });
+
+  it('marks email verified on valid code', async () => {
     const authTokenRepo = createMockAuthTokenRepo();
     authTokenRepo.consumeValid.mockResolvedValue({
       id: 'tok-1',
@@ -149,9 +155,41 @@ describe('VerifyEmailUseCase', () => {
     userRepo.findByEmail.mockResolvedValue(null);
 
     const useCase = new VerifyEmailUseCase(userRepo, authTokenRepo);
-    await useCase.execute('verify-token');
+    await useCase.execute('123456');
 
+    expect(authTokenRepo.consumeValid).toHaveBeenCalledWith(
+      hashAuthToken('123456'),
+      AuthTokenType.EMAIL_VERIFY,
+    );
     expect(userRepo.updateEmail).toHaveBeenCalledWith('user-1', 'new@example.com');
     expect(userRepo.markEmailVerified).toHaveBeenCalledWith('user-1');
+  });
+});
+
+describe('RequestEmailVerificationUseCase', () => {
+  it('returns verification code for unverified user', async () => {
+    const userRepo = createMockUserRepo();
+    userRepo.findById.mockResolvedValue(
+      createMockUser({ email: 'user@example.com', emailVerifiedAt: null }),
+    );
+    const authTokenRepo = createMockAuthTokenRepo();
+
+    const useCase = new RequestEmailVerificationUseCase(userRepo, authTokenRepo);
+    const result = await useCase.execute('user-1');
+
+    expect(result?.verificationCode).toMatch(/^\d{6}$/);
+    expect(authTokenRepo.create).toHaveBeenCalled();
+  });
+
+  it('returns null when already verified', async () => {
+    const userRepo = createMockUserRepo();
+    userRepo.findById.mockResolvedValue(
+      createMockUser({ email: 'user@example.com', emailVerifiedAt: new Date() }),
+    );
+
+    const useCase = new RequestEmailVerificationUseCase(userRepo, createMockAuthTokenRepo());
+    const result = await useCase.execute('user-1');
+
+    expect(result).toBeNull();
   });
 });

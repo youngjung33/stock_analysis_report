@@ -14,10 +14,15 @@ import {
   IUserRepository,
 } from '../../repositories';
 import {
+  EmailVerificationIssued,
+  issueEmailVerificationCode,
+} from '../../services/email-verification.service';
+import {
   authTokenExpiresAt,
   buildAppUrl,
   generateAuthTokenRaw,
   hashAuthToken,
+  isEmailVerificationCode,
 } from '../../../data/auth/auth-token.utils';
 
 export interface AccountProfile {
@@ -90,10 +95,9 @@ export class ChangeEmailUseCase {
   constructor(
     private readonly userRepo: IUserRepository,
     private readonly authTokenRepo: IAuthTokenRepository,
-    private readonly emailSender: IEmailSenderPort,
   ) {}
 
-  async execute(input: { userId: string; email: string }) {
+  async execute(input: { userId: string; email: string }): Promise<EmailVerificationIssued> {
     const email = input.email.trim().toLowerCase();
     if (!email || !email.includes('@')) {
       throw new ValidationError(AppErrorCode.AUTH_EMAIL_INVALID);
@@ -105,26 +109,7 @@ export class ChangeEmailUseCase {
     }
 
     await this.userRepo.updateEmail(input.userId, email);
-    await this.sendVerificationEmail(input.userId, email);
-  }
-
-  private async sendVerificationEmail(userId: string, email: string) {
-    await this.authTokenRepo.invalidateUserTokens(userId, AuthTokenType.EMAIL_VERIFY);
-    const raw = generateAuthTokenRaw();
-    await this.authTokenRepo.create({
-      userId,
-      type: AuthTokenType.EMAIL_VERIFY,
-      tokenHash: hashAuthToken(raw),
-      email,
-      expiresAt: authTokenExpiresAt(AuthTokenType.EMAIL_VERIFY),
-    });
-
-    const link = buildAppUrl(`/api/auth/verify-email?token=${raw}`);
-    await this.emailSender.send({
-      to: email,
-      subject: '[SAR Portfolio] 이메일 인증',
-      text: `아래 링크로 이메일을 인증해 주세요.\n\n${link}\n\n24시간 내에 유효합니다.`,
-    });
+    return issueEmailVerificationCode(this.authTokenRepo, input.userId, email);
   }
 }
 
@@ -132,30 +117,14 @@ export class RequestEmailVerificationUseCase {
   constructor(
     private readonly userRepo: IUserRepository,
     private readonly authTokenRepo: IAuthTokenRepository,
-    private readonly emailSender: IEmailSenderPort,
   ) {}
 
-  async execute(userId: string) {
+  async execute(userId: string): Promise<EmailVerificationIssued | null> {
     const user = await this.userRepo.findById(userId);
     if (!user?.email) throw new ValidationError(AppErrorCode.AUTH_EMAIL_REQUIRED);
-    if (user.emailVerifiedAt) return;
+    if (user.emailVerifiedAt) return null;
 
-    await this.authTokenRepo.invalidateUserTokens(userId, AuthTokenType.EMAIL_VERIFY);
-    const raw = generateAuthTokenRaw();
-    await this.authTokenRepo.create({
-      userId,
-      type: AuthTokenType.EMAIL_VERIFY,
-      tokenHash: hashAuthToken(raw),
-      email: user.email,
-      expiresAt: authTokenExpiresAt(AuthTokenType.EMAIL_VERIFY),
-    });
-
-    const link = buildAppUrl(`/api/auth/verify-email?token=${raw}`);
-    await this.emailSender.send({
-      to: user.email,
-      subject: '[SAR Portfolio] 이메일 인증',
-      text: `아래 링크로 이메일을 인증해 주세요.\n\n${link}\n\n24시간 내에 유효합니다.`,
-    });
+    return issueEmailVerificationCode(this.authTokenRepo, userId, user.email);
   }
 }
 
@@ -165,9 +134,14 @@ export class VerifyEmailUseCase {
     private readonly authTokenRepo: IAuthTokenRepository,
   ) {}
 
-  async execute(rawToken: string) {
+  async execute(rawCode: string) {
+    const code = rawCode.trim();
+    if (!isEmailVerificationCode(code)) {
+      throw new ValidationError(AppErrorCode.AUTH_TOKEN_INVALID);
+    }
+
     const token = await this.authTokenRepo.consumeValid(
-      hashAuthToken(rawToken.trim()),
+      hashAuthToken(code),
       AuthTokenType.EMAIL_VERIFY,
     );
     if (!token) throw new ValidationError(AppErrorCode.AUTH_TOKEN_INVALID);

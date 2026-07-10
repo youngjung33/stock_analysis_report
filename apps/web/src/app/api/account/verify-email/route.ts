@@ -8,8 +8,15 @@ export async function POST(req: NextRequest) {
     enforceRateLimit(req, 'auth:verify-email-request', 'authRegister');
     const user = requireAuth(req);
     const { requestEmailVerificationUseCase } = getServerServices();
-    await requestEmailVerificationUseCase.execute(user.userId);
-    return jsonData({ ok: true, message: '인증 메일을 발송했습니다.' });
+    const result = await requestEmailVerificationUseCase.execute(user.userId);
+    if (!result) {
+      return jsonData({ ok: true, message: '이미 인증된 이메일입니다.' });
+    }
+    return jsonData({
+      ok: true,
+      verificationCode: result.verificationCode,
+      message: '인증 코드가 발급되었습니다.',
+    });
   } catch (error) {
     return handleRouteError(error);
   }

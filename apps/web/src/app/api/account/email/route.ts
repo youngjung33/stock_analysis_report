@@ -12,8 +12,12 @@ export async function POST(req: NextRequest) {
     if (!body.email?.trim()) throw new ValidationError('email is required');
 
     const { changeEmailUseCase } = getServerServices();
-    await changeEmailUseCase.execute({ userId: user.userId, email: body.email });
-    return jsonData({ ok: true, message: '인증 메일을 발송했습니다.' });
+    const result = await changeEmailUseCase.execute({ userId: user.userId, email: body.email });
+    return jsonData({
+      ok: true,
+      verificationCode: result.verificationCode,
+      message: '인증 코드가 발급되었습니다.',
+    });
   } catch (error) {
     return handleRouteError(error);
   }

@@ -28,6 +28,13 @@ export class RequestEmailVerificationUseCase {
   }
 }
 
+export class ConfirmEmailVerificationUseCase {
+  constructor(private readonly repo: IAccountRepository) {}
+  execute(code: string) {
+    return this.repo.confirmEmailVerification(code);
+  }
+}
+
 export class UnlinkOAuthUseCase {
   constructor(private readonly repo: IAccountRepository) {}
   execute(provider: import('@sar/shared').OAuthProviderId) {
