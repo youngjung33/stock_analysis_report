@@ -30,6 +30,7 @@ export interface IUserRepository {
   updateEmail(userId: string, email: string | null): Promise<UserEntity>;
   updatePasswordHash(userId: string, passwordHash: string): Promise<UserEntity>;
   markEmailVerified(userId: string): Promise<UserEntity>;
+  delete(userId: string): Promise<void>;
 }
 
 export interface IAuthTokenRepository {

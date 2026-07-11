@@ -54,6 +54,7 @@ import { ConsoleEmailSender } from './data/auth/console-email.sender';
 import {
   ChangeEmailUseCase,
   ChangePasswordUseCase,
+  DeleteAccountUseCase,
   GetAccountUseCase,
   RequestEmailVerificationUseCase,
   RequestPasswordResetUseCase,
@@ -100,6 +101,7 @@ export interface ServerServices {
   requestPasswordResetUseCase: RequestPasswordResetUseCase;
   resetPasswordUseCase: ResetPasswordUseCase;
   unlinkOAuthAccountUseCase: UnlinkOAuthAccountUseCase;
+  deleteAccountUseCase: DeleteAccountUseCase;
 }
 
 let cached: ServerServices | null = null;
@@ -194,6 +196,7 @@ export function getServerServices(): ServerServices {
     ),
     resetPasswordUseCase: new ResetPasswordUseCase(userRepo, authTokenRepo, passwordHasher),
     unlinkOAuthAccountUseCase: new UnlinkOAuthAccountUseCase(userRepo, oauthAccountRepo),
+    deleteAccountUseCase: new DeleteAccountUseCase(userRepo, passwordHasher),
   };
 
   return cached;

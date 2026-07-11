@@ -104,6 +104,10 @@ export class PrismaUserRepository implements IUserRepository {
       data: { emailVerifiedAt: new Date() },
     });
   }
+
+  async delete(userId: string) {
+    await this.prisma.user.delete({ where: { id: userId } });
+  }
 }
 
 export class PrismaRefreshTokenRepository implements IRefreshTokenRepository {

@@ -81,6 +81,14 @@ export class ApiAccountRepository implements IAccountRepository {
       throw toAppError(error, AppErrorCode.AUTH_TOKEN_INVALID);
     }
   }
+
+  async deleteAccount(input: { password?: string }) {
+    try {
+      await apiClient.delete('/account', { data: input });
+    } catch (error) {
+      throw toAppError(error, AppErrorCode.INTERNAL);
+    }
+  }
 }
 
 export const accountRepository = new ApiAccountRepository();

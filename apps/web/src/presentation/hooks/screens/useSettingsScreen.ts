@@ -16,7 +16,7 @@ function showVerificationCodeToast(
 }
 
 export function useSettingsScreen() {
-  const { isGuest } = useAuth();
+  const { isGuest, logout } = useAuth();
   const {
     getAccountUseCase,
     changePasswordUseCase,
@@ -24,6 +24,7 @@ export function useSettingsScreen() {
     requestEmailVerificationUseCase,
     confirmEmailVerificationUseCase,
     unlinkOAuthUseCase,
+    deleteAccountUseCase,
   } = useServices();
   const { showError, showSuccess } = useToast();
   const router = useRouter();
@@ -38,6 +39,7 @@ export function useSettingsScreen() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
+  const [deletePassword, setDeletePassword] = useState('');
   const [saving, setSaving] = useState(false);
 
   const reload = useCallback(async () => {
@@ -142,6 +144,29 @@ export function useSettingsScreen() {
     }
   }
 
+  async function handleDeleteAccount() {
+    if (
+      !confirm(
+        '탈퇴 시 거래·관심종목·연동 계정 등 모든 데이터가 삭제되며 복구할 수 없습니다. 정말 탈퇴할까요?',
+      )
+    ) {
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await deleteAccountUseCase.execute({
+        password: profile?.hasPassword ? deletePassword : undefined,
+      });
+      await logout().catch(() => undefined);
+      router.replace('/login');
+    } catch (err) {
+      showError(getErrorMessage(err, '회원탈퇴에 실패했습니다.'));
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return {
     loading,
     profile,
@@ -155,11 +180,14 @@ export function useSettingsScreen() {
     setNewPassword,
     newPasswordConfirm,
     setNewPasswordConfirm,
+    deletePassword,
+    setDeletePassword,
     saving,
     handleChangeEmail,
     handleRequestVerificationCode,
     handleConfirmVerification,
     handleChangePassword,
     handleUnlink,
+    handleDeleteAccount,
   };
 }

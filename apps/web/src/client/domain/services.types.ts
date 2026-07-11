@@ -10,6 +10,7 @@ import {
   ChangeEmailUseCase,
   ChangePasswordUseCase,
   ConfirmEmailVerificationUseCase,
+  DeleteAccountUseCase,
   GetAccountUseCase,
   RequestEmailVerificationUseCase,
   RequestPasswordResetUseCase,
@@ -76,6 +77,7 @@ export interface AppServices {
   unlinkOAuthUseCase: UnlinkOAuthUseCase;
   requestPasswordResetUseCase: RequestPasswordResetUseCase;
   resetPasswordUseCase: ResetPasswordUseCase;
+  deleteAccountUseCase: DeleteAccountUseCase;
   authSession: IAuthSessionPort;
   guestSession: IGuestSessionPort;
   guestStore: IGuestStorePort;

@@ -67,6 +67,7 @@ export function createMockUserRepo(
     updateEmail: vi.fn(),
     updatePasswordHash: vi.fn(),
     markEmailVerified: vi.fn(),
+    delete: vi.fn(),
     ...overrides,
   };
 }

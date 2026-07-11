@@ -3,6 +3,7 @@ import { AppErrorCode, AuthTokenType } from '@sar/shared';
 import { ValidationError } from '@server/domain/errors/domain.errors';
 import {
   ChangePasswordUseCase,
+  DeleteAccountUseCase,
   RequestEmailVerificationUseCase,
   RequestPasswordResetUseCase,
   ResetPasswordUseCase,
@@ -191,5 +192,38 @@ describe('RequestEmailVerificationUseCase', () => {
     const result = await useCase.execute('user-1');
 
     expect(result).toBeNull();
+  });
+});
+
+describe('DeleteAccountUseCase', () => {
+  it('requires password for password-based accounts', async () => {
+    const userRepo = createMockUserRepo();
+    userRepo.findById.mockResolvedValue(createMockUser());
+
+    const useCase = new DeleteAccountUseCase(userRepo, createMockPasswordHasher(true));
+    await expect(useCase.execute({ userId: 'user-1' })).rejects.toMatchObject({
+      code: AppErrorCode.AUTH_LOGIN_REQUIRED,
+    });
+    expect(userRepo.delete).not.toHaveBeenCalled();
+  });
+
+  it('deletes user when password valid', async () => {
+    const userRepo = createMockUserRepo();
+    userRepo.findById.mockResolvedValue(createMockUser());
+
+    const useCase = new DeleteAccountUseCase(userRepo, createMockPasswordHasher(true));
+    await useCase.execute({ userId: 'user-1', password: 'secret' });
+
+    expect(userRepo.delete).toHaveBeenCalledWith('user-1');
+  });
+
+  it('deletes social-only user without password', async () => {
+    const userRepo = createMockUserRepo();
+    userRepo.findById.mockResolvedValue(createMockUser({ passwordHash: null }));
+
+    const useCase = new DeleteAccountUseCase(userRepo, createMockPasswordHasher(true));
+    await useCase.execute({ userId: 'user-1' });
+
+    expect(userRepo.delete).toHaveBeenCalledWith('user-1');
   });
 });

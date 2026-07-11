@@ -25,4 +25,5 @@ export interface IAccountRepository {
   unlinkOAuth(provider: OAuthProviderId): Promise<void>;
   requestPasswordReset(email: string): Promise<void>;
   resetPassword(input: { token: string; password: string; passwordConfirm: string }): Promise<void>;
+  deleteAccount(input: { password?: string }): Promise<void>;
 }

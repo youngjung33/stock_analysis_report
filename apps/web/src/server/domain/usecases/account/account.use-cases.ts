@@ -243,3 +243,26 @@ export class UnlinkOAuthAccountUseCase {
     await this.oauthAccountRepo.deleteByUserAndProvider(userId, provider);
   }
 }
+
+/** 회원탈퇴 — User 삭제 (관련 데이터는 DB cascade) */
+export class DeleteAccountUseCase {
+  constructor(
+    private readonly userRepo: IUserRepository,
+    private readonly passwordHasher: IPasswordHasher,
+  ) {}
+
+  async execute(input: { userId: string; password?: string }) {
+    const user = await this.userRepo.findById(input.userId);
+    if (!user) throw new AuthenticationError(AppErrorCode.AUTH_UNAUTHORIZED);
+
+    if (user.passwordHash) {
+      if (!input.password) {
+        throw new ValidationError(AppErrorCode.AUTH_LOGIN_REQUIRED);
+      }
+      const ok = await this.passwordHasher.compare(input.password, user.passwordHash);
+      if (!ok) throw new ValidationError(AppErrorCode.AUTH_CURRENT_PASSWORD_INVALID);
+    }
+
+    await this.userRepo.delete(input.userId);
+  }
+}

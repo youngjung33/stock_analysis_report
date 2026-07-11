@@ -55,3 +55,10 @@ export class ResetPasswordUseCase {
     return this.repo.resetPassword(input);
   }
 }
+
+export class DeleteAccountUseCase {
+  constructor(private readonly repo: IAccountRepository) {}
+  execute(input: { password?: string }) {
+    return this.repo.deleteAccount(input);
+  }
+}

@@ -147,6 +147,35 @@ export function SettingsPage() {
                 </ul>
               )}
             </Surface>
+
+            <Surface variant="section" className="space-y-4 border-danger/30">
+              <div>
+                <h2 className="text-base font-semibold text-danger">회원탈퇴</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  탈퇴 시 거래 내역, 관심종목, 소셜 연동 등 계정 데이터가 DB에서 영구 삭제됩니다.
+                </p>
+              </div>
+              {screen.profile.hasPassword && (
+                <label className="block">
+                  <span className="text-xs text-muted-foreground">비밀번호 확인</span>
+                  <input
+                    type="password"
+                    className="mt-1 w-full rounded-lg border border-border-strong bg-muted px-3 py-2 text-sm"
+                    value={screen.deletePassword}
+                    onChange={(e) => screen.setDeletePassword(e.target.value)}
+                    autoComplete="current-password"
+                  />
+                </label>
+              )}
+              <button
+                type="button"
+                onClick={screen.handleDeleteAccount}
+                disabled={screen.saving || (screen.profile.hasPassword && !screen.deletePassword)}
+                className="rounded-lg border border-danger/50 px-4 py-2 text-sm font-medium text-danger hover:bg-danger/10 disabled:opacity-50"
+              >
+                회원탈퇴
+              </button>
+            </Surface>
           </>
         )}
       </PageStack>
