@@ -1,51 +1,48 @@
 # 주식 포트폴리오 대시보드
 
-Next.js 풀스택 + Supabase(PostgreSQL) + Vercel 배포용 개인 포트폴리오 앱입니다.
+Next.js 풀스택 + PostgreSQL + Vercel 배포용 포트폴리오 앱입니다.
 
 ## 기술 스택
 
-- **Framework**: Next.js 15 (App Router, Route Handlers)
-- **DB**: Supabase PostgreSQL + Prisma
-- **UI**: React 19, Tailwind CSS v4, SCSS, TanStack Query
-- **Auth**: JWT access token + refresh token (httpOnly cookie)
-- **시세**: Yahoo Finance (KR), Finnhub (US, 키 설정 시)
+- **Framework**: Next.js 15 (App Router)
+- **DB**: PostgreSQL + Prisma
+- **UI**: React 19, Tailwind CSS v4, TanStack Query
+- **Auth**: httpOnly 쿠키 세션, 회원가입·SSO·비회원
+- **시세**: Yahoo Finance (KR/US 차트), Finnhub (US 포트폴리오 갱신, 선택)
 
 ## 프로젝트 구조
 
 ```
 apps/web/src/
-├── app/              # Next.js pages + /api Route Handlers
-├── client/           # 브라우저용 domain/data (axios → /api)
-├── server/           # 서버 domain/data (Prisma, Use Case)
-└── presentation/     # UI (desktop/mobile)
+├── app/              # pages + /api
+├── client/           # domain/data (axios)
+├── server/           # domain/data (Prisma, Use Case)
+└── presentation/     # UI (pages, hooks, layout)
 ```
 
 ## 사전 요구
 
 - Node.js 20+
-- [Supabase](https://supabase.com) 프로젝트
-- (선택) [Finnhub API Key](https://finnhub.io/register) — 미국 종목
+- PostgreSQL (로컬 또는 Supabase 등)
+- (선택) 미국 시세 API 키 — 미설정 시 US 포트폴리오 갱신만 제한
 
 ## 설치
 
 ```bash
 npm install
 npm run build -w @sar/shared
-cp apps/web/.env.example apps/web/.env
-# DATABASE_URL, DIRECT_URL, JWT_* 설정
 ```
 
-## DB (Supabase)
+로컬 env 파일(`apps/web/.env`)에 DB·인증·선택 기능을 설정합니다. **민감 값은 git에 올리지 마세요.**
 
-Supabase Dashboard → **Settings → Database → Connection string**
-
-- `DATABASE_URL`: **Transaction pooler** (port 6543, `?pgbouncer=true`)
-- `DIRECT_URL`: **Direct** (port 5432, migrate용)
+## DB
 
 ```bash
 npm run db:push      # 스키마 적용
-npm run db:seed      # admin 계정 생성
+npm run db:seed      # 초기 데이터
 ```
+
+seed 계정 정보는 로컬 env에서 지정합니다.
 
 ## 로컬 실행
 
@@ -53,26 +50,32 @@ npm run db:seed      # admin 계정 생성
 npm run dev
 ```
 
-- http://localhost:3000
-- 기본 계정: `admin` / `admin1234`
+http://localhost:3000
 
 ## Vercel 배포
 
 1. Vercel에 repo 연결, **Root Directory**: `apps/web`
-2. Environment Variables: `.env.example` 항목 전부 등록
+2. Environment Variables: Vercel 대시보드에서 DB·인증·선택 기능 설정
 3. Deploy
 
 ## 테스트
 
 ```bash
-npm run test
+npm run test           # Vitest (192 tests)
+npm run test:e2e       # Playwright smoke (선택)
 ```
+
+## 문서
+
+| 문서 | 내용 |
+|------|------|
+| [docs/PLAN.md](docs/PLAN.md) | 아키텍처·API·구현 상태 |
+| [docs/USECASES.md](docs/USECASES.md) | Use Case·테스트 매핑 |
+| [docs/stock-catalog-import.md](docs/stock-catalog-import.md) | 종목 마스터 import |
 
 ## 클린 아키텍처
 
-- **server/domain**: Use Case, Entity, Repository interface
-- **server/data**: Prisma, Finnhub, Yahoo
-- **client/domain**: API 호출용 Use Case (입력 검증)
-- **presentation**: MVVM hooks + desktop/mobile UI
-
-Use Case 정의: [docs/USECASES.md](docs/USECASES.md)
+- **server/domain**: Use Case, Entity
+- **server/data**: Prisma, 시세 provider
+- **client/domain**: API 호출 Use Case
+- **presentation**: MVVM hooks + UI
