@@ -3,6 +3,8 @@ import {
   IPortfolioRepository,
   ITransactionRepository,
   IWatchlistRepository,
+  ICashRepository,
+  IPortfolioCapitalRepository,
 } from '../../domain/repositories';
 import { guestSession } from '../guest/guest-session';
 import {
@@ -12,10 +14,13 @@ import {
   ApiPortfolioRepository,
   ApiTransactionRepository,
   ApiWatchlistRepository,
+  ApiCashRepository,
+  ApiPortfolioCapitalRepository,
 } from './api.repositories';
 import { GuestCorporateActionRepository, GuestWatchlistRepository } from '../guest/guest-feature.repositories';
 import { GuestPortfolioRepository } from '../guest/guest-portfolio.repository';
 import { GuestTransactionRepository } from '../guest/guest-transaction.repository';
+import { GuestCashRepository, GuestPortfolioCapitalRepository } from '../guest/guest-capital.repository';
 
 const guestTransactionRepository = new GuestTransactionRepository();
 const guestWatchlistRepository = new GuestWatchlistRepository();
@@ -25,6 +30,13 @@ const apiTransactionRepository = new ApiTransactionRepository();
 const apiPortfolioRepository = new ApiPortfolioRepository();
 const apiMarketRepository = new ApiMarketRepository();
 const guestPortfolioRepository = new GuestPortfolioRepository(apiMarketRepository);
+const guestPortfolioCapitalRepository = new GuestPortfolioCapitalRepository(
+  guestPortfolioRepository,
+  apiMarketRepository,
+);
+const guestCashRepository = new GuestCashRepository();
+const apiCashRepository = new ApiCashRepository();
+const apiPortfolioCapitalRepository = new ApiPortfolioCapitalRepository();
 const apiWatchlistRepository = new ApiWatchlistRepository();
 const apiCorporateActionRepository = new ApiCorporateActionRepository();
 
@@ -96,6 +108,35 @@ export const corporateActionRepository: ICorporateActionRepository = {
   },
   delete(id) {
     return pickCorporateActionRepo().delete(id);
+  },
+};
+
+function pickCashRepo(): ICashRepository {
+  return guestSession.isActive() ? guestCashRepository : apiCashRepository;
+}
+
+function pickCapitalRepo(): IPortfolioCapitalRepository {
+  return guestSession.isActive() ? guestPortfolioCapitalRepository : apiPortfolioCapitalRepository;
+}
+
+export const cashRepository: ICashRepository = {
+  getSummary() {
+    return pickCashRepo().getSummary();
+  },
+  recordEntry(input) {
+    return pickCashRepo().recordEntry(input);
+  },
+};
+
+export const portfolioCapitalRepository: IPortfolioCapitalRepository = {
+  getPreferences() {
+    return pickCapitalRepo().getPreferences();
+  },
+  updatePreferences(prefs) {
+    return pickCapitalRepo().updatePreferences(prefs);
+  },
+  getSimulation() {
+    return pickCapitalRepo().getSimulation();
   },
 };
 

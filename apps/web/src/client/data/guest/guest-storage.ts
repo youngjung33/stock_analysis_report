@@ -1,4 +1,4 @@
-import { Market, TransactionType, CorporateActionType } from '@sar/shared';
+import { Market, TransactionType, CorporateActionType, CashLedgerType, computeCashBalances, DEFAULT_PORTFOLIO_PREFERENCES, type CashCurrency } from '@sar/shared';
 import { Stock, Transaction, WatchlistItem } from '../../domain/models';
 
 const STORAGE_KEY = 'sar_guest_data';
@@ -10,15 +10,38 @@ export interface GuestQuote {
   fetchedAt: string;
 }
 
+interface GuestCashEntry {
+  id: string;
+  currency: CashCurrency;
+  type: CashLedgerType;
+  amount: number;
+  occurredAt: string;
+  memo?: string;
+  refId?: string;
+}
+
 interface GuestStore {
   transactions: Transaction[];
   quotes: Record<string, GuestQuote>;
   watchlist: WatchlistItem[];
   corporateActions: GuestCorporateAction[];
+  cashLedger: GuestCashEntry[];
+  portfolioPreference: {
+    targetKrPercent: number;
+    targetUsPercent: number;
+    maxSingleWeightPercent: number;
+  } | null;
 }
 
 function emptyStore(): GuestStore {
-  return { transactions: [], quotes: {}, watchlist: [], corporateActions: [] };
+  return {
+    transactions: [],
+    quotes: {},
+    watchlist: [],
+    corporateActions: [],
+    cashLedger: [],
+    portfolioPreference: null,
+  };
 }
 
 function readStore(): GuestStore {
@@ -32,6 +55,8 @@ function readStore(): GuestStore {
       quotes: parsed.quotes ?? {},
       watchlist: parsed.watchlist ?? [],
       corporateActions: parsed.corporateActions ?? [],
+      cashLedger: parsed.cashLedger ?? [],
+      portfolioPreference: parsed.portfolioPreference ?? null,
     };
   } catch {
     return emptyStore();
@@ -186,5 +211,60 @@ export function saveGuestWatchlistItem(input: {
 export function removeGuestWatchlistItem(id: string): void {
   const store = readStore();
   store.watchlist = store.watchlist.filter((w) => w.id !== id);
+  writeStore(store);
+}
+
+export function listGuestCashLedger(): GuestCashEntry[] {
+  return readStore().cashLedger ?? [];
+}
+
+export function getGuestCashBalances() {
+  return computeCashBalances(listGuestCashLedger());
+}
+
+export function saveGuestCashEntry(input: {
+  currency: CashCurrency;
+  type: CashLedgerType;
+  amount: number;
+  memo?: string;
+  refId?: string;
+  occurredAt?: string;
+}): GuestCashEntry {
+  const store = readStore();
+  const signed =
+    input.type === CashLedgerType.WITHDRAW || input.type === CashLedgerType.BUY_SETTLE
+      ? -Math.abs(input.amount)
+      : Math.abs(input.amount);
+  const entry: GuestCashEntry = {
+    id: crypto.randomUUID(),
+    currency: input.currency,
+    type: input.type,
+    amount: signed,
+    occurredAt: input.occurredAt ?? new Date().toISOString(),
+    memo: input.memo,
+    refId: input.refId,
+  };
+  store.cashLedger.unshift(entry);
+  writeStore(store);
+  return entry;
+}
+
+export function deleteGuestCashByRef(refId: string): void {
+  const store = readStore();
+  store.cashLedger = store.cashLedger.filter((e) => e.refId !== refId);
+  writeStore(store);
+}
+
+export function getGuestPortfolioPreference() {
+  return readStore().portfolioPreference ?? { ...DEFAULT_PORTFOLIO_PREFERENCES };
+}
+
+export function saveGuestPortfolioPreference(prefs: {
+  targetKrPercent: number;
+  targetUsPercent: number;
+  maxSingleWeightPercent: number;
+}) {
+  const store = readStore();
+  store.portfolioPreference = prefs;
   writeStore(store);
 }

@@ -1,12 +1,12 @@
 'use client';
 
 import { ProtectedRoute } from '@/presentation/routes/ProtectedRoute';
-import { TransactionsView } from '@/presentation/views/TransactionsView';
+import { TransactionsPage } from '@/presentation/pages/TransactionsPage';
 
 export default function TransactionsRoutePage() {
   return (
     <ProtectedRoute>
-      <TransactionsView />
+      <TransactionsPage />
     </ProtectedRoute>
   );
 }

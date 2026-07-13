@@ -4,6 +4,7 @@ import { GetDashboardUseCase } from '@server/domain/usecases/portfolio/get-dashb
 import {
   createMockQuoteRepo,
   createMockCorpActionRepo,
+  createMockCashRepo,
   createMockMarketData,
   createMockStock,
   createMockStockRepo,
@@ -40,6 +41,7 @@ describe('GetDashboardUseCase', () => {
       quoteRepo,
       corpActionRepo,
       createMockMarketData(),
+      createMockCashRepo(),
     );
     const result = await useCase.execute('user-1');
 
@@ -71,6 +73,7 @@ describe('GetDashboardUseCase', () => {
       quoteRepo,
       corpActionRepo,
       createMockMarketData(),
+      createMockCashRepo(),
     );
     const result = await useCase.execute('user-1');
 
@@ -101,6 +104,7 @@ describe('GetDashboardUseCase', () => {
       quoteRepo,
       corpActionRepo,
       createMockMarketData(),
+      createMockCashRepo(),
     );
     const result = await useCase.execute('user-1');
 
@@ -142,6 +146,7 @@ describe('GetDashboardUseCase', () => {
       quoteRepo,
       corpActionRepo,
       createMockMarketData(),
+      createMockCashRepo(),
     );
     const result = await useCase.execute('user-1');
 
@@ -184,6 +189,7 @@ describe('GetDashboardUseCase', () => {
       quoteRepo,
       corpActionRepo,
       createMockMarketData(),
+      createMockCashRepo(),
     );
     const result = await useCase.execute('user-1');
 
@@ -219,6 +225,7 @@ describe('GetDashboardUseCase', () => {
       quoteRepo,
       corpActionRepo,
       createMockMarketData(),
+      createMockCashRepo(),
     );
     const result = await useCase.execute('user-1');
 

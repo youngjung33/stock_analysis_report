@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { Market } from '@sar/shared';
 import { ProtectedRoute } from '@/presentation/routes/ProtectedRoute';
-import { StockDetailView } from '@/presentation/views/StockDetailView';
+import { StockDetailPage } from '@/presentation/pages/StockDetailPage';
 
 function StockDetailRouteInner() {
   const params = useParams<{ symbol: string }>();
@@ -21,7 +21,7 @@ function StockDetailRouteInner() {
     );
   }
 
-  return <StockDetailView symbol={symbol} market={market} />;
+  return <StockDetailPage symbol={symbol} market={market} />;
 }
 
 export default function StockDetailRoutePage() {

@@ -1,6 +1,7 @@
-import { Market, resolveCurrency, resolveYahooSymbol } from '@sar/shared';
+import { Market, resolveCurrency, resolveYahooSymbol, CashLedgerType } from '@sar/shared';
 import { CorporateActionEntity } from '../../entities';
-import { ICorporateActionRepository, IStockRepository } from '../../repositories';
+import { ICorporateActionRepository, ICashLedgerRepository, IStockRepository } from '../../repositories';
+import { SettleCashUseCase } from '../cash/cash.use-cases';
 
 export interface CreateCorporateActionInput {
   userId: string;
@@ -21,10 +22,15 @@ export interface CreateCorporateActionInput {
 
 /** 기업행위(배당·분할·합병 등) 등록 use case */
 export class CreateCorporateActionUseCase {
+  private readonly settleCash: SettleCashUseCase;
+
   constructor(
     private readonly stockRepo: IStockRepository,
     private readonly corpActionRepo: ICorporateActionRepository,
-  ) {}
+    cashRepo: ICashLedgerRepository,
+  ) {
+    this.settleCash = new SettleCashUseCase(cashRepo);
+  }
 
   /** 종목·대상종목 resolve 후 기업행위 레코드 생성 */
   async execute(input: CreateCorporateActionInput): Promise<CorporateActionEntity> {
@@ -54,7 +60,7 @@ export class CreateCorporateActionUseCase {
       targetStockId = target.id;
     }
 
-    return this.corpActionRepo.create({
+    const action = await this.corpActionRepo.create({
       userId: input.userId,
       stockId: stock.id,
       type: input.type,
@@ -66,6 +72,21 @@ export class CreateCorporateActionUseCase {
       targetPrice: input.targetPrice ?? null,
       memo: input.memo ?? null,
     });
+
+    if (input.type === 'DIVIDEND' && input.cashAmount && input.cashAmount > 0) {
+      const currency = stock.currency === 'USD' ? 'USD' : 'KRW';
+      await this.settleCash.execute({
+        userId: input.userId,
+        currency,
+        type: CashLedgerType.DIVIDEND,
+        amount: input.cashAmount,
+        occurredAt: input.effectiveAt,
+        refId: action.id,
+        memo: `${stock.symbol} 배당`,
+      });
+    }
+
+    return action;
   }
 }
 

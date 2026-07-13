@@ -1,12 +1,15 @@
-import { TransactionType, computePosition } from '@sar/shared';
+import { AppErrorCode, CashLedgerType, TransactionType, computePosition } from '@sar/shared';
 import { AppError } from '../../domain/errors/app-error';
 import { CreateTransactionInput, Transaction } from '../../domain/models';
 import { ITransactionRepository } from '../../domain/repositories';
 import {
   createGuestStock,
+  deleteGuestCashByRef,
   deleteGuestTransaction,
+  getGuestCashBalances,
   guestTransactionsForStock,
   listGuestTransactions,
+  saveGuestCashEntry,
   saveGuestTransaction,
 } from '../guest/guest-storage';
 
@@ -17,6 +20,8 @@ export class GuestTransactionRepository implements ITransactionRepository {
     }
 
     const stock = createGuestStock(input.stockSymbol, input.market, input.name);
+    const notional = input.quantity * input.price;
+    const currency = stock.currency === 'USD' ? 'USD' : 'KRW';
 
     if (input.type === TransactionType.SELL) {
       const existing = guestTransactionsForStock(stock.id);
@@ -33,6 +38,14 @@ export class GuestTransactionRepository implements ITransactionRepository {
       }
     }
 
+    if (input.type === TransactionType.BUY) {
+      const balances = getGuestCashBalances();
+      const available = currency === 'KRW' ? balances.krw : balances.usd;
+      if (available < notional) {
+        throw new AppError('가용 현금이 부족합니다.', AppErrorCode.CASH_INSUFFICIENT);
+      }
+    }
+
     const tx: Transaction = {
       id: crypto.randomUUID(),
       userId: 'guest',
@@ -46,6 +59,17 @@ export class GuestTransactionRepository implements ITransactionRepository {
     };
 
     saveGuestTransaction(tx);
+
+    saveGuestCashEntry({
+      currency,
+      type:
+        input.type === TransactionType.BUY ? CashLedgerType.BUY_SETTLE : CashLedgerType.SELL_SETTLE,
+      amount: notional,
+      refId: tx.id,
+      memo: `${stock.symbol} ${input.type === TransactionType.BUY ? '매수' : '매도'}`,
+      occurredAt: input.tradedAt,
+    });
+
     return tx;
   }
 
@@ -61,6 +85,7 @@ export class GuestTransactionRepository implements ITransactionRepository {
   }
 
   async delete(id: string): Promise<void> {
+    deleteGuestCashByRef(id);
     deleteGuestTransaction(id);
   }
 }

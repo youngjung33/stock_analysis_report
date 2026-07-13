@@ -2,6 +2,7 @@ import { vi } from 'vitest';
 import { Market, OAuthProvider, OAUTH_PROVIDER_META, TransactionType } from '@sar/shared';
 import {
   IAuthRepository,
+  IAccountRepository,
   IPortfolioRepository,
   ITransactionRepository,
 } from '@/client/domain/repositories';
@@ -29,6 +30,29 @@ export function createFakeAuthRepository(
     }),
     refresh: vi.fn(),
     logout: vi.fn(),
+    ...overrides,
+  };
+}
+
+export function createFakeAccountRepository(
+  overrides: Partial<IAccountRepository> = {},
+): IAccountRepository {
+  return {
+    getProfile: vi.fn().mockResolvedValue({
+      username: 'admin',
+      email: 'admin@example.com',
+      emailVerified: true,
+      hasPassword: true,
+      oauthAccounts: [],
+    }),
+    changePassword: vi.fn().mockResolvedValue(undefined),
+    changeEmail: vi.fn().mockResolvedValue({ verificationCode: '123456' }),
+    requestEmailVerification: vi.fn().mockResolvedValue({ verificationCode: '654321' }),
+    confirmEmailVerification: vi.fn().mockResolvedValue(undefined),
+    unlinkOAuth: vi.fn().mockResolvedValue(undefined),
+    requestPasswordReset: vi.fn().mockResolvedValue(undefined),
+    resetPassword: vi.fn().mockResolvedValue(undefined),
+    deleteAccount: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }

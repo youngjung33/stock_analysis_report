@@ -2,14 +2,13 @@
 
 import { useDashboardScreen } from '../hooks/screens/useDashboardScreen';
 import { PageStack } from '../design-system';
+import { CapitalAndSimulationSection } from '../components/CapitalAndSimulationSection';
 import { MarketStatusBanner } from '../components/MarketStatusBanner';
 import { QuoteRefreshNoticeBox } from '../components/QuoteRefreshNoticeBox';
 import { MarketSentimentSummarySection } from '../components/MarketSentimentSummarySection';
 import { FeaturedQuotesSection } from '../components/FeaturedQuotesSection';
-import { DesktopSummaryCards } from '../desktop/features/dashboard/SummaryCards';
-import { MobileSummaryCards } from '../mobile/features/dashboard/SummaryCards';
-import { DesktopHoldingsTable } from '../desktop/features/dashboard/HoldingsTable';
-import { MobileHoldingsCardList } from '../mobile/features/dashboard/HoldingsCardList';
+import { SummaryCards } from '../features/dashboard/SummaryCards';
+import { HoldingsSection } from '../features/dashboard/HoldingsSection';
 import { AllocationSection } from '../components/AllocationSection';
 import {
   BenchmarkComparisonRow,
@@ -58,12 +57,9 @@ export function DashboardPage() {
 
         {screen.data && (
           <>
-            <div className="md:hidden">
-              <MobileSummaryCards summary={screen.data.summary} />
-            </div>
-            <div className="hidden md:block">
-              <DesktopSummaryCards summary={screen.data.summary} />
-            </div>
+            <SummaryCards summary={screen.data.summary} />
+
+            <CapitalAndSimulationSection onPortfolioUpdated={screen.refreshDashboard} />
 
             <AllocationSection
               items={screen.data.holdings
@@ -78,12 +74,7 @@ export function DashboardPage() {
               allocationByMarket={screen.data.summary.allocationByMarket}
             />
 
-            <div className="md:hidden">
-              <MobileHoldingsCardList holdings={screen.data.holdings} />
-            </div>
-            <div className="hidden md:block">
-              <DesktopHoldingsTable holdings={screen.data.holdings} />
-            </div>
+            <HoldingsSection holdings={screen.data.holdings} />
 
             <PeriodReturnsCard analysis={analysis.data} isLoading={analysis.isLoading} />
             <BenchmarkComparisonRow analysis={analysis.data} />

@@ -49,7 +49,16 @@ import {
   portfolioRepository,
   transactionRepository,
   watchlistRepository,
+  cashRepository,
+  portfolioCapitalRepository,
 } from './data/repositories/routing.repositories';
+import {
+  GetCashSummaryUseCase,
+  GetPortfolioPreferencesUseCase,
+  GetPortfolioSimulationUseCase,
+  RecordCashEntryUseCase,
+  UpdatePortfolioPreferencesUseCase,
+} from './domain/usecases/portfolio/portfolio-capital.use-cases';
 
 export function wireAppServices(): AppServices {
   return {
@@ -86,6 +95,11 @@ export function wireAppServices(): AppServices {
     requestPasswordResetUseCase: new RequestPasswordResetUseCase(accountRepository),
     resetPasswordUseCase: new ResetPasswordUseCase(accountRepository),
     deleteAccountUseCase: new DeleteAccountUseCase(accountRepository),
+    recordCashEntryUseCase: new RecordCashEntryUseCase(cashRepository),
+    getCashSummaryUseCase: new GetCashSummaryUseCase(cashRepository),
+    getPortfolioPreferencesUseCase: new GetPortfolioPreferencesUseCase(portfolioCapitalRepository),
+    updatePortfolioPreferencesUseCase: new UpdatePortfolioPreferencesUseCase(portfolioCapitalRepository),
+    getPortfolioSimulationUseCase: new GetPortfolioSimulationUseCase(portfolioCapitalRepository),
     authSession: authSessionAdapter,
     guestSession: guestSessionAdapter,
     guestStore: guestStoreAdapter,

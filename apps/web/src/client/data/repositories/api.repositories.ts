@@ -12,12 +12,18 @@ import {
   SessionResult,
   StockQuoteSnapshot,
   WatchlistItem,
+  CashSummary,
+  CashLedgerEntry,
+  PortfolioPreferences,
+  PortfolioSimulationResponse,
 } from '../../domain/models';
 import {
   CreateCorporateActionInput,
   IAuthRepository,
+  ICashRepository,
   ICorporateActionRepository,
   IMarketRepository,
+  IPortfolioCapitalRepository,
   IPortfolioRepository,
   ITransactionRepository,
   IWatchlistRepository,
@@ -200,5 +206,39 @@ export class ApiCorporateActionRepository implements ICorporateActionRepository 
 
   async delete(id: string) {
     await apiClient.delete(`/corporate-actions/${id}`);
+  }
+}
+
+export class ApiCashRepository implements ICashRepository {
+  async getSummary() {
+    const { data } = await apiClient.get<CashSummary>('/cash');
+    return data;
+  }
+
+  async recordEntry(input: {
+    currency: import('@sar/shared').CashCurrency;
+    type: import('@sar/shared').CashLedgerType;
+    amount: number;
+    memo?: string;
+  }) {
+    const { data } = await apiClient.post<CashLedgerEntry>('/cash', input);
+    return data;
+  }
+}
+
+export class ApiPortfolioCapitalRepository implements IPortfolioCapitalRepository {
+  async getPreferences() {
+    const { data } = await apiClient.get<PortfolioPreferences>('/portfolio/preferences');
+    return data;
+  }
+
+  async updatePreferences(prefs: Omit<PortfolioPreferences, 'userId'>) {
+    const { data } = await apiClient.put<PortfolioPreferences>('/portfolio/preferences', prefs);
+    return data;
+  }
+
+  async getSimulation() {
+    const { data } = await apiClient.get<PortfolioSimulationResponse>('/portfolio/simulation');
+    return data;
   }
 }

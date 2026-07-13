@@ -1,12 +1,12 @@
 'use client';
 
 import { Suspense } from 'react';
-import { LoginView } from '@/presentation/views/LoginView';
+import { LoginPage } from '@/presentation/pages/LoginPage';
 
 export default function LoginRoutePage() {
   return (
     <Suspense fallback={null}>
-      <LoginView />
+      <LoginPage />
     </Suspense>
   );
 }

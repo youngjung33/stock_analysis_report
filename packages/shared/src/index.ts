@@ -69,6 +69,24 @@ export type {
 export { computeAllocation } from './portfolio-allocation';
 export type { AllocationByMarket, AllocationHoldingInput, AllocationItem, AllocationResult } from './portfolio-allocation';
 export {
+  CashLedgerType,
+  computeCashBalances,
+  cashToKrw,
+  formatCashAmount,
+} from './cash-ledger';
+export type { CashBalances, CashCurrency, CashLedgerEntryInput } from './cash-ledger';
+export {
+  DEFAULT_PORTFOLIO_PREFERENCES,
+  buildPortfolioSimulation,
+} from './portfolio-simulation';
+export type {
+  PortfolioPreferences,
+  PortfolioSimulationResult,
+  SimulationAction,
+  SimulationActionType,
+  SimulationHoldingInput,
+} from './portfolio-simulation';
+export {
   PORTFOLIO_PERIODS,
   PERIOD_LABELS,
   computeMaxTotalReturn,

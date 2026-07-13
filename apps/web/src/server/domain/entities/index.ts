@@ -120,6 +120,13 @@ export interface DashboardSummary {
   usdKrwRate: number | null;
   hasUsdHoldings: boolean;
   allocationByMarket: import('@sar/shared').AllocationByMarket;
+  /** 가용 현금 */
+  cashKrw: number;
+  cashUsd: number;
+  cashTotalKrw: number;
+  totalAssetsKrw: number | null;
+  cashPercent: number | null;
+  investedPercent: number | null;
 }
 
 export interface DashboardResult {
@@ -217,6 +224,25 @@ export interface WatchlistItemEntity {
   name: string;
   market: Market;
   createdAt: Date;
+}
+
+export interface CashLedgerEntryEntity {
+  id: string;
+  userId: string;
+  currency: import('@sar/shared').CashCurrency;
+  type: import('@sar/shared').CashLedgerType;
+  amount: number;
+  occurredAt: Date;
+  memo: string | null;
+  refId: string | null;
+  createdAt: Date;
+}
+
+export interface PortfolioPreferenceEntity {
+  userId: string;
+  targetKrPercent: number;
+  targetUsPercent: number;
+  maxSingleWeightPercent: number;
 }
 
 export interface PortfolioAnalysisResult {

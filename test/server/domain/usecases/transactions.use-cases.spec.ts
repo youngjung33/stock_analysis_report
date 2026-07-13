@@ -5,6 +5,7 @@ import { CreateTransactionUseCase } from '@server/domain/usecases/transactions/c
 import { DeleteTransactionUseCase } from '@server/domain/usecases/transactions/delete-transaction.use-case';
 import { ListTransactionsUseCase } from '@server/domain/usecases/transactions/list-transactions.use-case';
 import {
+  createMockCashRepo,
   createMockStock,
   createMockStockRepo,
   createMockTransaction,
@@ -17,6 +18,7 @@ describe('CreateTransactionUseCase', () => {
     const useCase = new CreateTransactionUseCase(
       createMockStockRepo(),
       createMockTransactionRepo(),
+      createMockCashRepo(),
     );
     await expect(
       useCase.execute({
@@ -36,6 +38,7 @@ describe('CreateTransactionUseCase', () => {
     const useCase = new CreateTransactionUseCase(
       createMockStockRepo(),
       createMockTransactionRepo(),
+      createMockCashRepo(),
     );
     await expect(
       useCase.execute({
@@ -54,6 +57,7 @@ describe('CreateTransactionUseCase', () => {
     const useCase = new CreateTransactionUseCase(
       createMockStockRepo(),
       createMockTransactionRepo(),
+      createMockCashRepo(),
     );
     await expect(
       useCase.execute({
@@ -78,7 +82,7 @@ describe('CreateTransactionUseCase', () => {
     const txRepo = createMockTransactionRepo();
     txRepo.create.mockResolvedValue(createMockTransaction());
 
-    const useCase = new CreateTransactionUseCase(stockRepo, txRepo);
+    const useCase = new CreateTransactionUseCase(stockRepo, txRepo, createMockCashRepo());
     await useCase.execute({
       userId: 'user-1',
       stockSymbol: 'AAPL',
@@ -103,7 +107,7 @@ describe('CreateTransactionUseCase', () => {
     const txRepo = createMockTransactionRepo();
     txRepo.create.mockResolvedValue(createMockTransaction());
 
-    const useCase = new CreateTransactionUseCase(stockRepo, txRepo);
+    const useCase = new CreateTransactionUseCase(stockRepo, txRepo, createMockCashRepo());
     await useCase.execute({
       userId: 'user-1',
       stockSymbol: 'AAPL',
@@ -132,7 +136,7 @@ describe('CreateTransactionUseCase', () => {
       createMockTransaction({ quantity: 5, type: TransactionType.BUY }),
     ]);
 
-    const useCase = new CreateTransactionUseCase(stockRepo, txRepo);
+    const useCase = new CreateTransactionUseCase(stockRepo, txRepo, createMockCashRepo());
     await expect(
       useCase.execute({
         userId: 'user-1',
@@ -173,7 +177,7 @@ describe('DeleteTransactionUseCase', () => {
       stock: createMockStock(),
     });
 
-    const useCase = new DeleteTransactionUseCase(txRepo);
+    const useCase = new DeleteTransactionUseCase(txRepo, createMockCashRepo());
     await useCase.execute('user-1', 'tx-1');
 
     expect(txRepo.delete).toHaveBeenCalledWith('tx-1');
@@ -187,7 +191,7 @@ describe('DeleteTransactionUseCase', () => {
       stock: createMockStock(),
     });
 
-    const useCase = new DeleteTransactionUseCase(txRepo);
+    const useCase = new DeleteTransactionUseCase(txRepo, createMockCashRepo());
 
     await expect(useCase.execute('user-1', 'tx-1')).rejects.toThrow(EntityNotFoundError);
   });
@@ -196,7 +200,7 @@ describe('DeleteTransactionUseCase', () => {
     const txRepo = createMockTransactionRepo();
     txRepo.findById.mockResolvedValue(null);
 
-    const useCase = new DeleteTransactionUseCase(txRepo);
+    const useCase = new DeleteTransactionUseCase(txRepo, createMockCashRepo());
 
     await expect(useCase.execute('user-1', 'missing')).rejects.toThrow(EntityNotFoundError);
   });

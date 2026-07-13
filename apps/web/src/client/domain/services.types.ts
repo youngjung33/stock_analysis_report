@@ -43,6 +43,13 @@ import { RefreshQuotesUseCase } from './usecases/portfolio/refresh-quotes.use-ca
 import { CreateTransactionUseCase } from './usecases/transactions/create-transaction.use-case';
 import { DeleteTransactionUseCase } from './usecases/transactions/delete-transaction.use-case';
 import { ListTransactionsUseCase } from './usecases/transactions/list-transactions.use-case';
+import {
+  GetCashSummaryUseCase,
+  GetPortfolioPreferencesUseCase,
+  GetPortfolioSimulationUseCase,
+  RecordCashEntryUseCase,
+  UpdatePortfolioPreferencesUseCase,
+} from './usecases/portfolio/portfolio-capital.use-cases';
 
 export interface AppServices {
   loginUseCase: LoginUseCase;
@@ -78,6 +85,11 @@ export interface AppServices {
   requestPasswordResetUseCase: RequestPasswordResetUseCase;
   resetPasswordUseCase: ResetPasswordUseCase;
   deleteAccountUseCase: DeleteAccountUseCase;
+  recordCashEntryUseCase: RecordCashEntryUseCase;
+  getCashSummaryUseCase: GetCashSummaryUseCase;
+  getPortfolioPreferencesUseCase: GetPortfolioPreferencesUseCase;
+  updatePortfolioPreferencesUseCase: UpdatePortfolioPreferencesUseCase;
+  getPortfolioSimulationUseCase: GetPortfolioSimulationUseCase;
   authSession: IAuthSessionPort;
   guestSession: IGuestSessionPort;
   guestStore: IGuestStorePort;

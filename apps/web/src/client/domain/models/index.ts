@@ -63,6 +63,12 @@ export interface DashboardSummary {
   usdKrwRate: number | null;
   hasUsdHoldings: boolean;
   allocationByMarket: import('@sar/shared').AllocationByMarket;
+  cashKrw: number;
+  cashUsd: number;
+  cashTotalKrw: number;
+  totalAssetsKrw: number | null;
+  cashPercent: number | null;
+  investedPercent: number | null;
 }
 
 export interface Dashboard {
@@ -205,4 +211,33 @@ export interface CreateTransactionInput {
   price: number;
   tradedAt: string;
   memo?: string;
+}
+
+export interface CashLedgerEntry {
+  id: string;
+  currency: import('@sar/shared').CashCurrency;
+  type: import('@sar/shared').CashLedgerType;
+  amount: number;
+  occurredAt: string;
+  memo: string | null;
+  refId: string | null;
+}
+
+export interface CashSummary {
+  balances: import('@sar/shared').CashBalances;
+  entries: CashLedgerEntry[];
+}
+
+export interface PortfolioPreferences {
+  userId?: string;
+  targetKrPercent: number;
+  targetUsPercent: number;
+  maxSingleWeightPercent: number;
+}
+
+export interface PortfolioSimulationResponse {
+  preferences: PortfolioPreferences;
+  simulation: import('@sar/shared').PortfolioSimulationResult;
+  ledgerEntryCount: number;
+  asOf: string;
 }

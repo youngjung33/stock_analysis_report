@@ -1,6 +1,7 @@
-import { Market, aggregatePortfolioTodayPnl, aggregateKrwSummary, applyCorporateActions, computeAllocation, enrichHoldingKrw } from '@sar/shared';
+import { Market, aggregatePortfolioTodayPnl, aggregateKrwSummary, applyCorporateActions, computeAllocation, enrichHoldingKrw, computeCashBalances, cashToKrw } from '@sar/shared';
 import { DashboardResult } from '../../entities';
 import {
+  ICashLedgerRepository,
   ICorporateActionRepository,
   IStockQuoteRepository,
   IStockRepository,
@@ -16,6 +17,7 @@ export class GetDashboardUseCase {
     private readonly quoteRepo: IStockQuoteRepository,
     private readonly corpActionRepo: ICorporateActionRepository,
     private readonly marketData: IMarketDataProvider,
+    private readonly cashRepo: ICashLedgerRepository,
   ) {}
 
   /** userId 보유 종목 집계 — summary·holdings·lastRefreshedAt 반환 */
@@ -124,6 +126,17 @@ export class GetDashboardUseCase {
       weightPercent: weightMap.get(`${h.symbol}:${h.market}`) ?? null,
     }));
 
+    const cashEntries = await this.cashRepo.findByUser(userId);
+    const cashBalances = computeCashBalances(cashEntries);
+    let fxRate = usdKrwRate;
+    if (fxRate === null && (hasUsdHoldings || cashBalances.usd > 0)) {
+      fxRate = await this.marketData.fetchUsdKrwRate();
+    }
+    const cashTotalKrwFinal = cashToKrw(cashBalances, fxRate);
+    const investedKrw = krwSummary.totalMarketValueKrw ?? 0;
+    const totalAssetsKrw =
+      krwSummary.totalMarketValueKrw !== null ? investedKrw + cashTotalKrwFinal : null;
+
     return {
       summary: {
         totalCostBasis,
@@ -139,9 +152,19 @@ export class GetDashboardUseCase {
         totalRealizedPnlKrw: krwSummary.totalRealizedPnlKrw,
         todayPnlKrw: krwSummary.todayPnlKrw,
         todayPnlPercentKrw: krwSummary.todayPnlPercentKrw,
-        usdKrwRate: krwSummary.usdKrwRate,
-        hasUsdHoldings: krwSummary.hasUsdHoldings,
+        usdKrwRate: krwSummary.usdKrwRate ?? fxRate,
+        hasUsdHoldings: krwSummary.hasUsdHoldings || cashBalances.usd > 0,
         allocationByMarket: allocation.allocationByMarket,
+        cashKrw: cashBalances.krw,
+        cashUsd: cashBalances.usd,
+        cashTotalKrw: cashTotalKrwFinal,
+        totalAssetsKrw,
+        cashPercent:
+          totalAssetsKrw && totalAssetsKrw > 0 ? (cashTotalKrwFinal / totalAssetsKrw) * 100 : null,
+        investedPercent:
+          totalAssetsKrw && totalAssetsKrw > 0 && krwSummary.totalMarketValueKrw !== null
+            ? (krwSummary.totalMarketValueKrw / totalAssetsKrw) * 100
+            : null,
       },
       holdings,
       lastRefreshedAt,

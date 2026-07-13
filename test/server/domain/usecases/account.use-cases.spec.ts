@@ -1,12 +1,15 @@
 import { vi } from 'vitest';
-import { AppErrorCode, AuthTokenType } from '@sar/shared';
-import { ValidationError } from '@server/domain/errors/domain.errors';
+import { AppErrorCode, AuthTokenType, OAuthProvider } from '@sar/shared';
+import { AuthenticationError, ConflictError, ValidationError } from '@server/domain/errors/domain.errors';
 import {
   ChangePasswordUseCase,
+  ChangeEmailUseCase,
   DeleteAccountUseCase,
+  GetAccountUseCase,
   RequestEmailVerificationUseCase,
   RequestPasswordResetUseCase,
   ResetPasswordUseCase,
+  UnlinkOAuthAccountUseCase,
   VerifyEmailUseCase,
 } from '@server/domain/usecases/account/account.use-cases';
 import { hashAuthToken } from '@server/data/auth/auth-token.utils';
@@ -19,6 +22,141 @@ import {
   createMockUser,
   createMockUserRepo,
 } from '../../mocks/repositories.mock';
+import { IUserOAuthAccountRepository } from '@server/domain/repositories';
+
+function createMockOAuthAccountRepo(
+  overrides: Partial<IUserOAuthAccountRepository> = {},
+): IUserOAuthAccountRepository {
+  return {
+    findByProviderUserId: vi.fn(),
+    findByUserId: vi.fn().mockResolvedValue([]),
+    create: vi.fn(),
+    deleteByUserAndProvider: vi.fn(),
+    ...overrides,
+  };
+}
+
+describe('GetAccountUseCase', () => {
+  it('returns profile with oauth accounts', async () => {
+    const userRepo = createMockUserRepo();
+    userRepo.findById.mockResolvedValue(
+      createMockUser({ email: 'user@example.com', emailVerifiedAt: new Date() }),
+    );
+    const oauthAccountRepo = createMockOAuthAccountRepo();
+    oauthAccountRepo.findByUserId.mockResolvedValue([
+      {
+        id: 'oauth-1',
+        userId: 'user-1',
+        provider: OAuthProvider.GOOGLE,
+        providerUserId: 'google-1',
+        email: 'user@gmail.com',
+        createdAt: new Date('2024-06-01'),
+      },
+    ]);
+
+    const useCase = new GetAccountUseCase(userRepo, oauthAccountRepo);
+    const profile = await useCase.execute('user-1');
+
+    expect(profile.username).toBe('admin');
+    expect(profile.email).toBe('user@example.com');
+    expect(profile.emailVerified).toBe(true);
+    expect(profile.hasPassword).toBe(true);
+    expect(profile.oauthAccounts).toHaveLength(1);
+    expect(profile.oauthAccounts[0].provider).toBe(OAuthProvider.GOOGLE);
+  });
+
+  it('throws when user missing', async () => {
+    const userRepo = createMockUserRepo();
+    userRepo.findById.mockResolvedValue(null);
+
+    const useCase = new GetAccountUseCase(userRepo, createMockOAuthAccountRepo());
+    await expect(useCase.execute('missing')).rejects.toBeInstanceOf(AuthenticationError);
+  });
+});
+
+describe('ChangeEmailUseCase', () => {
+  it('rejects invalid email', async () => {
+    const useCase = new ChangeEmailUseCase(createMockUserRepo(), createMockAuthTokenRepo());
+    await expect(
+      useCase.execute({ userId: 'user-1', email: 'not-an-email' }),
+    ).rejects.toThrow(ValidationError);
+  });
+
+  it('rejects email taken by another user', async () => {
+    const userRepo = createMockUserRepo();
+    userRepo.findByEmail.mockResolvedValue(createMockUser({ id: 'other-user' }));
+
+    const useCase = new ChangeEmailUseCase(userRepo, createMockAuthTokenRepo());
+    await expect(
+      useCase.execute({ userId: 'user-1', email: 'taken@example.com' }),
+    ).rejects.toBeInstanceOf(ConflictError);
+  });
+
+  it('updates email and returns verification code', async () => {
+    const userRepo = createMockUserRepo();
+    userRepo.findByEmail.mockResolvedValue(null);
+    const authTokenRepo = createMockAuthTokenRepo();
+
+    const useCase = new ChangeEmailUseCase(userRepo, authTokenRepo);
+    const result = await useCase.execute({ userId: 'user-1', email: 'New@Example.com' });
+
+    expect(userRepo.updateEmail).toHaveBeenCalledWith('user-1', 'new@example.com');
+    expect(result.verificationCode).toMatch(/^\d{6}$/);
+    expect(authTokenRepo.create).toHaveBeenCalled();
+  });
+});
+
+describe('UnlinkOAuthAccountUseCase', () => {
+  it('rejects invalid provider', async () => {
+    const useCase = new UnlinkOAuthAccountUseCase(createMockUserRepo(), createMockOAuthAccountRepo());
+    await expect(useCase.execute('user-1', 'invalid')).rejects.toThrow(ValidationError);
+  });
+
+  it('forbids unlink when no password and last oauth', async () => {
+    const userRepo = createMockUserRepo();
+    userRepo.findById.mockResolvedValue(createMockUser({ passwordHash: null }));
+    const oauthAccountRepo = createMockOAuthAccountRepo();
+    oauthAccountRepo.findByUserId.mockResolvedValue([
+      {
+        id: 'oauth-1',
+        userId: 'user-1',
+        provider: OAuthProvider.GOOGLE,
+        providerUserId: 'g-1',
+        email: null,
+        createdAt: new Date(),
+      },
+    ]);
+
+    const useCase = new UnlinkOAuthAccountUseCase(userRepo, oauthAccountRepo);
+    await expect(useCase.execute('user-1', OAuthProvider.GOOGLE)).rejects.toMatchObject({
+      code: AppErrorCode.AUTH_OAUTH_UNLINK_FORBIDDEN,
+    });
+  });
+
+  it('deletes oauth link when password exists', async () => {
+    const userRepo = createMockUserRepo();
+    userRepo.findById.mockResolvedValue(createMockUser());
+    const oauthAccountRepo = createMockOAuthAccountRepo();
+    oauthAccountRepo.findByUserId.mockResolvedValue([
+      {
+        id: 'oauth-1',
+        userId: 'user-1',
+        provider: OAuthProvider.GOOGLE,
+        providerUserId: 'g-1',
+        email: null,
+        createdAt: new Date(),
+      },
+    ]);
+
+    const useCase = new UnlinkOAuthAccountUseCase(userRepo, oauthAccountRepo);
+    await useCase.execute('user-1', OAuthProvider.GOOGLE);
+
+    expect(oauthAccountRepo.deleteByUserAndProvider).toHaveBeenCalledWith(
+      'user-1',
+      OAuthProvider.GOOGLE,
+    );
+  });
+});
 
 describe('ChangePasswordUseCase', () => {
   it('rejects wrong current password', async () => {

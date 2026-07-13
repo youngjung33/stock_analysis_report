@@ -9,6 +9,8 @@ import {
   OAuthStateEntity,
   CorporateActionEntity,
   WatchlistItemEntity,
+  CashLedgerEntryEntity,
+  PortfolioPreferenceEntity,
 } from '../entities';
 import { OAuthProviderId } from '@sar/shared';
 import { Market, TransactionType } from '@sar/shared';
@@ -103,6 +105,17 @@ export interface IWatchlistRepository {
   create(data: Omit<WatchlistItemEntity, 'id' | 'createdAt'>): Promise<WatchlistItemEntity>;
   delete(id: string, userId: string): Promise<void>;
   findByUserSymbolMarket(userId: string, symbol: string, market: Market): Promise<WatchlistItemEntity | null>;
+}
+
+export interface ICashLedgerRepository {
+  findByUser(userId: string): Promise<CashLedgerEntryEntity[]>;
+  create(data: Omit<CashLedgerEntryEntity, 'id' | 'createdAt'>): Promise<CashLedgerEntryEntity>;
+  deleteByRefId(userId: string, refId: string): Promise<void>;
+}
+
+export interface IPortfolioPreferenceRepository {
+  findByUser(userId: string): Promise<PortfolioPreferenceEntity | null>;
+  upsert(data: PortfolioPreferenceEntity): Promise<PortfolioPreferenceEntity>;
 }
 
 export interface IStockCatalogRepository {

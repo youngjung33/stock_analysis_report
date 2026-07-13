@@ -48,6 +48,8 @@ import {
   PrismaTransactionRepository,
   PrismaUserRepository,
   PrismaWatchlistRepository,
+  PrismaCashLedgerRepository,
+  PrismaPortfolioPreferenceRepository,
 } from './data/persistence/prisma.repositories';
 import { PrismaAuthTokenRepository } from './data/auth/auth-token.repository';
 import { ConsoleEmailSender } from './data/auth/console-email.sender';
@@ -62,6 +64,16 @@ import {
   UnlinkOAuthAccountUseCase,
   VerifyEmailUseCase,
 } from './domain/usecases/account/account.use-cases';
+import {
+  GetCashSummaryUseCase,
+  ListCashLedgerUseCase,
+  RecordCashEntryUseCase,
+} from './domain/usecases/cash/cash.use-cases';
+import {
+  GetPortfolioPreferencesUseCase,
+  GetPortfolioSimulationUseCase,
+  UpdatePortfolioPreferencesUseCase,
+} from './domain/usecases/portfolio/portfolio-capital.use-cases';
 
 export interface ServerServices {
   tokenService: ITokenService;
@@ -102,6 +114,12 @@ export interface ServerServices {
   resetPasswordUseCase: ResetPasswordUseCase;
   unlinkOAuthAccountUseCase: UnlinkOAuthAccountUseCase;
   deleteAccountUseCase: DeleteAccountUseCase;
+  recordCashEntryUseCase: RecordCashEntryUseCase;
+  listCashLedgerUseCase: ListCashLedgerUseCase;
+  getCashSummaryUseCase: GetCashSummaryUseCase;
+  getPortfolioPreferencesUseCase: GetPortfolioPreferencesUseCase;
+  updatePortfolioPreferencesUseCase: UpdatePortfolioPreferencesUseCase;
+  getPortfolioSimulationUseCase: GetPortfolioSimulationUseCase;
 }
 
 let cached: ServerServices | null = null;
@@ -116,6 +134,8 @@ export function getServerServices(): ServerServices {
   const quoteRepo = new PrismaStockQuoteRepository();
   const corpActionRepo = new PrismaCorporateActionRepository();
   const watchlistRepo = new PrismaWatchlistRepository();
+  const cashRepo = new PrismaCashLedgerRepository();
+  const prefRepo = new PrismaPortfolioPreferenceRepository();
   const catalogRepo = new PrismaStockCatalogRepository();
   const passwordHasher = new BcryptPasswordHasher();
   const tokenService = new JwtTokenService();
@@ -129,6 +149,14 @@ export function getServerServices(): ServerServices {
 
   const fetchQuotesUseCase = new FetchQuotesUseCase(marketData);
   const getFeaturedQuotesUseCase = new GetFeaturedQuotesUseCase(fetchQuotesUseCase);
+  const getDashboardUseCase = new GetDashboardUseCase(
+    stockRepo,
+    txRepo,
+    quoteRepo,
+    corpActionRepo,
+    marketData,
+    cashRepo,
+  );
 
   cached = {
     tokenService,
@@ -149,16 +177,10 @@ export function getServerServices(): ServerServices {
     getStockQuoteUseCase: new GetStockQuoteUseCase(marketData),
     refreshTokenUseCase: new RefreshTokenUseCase(refreshRepo, tokenService),
     logoutUseCase: new LogoutUseCase(refreshRepo, tokenService),
-    createTransactionUseCase: new CreateTransactionUseCase(stockRepo, txRepo),
+    createTransactionUseCase: new CreateTransactionUseCase(stockRepo, txRepo, cashRepo),
     listTransactionsUseCase: new ListTransactionsUseCase(txRepo),
-    deleteTransactionUseCase: new DeleteTransactionUseCase(txRepo),
-    getDashboardUseCase: new GetDashboardUseCase(
-      stockRepo,
-      txRepo,
-      quoteRepo,
-      corpActionRepo,
-      marketData,
-    ),
+    deleteTransactionUseCase: new DeleteTransactionUseCase(txRepo, cashRepo),
+    getDashboardUseCase,
     getHoldingBySymbolUseCase: new GetHoldingBySymbolUseCase(
       stockRepo,
       txRepo,
@@ -179,7 +201,7 @@ export function getServerServices(): ServerServices {
     searchStocksUseCase: new SearchStocksUseCase(catalogRepo, marketData),
     getFxRateUseCase: new GetFxRateUseCase(marketData),
     listCorporateActionsUseCase: new ListCorporateActionsUseCase(corpActionRepo),
-    createCorporateActionUseCase: new CreateCorporateActionUseCase(stockRepo, corpActionRepo),
+    createCorporateActionUseCase: new CreateCorporateActionUseCase(stockRepo, corpActionRepo, cashRepo),
     deleteCorporateActionUseCase: new DeleteCorporateActionUseCase(corpActionRepo),
     listWatchlistUseCase: new ListWatchlistUseCase(watchlistRepo),
     addWatchlistUseCase: new AddWatchlistUseCase(watchlistRepo),
@@ -197,6 +219,17 @@ export function getServerServices(): ServerServices {
     resetPasswordUseCase: new ResetPasswordUseCase(userRepo, authTokenRepo, passwordHasher),
     unlinkOAuthAccountUseCase: new UnlinkOAuthAccountUseCase(userRepo, oauthAccountRepo),
     deleteAccountUseCase: new DeleteAccountUseCase(userRepo, passwordHasher),
+    recordCashEntryUseCase: new RecordCashEntryUseCase(cashRepo),
+    listCashLedgerUseCase: new ListCashLedgerUseCase(cashRepo),
+    getCashSummaryUseCase: new GetCashSummaryUseCase(cashRepo),
+    getPortfolioPreferencesUseCase: new GetPortfolioPreferencesUseCase(prefRepo),
+    updatePortfolioPreferencesUseCase: new UpdatePortfolioPreferencesUseCase(prefRepo),
+    getPortfolioSimulationUseCase: new GetPortfolioSimulationUseCase(
+      getDashboardUseCase,
+      getFeaturedQuotesUseCase,
+      cashRepo,
+      prefRepo,
+    ),
   };
 
   return cached;

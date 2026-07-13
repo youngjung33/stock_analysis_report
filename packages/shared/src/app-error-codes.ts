@@ -31,6 +31,9 @@ export const AppErrorCode = {
   AUTH_CURRENT_PASSWORD_INVALID: 'AUTH_CURRENT_PASSWORD_INVALID',
   AUTH_OAUTH_UNLINK_FORBIDDEN: 'AUTH_OAUTH_UNLINK_FORBIDDEN',
   AUTH_EMAIL_REQUIRED: 'AUTH_EMAIL_REQUIRED',
+
+  CASH_INSUFFICIENT: 'CASH_INSUFFICIENT',
+  CASH_AMOUNT_INVALID: 'CASH_AMOUNT_INVALID',
 } as const;
 
 export type AppErrorCode = (typeof AppErrorCode)[keyof typeof AppErrorCode];
@@ -83,6 +86,9 @@ export const APP_ERROR_MESSAGES: Record<AppErrorCode, string> = {
   [AppErrorCode.AUTH_CURRENT_PASSWORD_INVALID]: '현재 비밀번호가 올바르지 않습니다.',
   [AppErrorCode.AUTH_OAUTH_UNLINK_FORBIDDEN]: '다른 로그인 수단을 먼저 설정해 주세요.',
   [AppErrorCode.AUTH_EMAIL_REQUIRED]: '이메일이 필요합니다.',
+
+  [AppErrorCode.CASH_INSUFFICIENT]: '가용 현금이 부족합니다.',
+  [AppErrorCode.CASH_AMOUNT_INVALID]: '금액을 확인해 주세요.',
 };
 
 const CODE_SET = new Set<string>(Object.values(AppErrorCode));

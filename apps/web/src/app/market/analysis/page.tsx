@@ -1,12 +1,12 @@
 'use client';
 
 import { ProtectedRoute } from '@/presentation/routes/ProtectedRoute';
-import { MarketAnalysisView } from '@/presentation/views/MarketAnalysisView';
+import { MarketAnalysisPage } from '@/presentation/pages/MarketAnalysisPage';
 
 export default function MarketAnalysisRoutePage() {
   return (
     <ProtectedRoute>
-      <MarketAnalysisView />
+      <MarketAnalysisPage />
     </ProtectedRoute>
   );
 }

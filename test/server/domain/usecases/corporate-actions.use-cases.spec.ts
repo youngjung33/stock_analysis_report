@@ -6,6 +6,7 @@ import {
   ListCorporateActionsUseCase,
 } from '@server/domain/usecases/corporate-actions/corporate-actions.use-cases';
 import {
+  createMockCashRepo,
   createMockCorpActionRepo,
   createMockStock,
   createMockStockRepo,
@@ -69,7 +70,7 @@ describe('CreateCorporateActionUseCase', () => {
       createdAt: new Date(),
     });
 
-    const useCase = new CreateCorporateActionUseCase(stockRepo, corpRepo);
+    const useCase = new CreateCorporateActionUseCase(stockRepo, corpRepo, createMockCashRepo());
     await useCase.execute({
       userId: 'user-1',
       stockSymbol: '005930',

@@ -10,6 +10,7 @@ import {
   ITransactionRepository,
   IUserRepository,
   ICorporateActionRepository,
+  ICashLedgerRepository,
 } from '@server/domain/repositories';
 import { StockEntity, TransactionEntity, UserEntity } from '@server/domain/entities';
 
@@ -165,6 +166,50 @@ export function createMockCorpActionRepo(
     findByUserAndStock: vi.fn().mockResolvedValue([]),
     create: vi.fn(),
     delete: vi.fn(),
+    ...overrides,
+  };
+}
+
+export function createMockCashRepo(
+  overrides: Partial<ICashLedgerRepository> = {},
+): ICashLedgerRepository {
+  return {
+    findByUser: vi.fn().mockResolvedValue([
+      {
+        id: 'cash-krw',
+        userId: 'user-1',
+        currency: 'KRW',
+        type: 'DEPOSIT',
+        amount: 10_000_000_000,
+        occurredAt: new Date(),
+        memo: null,
+        refId: null,
+        createdAt: new Date(),
+      },
+      {
+        id: 'cash-usd',
+        userId: 'user-1',
+        currency: 'USD',
+        type: 'DEPOSIT',
+        amount: 10_000_000,
+        occurredAt: new Date(),
+        memo: null,
+        refId: null,
+        createdAt: new Date(),
+      },
+    ]),
+    create: vi.fn().mockResolvedValue({
+      id: 'cash-new',
+      userId: 'user-1',
+      currency: 'USD',
+      type: 'TX_BUY',
+      amount: 1000,
+      occurredAt: new Date(),
+      memo: null,
+      refId: 'tx-1',
+      createdAt: new Date(),
+    }),
+    deleteByRefId: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }

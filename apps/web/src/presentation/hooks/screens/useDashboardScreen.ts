@@ -63,5 +63,6 @@ export function useDashboardScreen() {
     refreshNotice,
     refreshing,
     handleRefresh,
+    refreshDashboard: refresh,
   };
 }

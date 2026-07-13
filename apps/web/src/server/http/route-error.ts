@@ -9,6 +9,7 @@ import {
   ValidationError,
 } from '../domain/errors/domain.errors';
 import { HttpError } from './errors';
+import { logError } from '../observability/logger';
 
 export function jsonApiError(body: ApiErrorBody, status: number) {
   return NextResponse.json(body, { status });
@@ -16,34 +17,30 @@ export function jsonApiError(body: ApiErrorBody, status: number) {
 
 /** API route 공통 — 서버 로그 전용 (사용자 응답과 분리) */
 export function logApiError(error: unknown, context?: Record<string, unknown>) {
-  if (context) {
-    console.error('[api]', context);
-  }
-
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    console.error('[api] Prisma error', {
-      code: error.code,
-      meta: error.meta,
-      message: error.message,
+    logError('api Prisma error', error, {
+      ...context,
+      prismaCode: error.code,
+      prismaMeta: error.meta,
     });
     return;
   }
 
   if (error instanceof DomainError) {
-    console.error('[api] domain error', { code: error.code, message: error.message });
+    logError('api domain error', error, { ...context, code: error.code });
     return;
   }
 
   if (error instanceof HttpError) {
-    console.error('[api] http error', {
+    logError('api http error', error, {
+      ...context,
       status: error.statusCode,
       code: error.code,
-      message: error.message,
     });
     return;
   }
 
-  console.error('[api] unhandled error', error);
+  logError('api unhandled error', error, context);
 }
 
 function mapPrismaError(error: Prisma.PrismaClientKnownRequestError): ApiErrorBody {

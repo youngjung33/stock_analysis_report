@@ -13,6 +13,10 @@ import {
   Transaction,
   User,
   WatchlistItem,
+  CashSummary,
+  CashLedgerEntry,
+  PortfolioPreferences,
+  PortfolioSimulationResponse,
 } from '../models';
 import {
   CorporateActionType,
@@ -94,6 +98,22 @@ export interface ICorporateActionRepository {
   create(input: CreateCorporateActionInput): Promise<void>;
   list(): Promise<CorporateAction[]>;
   delete(id: string): Promise<void>;
+}
+
+export interface ICashRepository {
+  getSummary(): Promise<CashSummary>;
+  recordEntry(input: {
+    currency: import('@sar/shared').CashCurrency;
+    type: import('@sar/shared').CashLedgerType;
+    amount: number;
+    memo?: string;
+  }): Promise<CashLedgerEntry>;
+}
+
+export interface IPortfolioCapitalRepository {
+  getPreferences(): Promise<PortfolioPreferences>;
+  updatePreferences(prefs: Omit<PortfolioPreferences, 'userId'>): Promise<PortfolioPreferences>;
+  getSimulation(): Promise<PortfolioSimulationResponse>;
 }
 
 export interface IGuestSessionPort {

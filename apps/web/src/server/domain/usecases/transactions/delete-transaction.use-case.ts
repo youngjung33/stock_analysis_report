@@ -1,9 +1,12 @@
-import { ITransactionRepository } from '../../repositories';
+import { ICashLedgerRepository, ITransactionRepository } from '../../repositories';
 import { EntityNotFoundError } from '../../errors/domain.errors';
 
 /** 거래 삭제 use case */
 export class DeleteTransactionUseCase {
-  constructor(private readonly transactionRepo: ITransactionRepository) {}
+  constructor(
+    private readonly transactionRepo: ITransactionRepository,
+    private readonly cashRepo: ICashLedgerRepository,
+  ) {}
 
   /** userId 소유 거래만 삭제 — 없으면 EntityNotFoundError */
   async execute(userId: string, txId: string): Promise<void> {
@@ -11,6 +14,7 @@ export class DeleteTransactionUseCase {
     if (!tx || tx.userId !== userId) {
       throw new EntityNotFoundError('Transaction not found');
     }
+    await this.cashRepo.deleteByRefId(userId, txId);
     await this.transactionRepo.delete(txId);
   }
 }

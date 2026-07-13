@@ -7,6 +7,8 @@ import {
   UserEntity,
   CorporateActionEntity,
   WatchlistItemEntity,
+  CashLedgerEntryEntity,
+  PortfolioPreferenceEntity,
 } from '../../domain/entities';
 import {
   IRefreshTokenRepository,
@@ -16,6 +18,8 @@ import {
   IUserRepository,
   ICorporateActionRepository,
   IWatchlistRepository,
+  ICashLedgerRepository,
+  IPortfolioPreferenceRepository,
 } from '../../domain/repositories';
 import { prisma as defaultPrisma } from './prisma.service';
 
@@ -322,5 +326,65 @@ export class PrismaWatchlistRepository implements IWatchlistRepository {
       where: { userId_symbol_market: { userId, symbol, market } },
     });
     return row ? { ...row, market: row.market as Market } : null;
+  }
+}
+
+export class PrismaCashLedgerRepository implements ICashLedgerRepository {
+  constructor(private readonly prisma: PrismaClient = defaultPrisma) {}
+
+  async findByUser(userId: string) {
+    const rows = await this.prisma.cashLedgerEntry.findMany({
+      where: { userId },
+      orderBy: { occurredAt: 'desc' },
+    });
+    return rows.map((row) => ({
+      ...row,
+      currency: row.currency as CashLedgerEntryEntity['currency'],
+      type: row.type as CashLedgerEntryEntity['type'],
+    }));
+  }
+
+  async create(data: Omit<CashLedgerEntryEntity, 'id' | 'createdAt'>) {
+    const created = await this.prisma.cashLedgerEntry.create({
+      data: {
+        userId: data.userId,
+        currency: data.currency,
+        type: data.type,
+        amount: data.amount,
+        occurredAt: data.occurredAt,
+        memo: data.memo,
+        refId: data.refId,
+      },
+    });
+    return {
+      ...created,
+      currency: created.currency as CashLedgerEntryEntity['currency'],
+      type: created.type as CashLedgerEntryEntity['type'],
+    };
+  }
+
+  async deleteByRefId(userId: string, refId: string) {
+    await this.prisma.cashLedgerEntry.deleteMany({ where: { userId, refId } });
+  }
+}
+
+export class PrismaPortfolioPreferenceRepository implements IPortfolioPreferenceRepository {
+  constructor(private readonly prisma: PrismaClient = defaultPrisma) {}
+
+  async findByUser(userId: string) {
+    const row = await this.prisma.portfolioPreference.findUnique({ where: { userId } });
+    return row;
+  }
+
+  async upsert(data: PortfolioPreferenceEntity) {
+    return this.prisma.portfolioPreference.upsert({
+      where: { userId: data.userId },
+      create: data,
+      update: {
+        targetKrPercent: data.targetKrPercent,
+        targetUsPercent: data.targetUsPercent,
+        maxSingleWeightPercent: data.maxSingleWeightPercent,
+      },
+    });
   }
 }
