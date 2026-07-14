@@ -1,6 +1,9 @@
+import { formatAmount } from '@sar/shared';
+
 function formatNumber(value: number | null | undefined, currency?: string): string {
   if (value === null || value === undefined) return '-';
-  const formatted = value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  const maxFractionDigits = currency === 'KRW' ? 0 : 2;
+  const formatted = formatAmount(value, { maxFractionDigits });
   if (!currency) return formatted;
   return currency === 'KRW' ? `₩${formatted}` : `$${formatted}`;
 }

@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { CorporateActionType, Market, StockSearchResult } from '@sar/shared';
+import { CorporateActionType, Market, parseAmountInput, StockSearchResult } from '@sar/shared';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
 import { useToast } from '../components/Toast';
 import { useServices } from '../hooks/useServices';
 import { StockSearchField } from '../shared/StockSearchField';
+import { AmountInput } from '../shared/AmountInput';
 import { Surface } from '../design-system';
 
 interface Props {
@@ -43,13 +44,13 @@ export function CorporateActionForm({ onSuccess }: Props) {
         market: selectedStock.market,
         type,
         effectiveAt,
-        cashAmount: cashAmount ? Number(cashAmount) : undefined,
+        cashAmount: cashAmount ? parseAmountInput(cashAmount) : undefined,
         splitRatio: splitRatio ? Number(splitRatio) : undefined,
         targetSymbol: targetStock?.symbol,
         targetMarket: targetStock?.market,
         targetName: targetStock?.name,
         targetQuantity: targetQuantity ? Number(targetQuantity) : undefined,
-        targetPrice: targetPrice ? Number(targetPrice) : undefined,
+        targetPrice: targetPrice ? parseAmountInput(targetPrice) : undefined,
         memo: memo || undefined,
       });
       showSuccess('기업행위가 등록되었습니다.');
@@ -104,10 +105,10 @@ export function CorporateActionForm({ onSuccess }: Props) {
       {type === 'DIVIDEND' && (
         <div>
           <label className="text-xs text-slate-400">배당 총액</label>
-          <input
-            type="number"
+          <AmountInput
             value={cashAmount}
-            onChange={(e) => setCashAmount(e.target.value)}
+            onValueChange={setCashAmount}
+            formatOptions={{ maxFractionDigits: 0 }}
             className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white"
           />
         </div>
@@ -145,19 +146,19 @@ export function CorporateActionForm({ onSuccess }: Props) {
           </div>
           <div>
             <label className="text-xs text-slate-400">전환 단가 (매입가)</label>
-            <input
-              type="number"
+            <AmountInput
               value={targetPrice}
-              onChange={(e) => setTargetPrice(e.target.value)}
+              onValueChange={setTargetPrice}
+              formatOptions={{ maxFractionDigits: 2 }}
               className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white"
             />
           </div>
           <div>
             <label className="text-xs text-slate-400">현금 보상 (선택)</label>
-            <input
-              type="number"
+            <AmountInput
               value={cashAmount}
-              onChange={(e) => setCashAmount(e.target.value)}
+              onValueChange={setCashAmount}
+              formatOptions={{ maxFractionDigits: 0 }}
               className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white"
             />
           </div>

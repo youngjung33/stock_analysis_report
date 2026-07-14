@@ -1,7 +1,9 @@
 'use client';
 
+import { isPortfolioEmpty } from '@sar/shared';
 import { useDashboardScreen } from '../hooks/screens/useDashboardScreen';
 import { PageStack } from '../design-system';
+import { PortfolioOnboardingSection } from '../features/onboarding/PortfolioOnboardingSection';
 import { CapitalAndSimulationSection } from '../components/CapitalAndSimulationSection';
 import { MarketStatusBanner } from '../components/MarketStatusBanner';
 import { QuoteRefreshNoticeBox } from '../components/QuoteRefreshNoticeBox';
@@ -23,6 +25,8 @@ import { AppShell, RefreshQuotesButton } from '../layout';
 export function DashboardPage() {
   const screen = useDashboardScreen();
   const analysis = usePortfolioAnalysis();
+  const showOnboarding =
+    screen.data != null && isPortfolioEmpty(screen.data.summary);
 
   return (
     <AppShell
@@ -57,28 +61,35 @@ export function DashboardPage() {
 
         {screen.data && (
           <>
+            {showOnboarding && <PortfolioOnboardingSection isGuest={screen.isGuest} />}
+
             <SummaryCards summary={screen.data.summary} />
 
-            <CapitalAndSimulationSection onPortfolioUpdated={screen.refreshDashboard} />
+            {!showOnboarding && (
+              <>
+                <CapitalAndSimulationSection onPortfolioUpdated={screen.refreshDashboard} />
 
-            <AllocationSection
-              items={screen.data.holdings
-                .filter((h) => h.weightPercent !== null && h.marketValueKrw !== null)
-                .map((h) => ({
-                  symbol: h.symbol,
-                  name: h.name,
-                  market: h.market,
-                  marketValueKrw: h.marketValueKrw as number,
-                  weightPercent: h.weightPercent as number,
-                }))}
-              allocationByMarket={screen.data.summary.allocationByMarket}
-            />
+                <AllocationSection
+                  items={screen.data.holdings
+                    .filter((h) => h.weightPercent !== null && h.marketValueKrw !== null)
+                    .map((h) => ({
+                      symbol: h.symbol,
+                      name: h.name,
+                      market: h.market,
+                      marketValueKrw: h.marketValueKrw as number,
+                      weightPercent: h.weightPercent as number,
+                    }))}
+                  allocationByMarket={screen.data.summary.allocationByMarket}
+                />
 
-            <HoldingsSection holdings={screen.data.holdings} />
+                <HoldingsSection holdings={screen.data.holdings} />
 
-            <PeriodReturnsCard analysis={analysis.data} isLoading={analysis.isLoading} />
-            <BenchmarkComparisonRow analysis={analysis.data} />
-            <PortfolioInsightsSection analysis={analysis.data} isLoading={analysis.isLoading} />
+                <PeriodReturnsCard analysis={analysis.data} isLoading={analysis.isLoading} />
+                <BenchmarkComparisonRow analysis={analysis.data} />
+                <PortfolioInsightsSection analysis={analysis.data} isLoading={analysis.isLoading} />
+              </>
+            )}
+
             <WatchlistSection
               holdingSymbols={screen.data.holdings.map((h) => ({
                 symbol: h.symbol,

@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
-import { ArrowLeftRight, LayoutDashboard, LineChart } from 'lucide-react';
+import { ArrowLeftRight, LayoutDashboard, LineChart, UserCircle } from 'lucide-react';
 
-export type NavSectionId = 'dashboard' | 'transactions' | 'market';
+export type NavSectionId = 'dashboard' | 'my-info' | 'transactions' | 'market';
 
 export interface AppNavItem {
   id: NavSectionId;
@@ -21,6 +21,14 @@ export const APP_NAV_ITEMS: AppNavItem[] = [
     shortLabel: '홈',
     icon: LayoutDashboard,
     match: (pathname) => pathname === '/' || pathname.startsWith('/stocks'),
+  },
+  {
+    id: 'my-info',
+    href: '/my-info',
+    label: '내 정보',
+    shortLabel: '내 정보',
+    icon: UserCircle,
+    match: (pathname) => pathname.startsWith('/my-info'),
   },
   {
     id: 'transactions',

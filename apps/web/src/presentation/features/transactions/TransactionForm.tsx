@@ -1,5 +1,6 @@
 import { TransactionType } from '@sar/shared';
 import { useTransactionForm } from '../../hooks/screens/useTransactionForm';
+import { AmountInput } from '../../shared/AmountInput';
 import { StockSearchField } from '../../shared/StockSearchField';
 
 interface Props {
@@ -63,13 +64,11 @@ export function TransactionForm({ onSuccess }: Props) {
         </label>
         <label className="block">
           <span className="text-xs text-slate-400 md:text-sm">단가</span>
-          <input
-            type="number"
-            step="any"
-            min="0"
+          <AmountInput
             className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-white md:py-2"
             value={form.price}
-            onChange={(e) => form.setPrice(e.target.value)}
+            onValueChange={form.setPrice}
+            formatOptions={{ maxFractionDigits: 2 }}
             required
           />
         </label>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { CashLedgerType, formatCashAmount } from '@sar/shared';
+import { CashLedgerType, formatCashAmount, parseAmountInput } from '@sar/shared';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
 import { useToast } from '../../components/Toast';
 import { useServices } from '../useServices';
@@ -63,8 +63,8 @@ export function useCapitalScreen(onUpdated?: () => void) {
     e.preventDefault();
     setSaving(true);
     try {
-      const krw = Number(krwAmount);
-      const usd = Number(usdAmount);
+      const krw = parseAmountInput(krwAmount);
+      const usd = parseAmountInput(usdAmount);
       if (krw > 0) {
         await recordCashEntryUseCase.execute({
           currency: 'KRW',
@@ -95,7 +95,7 @@ export function useCapitalScreen(onUpdated?: () => void) {
 
   async function handleDeposit(currency: 'KRW' | 'USD') {
     const raw = currency === 'KRW' ? krwAmount : usdAmount;
-    const amount = Number(raw);
+    const amount = parseAmountInput(raw);
     if (!amount || amount <= 0) {
       showError('금액을 입력해 주세요.');
       return;
@@ -122,7 +122,7 @@ export function useCapitalScreen(onUpdated?: () => void) {
 
   async function handleWithdraw(currency: 'KRW' | 'USD') {
     const raw = currency === 'KRW' ? krwAmount : usdAmount;
-    const amount = Number(raw);
+    const amount = parseAmountInput(raw);
     if (!amount || amount <= 0) {
       showError('금액을 입력해 주세요.');
       return;

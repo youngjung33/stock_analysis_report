@@ -2,6 +2,7 @@
 
 import { formatCashAmount, type SimulationAction, type SimulationActionType } from '@sar/shared';
 import { Surface } from '../design-system';
+import { AmountInput } from '../shared/AmountInput';
 import { useCapitalScreen } from '../hooks/screens/useCapitalScreen';
 
 const ACTION_LABEL: Record<SimulationActionType, string> = {
@@ -44,25 +45,22 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
         <form onSubmit={screen.handleInitialCapital} className="grid gap-3 md:grid-cols-2">
           <label className="block">
             <span className="text-xs text-muted-foreground">원화 (KRW)</span>
-            <input
-              type="number"
-              min="0"
+            <AmountInput
               className="mt-1 w-full rounded-lg border border-border-strong bg-muted px-3 py-2 text-sm"
               value={screen.krwAmount}
-              onChange={(e) => screen.setKrwAmount(e.target.value)}
-              placeholder="예: 10000000"
+              onValueChange={screen.setKrwAmount}
+              formatOptions={{ maxFractionDigits: 0 }}
+              placeholder="예: 10,000,000"
             />
           </label>
           <label className="block">
             <span className="text-xs text-muted-foreground">달러 (USD)</span>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
+            <AmountInput
               className="mt-1 w-full rounded-lg border border-border-strong bg-muted px-3 py-2 text-sm"
               value={screen.usdAmount}
-              onChange={(e) => screen.setUsdAmount(e.target.value)}
-              placeholder="예: 5000"
+              onValueChange={screen.setUsdAmount}
+              formatOptions={{ maxFractionDigits: 2 }}
+              placeholder="예: 5,000"
             />
           </label>
           <div className="flex flex-wrap gap-2 md:col-span-2">

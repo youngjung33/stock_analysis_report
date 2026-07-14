@@ -20,7 +20,7 @@ export function AppBottomNav({ className }: Props) {
       )}
       aria-label="하단 메뉴"
     >
-      <div className="grid h-(--height-bottom-nav) grid-cols-3">
+      <div className="grid h-(--height-bottom-nav) grid-cols-4">
         {APP_NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = active === item.id;

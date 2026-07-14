@@ -41,8 +41,12 @@ export function cashToKrw(balances: CashBalances, usdKrwRate: number | null): nu
   return balances.krw + usdPart;
 }
 
+import { formatAmount } from './amount-format';
+
 export function formatCashAmount(amount: number, currency: CashCurrency): string {
-  const formatted = Math.abs(amount).toLocaleString(undefined, { maximumFractionDigits: currency === 'KRW' ? 0 : 2 });
+  const formatted = formatAmount(Math.abs(amount), {
+    maxFractionDigits: currency === 'KRW' ? 0 : 2,
+  });
   if (currency === 'KRW') return `₩${formatted}`;
   return `$${formatted}`;
 }

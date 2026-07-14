@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import { Market, StockSearchResult, TransactionType } from '@sar/shared';
+import { parseAmountInput } from '@sar/shared';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
 import { useToast } from '../../components/Toast';
 import { useServices } from '../useServices';
@@ -40,7 +41,7 @@ export function useTransactionForm(onSuccess: () => void) {
         yahooSymbol: selectedStock.yahooSymbol,
         type,
         quantity: Number(quantity),
-        price: Number(price),
+        price: parseAmountInput(price),
         tradedAt: new Date(tradedAt).toISOString(),
         memo: memo || undefined,
       });
