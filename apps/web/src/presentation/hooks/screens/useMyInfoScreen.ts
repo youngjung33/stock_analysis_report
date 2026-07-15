@@ -6,11 +6,11 @@ import { useDashboard } from '../useDashboard';
 
 export function useMyInfoScreen() {
   const { username, isGuest } = useAuth();
-  const { data, isLoading, refresh } = useDashboard();
+  const { data, isLoading, reload } = useDashboard();
   const [refreshKey, setRefreshKey] = useState(0);
 
   function onPortfolioUpdated() {
-    void refresh();
+    void reload();
     setRefreshKey((k) => k + 1);
   }
 

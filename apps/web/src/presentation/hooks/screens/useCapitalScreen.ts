@@ -1,63 +1,51 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { CashLedgerType, formatCashAmount, parseAmountInput } from '@sar/shared';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
 import { useToast } from '../../components/Toast';
 import { useServices } from '../useServices';
+import {
+  useCashSummary,
+  usePortfolioPreferences,
+  usePortfolioSimulation,
+} from '../usePortfolioCapital';
+import { invalidatePortfolioLocal } from '../../lib/query-config';
 
 export function useCapitalScreen(onUpdated?: () => void) {
-  const {
-    getCashSummaryUseCase,
-    recordCashEntryUseCase,
-    getPortfolioPreferencesUseCase,
-    updatePortfolioPreferencesUseCase,
-    getPortfolioSimulationUseCase,
-  } = useServices();
+  const { recordCashEntryUseCase, updatePortfolioPreferencesUseCase } = useServices();
+  const queryClient = useQueryClient();
   const { showError, showSuccess } = useToast();
 
-  const [loading, setLoading] = useState(true);
+  const cashQuery = useCashSummary();
+  const prefsQuery = usePortfolioPreferences();
+  const simQuery = usePortfolioSimulation();
+
   const [saving, setSaving] = useState(false);
   const [krwAmount, setKrwAmount] = useState('');
   const [usdAmount, setUsdAmount] = useState('');
-  const [cashKrw, setCashKrw] = useState(0);
-  const [cashUsd, setCashUsd] = useState(0);
   const [targetKr, setTargetKr] = useState(70);
   const [targetUs, setTargetUs] = useState(30);
   const [maxWeight, setMaxWeight] = useState(40);
-  const [simulation, setSimulation] = useState<
-    Awaited<ReturnType<typeof getPortfolioSimulationUseCase.execute>> | null
-  >(null);
 
-  const reload = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [cash, prefs, sim] = await Promise.all([
-        getCashSummaryUseCase.execute(),
-        getPortfolioPreferencesUseCase.execute(),
-        getPortfolioSimulationUseCase.execute(),
-      ]);
-      setCashKrw(cash.balances.krw);
-      setCashUsd(cash.balances.usd);
-      setTargetKr(prefs.targetKrPercent);
-      setTargetUs(prefs.targetUsPercent);
-      setMaxWeight(prefs.maxSingleWeightPercent);
-      setSimulation(sim);
-    } catch (err) {
-      showError(getErrorMessage(err, '자본 정보를 불러오지 못했습니다.'));
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    getCashSummaryUseCase,
-    getPortfolioPreferencesUseCase,
-    getPortfolioSimulationUseCase,
-    showError,
-  ]);
+  const cashKrw = cashQuery.data?.balances.krw ?? 0;
+  const cashUsd = cashQuery.data?.balances.usd ?? 0;
+  const loading = cashQuery.isLoading || prefsQuery.isLoading;
+  const refreshing =
+    cashQuery.isFetching || prefsQuery.isFetching || simQuery.isFetching;
 
   useEffect(() => {
-    reload();
-  }, [reload]);
+    if (!prefsQuery.data) return;
+    setTargetKr(prefsQuery.data.targetKrPercent);
+    setTargetUs(prefsQuery.data.targetUsPercent);
+    setMaxWeight(prefsQuery.data.maxSingleWeightPercent);
+  }, [prefsQuery.data]);
+
+  async function notifyPortfolioChange() {
+    await invalidatePortfolioLocal(queryClient);
+    onUpdated?.();
+  }
 
   async function handleInitialCapital(e: React.FormEvent) {
     e.preventDefault();
@@ -65,7 +53,11 @@ export function useCapitalScreen(onUpdated?: () => void) {
     try {
       const krw = parseAmountInput(krwAmount);
       const usd = parseAmountInput(usdAmount);
-      if (krw > 0) {
+      if ((!Number.isFinite(krw) || krw <= 0) && (!Number.isFinite(usd) || usd <= 0)) {
+        showError('금액을 입력해 주세요.');
+        return;
+      }
+      if (Number.isFinite(krw) && krw > 0) {
         await recordCashEntryUseCase.execute({
           currency: 'KRW',
           type: CashLedgerType.INITIAL,
@@ -73,7 +65,7 @@ export function useCapitalScreen(onUpdated?: () => void) {
           memo: '초기 자본금',
         });
       }
-      if (usd > 0) {
+      if (Number.isFinite(usd) && usd > 0) {
         await recordCashEntryUseCase.execute({
           currency: 'USD',
           type: CashLedgerType.INITIAL,
@@ -84,8 +76,7 @@ export function useCapitalScreen(onUpdated?: () => void) {
       setKrwAmount('');
       setUsdAmount('');
       showSuccess('자본금이 반영되었습니다.');
-      await reload();
-      onUpdated?.();
+      await notifyPortfolioChange();
     } catch (err) {
       showError(getErrorMessage(err, '자본금 등록에 실패했습니다.'));
     } finally {
@@ -111,8 +102,7 @@ export function useCapitalScreen(onUpdated?: () => void) {
       if (currency === 'KRW') setKrwAmount('');
       else setUsdAmount('');
       showSuccess('입금이 반영되었습니다.');
-      await reload();
-      onUpdated?.();
+      await notifyPortfolioChange();
     } catch (err) {
       showError(getErrorMessage(err, '입금에 실패했습니다.'));
     } finally {
@@ -138,8 +128,7 @@ export function useCapitalScreen(onUpdated?: () => void) {
       if (currency === 'KRW') setKrwAmount('');
       else setUsdAmount('');
       showSuccess('출금이 반영되었습니다.');
-      await reload();
-      onUpdated?.();
+      await notifyPortfolioChange();
     } catch (err) {
       showError(getErrorMessage(err, '출금에 실패했습니다.'));
     } finally {
@@ -157,8 +146,7 @@ export function useCapitalScreen(onUpdated?: () => void) {
         maxSingleWeightPercent: maxWeight,
       });
       showSuccess('목표 비중이 저장되었습니다.');
-      await reload();
-      onUpdated?.();
+      await notifyPortfolioChange();
     } catch (err) {
       showError(getErrorMessage(err, '설정 저장에 실패했습니다.'));
     } finally {
@@ -168,6 +156,7 @@ export function useCapitalScreen(onUpdated?: () => void) {
 
   return {
     loading,
+    refreshing,
     saving,
     cashKrw,
     cashUsd,
@@ -183,11 +172,10 @@ export function useCapitalScreen(onUpdated?: () => void) {
     setTargetUs,
     maxWeight,
     setMaxWeight,
-    simulation,
+    simulation: simQuery.data ?? null,
     handleInitialCapital,
     handleDeposit,
     handleWithdraw,
     handleSavePreferences,
-    reload,
   };
 }

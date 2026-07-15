@@ -11,7 +11,7 @@ import { useMarketStatus } from '../useMarketStatus';
 
 export function useDashboardScreen() {
   const { username, isGuest, logout } = useAuth();
-  const { data, isLoading, error, refresh } = useDashboard();
+  const { data, isLoading, error, reload, refresh } = useDashboard();
   const marketStatus = useMarketStatus();
   const { showError, showSuccess } = useToast();
   const router = useRouter();
@@ -63,6 +63,6 @@ export function useDashboardScreen() {
     refreshNotice,
     refreshing,
     handleRefresh,
-    refreshDashboard: refresh,
+    refreshDashboard: reload,
   };
 }

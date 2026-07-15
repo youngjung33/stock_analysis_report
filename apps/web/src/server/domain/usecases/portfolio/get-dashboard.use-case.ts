@@ -135,7 +135,11 @@ export class GetDashboardUseCase {
     const cashTotalKrwFinal = cashToKrw(cashBalances, fxRate);
     const investedKrw = krwSummary.totalMarketValueKrw ?? 0;
     const totalAssetsKrw =
-      krwSummary.totalMarketValueKrw !== null ? investedKrw + cashTotalKrwFinal : null;
+      krwSummary.totalMarketValueKrw !== null
+        ? krwSummary.totalMarketValueKrw + cashTotalKrwFinal
+        : cashTotalKrwFinal > 0
+          ? cashTotalKrwFinal
+          : null;
 
     return {
       summary: {
@@ -160,7 +164,11 @@ export class GetDashboardUseCase {
         cashTotalKrw: cashTotalKrwFinal,
         totalAssetsKrw,
         cashPercent:
-          totalAssetsKrw && totalAssetsKrw > 0 ? (cashTotalKrwFinal / totalAssetsKrw) * 100 : null,
+          totalAssetsKrw && totalAssetsKrw > 0
+            ? (cashTotalKrwFinal / totalAssetsKrw) * 100
+            : cashTotalKrwFinal > 0
+              ? 100
+              : null,
         investedPercent:
           totalAssetsKrw && totalAssetsKrw > 0 && krwSummary.totalMarketValueKrw !== null
             ? (krwSummary.totalMarketValueKrw / totalAssetsKrw) * 100

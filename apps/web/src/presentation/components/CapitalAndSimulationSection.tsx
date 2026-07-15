@@ -33,6 +33,9 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
 
   return (
     <div className="space-y-6">
+      {screen.refreshing && (
+        <p className="text-xs text-muted-foreground">잔액 반영 중...</p>
+      )}
       <Surface variant="section" className="space-y-4">
         <div>
           <h2 className="text-base font-semibold md:text-lg">자본금 · 현금</h2>

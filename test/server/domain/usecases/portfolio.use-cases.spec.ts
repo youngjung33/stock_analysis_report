@@ -232,4 +232,44 @@ describe('GetDashboardUseCase', () => {
     expect(result.holdings).toHaveLength(2);
     expect(result.summary.totalMarketValue).toBeNull();
   });
+
+  it('includes cash-only balance in totalAssetsKrw', async () => {
+    const stockRepo = createMockStockRepo();
+    stockRepo.findHeldByUser.mockResolvedValue([]);
+
+    const txRepo = createMockTransactionRepo();
+    const quoteRepo = createMockQuoteRepo();
+    quoteRepo.findByStockIds.mockResolvedValue([]);
+    const corpActionRepo = createMockCorpActionRepo();
+    const cashRepo = createMockCashRepo({
+      findByUser: vi.fn().mockResolvedValue([
+        {
+          id: 'cash-krw',
+          userId: 'user-1',
+          currency: 'KRW',
+          type: 'INITIAL',
+          amount: 10_000_000,
+          occurredAt: new Date(),
+          memo: null,
+          refId: null,
+          createdAt: new Date(),
+        },
+      ]),
+    });
+
+    const useCase = new GetDashboardUseCase(
+      stockRepo,
+      txRepo,
+      quoteRepo,
+      corpActionRepo,
+      createMockMarketData(),
+      cashRepo,
+    );
+    const result = await useCase.execute('user-1');
+
+    expect(result.summary.holdingsCount).toBe(0);
+    expect(result.summary.cashKrw).toBe(10_000_000);
+    expect(result.summary.totalAssetsKrw).toBe(10_000_000);
+    expect(result.summary.cashPercent).toBe(100);
+  });
 });
