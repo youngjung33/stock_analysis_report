@@ -9,7 +9,7 @@ interface Props {
   preferKrw?: boolean;
 }
 
-function useKrwDisplay(holdings: DashboardHolding[], preferKrw?: boolean) {
+function resolveKrwDisplay(holdings: DashboardHolding[], preferKrw?: boolean) {
   const hasMixed = holdings.some((h) => h.currency === 'USD');
   return preferKrw || hasMixed;
 }
@@ -138,7 +138,7 @@ export function HoldingsSection({ holdings, preferKrw }: Props) {
     return <EmptyHoldings />;
   }
 
-  const useKrw = useKrwDisplay(holdings, preferKrw);
+  const useKrw = resolveKrwDisplay(holdings, preferKrw);
 
   return (
     <>

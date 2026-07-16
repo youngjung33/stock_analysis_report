@@ -7,6 +7,7 @@ import { GuestWatchlistRepository, GuestCorporateActionRepository } from '@/clie
 import { GuestPortfolioRepository } from '@/client/data/guest/guest-portfolio.repository';
 import {
   clearGuestStore,
+  getGuestCashBalances,
   saveGuestTransaction,
   createGuestStock,
 } from '@/client/data/guest/guest-storage';
@@ -61,6 +62,19 @@ describe('GuestCorporateActionRepository', () => {
     });
     const items = await repo.list();
     expect(items).toHaveLength(1);
+  });
+
+  it('records dividend cash in guest ledger', async () => {
+    const repo = new GuestCorporateActionRepository();
+    await repo.create({
+      stockSymbol: '005930',
+      name: '삼성전자',
+      market: Market.KR,
+      type: 'DIVIDEND',
+      effectiveAt: new Date().toISOString(),
+      cashAmount: 500_000,
+    });
+    expect(getGuestCashBalances().krw).toBe(500_000);
   });
 });
 

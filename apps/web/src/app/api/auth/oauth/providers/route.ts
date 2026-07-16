@@ -1,4 +1,3 @@
-import { NextRequest } from 'next/server';
 import { OAUTH_PROVIDER_META, OAUTH_PROVIDERS } from '@sar/shared';
 import { getServerServices } from '@/server/container';
 import { handleRouteError, jsonData } from '@/server/http/route-utils';

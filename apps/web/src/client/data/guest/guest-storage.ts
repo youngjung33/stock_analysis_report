@@ -162,8 +162,9 @@ export function saveGuestCorporateAction(input: {
 }): void {
   const store = readStore();
   const stock = createGuestStock(input.stockSymbol, input.market, input.name);
+  const id = `guest-ca-${Date.now()}`;
   store.corporateActions.unshift({
-    id: `guest-ca-${Date.now()}`,
+    id,
     stockId: stock.id,
     symbol: stock.symbol,
     market: stock.market,
@@ -179,6 +180,17 @@ export function saveGuestCorporateAction(input: {
     memo: input.memo,
   });
   writeStore(store);
+
+  if (input.type === 'DIVIDEND' && input.cashAmount && input.cashAmount > 0) {
+    saveGuestCashEntry({
+      currency: stock.currency === 'USD' ? 'USD' : 'KRW',
+      type: CashLedgerType.DIVIDEND,
+      amount: input.cashAmount,
+      memo: input.memo ?? `${stock.symbol} 배당`,
+      refId: id,
+      occurredAt: input.effectiveAt,
+    });
+  }
 }
 
 export function getGuestWatchlist(): WatchlistItem[] {

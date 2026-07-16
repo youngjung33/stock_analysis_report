@@ -1,6 +1,6 @@
 import { vi, type Mock } from 'vitest';
 import { ValidationError, EntityNotFoundError } from '@server/domain/errors/domain.errors';
-import { Market, TransactionType } from '@sar/shared';
+import { AppErrorCode, Market, TransactionType } from '@sar/shared';
 import { CreateTransactionUseCase } from '@server/domain/usecases/transactions/create-transaction.use-case';
 import { DeleteTransactionUseCase } from '@server/domain/usecases/transactions/delete-transaction.use-case';
 import { ListTransactionsUseCase } from '@server/domain/usecases/transactions/list-transactions.use-case';
@@ -123,6 +123,33 @@ describe('CreateTransactionUseCase', () => {
     expect(txRepo.create).toHaveBeenCalledWith(
       expect.objectContaining({ stockId: stock.id }),
     );
+  });
+
+  it('rejects BUY when cash is insufficient', async () => {
+    const stock = createMockStock();
+    const stockRepo = createMockStockRepo();
+    stockRepo.findBySymbolAndMarket.mockResolvedValue(stock);
+
+    const txRepo = createMockTransactionRepo();
+    const cashRepo = createMockCashRepo({
+      findByUser: vi.fn().mockResolvedValue([]),
+    });
+
+    const useCase = new CreateTransactionUseCase(stockRepo, txRepo, cashRepo);
+    await expect(
+      useCase.execute({
+        userId: 'user-1',
+        stockSymbol: 'AAPL',
+        market: Market.US,
+        name: 'Apple Inc.',
+        type: TransactionType.BUY,
+        quantity: 10,
+        price: 100,
+        tradedAt: new Date(),
+      }),
+    ).rejects.toMatchObject({
+      code: AppErrorCode.CASH_INSUFFICIENT,
+    });
   });
 
   // CT-02

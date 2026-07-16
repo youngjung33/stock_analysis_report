@@ -18,7 +18,16 @@ apps/web/src/
 ├── client/           # domain/data (axios)
 ├── server/           # domain/data (Prisma, Use Case)
 └── presentation/     # UI (pages, hooks, layout)
+packages/shared/      # 공통 도메인·포맷·시뮬레이션
 ```
+
+## 주요 기능
+
+- **자본금·현금** — 초기 자본, 입출금, 매수/매도·배당 연동
+- **포트폴리오 시뮬레이션** — 목표 비중 대비 유지/축소/매수 검토
+- **내 정보** (`/my-info`) — 자본금·주식 거래 등록·수정 (비회원 포함)
+- **온보딩** — 자본·종목 미등록 시 대시보드 시작 안내
+- **시세 캐시** — React Query staleTime, 갱신 버튼으로만 외부 API 재호출
 
 ## 사전 요구
 
@@ -38,7 +47,8 @@ npm run build -w @sar/shared
 ## DB
 
 ```bash
-npm run db:push      # 스키마 적용
+npm run db:push      # 스키마 적용 (로컬)
+npm run db:migrate   # migration (프로덕션 권장)
 npm run db:seed      # 초기 데이터
 ```
 
@@ -61,8 +71,10 @@ http://localhost:3000
 ## 테스트
 
 ```bash
-npm run test           # Vitest (192 tests)
-npm run test:e2e       # Playwright smoke (선택)
+npm run test           # Vitest (226+ tests)
+npm run lint           # ESLint (flat config)
+npm run test:e2e       # Playwright smoke
+npm run build          # 프로덕션 빌드
 ```
 
 ## 문서

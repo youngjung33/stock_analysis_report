@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ACCESS_TOKEN_COOKIE, AppErrorCode, REFRESH_TOKEN_COOKIE } from '@sar/shared';
 import { getServerServices } from '../container';
-import { AccessTokenPayload } from '../domain/auth.types';
 import { AuthenticationError } from '../domain/errors/domain.errors';
 
 export { handleRouteError } from './route-error';

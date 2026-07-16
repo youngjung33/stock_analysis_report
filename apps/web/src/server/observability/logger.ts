@@ -25,7 +25,12 @@ function captureSentry(payload: LogPayload) {
   if (!dsn || payload.level !== 'error') return;
 
   const message = payload.msg;
-  const { level: _level, msg: _msg, ts: _ts, ...extra } = payload;
+  const extra: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(payload)) {
+    if (key !== 'level' && key !== 'msg' && key !== 'ts') {
+      extra[key] = value;
+    }
+  }
 
   void import('@sentry/nextjs')
     .then((Sentry) => {

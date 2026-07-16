@@ -133,7 +133,6 @@ export class GetDashboardUseCase {
       fxRate = await this.marketData.fetchUsdKrwRate();
     }
     const cashTotalKrwFinal = cashToKrw(cashBalances, fxRate);
-    const investedKrw = krwSummary.totalMarketValueKrw ?? 0;
     const totalAssetsKrw =
       krwSummary.totalMarketValueKrw !== null
         ? krwSummary.totalMarketValueKrw + cashTotalKrwFinal

@@ -2,6 +2,7 @@ import { Market } from '@sar/shared';
 import { CorporateAction } from '../../domain/models';
 import { CreateCorporateActionInput, ICorporateActionRepository, IWatchlistRepository } from '../../domain/repositories';
 import {
+  deleteGuestCashByRef,
   getGuestWatchlist,
   listGuestCorporateActions,
   removeGuestWatchlistItem,
@@ -10,6 +11,7 @@ import {
 } from '../guest/guest-storage';
 
 function deleteGuestCorporateAction(id: string): void {
+  deleteGuestCashByRef(id);
   const storeKey = 'sar_guest_data';
   const raw = sessionStorage.getItem(storeKey);
   if (!raw) return;

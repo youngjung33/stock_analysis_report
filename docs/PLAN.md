@@ -10,7 +10,7 @@
 | 시세 API | **미국: Finnhub**, **한국: Yahoo Finance** |
 | 거래 | **매수 + 매도 + 분할매수(DCA)** |
 | 사용자 | **회원가입 · SSO · 비회원** 지원 |
-| UI | **대시보드 · 거래 · 시장 분석 · 계정 설정**, responsive + `AppShell` |
+| UI | **대시보드 · 내 정보 · 거래 · 시장 분석 · 계정 설정**, responsive + `AppShell` |
 
 ---
 
@@ -40,9 +40,8 @@ stock-analysis-report/
 │       ├── client/           # 브라우저 Domain · Data
 │       └── presentation/     # UI (MVVM)
 │           ├── pages/        # responsive 단일 페이지
-│           ├── views/        # app route → pages 래퍼 (일부)
 │           ├── layout/       # AppShell, nav, header
-│           ├── desktop/, mobile/  # feature 컴포넌트 (responsive 분기)
+│           ├── features/     # dashboard, transactions, onboarding
 │           └── hooks/
 ├── packages/shared/          # @sar/shared
 └── test/
@@ -60,9 +59,10 @@ stock-analysis-report/
 
 | 경로 | 역할 |
 |------|------|
-| `/` | 대시보드 (protected) |
+| `/` | 대시보드 (protected) — 온보딩·요약·시뮬레이션 |
+| `/my-info` | 내 정보 — 자본금·주식 거래 (protected, 비회원 포함) |
 | `/login` | 로그인 · 회원가입 · SSO · 비회원 |
-| `/transactions` | 거래 (protected) |
+| `/transactions` | 거래 · 기업행위 (protected) |
 | `/stocks/[symbol]` | 종목 상세 (`?market=KR\|US`) |
 | `/market/analysis` | 시장 분석 (protected) |
 | `/settings` | 계정 설정 (protected) |
@@ -72,7 +72,8 @@ stock-analysis-report/
 ### UI 레이아웃
 
 - **`AppShell`**: sidebar(데스크톱) + header + bottom nav(모바일)
-- **데스크톱**: 사이드바 하단 계정 설정 / **모바일**: 헤더 ⚙ 설정
+- **데스크톱**: 사이드바 — 대시보드 · **내 정보** · 거래 · 시장 / 하단 계정 설정
+- **모바일**: 하단 nav 4탭 (홈 · 내 정보 · 거래 · 시장)
 - **`pages/`**: Dashboard, Transactions, Login 등 responsive 단일 페이지
 - **Toast**: PC 우상단 / 모바일 하단
 
@@ -117,6 +118,9 @@ Handler → `getServerServices()` → Domain Use Case
 | GET | `/api/portfolio/dashboard` | ✅ |
 | GET | `/api/portfolio/analysis` | ✅ |
 | GET | `/api/portfolio/holding` | ✅ |
+| GET/PUT | `/api/portfolio/preferences` | ✅ |
+| GET | `/api/portfolio/simulation` | ✅ |
+| GET/POST | `/api/cash` | ✅ |
 | GET/POST | `/api/watchlist` | ✅ |
 | DELETE | `/api/watchlist/[id]` | ✅ |
 | GET/POST | `/api/corporate-actions` | ✅ |
