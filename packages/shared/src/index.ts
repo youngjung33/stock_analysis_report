@@ -105,6 +105,31 @@ export { blendBenchmarkReturn, compareToBenchmark, selectBlendedBenchmark } from
 export type { BenchmarkComparison } from './portfolio-benchmark';
 export { applyCorporateActions } from './corporate-actions';
 export type { CorporateActionInput, CorporateActionType } from './corporate-actions';
+export {
+  extractRealizedEvents,
+  filterEventsByYear,
+} from './realized-events';
+export type { SellEvent, DividendEvent } from './realized-events';
+export {
+  estimateKoreanTax,
+  KOREAN_TAX_RULES_REFERENCE,
+  FOREIGN_DIVIDEND_WITHHOLDING,
+  DEFAULT_KOREAN_TAX_PROFILE,
+  FINANCIAL_INCOME_THRESHOLD_KRW,
+  CAPITAL_GAINS_BASIC_DEDUCTION_KRW,
+  DOMESTIC_DIVIDEND_WITHHOLDING_RATE,
+  FOREIGN_CAPITAL_GAINS_RATE,
+  SECURITIES_TRANSACTION_TAX_RATE,
+} from './korean-tax';
+export type {
+  KoreanTaxProfile,
+  KoreanTaxRuleItem,
+  KoreanTaxEstimate,
+  TaxLineItem,
+  TaxStockHistory,
+  ForeignDividendSource,
+  ForeignDividendWithholdingRule,
+} from './korean-tax';
 export { resolveCurrency, resolveYahooSymbol } from './stock-symbol';
 export {
   dedupeSearchResults,

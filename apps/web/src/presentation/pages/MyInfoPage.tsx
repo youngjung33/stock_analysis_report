@@ -3,6 +3,7 @@
 import { CapitalAndSimulationSection } from '../components/CapitalAndSimulationSection';
 import { TransactionForm } from '../features/transactions/TransactionForm';
 import { TransactionList } from '../features/transactions/TransactionList';
+import { TaxSection } from '../features/tax/TaxSection';
 import { SummaryCards } from '../features/dashboard/SummaryCards';
 import { useMyInfoScreen } from '../hooks/screens/useMyInfoScreen';
 import { AppShell } from '../layout';
@@ -54,6 +55,17 @@ export function MyInfoPage() {
                 </h3>
                 <TransactionList refreshKey={screen.refreshKey} />
               </div>
+            </section>
+
+            <section id="tax" className="scroll-mt-6 space-y-5">
+              <Surface variant="section" className="space-y-1">
+                <h2 className="text-base font-semibold md:text-lg">세금 추정</h2>
+                <p className="text-xs text-muted-foreground md:text-sm">
+                  한국 거주자 기준 세금 규정을 확인하고, 내 정보를 선택해 포트폴리오 기반 추정
+                  세액을 확인할 수 있습니다.
+                </p>
+              </Surface>
+              <TaxSection refreshKey={screen.refreshKey} />
             </section>
           </>
         )}
