@@ -112,7 +112,13 @@ export {
 export type { SellEvent, DividendEvent } from './realized-events';
 export {
   estimateKoreanTax,
+  resolveApplicableTaxRules,
+  OTHER_INCOME_BRACKETS,
+  DEFAULT_OTHER_INCOME_BRACKET_ID,
+  resolveEstimatedOtherIncomeKrw,
+  mapOtherIncomeToBracket,
   KOREAN_TAX_RULES_REFERENCE,
+  KOREAN_INCOME_TAX_BRACKETS,
   FOREIGN_DIVIDEND_WITHHOLDING,
   DEFAULT_KOREAN_TAX_PROFILE,
   FINANCIAL_INCOME_THRESHOLD_KRW,
@@ -129,6 +135,10 @@ export type {
   TaxStockHistory,
   ForeignDividendSource,
   ForeignDividendWithholdingRule,
+  ApplicableTaxRule,
+  ApplicableTaxStatus,
+  OtherIncomeBracket,
+  OtherIncomeBracketId,
 } from './korean-tax';
 export { resolveCurrency, resolveYahooSymbol } from './stock-symbol';
 export {

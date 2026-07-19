@@ -7,6 +7,7 @@ import {
   estimateKoreanTax,
   FINANCIAL_INCOME_THRESHOLD_KRW,
   FOREIGN_CAPITAL_GAINS_RATE,
+  resolveApplicableTaxRules,
 } from '../../packages/shared/src/korean-tax';
 
 describe('extractRealizedEvents', () => {
@@ -40,6 +41,36 @@ describe('filterEventsByYear', () => {
       2026,
     );
     expect(sells).toHaveLength(0);
+  });
+});
+
+describe('resolveApplicableTaxRules', () => {
+  it('marks domestic capital gains exempt for general investor', () => {
+    const rules = resolveApplicableTaxRules({
+      ...DEFAULT_KOREAN_TAX_PROFILE,
+      isMajorShareholder: false,
+      investsDomestic: true,
+    });
+    const general = rules.find((r) => r.ruleId === 'kr-capital-general');
+    expect(general?.status).toBe('exempt');
+  });
+
+  it('marks major shareholder capital gains as applies', () => {
+    const rules = resolveApplicableTaxRules({
+      ...DEFAULT_KOREAN_TAX_PROFILE,
+      isMajorShareholder: true,
+      investsDomestic: true,
+    });
+    const major = rules.find((r) => r.ruleId === 'kr-capital-major');
+    expect(major?.status).toBe('applies');
+  });
+
+  it('skips foreign rules when not investing abroad', () => {
+    const rules = resolveApplicableTaxRules({
+      ...DEFAULT_KOREAN_TAX_PROFILE,
+      investsForeign: false,
+    });
+    expect(rules.find((r) => r.ruleId === 'us-capital')?.status).toBe('not_applicable');
   });
 });
 
@@ -116,7 +147,7 @@ describe('estimateKoreanTax', () => {
         ...DEFAULT_KOREAN_TAX_PROFILE,
         taxYear: 2026,
         otherFinancialIncomeKrw: 0,
-        estimatedOtherIncomeKrw: 60_000_000,
+        otherIncomeBracketId: '50m_88m',
       },
       null,
     );

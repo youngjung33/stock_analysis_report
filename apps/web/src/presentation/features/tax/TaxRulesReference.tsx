@@ -4,26 +4,42 @@ import { useState } from 'react';
 import { KOREAN_TAX_RULES_REFERENCE } from '@sar/shared';
 import { Surface } from '../../design-system';
 
-export function TaxRulesReference() {
-  const [open, setOpen] = useState(true);
+interface Props {
+  /** true면 접기 없이 항상 펼침 (세금 안내 페이지) */
+  defaultOpen?: boolean;
+}
+
+export function TaxRulesReference({ defaultOpen = false }: Props) {
+  const [open, setOpen] = useState<boolean>(true);
+
+  const collapsible = !defaultOpen;
 
   return (
     <Surface variant="section" className="space-y-4">
-      <button
-        type="button"
-        className="flex w-full items-center justify-between text-left"
-        onClick={() => setOpen((v) => !v)}
-      >
+      {collapsible ? (
+        <button
+          type="button"
+          className="flex w-full items-center justify-between text-left"
+          onClick={() => setOpen((v) => !v)}
+        >
+          <div>
+            <h3 className="text-base font-semibold">세목별 기준</h3>
+            <p className="mt-1 text-xs text-muted-foreground md:text-sm">
+              {KOREAN_TAX_RULES_REFERENCE.length}개 항목
+            </p>
+          </div>
+          <span className="text-sm text-muted-foreground">{open ? '접기' : '펼치기'}</span>
+        </button>
+      ) : (
         <div>
-          <h3 className="text-base font-semibold">한국인 주식 세금 기준 (2026년 참고)</h3>
+          <h3 className="text-base font-semibold md:text-lg">세목별 기준</h3>
           <p className="mt-1 text-xs text-muted-foreground md:text-sm">
-            국세청·소득세법 기준 요약 — {KOREAN_TAX_RULES_REFERENCE.length}개 항목
+            국세청·소득세법 기준 — {KOREAN_TAX_RULES_REFERENCE.length}개 항목
           </p>
         </div>
-        <span className="text-sm text-muted-foreground">{open ? '접기' : '펼치기'}</span>
-      </button>
+      )}
 
-      {open && (
+      {(defaultOpen || open) && (
         <div className="space-y-3">
           {KOREAN_TAX_RULES_REFERENCE.map((rule) => (
             <article

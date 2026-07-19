@@ -138,20 +138,192 @@ export const KOREAN_TAX_RULES_REFERENCE: KoreanTaxRuleItem[] = [
 export interface KoreanTaxProfile {
   taxYear: number;
   isMajorShareholder: boolean;
+  /** 국내 주식 투자 여부 */
+  investsDomestic: boolean;
+  /** 해외 주식 투자 여부 */
+  investsForeign: boolean;
   foreignDividendSource: ForeignDividendSource;
   /** 예금 이자·채권 이자 등 (배당 외 금융소득) */
   otherFinancialIncomeKrw: number;
-  /** 근로·사업 등 배당 외 종합소득 추정 (누진세 구간 산정용) */
-  estimatedOtherIncomeKrw: number;
+  /** 근로·사업 등 종합소득 구간 (누진세 구간 산정용) */
+  otherIncomeBracketId: OtherIncomeBracketId;
+  /** @deprecated otherIncomeBracketId 사용 — 로컬 저장 마이그레이션용 */
+  estimatedOtherIncomeKrw?: number;
+}
+
+export type OtherIncomeBracketId =
+  | 'under_14m'
+  | '14m_50m'
+  | '50m_88m'
+  | '88m_150m'
+  | '150m_300m'
+  | '300m_500m'
+  | '500m_1b'
+  | 'over_1b';
+
+export interface OtherIncomeBracket {
+  id: OtherIncomeBracketId;
+  label: string;
+  /** 종합과세 marginal 구간 산정용 대표 금액 */
+  estimateKrw: number;
+  rateLabel: string;
+}
+
+/** 연간 기타 소득(근로·사업) 구간 — 종합소득세 누진 구간과 동일 */
+export const OTHER_INCOME_BRACKETS: OtherIncomeBracket[] = [
+  { id: 'under_14m', label: '1,400만 원 이하', estimateKrw: 7_000_000, rateLabel: '6%' },
+  { id: '14m_50m', label: '1,400만~5,000만 원', estimateKrw: 32_000_000, rateLabel: '15%' },
+  { id: '50m_88m', label: '5,000만~8,800만 원', estimateKrw: 69_000_000, rateLabel: '24%' },
+  { id: '88m_150m', label: '8,800만~1.5억 원', estimateKrw: 119_000_000, rateLabel: '35%' },
+  { id: '150m_300m', label: '1.5억~3억 원', estimateKrw: 225_000_000, rateLabel: '38%' },
+  { id: '300m_500m', label: '3억~5억 원', estimateKrw: 400_000_000, rateLabel: '40%' },
+  { id: '500m_1b', label: '5억~10억 원', estimateKrw: 750_000_000, rateLabel: '42%' },
+  { id: 'over_1b', label: '10억 원 초과', estimateKrw: 1_500_000_000, rateLabel: '45%' },
+];
+
+export const DEFAULT_OTHER_INCOME_BRACKET_ID: OtherIncomeBracketId = '14m_50m';
+
+/** 프로필 → 종합소득 추정 금액 */
+export function resolveEstimatedOtherIncomeKrw(profile: KoreanTaxProfile): number {
+  const bracket = OTHER_INCOME_BRACKETS.find((b) => b.id === profile.otherIncomeBracketId);
+  if (bracket) return bracket.estimateKrw;
+  const legacy = profile.estimatedOtherIncomeKrw;
+  if (legacy !== undefined && legacy > 0) return legacy;
+  return OTHER_INCOME_BRACKETS.find((b) => b.id === DEFAULT_OTHER_INCOME_BRACKET_ID)!.estimateKrw;
+}
+
+/** legacy 금액 → 구간 id */
+export function mapOtherIncomeToBracket(krw: number): OtherIncomeBracketId {
+  if (krw <= 14_000_000) return 'under_14m';
+  if (krw <= 50_000_000) return '14m_50m';
+  if (krw <= 88_000_000) return '50m_88m';
+  if (krw <= 150_000_000) return '88m_150m';
+  if (krw <= 300_000_000) return '150m_300m';
+  if (krw <= 500_000_000) return '300m_500m';
+  if (krw <= 1_000_000_000) return '500m_1b';
+  return 'over_1b';
 }
 
 export const DEFAULT_KOREAN_TAX_PROFILE: KoreanTaxProfile = {
   taxYear: new Date().getFullYear(),
   isMajorShareholder: false,
+  investsDomestic: true,
+  investsForeign: true,
   foreignDividendSource: 'US',
   otherFinancialIncomeKrw: 0,
-  estimatedOtherIncomeKrw: 50_000_000,
+  otherIncomeBracketId: DEFAULT_OTHER_INCOME_BRACKET_ID,
 };
+
+export type ApplicableTaxStatus = 'applies' | 'exempt' | 'conditional' | 'not_applicable';
+
+export interface ApplicableTaxRule {
+  ruleId: string;
+  status: ApplicableTaxStatus;
+  reason: string;
+  rule: KoreanTaxRuleItem;
+}
+
+/** 종합소득세 누진 구간 (2026년 참고) */
+export const KOREAN_INCOME_TAX_BRACKETS = [
+  { upTo: 14_000_000, rate: 0.06, label: '1,400만 원 이하' },
+  { upTo: 50_000_000, rate: 0.15, label: '1,400만~5,000만 원' },
+  { upTo: 88_000_000, rate: 0.24, label: '5,000만~8,800만 원' },
+  { upTo: 150_000_000, rate: 0.35, label: '8,800만~1.5억 원' },
+  { upTo: 300_000_000, rate: 0.38, label: '1.5억~3억 원' },
+  { upTo: 500_000_000, rate: 0.4, label: '3억~5억 원' },
+  { upTo: 1_000_000_000, rate: 0.42, label: '5억~10억 원' },
+  { upTo: Infinity, rate: 0.45, label: '10억 원 초과' },
+] as const;
+
+/** 사용자 프로필·추정 결과 기준 적용 세목 판별 */
+export function resolveApplicableTaxRules(
+  profile: KoreanTaxProfile,
+  estimate?: Pick<KoreanTaxEstimate, 'totalFinancialIncomeKrw' | 'requiresComprehensiveTax'> | null,
+): ApplicableTaxRule[] {
+  const totalFinancial =
+    estimate?.totalFinancialIncomeKrw ??
+    profile.otherFinancialIncomeKrw;
+  const comprehensive =
+    estimate?.requiresComprehensiveTax ?? totalFinancial > FINANCIAL_INCOME_THRESHOLD_KRW;
+  const foreignRule = FOREIGN_DIVIDEND_WITHHOLDING[profile.foreignDividendSource];
+
+  const byId = new Map(KOREAN_TAX_RULES_REFERENCE.map((r) => [r.id, r]));
+
+  const result: ApplicableTaxRule[] = [];
+
+  const general = byId.get('kr-capital-general')!;
+  if (!profile.investsDomestic) {
+    result.push({ ruleId: general.id, status: 'not_applicable', reason: '국내 주식 미투자', rule: general });
+  } else if (profile.isMajorShareholder) {
+    result.push({ ruleId: general.id, status: 'not_applicable', reason: '대주주 — 매매차익 별도 과세', rule: general });
+  } else {
+    result.push({ ruleId: general.id, status: 'exempt', reason: '일반 투자자 — 코스피·코스닥 매매차익 비과세', rule: general });
+  }
+
+  const major = byId.get('kr-capital-major')!;
+  if (profile.isMajorShareholder && profile.investsDomestic) {
+    result.push({ ruleId: major.id, status: 'applies', reason: '대주주 — 국·해외 양도손익 통산 과세', rule: major });
+  } else {
+    result.push({
+      ruleId: major.id,
+      status: 'not_applicable',
+      reason: profile.isMajorShareholder ? '국내 주식 미투자' : '일반 투자자',
+      rule: major,
+    });
+  }
+
+  const krDiv = byId.get('kr-dividend')!;
+  if (!profile.investsDomestic) {
+    result.push({ ruleId: krDiv.id, status: 'not_applicable', reason: '국내 주식 미투자', rule: krDiv });
+  } else if (comprehensive) {
+    result.push({ ruleId: krDiv.id, status: 'conditional', reason: '금융소득 2,000만 원 초과 — 종합과세 전환', rule: krDiv });
+  } else {
+    result.push({ ruleId: krDiv.id, status: 'applies', reason: '배당 수령 시 15.4% 원천징수', rule: krDiv });
+  }
+
+  const stt = byId.get('kr-securities-tax')!;
+  if (profile.investsDomestic) {
+    result.push({ ruleId: stt.id, status: 'applies', reason: '국내 주식 매도 시 매도 대금의 약 0.20% 부과', rule: stt });
+  } else {
+    result.push({ ruleId: stt.id, status: 'not_applicable', reason: '국내 주식 미투자', rule: stt });
+  }
+
+  const usCap = byId.get('us-capital')!;
+  if (!profile.investsForeign) {
+    result.push({ ruleId: usCap.id, status: 'not_applicable', reason: '해외 주식 미투자', rule: usCap });
+  } else if (profile.isMajorShareholder) {
+    result.push({ ruleId: usCap.id, status: 'conditional', reason: '대주주 — 국내 대주주 양도세에 통산', rule: usCap });
+  } else {
+    result.push({ ruleId: usCap.id, status: 'applies', reason: '해외 매매차익 — 250만 원 공제 후 22%', rule: usCap });
+  }
+
+  const usDiv = byId.get('us-dividend')!;
+  if (!profile.investsForeign) {
+    result.push({ ruleId: usDiv.id, status: 'not_applicable', reason: '해외 주식 미투자', rule: usDiv });
+  } else {
+    const extra =
+      foreignRule.additionalKrRate > 0
+        ? `현지 ${(foreignRule.abroadRate * 100).toFixed(1)}% + 국내 ${(foreignRule.additionalKrRate * 100).toFixed(1)}%`
+        : `현지 ${(foreignRule.abroadRate * 100).toFixed(1)}% (조세조약)`;
+    result.push({
+      ruleId: usDiv.id,
+      status: comprehensive ? 'conditional' : 'applies',
+      reason: `${foreignRule.label} 배당 — ${extra}, 5월 신고`,
+      rule: usDiv,
+    });
+  }
+
+  const fin = byId.get('financial-comprehensive')!;
+  if (comprehensive) {
+    result.push({ ruleId: fin.id, status: 'applies', reason: '금융소득 2,000만 원 초과 — 누진세 적용', rule: fin });
+  } else if (totalFinancial > 0 || profile.otherFinancialIncomeKrw > 0) {
+    result.push({ ruleId: fin.id, status: 'conditional', reason: '금융소득 합계 2,000만 원 이하 — 분리과세 유지', rule: fin });
+  } else {
+    result.push({ ruleId: fin.id, status: 'conditional', reason: '이자·배당 합산 2,000만 원 초과 시 적용', rule: fin });
+  }
+
+  return result;
+}
 
 export interface TaxStockHistory {
   symbol: string;
@@ -369,9 +541,10 @@ export function estimateKoreanTax(
   let comprehensiveTaxKrw = 0;
 
   if (requiresComprehensiveTax) {
-    const totalIncome = profile.estimatedOtherIncomeKrw + totalFinancialIncomeKrw;
+    const otherIncomeKrw = resolveEstimatedOtherIncomeKrw(profile);
+    const totalIncome = otherIncomeKrw + totalFinancialIncomeKrw;
     const taxWithFinancial = computeProgressiveTax(totalIncome);
-    const taxWithoutFinancial = computeProgressiveTax(profile.estimatedOtherIncomeKrw);
+    const taxWithoutFinancial = computeProgressiveTax(otherIncomeKrw);
     comprehensiveTaxKrw = Math.max(0, taxWithFinancial - taxWithoutFinancial);
     separationDividendTaxKrw = 0;
     lines.push({

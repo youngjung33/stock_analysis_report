@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
-import { ArrowLeftRight, LayoutDashboard, LineChart, UserCircle } from 'lucide-react';
+import { ArrowLeftRight, LayoutDashboard, LineChart, Receipt, UserCircle } from 'lucide-react';
 
-export type NavSectionId = 'dashboard' | 'my-info' | 'transactions' | 'market';
+export type NavSectionId = 'dashboard' | 'my-info' | 'transactions' | 'market' | 'tax';
 
 export interface AppNavItem {
   id: NavSectionId;
@@ -45,6 +45,14 @@ export const APP_NAV_ITEMS: AppNavItem[] = [
     shortLabel: '시장',
     icon: LineChart,
     match: (pathname) => pathname.startsWith('/market'),
+  },
+  {
+    id: 'tax',
+    href: '/tax',
+    label: '세금 정보',
+    shortLabel: '세금',
+    icon: Receipt,
+    match: (pathname) => pathname.startsWith('/tax'),
   },
 ];
 
