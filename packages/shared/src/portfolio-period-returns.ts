@@ -6,9 +6,9 @@ export type PortfolioPeriod = '1mo' | '3mo' | 'ytd' | 'max';
 export const PORTFOLIO_PERIODS: PortfolioPeriod[] = ['1mo', '3mo', 'ytd', 'max'];
 
 export const PERIOD_LABELS: Record<PortfolioPeriod, string> = {
-  '1mo': '1M',
-  '3mo': '3M',
-  ytd: 'YTD',
+  '1mo': '1개월',
+  '3mo': '3개월',
+  ytd: '올해',
   max: '전체',
 };
 

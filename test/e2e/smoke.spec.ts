@@ -20,7 +20,7 @@ test.describe('smoke', () => {
 
   test('guest can open dashboard', async ({ page }) => {
     await enterAsGuest(page);
-    await expect(page.getByText('포트폴리오 대시보드')).toBeVisible();
+    await expect(page.getByText('투자 현황')).toBeVisible();
   });
 
   test('register mode shows signup form', async ({ page }) => {
@@ -34,8 +34,8 @@ test.describe('smoke', () => {
   test('guest can open transactions page', async ({ page }) => {
     await enterAsGuest(page);
     await page.goto('/transactions');
-    await expect(page.getByRole('heading', { name: '거래 등록' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: '거래 내역' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '매매 등록' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '매매 내역' })).toBeVisible();
   });
 
   test('guest is redirected from settings to dashboard', async ({ page }) => {
@@ -48,13 +48,13 @@ test.describe('smoke', () => {
     await enterAsGuest(page);
     await page.goto('/my-info');
     await expect(page.getByRole('heading', { name: '내 정보' })).toBeVisible();
-    await expect(page.getByText('자본금 관리')).toBeVisible();
-    await expect(page.getByText('주식 거래')).toBeVisible();
+    await expect(page.getByText('예수금·투자 원금')).toBeVisible();
+    await expect(page.getByText('매매 등록')).toBeVisible();
   });
 
   test('guest sees onboarding on empty dashboard', async ({ page }) => {
     await enterAsGuest(page);
-    await expect(page.getByText('포트폴리오를 시작해 보세요')).toBeVisible();
+    await expect(page.getByText('투자 내역을 시작해 보세요')).toBeVisible();
     await expect(page.getByRole('link', { name: /내 정보에서 등록하기/ })).toBeVisible();
   });
 
@@ -62,7 +62,7 @@ test.describe('smoke', () => {
     await enterAsGuest(page);
     await page.goto('/my-info');
     await page.getByPlaceholder('예: 10,000,000').fill('1000000');
-    await page.getByRole('button', { name: '초기 자본 설정' }).click();
+    await page.getByRole('button', { name: '투자 원금 설정' }).click();
     await expect(page.getByText('₩1,000,000').first()).toBeVisible({ timeout: 10_000 });
   });
 

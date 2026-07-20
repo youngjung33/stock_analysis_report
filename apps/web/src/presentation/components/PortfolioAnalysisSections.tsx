@@ -32,7 +32,7 @@ export function PeriodReturnsCard({ analysis, isLoading }: Props) {
             </p>
             {item.coveragePercent < 100 && item.returnPercent !== null && (
               <p className="mt-2 text-xs text-muted-foreground">
-                커버리지 {item.coveragePercent.toFixed(0)}%
+                시세 반영률 {item.coveragePercent.toFixed(0)}%
               </p>
             )}
           </Surface>
@@ -47,15 +47,15 @@ export function BenchmarkComparisonRow({ analysis }: { analysis: PortfolioAnalys
 
   return (
     <Surface>
-      <h2 className="text-base font-semibold tracking-tight">벤치마크 대비</h2>
+      <h2 className="text-base font-semibold tracking-tight">지수 대비 수익률</h2>
       <ul className="mt-5 space-y-3 text-sm">
         {analysis.benchmarkComparisons.map((row) => (
           <li key={row.period} className="flex flex-wrap items-center gap-x-2 text-muted-foreground">
             <span className="font-medium text-foreground">{row.label}</span>
             <span className={pnlClass(row.portfolioReturn)}>
-              포트폴리오 {formatPercent(row.portfolioReturn)}
+              내 수익률 {formatPercent(row.portfolioReturn)}
             </span>
-            <span className="text-muted-foreground">vs {row.benchmarkName}</span>
+            <span className="text-muted-foreground">· {row.benchmarkName}</span>
             <span className={pnlClass(row.benchmarkReturn)}>
               {formatPercent(row.benchmarkReturn)}
             </span>
@@ -76,14 +76,14 @@ export function PortfolioInsightsSection({ analysis, isLoading }: Props) {
   if (!analysis || analysis.holdingsInsights.length === 0) {
     return (
       <Surface variant="subtle" className="border-dashed text-center text-sm text-muted-foreground">
-        보유 종목 인사이트가 없습니다.
+        보유 종목 분석 정보가 없습니다.
       </Surface>
     );
   }
 
   return (
     <Surface>
-      <h2 className="text-base font-semibold tracking-tight">보유 종목 RSI · 뉴스</h2>
+      <h2 className="text-base font-semibold tracking-tight">보유 종목 차트·뉴스</h2>
       <ul className="mt-6 space-y-4">
         {analysis.holdingsInsights.map((item) => (
           <li key={`${item.symbol}-${item.market}`} className="rounded-xl border border-border bg-muted/20 p-4 sm:p-5">

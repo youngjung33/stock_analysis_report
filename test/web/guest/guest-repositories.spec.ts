@@ -76,6 +76,24 @@ describe('GuestCorporateActionRepository', () => {
     });
     expect(getGuestCashBalances().krw).toBe(500_000);
   });
+
+  it('lists corporate actions with stock info and deletes dividend cash', async () => {
+    const repo = new GuestCorporateActionRepository();
+    await repo.create({
+      stockSymbol: '005930',
+      name: '삼성전자',
+      market: Market.KR,
+      type: 'DIVIDEND',
+      effectiveAt: new Date().toISOString(),
+      cashAmount: 500_000,
+    });
+    const items = await repo.list();
+    expect(items[0]?.stock?.symbol).toBe('005930');
+    expect(items[0]?.stock?.name).toBe('삼성전자');
+    await repo.delete(items[0]!.id);
+    expect(await repo.list()).toHaveLength(0);
+    expect(getGuestCashBalances().krw).toBe(0);
+  });
 });
 
 describe('GuestPortfolioRepository', () => {

@@ -49,10 +49,10 @@ export function useTransactionForm(onSuccess: () => void) {
       setQuantity('');
       setPrice('');
       setMemo('');
-      showSuccess('거래가 등록되었습니다.');
+      showSuccess('매매가 등록되었습니다.');
       onSuccess();
     } catch (err) {
-      showError(getErrorMessage(err, '거래 등록에 실패했습니다.'));
+      showError(getErrorMessage(err, '매매 등록에 실패했습니다.'));
     } finally {
       setLoading(false);
     }

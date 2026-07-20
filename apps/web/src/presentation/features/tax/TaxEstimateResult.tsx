@@ -17,7 +17,7 @@ export function TaxEstimateResult({ estimate, usdKrwRate, compact = false }: Pro
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h3 className="text-base font-semibold md:text-lg">
-              {compact ? '포트폴리오 기반 추정 세액' : `${estimate.year}년 추정 세금`}
+              {compact ? '보유·매매 기반 추정 세액' : `${estimate.year}년 추정 세금`}
             </h3>
             <p className="mt-1 text-xs text-muted-foreground md:text-sm">
               등록된 거래·배당 기준 · 환율{' '}

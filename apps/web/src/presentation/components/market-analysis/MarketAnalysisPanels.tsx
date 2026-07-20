@@ -35,8 +35,8 @@ export function MacroPanel({
   return (
     <div className="space-y-3">
       <div>
-        <h3 className={`font-semibold text-white ${compact ? 'text-sm' : ''}`}>매크로 · 공포 · 환율 · 금리</h3>
-        <p className="mt-0.5 text-xs text-slate-500">VIX · USD/KRW · 미국 국채 수익률 (Yahoo Finance)</p>
+        <h3 className={`font-semibold text-white ${compact ? 'text-sm' : ''}`}>경기 · 변동성 · 환율 · 금리</h3>
+        <p className="mt-0.5 text-xs text-slate-500">VIX · USD/KRW · 미국 국채 수익률</p>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -209,8 +209,8 @@ export function SectorStrengthPanel({
   return (
     <div className="space-y-4">
       <div>
-        <h3 className={`font-semibold text-white ${compact ? 'text-sm' : ''}`}>섹터 ETF 상대강도 (RS)</h3>
-        <p className="mt-0.5 text-xs text-slate-500">1주·1달 수익률 vs SPY / KODEX 200 — rotation 관찰</p>
+        <h3 className={`font-semibold text-white ${compact ? 'text-sm' : ''}`}>업종 ETF 상대강도</h3>
+        <p className="mt-0.5 text-xs text-slate-500">1주·1달 수익률 — SPY / KODEX 200 대비 자금 이동 관찰</p>
       </div>
       <SectorGroup title="🇺🇸 미국" sectors={us} benchmark="SPY" />
       <SectorGroup title="🇰🇷 한국" sectors={kr} benchmark="KODEX200" />
@@ -232,7 +232,7 @@ function SectorGroup({
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-950/30 p-4">
       <p className="text-xs font-medium text-slate-400">
-        {title} · 벤치마크 {benchmark}
+        {title} · 기준지수 {benchmark}
       </p>
       <ul className="mt-3 space-y-3">
         {sectors.map((s) => (
@@ -244,9 +244,9 @@ function SectorGroup({
               </div>
               <div className="shrink-0 text-right">
                 <span className={`font-medium ${pnlClass(s.rsBenchmark1w)}`}>
-                  RS 1w {formatPercent(s.rsBenchmark1w)}
+                  1주 {formatPercent(s.rsBenchmark1w)}
                 </span>
-                <span className="ml-2 text-slate-500">1d {formatPercent(s.changePercent1d)}</span>
+                <span className="ml-2 text-slate-500">당일 {formatPercent(s.changePercent1d)}</span>
               </div>
             </div>
             <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-800">

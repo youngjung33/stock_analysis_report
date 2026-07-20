@@ -62,7 +62,7 @@ export function useCapitalScreen(onUpdated?: () => void) {
           currency: 'KRW',
           type: CashLedgerType.INITIAL,
           amount: krw,
-          memo: '초기 자본금',
+          memo: '투자 원금',
         });
       }
       if (Number.isFinite(usd) && usd > 0) {
@@ -70,15 +70,15 @@ export function useCapitalScreen(onUpdated?: () => void) {
           currency: 'USD',
           type: CashLedgerType.INITIAL,
           amount: usd,
-          memo: '초기 자본금 (USD)',
+          memo: '투자 원금 (USD)',
         });
       }
       setKrwAmount('');
       setUsdAmount('');
-      showSuccess('자본금이 반영되었습니다.');
+      showSuccess('투자 원금이 반영되었습니다.');
       await notifyPortfolioChange();
     } catch (err) {
-      showError(getErrorMessage(err, '자본금 등록에 실패했습니다.'));
+      showError(getErrorMessage(err, '투자 원금 등록에 실패했습니다.'));
     } finally {
       setSaving(false);
     }

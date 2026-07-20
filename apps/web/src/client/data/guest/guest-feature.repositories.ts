@@ -2,6 +2,7 @@ import { Market } from '@sar/shared';
 import { CorporateAction } from '../../domain/models';
 import { CreateCorporateActionInput, ICorporateActionRepository, IWatchlistRepository } from '../../domain/repositories';
 import {
+  createGuestStock,
   deleteGuestCashByRef,
   getGuestWatchlist,
   listGuestCorporateActions,
@@ -27,6 +28,12 @@ function deleteGuestCorporateAction(id: string): void {
 function mapGuestCorporateAction(
   action: ReturnType<typeof listGuestCorporateActions>[number],
 ): CorporateAction {
+  const stock = createGuestStock(action.symbol, action.market, action.name);
+  const targetStock =
+    action.targetSymbol && action.targetMarket
+      ? createGuestStock(action.targetSymbol, action.targetMarket, action.targetName)
+      : null;
+
   return {
     id: action.id,
     stockId: action.stockId,
@@ -34,10 +41,12 @@ function mapGuestCorporateAction(
     effectiveAt: action.effectiveAt,
     cashAmount: action.cashAmount ?? null,
     splitRatio: action.splitRatio ?? null,
-    targetStockId: null,
+    targetStockId: targetStock?.id ?? null,
     targetQuantity: action.targetQuantity ?? null,
     targetPrice: action.targetPrice ?? null,
     memo: action.memo ?? null,
+    stock,
+    targetStock,
   };
 }
 

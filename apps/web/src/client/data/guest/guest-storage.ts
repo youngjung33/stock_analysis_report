@@ -128,6 +128,7 @@ export interface GuestCorporateAction {
   id: string;
   stockId: string;
   symbol: string;
+  name?: string;
   market: Market;
   type: CorporateActionType;
   effectiveAt: string;
@@ -167,6 +168,7 @@ export function saveGuestCorporateAction(input: {
     id,
     stockId: stock.id,
     symbol: stock.symbol,
+    name: stock.name,
     market: stock.market,
     type: input.type,
     effectiveAt: input.effectiveAt,

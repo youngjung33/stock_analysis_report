@@ -9,10 +9,10 @@ function EmptyTransactions() {
   return (
     <>
       <div className="hidden rounded-xl border border-dashed border-slate-700 p-6 text-center text-slate-400 md:block">
-        등록된 거래가 없습니다.
+        등록된 매매가 없습니다.
       </div>
       <div className="rounded-xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-400 md:hidden">
-        등록된 거래가 없습니다.
+        등록된 매매가 없습니다.
       </div>
     </>
   );
@@ -30,7 +30,7 @@ function TransactionTable({
       <table className="min-w-full text-left text-sm">
         <thead className="bg-slate-900 text-slate-400">
           <tr>
-            <th className="px-4 py-3">거래일</th>
+            <th className="px-4 py-3">매매일</th>
             <th className="px-4 py-3">종목</th>
             <th className="px-4 py-3">유형</th>
             <th className="px-4 py-3">수량</th>
@@ -100,7 +100,7 @@ function TransactionCardList({
           </div>
           <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
             <div>
-              <dt className="text-slate-500">거래일</dt>
+              <dt className="text-slate-500">매매일</dt>
               <dd className="text-slate-200">
                 {new Date(tx.tradedAt).toLocaleDateString('ko-KR')}
               </dd>
@@ -136,7 +136,7 @@ export function TransactionList({ refreshKey }: Props) {
   const { data, isLoading, handleDelete } = useTransactionList(refreshKey);
 
   if (isLoading) {
-    return <p className="text-sm text-slate-400 md:text-base">거래 내역 불러오는 중...</p>;
+    return <p className="text-sm text-slate-400 md:text-base">매매 내역 불러오는 중...</p>;
   }
 
   if (!data?.length) {

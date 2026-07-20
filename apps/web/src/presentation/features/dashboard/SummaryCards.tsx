@@ -21,7 +21,7 @@ export function SummaryCards({ summary }: Props) {
     },
     {
       id: 'cash-total',
-      label: '가용 현금 (원화)',
+      label: '예수금 (원화)',
       value: formatNumber(cashTotalKrw, 'KRW'),
       className: 'text-foreground md:text-white',
       wideOnMobile: false,
@@ -45,7 +45,7 @@ export function SummaryCards({ summary }: Props) {
     },
     {
       id: 'today-pnl',
-      label: '오늘 변화',
+      label: '당일 손익',
       value: formatTodayChange(
         showKrw ? summary.todayPnlKrw : summary.todayPnl,
         showKrw ? summary.todayPnlPercentKrw : summary.todayPnlPercent,
@@ -56,7 +56,7 @@ export function SummaryCards({ summary }: Props) {
     },
     {
       id: 'unrealized-pnl',
-      label: '미실현 손익',
+      label: '평가 손익',
       value: formatNumber(
         showKrw ? summary.totalUnrealizedPnlKrw : summary.totalUnrealizedPnl,
         showKrw ? 'KRW' : undefined,

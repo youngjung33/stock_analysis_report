@@ -123,12 +123,12 @@ export interface MarketAnalysisReport extends MarketInsightsResult {
 }
 
 const CATEGORY_LABEL: Record<AnalysisCategory, string> = {
-  breadth: '시장 Breadth',
+  breadth: '시장 폭',
   index: '지수·차트',
   technical: '기술적 지표',
   news: '뉴스·이슈',
-  macro: '매크로·심리',
-  sector: '섹터 상대강도',
+  macro: '경기·심리',
+  sector: '업종 상대강도',
   recommendation: '종목 관찰',
 };
 
@@ -250,10 +250,10 @@ function breadthInsights(
         summary: `${region} 대표 ${valid.length}종 평균 ${formatPct(sentiment.avgChangePercent)}. 상승·하락 비율 ${adRatio.toFixed(2)}.`,
         reasoning:
           adRatio > 1.5
-            ? '상승 종목 수가 하락 종목보다 확실히 많으면 시장 참여자 심리가 risk-on에 가깝다고 봅니다. Breadth(넓이)가 좁은 상승(소수 대형주만 오름)보다 건강한 편입니다.'
+            ? '상승 종목 수가 하락 종목보다 확실히 많으면 위험 선호 심리가 강한 편입니다. 소수 대형주만 오르는 것보다 전반적으로 오르는 편이 건강합니다.'
             : adRatio < 0.7
               ? '하락 종목이 우세하면 단기적으로 매도 압력·위험 회피 심리가 강합니다. 지수만 버티는지, 대표주 전반이 약한지 함께 확인하는 것이 좋습니다.'
-              : '상승·하락이 엇갈리면 방향성이 분명하지 않습니다. 추세 추종보다 개별 종목·섹터 차별화가 큰 장세로 해석합니다.',
+              : '상승·하락이 엇갈리면 방향성이 분명하지 않습니다. 추세 추종보다 개별 종목·업종 차별화가 큰 장세로 해석합니다.',
         evidence: [
           `평균 등락 ${formatPct(sentiment.avgChangePercent)}`,
           `상승 ${sentiment.upCount} · 하락 ${sentiment.downCount} · 보합 ${sentiment.flatCount}`,
@@ -460,13 +460,13 @@ function sectorInsights(sectors: SectorEtfSnapshot[]): AnalysisInsight[] {
       insight({
         id: `sector-overview-${market}`,
         category: 'sector',
-        title: `${label} 섹터 — 1주 RS 1위 ${leader.sectorLabel}`,
-        summary: `${leader.name} 1주 RS ${formatPct(leader.rsBenchmark1w)} (vs ${market === Market.US ? 'SPY' : 'KODEX200'})`,
+        title: `${label} 업종 — 1주 상대강도 1위 ${leader.sectorLabel}`,
+        summary: `${leader.name} 1주 상대강도 ${formatPct(leader.rsBenchmark1w)} (기준 ${market === Market.US ? 'SPY' : 'KODEX200'} 대비)`,
         reasoning:
-          '섹터 ETF 상대강도(RS)는 벤치마크 대비 초과수익입니다. RS 상위 섹터로 rotation(자금 이동)이 진행 중인지, lagging sector는 추격매수·함정인지 판단하는 데 씁니다.',
+          '업종 ETF 상대강도는 기준지수 대비 초과 수익입니다. 상대강도가 높은 업종으로 자금이 이동하는지, 낮은 업종이 추격 매수인지 함정인지 함께 판단합니다.',
         evidence: [
-          `Leading: ${leader.sectorLabel} RS(1w) ${formatPct(leader.rsBenchmark1w)} · 1mo ${formatPct(leader.rsBenchmark1mo)}`,
-          `Lagging: ${laggard.sectorLabel} RS(1w) ${formatPct(laggard.rsBenchmark1w)}`,
+          `주도 ${leader.sectorLabel} RS(1주) ${formatPct(leader.rsBenchmark1w)} · 1달 ${formatPct(leader.rsBenchmark1mo)}`,
+          `부진 ${laggard.sectorLabel} RS(1주) ${formatPct(laggard.rsBenchmark1w)}`,
           ...list.map(
             (s) =>
               `#${s.strengthRank} ${s.sectorLabel} ${formatPct(s.changePercent1d)} (RS1w ${formatPct(s.rsBenchmark1w)})`,
@@ -564,11 +564,11 @@ function macroInsight(kr: RegionSentiment, us: RegionSentiment): AnalysisInsight
     category: 'macro',
     title: diverge ? '한·미 시장 온도차' : '한·미 동조/혼조',
     summary: diverge
-      ? `한국 ${formatPct(kr.avgChangePercent)} vs 미국 ${formatPct(us.avgChangePercent)} — regional divergence`
+      ? `한국 ${formatPct(kr.avgChangePercent)} · 미국 ${formatPct(us.avgChangePercent)} — 지역별 온도차`
       : `한국 ${formatPct(kr.avgChangePercent)} · 미국 ${formatPct(us.avgChangePercent)}`,
     reasoning: diverge
-      ? '한국과 미국 대표주 평균 등락이 크게 다르면 환율·금리·섹터 이슈 등 regional factor가 작동 중일 수 있습니다. 글로벌 ETF·환율(KRW/USD)과 함께 보는 것이 일반적입니다.'
-      : '양 시장이 비슷한 방향이면 글로벌 risk sentiment가 공통 변수일 가능성이 큽니다. Fed·원화·유가 등 매크로 헤드라인과 교차 확인하세요.',
+      ? '한국과 미국 대표주 평균 등락이 크게 다르면 환율·금리·업종 이슈 등 지역 요인이 작용 중일 수 있습니다. 환율(KRW/USD)과 함께 보는 것이 일반적입니다.'
+      : '양 시장이 비슷한 방향이면 글로벌 투자 심리가 공통 변수일 가능성이 큽니다. 연준·원화·유가 등 경제 헤드라인과 교차 확인하세요.',
     evidence: [
       `한국 정세 ${kr.label} (평균 ${formatPct(kr.avgChangePercent)})`,
       `미국 정세 ${us.label} (평균 ${formatPct(us.avgChangePercent)})`,
@@ -592,12 +592,12 @@ function recommendationInsights(recommendations: StockRecommendation[]): Analysi
       summary: rec.reason,
       reasoning:
         rec.tag === 'momentum'
-          ? '강한 당일·단기 수익률은 추세 추종 트레이더가 관심 갖는 구간입니다. 거래량·지수와의 상대강도(RS)를 함께 확인하면 false breakout을 줄일 수 있습니다.'
+          ? '강한 당일·단기 수익률은 추세 추종 투자자가 관심 갖는 구간입니다. 거래량·지수 대비 상대강도를 함께 확인하면 허수 돌파를 줄일 수 있습니다.'
           : rec.tag === 'pullback'
-            ? '급락·조정 구간은 평균회귀 매수 vs 추세 붕괴 매도가 갈리는 지점입니다. 지지선·RSI 과매도·뉴스 악재 여부를 확인하세요.'
+            ? '급락·조정 구간은 되돌림 매수와 추세 이탈 매도가 갈리는 지점입니다. 지지선·RSI 과매도·뉴스 악재 여부를 확인하세요.'
             : rec.tag === 'defensive'
-              ? '약세장에서도 버티는 종목은 beta가 낮거나 실적·현금흐름이 받쳐주는 경우가 많습니다. 방어 후 반등 시 lagging sector일 수 있습니다.'
-              : '혼조장에서는 상대강도·배당·실적 일정 등 개별 catalyst가 더 중요합니다.',
+              ? '약세장에서도 버티는 종목은 변동성이 낮거나 실적·현금흐름이 받쳐주는 경우가 많습니다. 반등 시 상대적으로 늦게 따라오는 업종일 수 있습니다.'
+              : '혼조장에서는 상대강도·배당·실적 일정 등 개별 재료가 더 중요합니다.',
       evidence: [
         `현재가 ${rec.currentPrice.toLocaleString()} ${rec.currency}`,
         `당일 등락 ${formatPct(rec.changePercent)}`,

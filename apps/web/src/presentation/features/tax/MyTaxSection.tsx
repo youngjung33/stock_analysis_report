@@ -30,7 +30,7 @@ export function MyTaxSection({ refreshKey = 0 }: Props) {
 
       {!screen.loading && screen.estimate && screen.estimate.lines.length === 0 && (
         <Surface variant="section" className="text-sm text-muted-foreground">
-          {screen.profile.taxYear}년 매도·배당 내역이 없습니다. 거래·기업행위(배당)를 등록하면 추정
+          {screen.profile.taxYear}년 매도·배당 내역이 없습니다. 거래·배당·분할·합병을 등록하면 추정
           세액이 표시됩니다.
         </Surface>
       )}

@@ -30,7 +30,7 @@ export function DashboardPage() {
 
   return (
     <AppShell
-      title="포트폴리오 대시보드"
+      title="투자 현황"
       subtitle={`${screen.displayName}님`}
       headerActions={
         <RefreshQuotesButton compact onClick={screen.handleRefresh} loading={screen.refreshing} />
@@ -39,7 +39,7 @@ export function DashboardPage() {
       <PageStack>
         {screen.isGuest && (
           <p className="rounded-xl border border-amber-900/40 bg-amber-950/30 px-4 py-3 text-xs text-amber-200/90 md:px-5 md:text-sm">
-            비회원 모드입니다. 거래 데이터는 서버에 저장되지 않으며, 탭을 닫으면 사라집니다.
+            비회원 모드입니다. 매매 데이터는 서버에 저장되지 않으며, 탭을 닫으면 사라집니다.
           </p>
         )}
 
@@ -56,7 +56,7 @@ export function DashboardPage() {
         )}
 
         {screen.isLoading && (
-          <p className="text-sm text-muted-foreground md:text-base">대시보드 로딩 중...</p>
+          <p className="text-sm text-muted-foreground md:text-base">투자 현황 불러오는 중...</p>
         )}
 
         {screen.data && (

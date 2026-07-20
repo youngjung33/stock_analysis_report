@@ -177,7 +177,7 @@ export function MarketAnalysisDetailSection({ compact }: Props) {
       </div>
 
       {isLoading && (
-        <p className="text-sm text-slate-400">매크로·지수·섹터·뉴스 분석 중… (최대 25초)</p>
+        <p className="text-sm text-slate-400">경기·지수·업종·뉴스 분석 중… (최대 25초)</p>
       )}
 
       {data && (

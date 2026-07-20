@@ -6,26 +6,26 @@ import { useToast } from '../../components/Toast';
 import { useServices } from '../useServices';
 import { invalidatePortfolioLocal, MARKET_QUERY_KEYS, QUERY_STALE } from '../../lib/query-config';
 
-export function useTransactionList(refreshKey: number) {
-  const { listTransactionsUseCase, deleteTransactionUseCase } = useServices();
+export function useCorporateActionList(refreshKey: number) {
+  const { listCorporateActionsUseCase, deleteCorporateActionUseCase } = useServices();
   const queryClient = useQueryClient();
   const { showError, showSuccess } = useToast();
   const { data, isLoading, refetch } = useQuery({
-    queryKey: [...MARKET_QUERY_KEYS.transactions, refreshKey],
-    queryFn: () => listTransactionsUseCase.execute(),
-    staleTime: QUERY_STALE.transactions,
+    queryKey: [...MARKET_QUERY_KEYS.corporateActions, refreshKey],
+    queryFn: () => listCorporateActionsUseCase.execute(),
+    staleTime: QUERY_STALE.corporateActions,
   });
 
   async function handleDelete(id: string) {
-    if (!confirm('이 매매 내역을 삭제할까요?')) return;
+    if (!confirm('이 내역을 삭제할까요?')) return;
 
     try {
-      await deleteTransactionUseCase.execute(id);
-      showSuccess('매매가 삭제되었습니다.');
+      await deleteCorporateActionUseCase.execute(id);
+      showSuccess('내역이 삭제되었습니다.');
       await invalidatePortfolioLocal(queryClient);
       refetch();
     } catch (err) {
-      showError(getErrorMessage(err, '매매 삭제에 실패했습니다.'));
+      showError(getErrorMessage(err, '삭제에 실패했습니다.'));
     }
   }
 

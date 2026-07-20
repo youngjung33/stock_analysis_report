@@ -20,7 +20,7 @@ export function RefreshQuotesButton({ onClick, loading, className, compact }: Pr
         className,
       )}
     >
-      {loading ? '갱신 중...' : '갱신'}
+      {loading ? '시세 갱신 중...' : '시세 갱신'}
     </button>
   );
 }

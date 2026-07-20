@@ -152,7 +152,7 @@ export function SettingsPage() {
               <div>
                 <h2 className="text-base font-semibold text-danger">회원탈퇴</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  탈퇴 시 거래 내역, 관심종목, 소셜 연동 등 계정 데이터가 DB에서 영구 삭제됩니다.
+                  탈퇴 시 매매 내역, 관심종목, 소셜 연동 등 계정 데이터가 DB에서 영구 삭제됩니다.
                 </p>
               </div>
               {screen.profile.hasPassword && (

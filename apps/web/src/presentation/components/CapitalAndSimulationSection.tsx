@@ -9,7 +9,7 @@ const ACTION_LABEL: Record<SimulationActionType, string> = {
   keep: '유지',
   trim: '비중 축소',
   add: '매수 검토',
-  reserve_cash: '남는 현금',
+  reserve_cash: '남는 예수금',
 };
 
 const ACTION_CLASS: Record<SimulationActionType, string> = {
@@ -28,7 +28,7 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
   const sim = screen.simulation?.simulation;
 
   if (screen.loading) {
-    return <p className="text-sm text-muted-foreground">자본·시뮬레이션 불러오는 중...</p>;
+    return <p className="text-sm text-muted-foreground">예수금·비중 조정 불러오는 중...</p>;
   }
 
   return (
@@ -38,9 +38,9 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
       )}
       <Surface variant="section" className="space-y-4">
         <div>
-          <h2 className="text-base font-semibold md:text-lg">자본금 · 현금</h2>
+          <h2 className="text-base font-semibold md:text-lg">투자 원금 · 예수금</h2>
           <p className="mt-1 text-xs text-muted-foreground md:text-sm">
-            가용 현금 {screen.cashLabelKrw}
+            예수금 {screen.cashLabelKrw}
             {screen.cashUsd > 0 && ` · ${screen.cashLabelUsd}`}
           </p>
         </div>
@@ -72,7 +72,7 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
               disabled={screen.saving}
               className="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
             >
-              초기 자본 설정
+              투자 원금 설정
             </button>
             <button
               type="button"
@@ -114,7 +114,7 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
         <h2 className="text-base font-semibold md:text-lg">목표 비중 · 집중도</h2>
         <form onSubmit={screen.handleSavePreferences} className="grid gap-3 sm:grid-cols-3">
           <label className="block">
-            <span className="text-xs text-muted-foreground">국내(KR) %</span>
+            <span className="text-xs text-muted-foreground">국내 %</span>
             <input
               type="number"
               min="0"
@@ -125,7 +125,7 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
             />
           </label>
           <label className="block">
-            <span className="text-xs text-muted-foreground">미국(US) %</span>
+            <span className="text-xs text-muted-foreground">해외(미국) %</span>
             <input
               type="number"
               min="0"
@@ -159,7 +159,7 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
       {sim && (
         <Surface variant="section" className="space-y-4">
           <div>
-            <h2 className="text-base font-semibold md:text-lg">포트폴리오 시뮬레이션</h2>
+            <h2 className="text-base font-semibold md:text-lg">비중 조정 제안</h2>
             <p className="mt-1 text-sm font-medium text-foreground">{sim.headline}</p>
             <p className="mt-1 text-xs text-muted-foreground md:text-sm">{sim.description}</p>
           </div>
@@ -174,14 +174,14 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
               <dd className="font-semibold">{sim.cashPercent.toFixed(1)}%</dd>
             </div>
             <div>
-              <dt className="text-muted-foreground">KR / US (주식)</dt>
+              <dt className="text-muted-foreground">국내 / 해외 (주식)</dt>
               <dd className="font-semibold">
                 {sim.stockAllocationByMarket.krPercent.toFixed(0)}% /{' '}
                 {sim.stockAllocationByMarket.usPercent.toFixed(0)}%
               </dd>
             </div>
             <div>
-              <dt className="text-muted-foreground">시뮬 후 현금</dt>
+              <dt className="text-muted-foreground">조정 후 예수금</dt>
               <dd className="font-semibold">
                 {formatCashAmount(sim.projectedCashTotalKrw, 'KRW')}
               </dd>

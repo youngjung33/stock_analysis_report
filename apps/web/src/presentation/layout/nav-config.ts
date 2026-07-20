@@ -17,7 +17,7 @@ export const APP_NAV_ITEMS: AppNavItem[] = [
   {
     id: 'dashboard',
     href: '/',
-    label: '대시보드',
+    label: '투자 현황',
     shortLabel: '홈',
     icon: LayoutDashboard,
     match: (pathname) => pathname === '/' || pathname.startsWith('/stocks'),
@@ -33,8 +33,8 @@ export const APP_NAV_ITEMS: AppNavItem[] = [
   {
     id: 'transactions',
     href: '/transactions',
-    label: '거래 관리',
-    shortLabel: '거래',
+    label: '매매·배당',
+    shortLabel: '매매',
     icon: ArrowLeftRight,
     match: (pathname) => pathname.startsWith('/transactions'),
   },

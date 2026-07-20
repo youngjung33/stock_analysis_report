@@ -52,7 +52,7 @@ const SENTIMENT_LABEL_KO: Record<SentimentLabel, string> = {
 };
 
 const TAG_LABEL_KO: Record<RecommendationTag, string> = {
-  momentum: '모멘텀',
+  momentum: '상승 흐름',
   watchlist: '관심',
   pullback: '조정 구간',
   defensive: '방어',
@@ -86,7 +86,7 @@ function regionDescription(market: Market, label: SentimentLabel, avg: number, u
 
   switch (label) {
     case 'strong_bull':
-      return `${region} 대표주 평균 ${avgText}. ${breadth} — 단기 모멘텀 우세.`;
+      return `${region} 대표주 평균 ${avgText}. ${breadth} — 단기 상승세 우세.`;
     case 'bull':
       return `${region} 대표주 평균 ${avgText}. ${breadth} — 완만한 상승 분위기.`;
     case 'neutral':

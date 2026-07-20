@@ -21,13 +21,13 @@ export function useDashboardScreen() {
 
   useEffect(() => {
     if (searchParams.get('welcome') !== '1') return;
-    showSuccess('회원가입을 환영합니다! 포트폴리오를 시작해 보세요.');
+    showSuccess('회원가입을 환영합니다! 투자 내역을 시작해 보세요.');
     router.replace('/', { scroll: false });
   }, [searchParams, showSuccess, router]);
 
   useEffect(() => {
     if (!error) return;
-    showError('대시보드를 불러오지 못했습니다.');
+    showError('투자 현황을 불러오지 못했습니다.');
   }, [error, showError]);
 
   async function handleRefresh() {

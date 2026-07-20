@@ -6,6 +6,7 @@ import { ListOAuthProvidersUseCase } from './domain/usecases/auth/list-oauth-pro
 import { LogoutUseCase } from './domain/usecases/auth/logout.use-case';
 import { RefreshSessionUseCase } from './domain/usecases/auth/refresh-session.use-case';
 import { CreateCorporateActionUseCase } from './domain/usecases/corporate-actions/create-corporate-action.use-case';
+import { DeleteCorporateActionUseCase } from './domain/usecases/corporate-actions/delete-corporate-action.use-case';
 import { ListCorporateActionsUseCase } from './domain/usecases/corporate-actions/list-corporate-actions.use-case';
 import { AppServices } from './domain/services.types';
 import {
@@ -88,6 +89,7 @@ export function wireAppServices(): AppServices {
     removeWatchlistUseCase: new RemoveWatchlistUseCase(watchlistRepository),
     createCorporateActionUseCase: new CreateCorporateActionUseCase(corporateActionRepository),
     listCorporateActionsUseCase: new ListCorporateActionsUseCase(corporateActionRepository),
+    deleteCorporateActionUseCase: new DeleteCorporateActionUseCase(corporateActionRepository),
     getAccountUseCase: new GetAccountUseCase(accountRepository),
     changePasswordUseCase: new ChangePasswordUseCase(accountRepository),
     changeEmailUseCase: new ChangeEmailUseCase(accountRepository),

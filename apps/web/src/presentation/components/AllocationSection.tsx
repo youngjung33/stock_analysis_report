@@ -58,7 +58,7 @@ export function AllocationSection({ items, allocationByMarket }: Props) {
       <h2 className="text-base font-semibold tracking-tight">자산 배분 (원화 기준)</h2>
       {hasMixed && (
         <p className="mt-2 text-sm text-muted-foreground">
-          KR {allocationByMarket.krPercent.toFixed(1)}% · US {allocationByMarket.usPercent.toFixed(1)}%
+          KR {allocationByMarket.krPercent.toFixed(1)}% · 해외 {allocationByMarket.usPercent.toFixed(1)}%
         </p>
       )}
 
@@ -87,7 +87,7 @@ export function AllocationSection({ items, allocationByMarket }: Props) {
                     <span className="text-white">{item.symbol}</span>
                     <span className="ml-1 text-xs text-slate-500">{item.name}</span>
                   </td>
-                  <td className="py-2 pr-4 text-slate-400">{item.market === Market.KR ? 'KR' : 'US'}</td>
+                  <td className="py-2 pr-4 text-slate-400">{item.market === Market.KR ? '국내' : '미국'}</td>
                   <td className="py-2 pr-4 text-slate-300">{formatNumber(item.marketValueKrw, 'KRW')}</td>
                   <td className="py-2 font-medium text-white">{item.weightPercent.toFixed(1)}%</td>
                 </tr>

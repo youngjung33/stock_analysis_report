@@ -27,7 +27,7 @@ export function MarketSentimentSummarySection({ compact }: Props) {
             시장 정세 요약
           </h2>
           <p className="mt-1 text-xs text-slate-500">
-            대표 종목 오늘 시세 기준 · VIX·섹터·기술적 지표는 상세 페이지
+            대표 종목 오늘 시세 기준 · 변동성·업종·차트 지표는 상세 페이지
           </p>
         </div>
         <Link

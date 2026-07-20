@@ -54,7 +54,7 @@ export function LoginPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{APP_BRAND.name}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {isRegister ? '회원가입 후 포트폴리오를 관리하세요.' : '로그인 후 거래와 시세를 관리하세요.'}
+            {isRegister ? '회원가입 후 투자 내역을 관리하세요.' : '로그인 후 매매와 시세를 관리하세요.'}
           </p>
         </div>
 

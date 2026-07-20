@@ -12,6 +12,7 @@ export const QUERY_STALE = {
   marketStatus: 5 * 60_000,
   portfolioCapital: 5 * 60_000,
   transactions: 2 * 60_000,
+  corporateActions: 2 * 60_000,
 } as const;
 
 export const QUERY_GC_TIME = 30 * 60_000;
@@ -26,6 +27,7 @@ export const MARKET_QUERY_KEYS = {
   cashSummary: ['cash', 'summary'] as const,
   portfolioPreferences: ['portfolio', 'preferences'] as const,
   transactions: ['transactions'] as const,
+  corporateActions: ['corporate-actions'] as const,
   stockQuoteRoot: ['stock-quote'] as const,
 } as const;
 
@@ -62,6 +64,7 @@ export function invalidatePortfolioLocal(queryClient: QueryClient) {
     queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.cashSummary }),
     queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.portfolioPreferences }),
     queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.transactions }),
+    queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.corporateActions }),
     queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.portfolioAnalysis }),
   ]);
 }

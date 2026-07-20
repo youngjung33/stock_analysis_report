@@ -1,8 +1,13 @@
 import Link from 'next/link';
+import { Market } from '@sar/shared';
 import { DashboardHolding } from '@/client/domain/models';
 import { Surface } from '../../design-system';
 import { stockDetailHref } from '../../shared/stock-routes';
 import { formatNumber, formatPercent, pnlClass } from '../../shared/formatters';
+
+function marketLabel(market: Market): string {
+  return market === Market.KR ? '국내' : '미국';
+}
 
 interface Props {
   holdings: DashboardHolding[];
@@ -21,10 +26,10 @@ function EmptyHoldings() {
         variant="subtle"
         className="hidden border-dashed py-12 text-center text-muted-foreground md:block"
       >
-        보유 종목이 없습니다. 거래를 등록해 보세요.
+        보유 종목이 없습니다. 매매를 등록해 보세요.
       </Surface>
       <div className="rounded-xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-400 md:hidden">
-        보유 종목이 없습니다. 거래를 등록해 보세요.
+        보유 종목이 없습니다. 매매를 등록해 보세요.
       </div>
     </>
   );
@@ -43,8 +48,8 @@ function HoldingsTable({ holdings, useKrw }: { holdings: DashboardHolding[]; use
             <th className="px-5 py-4">현재가</th>
             <th className="px-5 py-4">등락</th>
             <th className="px-5 py-4">{useKrw ? '평가금액 (원화)' : '평가금액'}</th>
-            <th className="px-5 py-4">{useKrw ? '미실현손익 (원화)' : '미실현손익'}</th>
-            <th className="px-5 py-4">{useKrw ? '실현손익 (원화)' : '실현손익'}</th>
+            <th className="px-5 py-4">{useKrw ? '평가 손익 (원화)' : '평가 손익'}</th>
+            <th className="px-5 py-4">{useKrw ? '실현 손익 (원화)' : '실현 손익'}</th>
           </tr>
         </thead>
         <tbody>
@@ -56,7 +61,7 @@ function HoldingsTable({ holdings, useKrw }: { holdings: DashboardHolding[]; use
                   <div className="text-xs text-muted-foreground">{h.name}</div>
                 </Link>
               </td>
-              <td className="px-5 py-4 text-muted-foreground">{h.market}</td>
+              <td className="px-5 py-4 text-muted-foreground">{marketLabel(h.market)}</td>
               <td className="px-5 py-4 text-muted-foreground">{h.quantity}</td>
               <td className="px-5 py-4 text-muted-foreground">
                 {formatNumber(h.averageCost, h.currency)}
@@ -94,7 +99,7 @@ function HoldingsCardList({ holdings, useKrw }: { holdings: DashboardHolding[]; 
               <p className="font-semibold text-white group-hover:text-indigo-300">{h.symbol}</p>
               <p className="text-xs text-slate-500 group-hover:text-slate-400">{h.name}</p>
             </Link>
-            <span className="rounded bg-slate-800 px-2 py-0.5 text-xs text-slate-300">{h.market}</span>
+            <span className="rounded bg-slate-800 px-2 py-0.5 text-xs text-slate-300">{marketLabel(h.market)}</span>
           </div>
           <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
             <div>
@@ -120,7 +125,7 @@ function HoldingsCardList({ holdings, useKrw }: { holdings: DashboardHolding[]; 
               </dd>
             </div>
             <div>
-              <dt className="text-slate-500">{useKrw ? '미실현 (원화)' : '미실현'}</dt>
+              <dt className="text-slate-500">{useKrw ? '평가 손익 (원화)' : '평가 손익'}</dt>
               <dd className={pnlClass(useKrw ? h.unrealizedPnlKrw : h.unrealizedPnl)}>
                 {formatNumber(useKrw ? h.unrealizedPnlKrw : h.unrealizedPnl, useKrw ? 'KRW' : h.currency)}
               </dd>

@@ -57,6 +57,6 @@ describe('buildPortfolioSimulation', () => {
       usdKrwRate: null,
     });
 
-    expect(result.headline).toContain('자본금');
+    expect(result.headline).toContain('투자 원금');
   });
 });

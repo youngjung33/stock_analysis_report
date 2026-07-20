@@ -23,7 +23,7 @@ export function OAuthLoginButtons({
   if (providers.length === 0) {
     return (
       <p className="text-center text-xs text-muted-foreground">
-        소셜 로그인은 OAuth 클라이언트 설정 후 사용할 수 있습니다.
+        소셜 로그인은 관리자 설정 후 사용할 수 있습니다.
       </p>
     );
   }

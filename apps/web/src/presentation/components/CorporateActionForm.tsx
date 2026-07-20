@@ -53,12 +53,12 @@ export function CorporateActionForm({ onSuccess }: Props) {
         targetPrice: targetPrice ? parseAmountInput(targetPrice) : undefined,
         memo: memo || undefined,
       });
-      showSuccess('기업행위가 등록되었습니다.');
+      showSuccess('배당·분할·합병 내역이 등록되었습니다.');
       onSuccess?.();
       setCashAmount('');
       setMemo('');
     } catch (err) {
-      showError(getErrorMessage(err, '기업행위 등록에 실패했습니다.'));
+      showError(getErrorMessage(err, '등록에 실패했습니다.'));
     } finally {
       setSubmitting(false);
     }
@@ -67,8 +67,10 @@ export function CorporateActionForm({ onSuccess }: Props) {
   return (
     <Surface as="form" variant="section" onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <h2 className="text-base font-semibold tracking-tight">기업행위 등록</h2>
-        <p className="mt-2 text-sm text-muted-foreground">배당 · 분할 · 합병을 수동으로 등록합니다.</p>
+        <h2 className="text-base font-semibold tracking-tight">배당·분할·합병 등록</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          배당금 입금, 주식분할, 합병 전환 등을 투자·세금 계산에 반영합니다.
+        </p>
       </div>
 
       <StockSearchField
@@ -87,7 +89,7 @@ export function CorporateActionForm({ onSuccess }: Props) {
           className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white"
         >
           <option value="DIVIDEND">배당</option>
-          <option value="SPLIT">분할</option>
+          <option value="SPLIT">주식분할</option>
           <option value="MERGER">합병</option>
         </select>
       </div>
@@ -180,7 +182,7 @@ export function CorporateActionForm({ onSuccess }: Props) {
         disabled={submitting}
         className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
       >
-        {submitting ? '등록 중...' : '기업행위 등록'}
+        {submitting ? '등록 중...' : '등록'}
       </button>
     </Surface>
   );

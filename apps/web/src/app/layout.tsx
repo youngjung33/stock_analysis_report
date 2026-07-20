@@ -4,8 +4,8 @@ import './globals.css';
 import './globals.scss';
 
 export const metadata: Metadata = {
-  title: '주식 포트폴리오 대시보드',
-  description: '개인용 주식 포트폴리오 관리',
+  title: '주식 투자 현황',
+  description: '개인용 주식 매매·배당·세금 관리',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

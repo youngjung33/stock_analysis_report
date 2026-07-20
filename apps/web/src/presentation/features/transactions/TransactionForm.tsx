@@ -16,7 +16,7 @@ export function TransactionForm({ onSuccess }: Props) {
       onSubmit={form.handleSubmit}
       className="space-y-3 rounded-xl border border-slate-800 bg-slate-900/60 p-4 md:space-y-4 md:p-6"
     >
-      <h2 className="text-base font-semibold text-white md:text-lg">거래 등록</h2>
+      <h2 className="text-base font-semibold text-white md:text-lg">매매 등록</h2>
 
       <div className="grid gap-3 md:gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
@@ -30,7 +30,7 @@ export function TransactionForm({ onSuccess }: Props) {
         </div>
 
         <label className="block">
-          <span className="text-xs text-slate-400 md:text-sm">거래 유형</span>
+          <span className="text-xs text-slate-400 md:text-sm">매매 구분</span>
           <select
             className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-white md:py-2"
             value={form.type}
@@ -41,7 +41,7 @@ export function TransactionForm({ onSuccess }: Props) {
           </select>
         </label>
         <label className="block">
-          <span className="text-xs text-slate-400 md:text-sm">거래일</span>
+          <span className="text-xs text-slate-400 md:text-sm">매매일</span>
           <input
             type="date"
             className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-white md:py-2"

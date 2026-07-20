@@ -136,7 +136,7 @@ export function TaxProfileForm({ profile, onChange }: Props) {
       <div>
         <h3 className="text-base font-semibold">내 세금 조건</h3>
         <p className="mt-1 text-xs text-muted-foreground md:text-sm">
-          본인 상황을 선택하면 적용되는 세목과 포트폴리오 기반 추정 세액을 확인할 수 있습니다.
+          본인 상황을 선택하면 적용되는 세목과 보유·매매 기반 추정 세액을 확인할 수 있습니다.
         </p>
       </div>
 

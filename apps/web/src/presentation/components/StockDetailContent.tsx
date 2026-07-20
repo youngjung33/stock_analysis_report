@@ -41,7 +41,7 @@ export function StockDetailContent({ symbol, market }: Props) {
           href="/"
           className="text-sm text-indigo-400 hover:text-indigo-300"
         >
-          ← 대시보드
+          ← 투자 현황
         </Link>
         <h1 className="mt-3 text-2xl font-semibold text-white">{title}</h1>
         <p className="mt-1 text-sm text-slate-500">

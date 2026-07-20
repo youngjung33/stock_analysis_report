@@ -6,6 +6,7 @@ import { ListOAuthProvidersUseCase } from './usecases/auth/list-oauth-providers.
 import { LogoutUseCase } from './usecases/auth/logout.use-case';
 import { RefreshSessionUseCase } from './usecases/auth/refresh-session.use-case';
 import { CreateCorporateActionUseCase } from './usecases/corporate-actions/create-corporate-action.use-case';
+import { DeleteCorporateActionUseCase } from './usecases/corporate-actions/delete-corporate-action.use-case';
 import { ListCorporateActionsUseCase } from './usecases/corporate-actions/list-corporate-actions.use-case';
 import {
   ChangeEmailUseCase,
@@ -78,6 +79,7 @@ export interface AppServices {
   removeWatchlistUseCase: RemoveWatchlistUseCase;
   createCorporateActionUseCase: CreateCorporateActionUseCase;
   listCorporateActionsUseCase: ListCorporateActionsUseCase;
+  deleteCorporateActionUseCase: DeleteCorporateActionUseCase;
   getAccountUseCase: GetAccountUseCase;
   changePasswordUseCase: ChangePasswordUseCase;
   changeEmailUseCase: ChangeEmailUseCase;

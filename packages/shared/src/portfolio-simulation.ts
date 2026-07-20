@@ -248,7 +248,7 @@ export function buildPortfolioSimulation(input: {
       name: '가용 현금',
       market: Market.KR,
       currency: 'KRW',
-      reason: '시뮬레이션 후 남는 현금 — 추가 매수·비상금으로 활용',
+      reason: '조정 후 남는 예수금 — 추가 매수·비상금으로 활용',
       currentWeightPercent: null,
       targetWeightPercent: null,
       suggestedAmountKrw: projectedCashTotalKrw,
@@ -295,12 +295,12 @@ export function buildPortfolioSimulation(input: {
   const regionLabel = underweightMarket === Market.KR ? '국내' : '미국';
   const headline =
     cashTotalKrw <= 0 && investedKrw <= 0
-      ? '자본금을 설정하면 맞춤 시뮬레이션이 시작됩니다'
-      : `총 자산 ${formatCashAmount(totalAssetsKrw, 'KRW')} · 현금 ${cashPercent.toFixed(0)}%`;
+      ? '투자 원금을 설정하면 맞춤 비중 제안이 시작됩니다'
+      : `총 자산 ${formatCashAmount(totalAssetsKrw, 'KRW')} · 예수금 ${cashPercent.toFixed(0)}%`;
 
   const description =
     gapPercent > 2
-      ? `${regionLabel} 비중이 목표 대비 ${Math.abs(gapPercent).toFixed(1)}%p ${allocationGapPercent.kr >= allocationGapPercent.us ? '부족' : '과다'}합니다. 추천 종목 매수 시뮬레이션을 참고하세요.`
+      ? `${regionLabel} 비중이 목표 대비 ${Math.abs(gapPercent).toFixed(1)}%p ${allocationGapPercent.kr >= allocationGapPercent.us ? '부족' : '과다'}합니다. 아래 매수 제안을 참고하세요.`
       : '시장·종목 비중이 목표에 근접합니다. 과집중 종목 조정과 현금 배분을 확인하세요.';
 
   return {
