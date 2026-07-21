@@ -7,6 +7,27 @@ import { convertToKrw } from './portfolio-fx';
 import { DividendEvent, SellEvent, extractRealizedEvents, filterEventsByYear } from './realized-events';
 import type { CorporateActionInput } from './corporate-actions';
 import type { PositionTransaction } from './position-calculator';
+import {
+  computeIsaAccountTax,
+  computePensionSavingsCredit,
+  IsaAccountType,
+  resolveIsaTaxFreeLimit,
+  splitIncomeByIsaAccount,
+  ISA_OVERFLOW_TAX_RATE,
+} from './korean-tax-shelter';
+
+export type { IsaAccountType } from './korean-tax-shelter';
+export {
+  ISA_ACCOUNT_OPTIONS,
+  ISA_OVERFLOW_TAX_RATE,
+  PENSION_SAVINGS_ANNUAL_LIMIT_KRW,
+  PENSION_SAVINGS_CREDIT_MAX_KRW,
+  PENSION_SAVINGS_CREDIT_RATE,
+  computeIsaAccountTax,
+  computePensionSavingsCredit,
+  resolveIsaTaxFreeLimit,
+  splitIncomeByIsaAccount,
+} from './korean-tax-shelter';
 
 /** 금융소득종합과세 기준 (이자+배당 합산) */
 export const FINANCIAL_INCOME_THRESHOLD_KRW = 20_000_000;
@@ -133,6 +154,30 @@ export const KOREAN_TAX_RULES_REFERENCE: KoreanTaxRuleItem[] = [
     filingLabel: '5월 종합소득세',
     notes: ['초과 시 금융소득 전액이 종합과세 대상', '이미 원천징수한 세액은 공제'],
   },
+  {
+    id: 'isa-account',
+    category: '세제혜택 계좌',
+    title: 'ISA (개인종합자산관리계좌)',
+    summary: '계좌 내 순소득 손익통산 후 비과세 한도·9.9% 분리과세',
+    rateLabel: '비과세 한도 내 0% / 초과 9.9%',
+    thresholdLabel: '일반형 200만 원 · 서민·노후형 400만 원',
+    filingLabel: '만기·해지 시 또는 연간 정산 (금융사)',
+    notes: [
+      '주식·ETF·펀드·예금 등 통합, 의무 가입 3년',
+      'ISA 분리과세 소득은 금융소득종합과세 합산에서 제외 (9.9%로 종결)',
+      '증권거래세 등 별도 세목은 그대로 부과',
+    ],
+  },
+  {
+    id: 'pension-savings',
+    category: '세제혜택 계좌',
+    title: '연금저축 납입 공제',
+    summary: '근로소득자 연금저축 납입액 세액공제 (본 추정은 단순 13.2%)',
+    rateLabel: '납입액의 13.2% (연 600만 원 한도)',
+    thresholdLabel: '최대 약 79.2만 원 세액공제',
+    filingLabel: '연말정산 또는 5월 확정신고',
+    notes: ['IRP·퇴직연금 합산 한도는 별도', '배당·매매차익과는 별개 — 납입 공제'],
+  },
 ];
 
 export interface KoreanTaxProfile {
@@ -149,6 +194,14 @@ export interface KoreanTaxProfile {
   otherIncomeBracketId: OtherIncomeBracketId;
   /** @deprecated otherIncomeBracketId 사용 — 로컬 저장 마이그레이션용 */
   estimatedOtherIncomeKrw?: number;
+  /** ISA 등 세제혜택 계좌 */
+  isaType: IsaAccountType;
+  /** 등록 소득 중 ISA 계좌 비율 (0~100). 거래별 구분 없을 때 */
+  isaIncomeSharePercent: number;
+  /** ISA 순소득 직접 입력 (0이면 비율로 추정). 손익통산 결과 */
+  isaNetIncomeOverrideKrw: number;
+  /** 연금저축 연간 납입액 (세액공제 추정용) */
+  pensionContributionKrw: number;
 }
 
 export type OtherIncomeBracketId =
@@ -212,6 +265,10 @@ export const DEFAULT_KOREAN_TAX_PROFILE: KoreanTaxProfile = {
   foreignDividendSource: 'US',
   otherFinancialIncomeKrw: 0,
   otherIncomeBracketId: DEFAULT_OTHER_INCOME_BRACKET_ID,
+  isaType: 'none',
+  isaIncomeSharePercent: 100,
+  isaNetIncomeOverrideKrw: 0,
+  pensionContributionKrw: 0,
 };
 
 export type ApplicableTaxStatus = 'applies' | 'exempt' | 'conditional' | 'not_applicable';
@@ -322,6 +379,31 @@ export function resolveApplicableTaxRules(
     result.push({ ruleId: fin.id, status: 'conditional', reason: '이자·배당 합산 2,000만 원 초과 시 적용', rule: fin });
   }
 
+  const isaRule = byId.get('isa-account')!;
+  if (profile.isaType === 'none') {
+    result.push({ ruleId: isaRule.id, status: 'not_applicable', reason: 'ISA 미사용', rule: isaRule });
+  } else {
+    const limit = resolveIsaTaxFreeLimit(profile.isaType);
+    result.push({
+      ruleId: isaRule.id,
+      status: 'applies',
+      reason: `순소득 ${(limit / 10_000).toLocaleString('ko-KR')}만 원까지 비과세, 초과 9.9%`,
+      rule: isaRule,
+    });
+  }
+
+  const pensionRule = byId.get('pension-savings')!;
+  if (profile.pensionContributionKrw > 0) {
+    result.push({
+      ruleId: pensionRule.id,
+      status: 'applies',
+      reason: `납입 ${profile.pensionContributionKrw.toLocaleString('ko-KR')}원 — 세액공제 추정`,
+      rule: pensionRule,
+    });
+  } else {
+    result.push({ ruleId: pensionRule.id, status: 'conditional', reason: '납입액 입력 시 세액공제 추정', rule: pensionRule });
+  }
+
   return result;
 }
 
@@ -361,6 +443,12 @@ export interface KoreanTaxEstimate {
   requiresComprehensiveTax: boolean;
   comprehensiveTaxKrw: number;
   separationDividendTaxKrw: number;
+  isaNetIncomeKrw: number;
+  isaTaxFreeLimitKrw: number;
+  isaTaxKrw: number;
+  isaTaxSavedKrw: number;
+  pensionTaxCreditKrw: number;
+  totalEstimatedTaxAfterCreditKrw: number;
   totalEstimatedTaxKrw: number;
   lines: TaxLineItem[];
   disclaimers: string[];
@@ -464,14 +552,37 @@ export function estimateKoreanTax(
     }
   }
 
-  // 국내·해외 양도손익 (대주주는 통산)
   const rawForeignNetKrw = foreignGainKrw - foreignLossKrw;
+
+  const split = splitIncomeByIsaAccount({
+    domesticDividendKrw,
+    foreignDividendKrw,
+    foreignCapitalGainNetKrw: rawForeignNetKrw,
+    otherFinancialIncomeKrw: profile.otherFinancialIncomeKrw,
+    isaType: profile.isaType,
+    isaIncomeSharePercent: profile.isaIncomeSharePercent,
+    isaNetIncomeOverrideKrw: profile.isaNetIncomeOverrideKrw,
+  });
+
+  const isaTaxFreeLimitKrw = resolveIsaTaxFreeLimit(profile.isaType);
+  const isaTaxKrw = computeIsaAccountTax(split.isaNetIncomeKrw, profile.isaType);
+  const isaRegularEquivalentTaxKrw = Math.round(split.isaNetIncomeKrw * DOMESTIC_DIVIDEND_WITHHOLDING_RATE);
+  const isaTaxSavedKrw = Math.max(0, isaRegularEquivalentTaxKrw - isaTaxKrw);
+  const pensionTaxCreditKrw = computePensionSavingsCredit(profile.pensionContributionKrw);
+
+  if (profile.isaType !== 'none') {
+    disclaimers.push(
+      'ISA는 계좌 단위 손익통산·비율 분할로 단순 추정합니다. 실제는 금융사 정산·만기 시 확정됩니다.',
+    );
+  }
+
+  // 국내·해외 양도손익 (대주주는 통산) — ISA 해외분은 별도 과세
   let domesticCapitalGainTaxKrw = 0;
   let foreignTaxable = 0;
   let foreignCapitalGainTaxKrw = 0;
 
   if (profile.isMajorShareholder) {
-    const combinedNetGain = Math.max(0, domesticGainKrw + rawForeignNetKrw);
+    const combinedNetGain = Math.max(0, domesticGainKrw + split.regularForeignGainNetKrw);
     const taxable = Math.max(0, combinedNetGain - CAPITAL_GAINS_BASIC_DEDUCTION_KRW);
     domesticCapitalGainTaxKrw = majorShareholderGainTax(taxable);
     if (taxable > 0 || combinedNetGain > 0) {
@@ -497,9 +608,9 @@ export function estimateKoreanTax(
         note: '일반 투자자 코스피·코스닥',
       });
     }
-    foreignTaxable = Math.max(0, rawForeignNetKrw - CAPITAL_GAINS_BASIC_DEDUCTION_KRW);
+    foreignTaxable = Math.max(0, split.regularForeignGainNetKrw - CAPITAL_GAINS_BASIC_DEDUCTION_KRW);
     foreignCapitalGainTaxKrw = Math.round(foreignTaxable * FOREIGN_CAPITAL_GAINS_RATE);
-    if (rawForeignNetKrw !== 0 || foreignTaxable > 0) {
+    if (split.regularForeignGainNetKrw !== 0 || foreignTaxable > 0) {
       lines.push({
         id: 'us-gain',
         category: '해외주식',
@@ -507,12 +618,10 @@ export function estimateKoreanTax(
         baseKrw: foreignTaxable,
         rate: FOREIGN_CAPITAL_GAINS_RATE,
         taxKrw: foreignCapitalGainTaxKrw,
-        note: `순손익 ${Math.round(rawForeignNetKrw).toLocaleString('ko-KR')}원`,
+        note: `일반 계좌 순손익 ${Math.round(split.regularForeignGainNetKrw).toLocaleString('ko-KR')}원`,
       });
     }
   }
-
-  const foreignNetKrw = rawForeignNetKrw;
 
   // 증권거래세
   const domesticSecuritiesTaxKrw = Math.round(domesticSellProceedsKrw * SECURITIES_TRANSACTION_TAX_RATE);
@@ -527,14 +636,16 @@ export function estimateKoreanTax(
     });
   }
 
-  // 배당 분리과세
-  const domesticDividendWithheldKrw = Math.round(domesticDividendKrw * DOMESTIC_DIVIDEND_WITHHOLDING_RATE);
+  // 배당 분리과세 (일반 계좌분만 — ISA 분은 별도)
+  const regularDomesticDividendKrw = split.regularDomesticDividendKrw;
+  const regularForeignDividendKrw = split.regularForeignDividendKrw;
+  const domesticDividendWithheldKrw = Math.round(regularDomesticDividendKrw * DOMESTIC_DIVIDEND_WITHHOLDING_RATE);
   const foreignRule = FOREIGN_DIVIDEND_WITHHOLDING[profile.foreignDividendSource];
-  const foreignDividendWithheldKrw = Math.round(foreignDividendKrw * foreignRule.abroadRate);
-  const foreignDividendAdditionalTaxKrw = Math.round(foreignDividendKrw * foreignRule.additionalKrRate);
+  const foreignDividendWithheldKrw = Math.round(regularForeignDividendKrw * foreignRule.abroadRate);
+  const foreignDividendAdditionalTaxKrw = Math.round(regularForeignDividendKrw * foreignRule.additionalKrRate);
 
   const totalFinancialIncomeKrw =
-    domesticDividendKrw + foreignDividendKrw + profile.otherFinancialIncomeKrw;
+    regularDomesticDividendKrw + regularForeignDividendKrw + split.regularOtherFinancialKrw;
   const requiresComprehensiveTax = totalFinancialIncomeKrw > FINANCIAL_INCOME_THRESHOLD_KRW;
 
   let separationDividendTaxKrw = domesticDividendWithheldKrw + foreignDividendWithheldKrw + foreignDividendAdditionalTaxKrw;
@@ -557,22 +668,22 @@ export function estimateKoreanTax(
       note: `금융소득 ${(FINANCIAL_INCOME_THRESHOLD_KRW / 10_000).toLocaleString('ko-KR')}만 원 초과`,
     });
   } else {
-    if (domesticDividendKrw > 0) {
+    if (regularDomesticDividendKrw > 0) {
       lines.push({
         id: 'kr-div',
         category: '국내주식',
-        label: '배당소득 원천징수',
-        baseKrw: domesticDividendKrw,
+        label: '배당소득 원천징수 (일반 계좌)',
+        baseKrw: regularDomesticDividendKrw,
         rate: DOMESTIC_DIVIDEND_WITHHOLDING_RATE,
         taxKrw: domesticDividendWithheldKrw,
       });
     }
-    if (foreignDividendKrw > 0) {
+    if (regularForeignDividendKrw > 0) {
       lines.push({
         id: 'us-div',
         category: '해외주식',
-        label: `배당 (${foreignRule.label})`,
-        baseKrw: foreignDividendKrw,
+        label: `배당 (${foreignRule.label}, 일반 계좌)`,
+        baseKrw: regularForeignDividendKrw,
         rate: foreignRule.abroadRate + foreignRule.additionalKrRate,
         taxKrw: foreignDividendWithheldKrw + foreignDividendAdditionalTaxKrw,
         note: foreignRule.note,
@@ -580,11 +691,26 @@ export function estimateKoreanTax(
     }
   }
 
+  if (profile.isaType !== 'none' && split.isaNetIncomeKrw > 0) {
+    lines.push({
+      id: 'isa-tax',
+      category: '세제혜택 계좌',
+      label: 'ISA 분리과세',
+      baseKrw: Math.max(0, split.isaNetIncomeKrw - isaTaxFreeLimitKrw),
+      rate: ISA_OVERFLOW_TAX_RATE,
+      taxKrw: isaTaxKrw,
+      note: `순소득 ${Math.round(split.isaNetIncomeKrw).toLocaleString('ko-KR')}원 · 비과세 ${isaTaxFreeLimitKrw.toLocaleString('ko-KR')}원`,
+    });
+  }
+
   const totalEstimatedTaxKrw =
     domesticCapitalGainTaxKrw +
     foreignCapitalGainTaxKrw +
     domesticSecuritiesTaxKrw +
-    (requiresComprehensiveTax ? comprehensiveTaxKrw : separationDividendTaxKrw);
+    (requiresComprehensiveTax ? comprehensiveTaxKrw : separationDividendTaxKrw) +
+    isaTaxKrw;
+
+  const totalEstimatedTaxAfterCreditKrw = Math.max(0, totalEstimatedTaxKrw - pensionTaxCreditKrw);
 
   return {
     year,
@@ -594,7 +720,7 @@ export function estimateKoreanTax(
     domesticDividendGrossKrw: Math.round(domesticDividendKrw),
     domesticDividendWithheldKrw,
     domesticSecuritiesTaxKrw,
-    foreignCapitalGainNetKrw: Math.round(foreignNetKrw),
+    foreignCapitalGainNetKrw: Math.round(rawForeignNetKrw),
     foreignCapitalGainTaxableKrw: Math.round(foreignTaxable),
     foreignCapitalGainTaxKrw,
     foreignDividendGrossKrw: Math.round(foreignDividendKrw),
@@ -604,6 +730,12 @@ export function estimateKoreanTax(
     requiresComprehensiveTax,
     comprehensiveTaxKrw,
     separationDividendTaxKrw,
+    isaNetIncomeKrw: Math.round(split.isaNetIncomeKrw),
+    isaTaxFreeLimitKrw,
+    isaTaxKrw,
+    isaTaxSavedKrw,
+    pensionTaxCreditKrw,
+    totalEstimatedTaxAfterCreditKrw,
     totalEstimatedTaxKrw,
     lines,
     disclaimers,

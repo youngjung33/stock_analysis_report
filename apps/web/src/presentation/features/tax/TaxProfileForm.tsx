@@ -3,8 +3,11 @@
 import {
   FOREIGN_DIVIDEND_WITHHOLDING,
   formatAmount,
+  ISA_ACCOUNT_OPTIONS,
   OTHER_INCOME_BRACKETS,
+  PENSION_SAVINGS_ANNUAL_LIMIT_KRW,
   type ForeignDividendSource,
+  type IsaAccountType,
   type KoreanTaxProfile,
   type OtherIncomeBracketId,
   parseAmountInput,
@@ -212,6 +215,73 @@ export function TaxProfileForm({ profile, onChange }: Props) {
           </div>
         </fieldset>
       )}
+
+      <fieldset className="space-y-2">
+        <legend className="mb-2 text-xs font-medium text-muted-foreground">세제혜택 계좌 (ISA)</legend>
+        <p className="text-[11px] text-muted-foreground md:text-xs">
+          ISA 계좌 내 순소득은 비과세 한도·9.9% 분리과세로 별도 계산됩니다. 거래를 ISA/일반으로
+          구분하지 않았다면 비율로 나눕니다.
+        </p>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {ISA_ACCOUNT_OPTIONS.map((opt) => (
+            <SelectBtn
+              key={opt.id}
+              selected={profile.isaType === opt.id}
+              onClick={() => onChange({ isaType: opt.id as IsaAccountType })}
+              label={opt.label}
+              subLabel={opt.id === 'none' ? opt.description : `비과세 ${(opt.taxFreeLimitKrw / 10_000).toLocaleString('ko-KR')}만 원`}
+            />
+          ))}
+        </div>
+        {profile.isaType !== 'none' && (
+          <div className="mt-3 space-y-3 rounded-lg border border-border bg-muted/20 p-4">
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                ISA 소득 비율 ({profile.isaIncomeSharePercent}%)
+              </label>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                value={profile.isaIncomeSharePercent}
+                onChange={(e) => onChange({ isaIncomeSharePercent: Number(e.target.value) })}
+                className="w-full accent-primary"
+              />
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                배당·매매·기타 금융소득 중 ISA 계좌 비율 (직접 입력이 있으면 아래 값 우선)
+              </p>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                ISA 순소득 직접 입력 (원, 선택)
+              </label>
+              <AmountInput
+                className="w-full max-w-md rounded-lg border border-border-strong bg-muted px-3 py-2 text-sm"
+                value={formatKrwInputValue(profile.isaNetIncomeOverrideKrw)}
+                onValueChange={(v) => onChange({ isaNetIncomeOverrideKrw: parseAmountInput(v) ?? 0 })}
+                formatOptions={{ maxFractionDigits: 0 }}
+                placeholder="비율로 자동 추정"
+              />
+            </div>
+          </div>
+        )}
+      </fieldset>
+
+      <fieldset className="space-y-2">
+        <legend className="mb-2 text-xs font-medium text-muted-foreground">연금저축 납입 (세액공제)</legend>
+        <p className="text-[11px] text-muted-foreground md:text-xs">
+          근로소득자 연금저축 납입액 — 연 {(PENSION_SAVINGS_ANNUAL_LIMIT_KRW / 10_000).toLocaleString('ko-KR')}만
+          원 한도, 13.2% 세액공제 추정
+        </p>
+        <AmountInput
+          className="w-full max-w-md rounded-lg border border-border-strong bg-muted px-3 py-2 text-sm"
+          value={formatKrwInputValue(profile.pensionContributionKrw)}
+          onValueChange={(v) => onChange({ pensionContributionKrw: parseAmountInput(v) ?? 0 })}
+          formatOptions={{ maxFractionDigits: 0 }}
+          placeholder="0"
+        />
+      </fieldset>
 
       <fieldset className="space-y-2">
         <legend className="mb-2 text-xs font-medium text-muted-foreground">기타 금융소득 (원)</legend>

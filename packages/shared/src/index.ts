@@ -126,6 +126,15 @@ export {
   DOMESTIC_DIVIDEND_WITHHOLDING_RATE,
   FOREIGN_CAPITAL_GAINS_RATE,
   SECURITIES_TRANSACTION_TAX_RATE,
+  ISA_ACCOUNT_OPTIONS,
+  ISA_OVERFLOW_TAX_RATE,
+  PENSION_SAVINGS_ANNUAL_LIMIT_KRW,
+  PENSION_SAVINGS_CREDIT_MAX_KRW,
+  PENSION_SAVINGS_CREDIT_RATE,
+  computeIsaAccountTax,
+  computePensionSavingsCredit,
+  resolveIsaTaxFreeLimit,
+  splitIncomeByIsaAccount,
 } from './korean-tax';
 export type {
   KoreanTaxProfile,
@@ -139,6 +148,7 @@ export type {
   ApplicableTaxStatus,
   OtherIncomeBracket,
   OtherIncomeBracketId,
+  IsaAccountType,
 } from './korean-tax';
 export { resolveCurrency, resolveYahooSymbol } from './stock-symbol';
 export {

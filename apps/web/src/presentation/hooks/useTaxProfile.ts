@@ -17,6 +17,12 @@ function normalizeProfile(raw: Partial<KoreanTaxProfile>): KoreanTaxProfile {
   if (!merged.otherIncomeBracketId) {
     merged.otherIncomeBracketId = DEFAULT_KOREAN_TAX_PROFILE.otherIncomeBracketId;
   }
+  if (!merged.isaType) merged.isaType = 'none';
+  if (merged.isaIncomeSharePercent == null || Number.isNaN(merged.isaIncomeSharePercent)) {
+    merged.isaIncomeSharePercent = DEFAULT_KOREAN_TAX_PROFILE.isaIncomeSharePercent;
+  }
+  if (merged.isaNetIncomeOverrideKrw == null) merged.isaNetIncomeOverrideKrw = 0;
+  if (merged.pensionContributionKrw == null) merged.pensionContributionKrw = 0;
   return merged;
 }
 

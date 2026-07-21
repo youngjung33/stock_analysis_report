@@ -174,4 +174,69 @@ describe('estimateKoreanTax', () => {
     expect(result.requiresComprehensiveTax).toBe(false);
     expect(result.domesticDividendWithheldKrw).toBe(Math.round(dividend * 0.154));
   });
+
+  it('applies ISA tax-free limit and 9.9% overflow', () => {
+    const result = estimateKoreanTax(
+      [
+        {
+          symbol: '005930',
+          market: Market.KR,
+          currency: 'KRW',
+          transactions: [{ type: TransactionType.BUY, quantity: 10, price: 100_000, tradedAt: '2026-01-01' }],
+          corporateActions: [{ type: 'DIVIDEND', effectiveAt: '2026-04-01', cashAmount: 5_000_000 }],
+        },
+      ],
+      {
+        ...DEFAULT_KOREAN_TAX_PROFILE,
+        taxYear: 2026,
+        isaType: 'general',
+        isaIncomeSharePercent: 100,
+      },
+      null,
+    );
+    expect(result.isaNetIncomeKrw).toBe(5_000_000);
+    expect(result.isaTaxFreeLimitKrw).toBe(2_000_000);
+    expect(result.isaTaxKrw).toBe(Math.round(3_000_000 * 0.099));
+    expect(result.domesticDividendWithheldKrw).toBe(0);
+    expect(result.requiresComprehensiveTax).toBe(false);
+  });
+
+  it('excludes ISA income from comprehensive tax threshold', () => {
+    const result = estimateKoreanTax(
+      [
+        {
+          symbol: '005930',
+          market: Market.KR,
+          currency: 'KRW',
+          transactions: [{ type: TransactionType.BUY, quantity: 100, price: 100_000, tradedAt: '2026-01-01' }],
+          corporateActions: [
+            {
+              type: 'DIVIDEND',
+              effectiveAt: '2026-04-01',
+              cashAmount: FINANCIAL_INCOME_THRESHOLD_KRW + 1_000_000,
+            },
+          ],
+        },
+      ],
+      {
+        ...DEFAULT_KOREAN_TAX_PROFILE,
+        taxYear: 2026,
+        isaType: 'general',
+        isaIncomeSharePercent: 100,
+      },
+      null,
+    );
+    expect(result.requiresComprehensiveTax).toBe(false);
+    expect(result.isaNetIncomeKrw).toBeGreaterThan(FINANCIAL_INCOME_THRESHOLD_KRW);
+  });
+
+  it('applies pension savings tax credit', () => {
+    const result = estimateKoreanTax([], {
+      ...DEFAULT_KOREAN_TAX_PROFILE,
+      taxYear: 2026,
+      pensionContributionKrw: 6_000_000,
+    }, null);
+    expect(result.pensionTaxCreditKrw).toBe(792_000);
+    expect(result.totalEstimatedTaxAfterCreditKrw).toBe(0);
+  });
 });

@@ -11,6 +11,13 @@ interface Props {
 }
 
 export function TaxEstimateResult({ estimate, usdKrwRate, compact = false }: Props) {
+  const displayTax =
+    estimate.pensionTaxCreditKrw > 0
+      ? estimate.totalEstimatedTaxAfterCreditKrw
+      : estimate.totalEstimatedTaxKrw;
+  const hasShelter =
+    estimate.isaNetIncomeKrw > 0 || estimate.pensionTaxCreditKrw > 0;
+
   return (
     <div className="space-y-4">
       <Surface variant="section" className="space-y-4">
@@ -24,9 +31,17 @@ export function TaxEstimateResult({ estimate, usdKrwRate, compact = false }: Pro
               {usdKrwRate ? `₩${usdKrwRate.toLocaleString('ko-KR')}/USD` : '미적용'}
             </p>
           </div>
-          <p className="text-2xl font-bold text-amber-300 md:text-3xl">
-            {formatNumber(estimate.totalEstimatedTaxKrw, 'KRW')}
-          </p>
+          <div className="text-right">
+            <p className="text-2xl font-bold text-amber-300 md:text-3xl">
+              {formatNumber(displayTax, 'KRW')}
+            </p>
+            {estimate.pensionTaxCreditKrw > 0 && (
+              <p className="mt-0.5 text-[11px] text-muted-foreground md:text-xs">
+                연금 세액공제 {formatNumber(estimate.pensionTaxCreditKrw, 'KRW')} 반영
+                · 공제 전 {formatNumber(estimate.totalEstimatedTaxKrw, 'KRW')}
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -48,16 +63,35 @@ export function TaxEstimateResult({ estimate, usdKrwRate, compact = false }: Pro
             )}
             sub={
               estimate.requiresComprehensiveTax
-                ? '종합과세 대상'
+                ? '종합과세 대상 (일반 계좌)'
                 : '분리과세 (15.4% 등)'
             }
           />
           <StatCard
             label="금융소득 합계"
             value={formatNumber(estimate.totalFinancialIncomeKrw, 'KRW')}
-            sub={`기준 ${(FINANCIAL_INCOME_THRESHOLD_KRW / 10_000).toLocaleString('ko-KR')}만 원`}
+            sub={`일반 계좌 · 기준 ${(FINANCIAL_INCOME_THRESHOLD_KRW / 10_000).toLocaleString('ko-KR')}만 원`}
           />
         </div>
+
+        {hasShelter && (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {estimate.isaNetIncomeKrw > 0 && (
+              <StatCard
+                label="ISA 순소득"
+                value={formatNumber(estimate.isaNetIncomeKrw, 'KRW')}
+                sub={`ISA 세금 ${formatNumber(estimate.isaTaxKrw, 'KRW')} · 절세 추정 ${formatNumber(estimate.isaTaxSavedKrw, 'KRW')}`}
+              />
+            )}
+            {estimate.pensionTaxCreditKrw > 0 && (
+              <StatCard
+                label="연금저축 세액공제"
+                value={formatNumber(estimate.pensionTaxCreditKrw, 'KRW')}
+                sub="납입 공제 (추정)"
+              />
+            )}
+          </div>
+        )}
       </Surface>
 
       {estimate.lines.length > 0 && (
