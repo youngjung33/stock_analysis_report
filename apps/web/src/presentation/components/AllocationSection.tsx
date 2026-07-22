@@ -1,6 +1,8 @@
 'use client';
 
-import { AllocationByMarket, AllocationItem, Market } from '@sar/shared';
+import { useTranslation } from 'react-i18next';
+import { AllocationByMarket, AllocationItem } from '@sar/shared';
+import { translateMarketLabel } from '@/i18n/translate-shared';
 import { Surface } from '../design-system';
 import { formatNumber } from '../shared/formatters';
 
@@ -49,16 +51,21 @@ function DonutChart({ items }: { items: AllocationItem[] }) {
 }
 
 export function AllocationSection({ items, allocationByMarket }: Props) {
+  const { t } = useTranslation();
+
   if (items.length === 0) return null;
 
   const hasMixed = allocationByMarket.krPercent > 0 && allocationByMarket.usPercent > 0;
 
   return (
     <Surface>
-      <h2 className="text-base font-semibold tracking-tight">자산 배분 (원화 기준)</h2>
+      <h2 className="text-base font-semibold tracking-tight">{t('portfolio.allocation.title')}</h2>
       {hasMixed && (
         <p className="mt-2 text-sm text-muted-foreground">
-          KR {allocationByMarket.krPercent.toFixed(1)}% · 해외 {allocationByMarket.usPercent.toFixed(1)}%
+          {t('portfolio.allocation.marketSplit', {
+            kr: allocationByMarket.krPercent.toFixed(1),
+            us: allocationByMarket.usPercent.toFixed(1),
+          })}
         </p>
       )}
 
@@ -70,10 +77,10 @@ export function AllocationSection({ items, allocationByMarket }: Props) {
           <table className="min-w-full text-left text-sm">
             <thead className="text-slate-500">
               <tr>
-                <th className="pb-2 pr-4">종목</th>
-                <th className="pb-2 pr-4">시장</th>
-                <th className="pb-2 pr-4">평가 (원화)</th>
-                <th className="pb-2">비중</th>
+                <th className="pb-2 pr-4">{t('common.symbol')}</th>
+                <th className="pb-2 pr-4">{t('common.marketColumn')}</th>
+                <th className="pb-2 pr-4">{t('common.valuationKrw')}</th>
+                <th className="pb-2">{t('common.weight')}</th>
               </tr>
             </thead>
             <tbody>
@@ -87,7 +94,9 @@ export function AllocationSection({ items, allocationByMarket }: Props) {
                     <span className="text-white">{item.symbol}</span>
                     <span className="ml-1 text-xs text-slate-500">{item.name}</span>
                   </td>
-                  <td className="py-2 pr-4 text-slate-400">{item.market === Market.KR ? '국내' : '미국'}</td>
+                  <td className="py-2 pr-4 text-slate-400">
+                    {translateMarketLabel(item.market, t)}
+                  </td>
                   <td className="py-2 pr-4 text-slate-300">{formatNumber(item.marketValueKrw, 'KRW')}</td>
                   <td className="py-2 font-medium text-white">{item.weightPercent.toFixed(1)}%</td>
                 </tr>

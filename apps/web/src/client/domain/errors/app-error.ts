@@ -1,10 +1,12 @@
 import {
   AppErrorCode,
+  isAppErrorCode,
+  isInternalAppErrorCode,
   resolveAppErrorMessage,
-  USER_FACING_SERVER_ERROR_MESSAGE,
   type AppErrorCode as AppErrorCodeType,
 } from '@sar/shared';
 import { AxiosError } from 'axios';
+import i18n from '@/i18n/config';
 import { parseApiErrorBody } from './api-error-parse';
 
 export class AppError extends Error {
@@ -17,25 +19,37 @@ export class AppError extends Error {
   }
 }
 
-export function getErrorMessage(
-  error: unknown,
-  fallback = USER_FACING_SERVER_ERROR_MESSAGE,
-): string {
+function translateErrorCode(code: AppErrorCodeType | string | undefined, serverMessage?: string): string {
+  if (code && isAppErrorCode(code)) {
+    const key = `errors.${code}`;
+    const translated = i18n.t(key);
+    if (translated !== key) return translated;
+    return resolveAppErrorMessage(code, serverMessage);
+  }
+  return i18n.t('errors.serverError');
+}
+
+export function getErrorMessage(error: unknown, fallback?: string): string {
+  const defaultFallback = fallback ?? i18n.t('errors.serverError');
+
   if (error instanceof AppError) {
-    return resolveAppErrorMessage(error.code, error.message);
+    return translateErrorCode(error.code, error.message);
   }
 
   if (error instanceof AxiosError) {
     const parsed = parseApiErrorBody(error.response?.data);
     if (parsed) {
-      return resolveAppErrorMessage(parsed.code, parsed.message);
+      if (parsed.code && isAppErrorCode(parsed.code) && isInternalAppErrorCode(parsed.code)) {
+        return i18n.t('errors.serverError');
+      }
+      return translateErrorCode(parsed.code, parsed.message);
     }
     if (error.response) {
-      return USER_FACING_SERVER_ERROR_MESSAGE;
+      return i18n.t('errors.serverError');
     }
   }
 
-  return fallback;
+  return defaultFallback;
 }
 
 export { toAppError } from './api-error';

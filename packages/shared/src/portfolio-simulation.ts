@@ -34,13 +34,17 @@ export interface SimulationAction {
   name: string;
   market: Market;
   currency: string;
+  /** @deprecated use reasonKey — kept for tests / fallback */
   reason: string;
+  reasonKey: string;
+  reasonParams?: Record<string, string | number>;
   currentWeightPercent: number | null;
   targetWeightPercent: number | null;
   suggestedAmountKrw: number | null;
   suggestedAmountNative: number | null;
   suggestedQuantity: number | null;
   tagLabel?: string;
+  tag?: import('./market-insights').RecommendationTag;
 }
 
 export interface PortfolioSimulationResult {
@@ -59,8 +63,14 @@ export interface PortfolioSimulationResult {
   projectedInvestedKrw: number;
   projectedTotalAssetsKrw: number;
   projectedStockAllocation: AllocationByMarket;
+  /** @deprecated use headlineKey — kept for tests / fallback */
   headline: string;
+  /** @deprecated use descriptionKey */
   description: string;
+  headlineKey: string;
+  headlineParams?: Record<string, string | number>;
+  descriptionKey: string;
+  descriptionParams?: Record<string, string | number>;
 }
 
 function clampPercent(n: number): number {
@@ -138,6 +148,7 @@ export function buildPortfolioSimulation(input: {
         market: h.market,
         currency: h.currency,
         reason: weight > 0 ? '목표 비중 내 — 유지' : '소량 보유 — 유지',
+        reasonKey: weight > 0 ? 'shared.simulation.reason.withinTarget' : 'shared.simulation.reason.smallHolding',
         currentWeightPercent: h.weightPercent,
         targetWeightPercent: h.weightPercent,
         suggestedAmountKrw: null,
@@ -171,6 +182,11 @@ export function buildPortfolioSimulation(input: {
         market: h.market,
         currency: h.currency,
         reason: `비중 ${weight.toFixed(1)}% → 목표 ${targetWeight.toFixed(0)}% 이하로 조정 검토`,
+        reasonKey: 'shared.simulation.reason.trimWeight',
+        reasonParams: {
+          weight: weight.toFixed(1),
+          target: targetWeight.toFixed(0),
+        },
         currentWeightPercent: h.weightPercent,
         targetWeightPercent: targetWeight,
         suggestedAmountKrw: actualTrimKrw,
@@ -185,6 +201,7 @@ export function buildPortfolioSimulation(input: {
         market: h.market,
         currency: h.currency,
         reason: '과집중이나 매도 단위 미달 — 관찰',
+        reasonKey: 'shared.simulation.reason.trimUnitTooSmall',
         currentWeightPercent: h.weightPercent,
         targetWeightPercent: h.weightPercent,
         suggestedAmountKrw: null,
@@ -230,6 +247,9 @@ export function buildPortfolioSimulation(input: {
       market: rec.market,
       currency: rec.currency,
       reason: `${rec.tagLabel} — ${rec.reason}`,
+      reasonKey: rec.reasonKey ?? 'shared.simulation.reason.addRecommendation',
+      reasonParams: rec.reasonParams,
+      tag: rec.tag,
       currentWeightPercent: null,
       targetWeightPercent: null,
       suggestedAmountKrw: spendKrw,
@@ -249,6 +269,7 @@ export function buildPortfolioSimulation(input: {
       market: Market.KR,
       currency: 'KRW',
       reason: '조정 후 남는 예수금 — 추가 매수·비상금으로 활용',
+      reasonKey: 'shared.simulation.reason.reserveCash',
       currentWeightPercent: null,
       targetWeightPercent: null,
       suggestedAmountKrw: projectedCashTotalKrw,
@@ -293,6 +314,34 @@ export function buildPortfolioSimulation(input: {
       : { krPercent: 0, usPercent: 0 };
 
   const regionLabel = underweightMarket === Market.KR ? '국내' : '미국';
+  const regionKey = underweightMarket === Market.KR ? 'domestic' : 'us';
+  const headlineKey =
+    cashTotalKrw <= 0 && investedKrw <= 0
+      ? 'shared.simulation.headline.noCapital'
+      : 'shared.simulation.headline.withAssets';
+  const headlineParams =
+    cashTotalKrw <= 0 && investedKrw <= 0
+      ? undefined
+      : {
+          totalAssets: formatCashAmount(totalAssetsKrw, 'KRW'),
+          cashPercent: cashPercent.toFixed(0),
+        };
+
+  const isUnderweightKr = allocationGapPercent.kr >= allocationGapPercent.us;
+  const descriptionKey =
+    gapPercent > 2
+      ? isUnderweightKr
+        ? 'shared.simulation.description.underweight'
+        : 'shared.simulation.description.overweight'
+      : 'shared.simulation.description.balanced';
+  const descriptionParams =
+    gapPercent > 2
+      ? {
+          region: regionKey,
+          gap: Math.abs(gapPercent).toFixed(1),
+        }
+      : undefined;
+
   const headline =
     cashTotalKrw <= 0 && investedKrw <= 0
       ? '투자 원금을 설정하면 맞춤 비중 제안이 시작됩니다'
@@ -300,7 +349,7 @@ export function buildPortfolioSimulation(input: {
 
   const description =
     gapPercent > 2
-      ? `${regionLabel} 비중이 목표 대비 ${Math.abs(gapPercent).toFixed(1)}%p ${allocationGapPercent.kr >= allocationGapPercent.us ? '부족' : '과다'}합니다. 아래 매수 제안을 참고하세요.`
+      ? `${regionLabel} 비중이 목표 대비 ${Math.abs(gapPercent).toFixed(1)}%p ${isUnderweightKr ? '부족' : '과다'}합니다. 아래 매수 제안을 참고하세요.`
       : '시장·종목 비중이 목표에 근접합니다. 과집중 종목 조정과 현금 배분을 확인하세요.';
 
   return {
@@ -321,5 +370,9 @@ export function buildPortfolioSimulation(input: {
     projectedStockAllocation,
     headline,
     description,
+    headlineKey,
+    headlineParams,
+    descriptionKey,
+    descriptionParams,
   };
 }

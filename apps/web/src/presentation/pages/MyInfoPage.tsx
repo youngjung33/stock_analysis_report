@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
 import { CapitalAndSimulationSection } from '../components/CapitalAndSimulationSection';
 import { TransactionForm } from '../features/transactions/TransactionForm';
 import { TransactionList } from '../features/transactions/TransactionList';
@@ -12,19 +13,22 @@ import { PageStack, Surface } from '../design-system';
 /** 자본금·보유 종목 등록·수정 전용 페이지 */
 export function MyInfoPage() {
   const screen = useMyInfoScreen();
+  const { t } = useTranslation();
 
   return (
-    <AppShell title="내 정보" subtitle={`${screen.displayName}님의 투자 정보`}>
+    <AppShell
+      title={t('myInfo.title')}
+      subtitle={t('myInfo.subtitle', { name: screen.displayName })}
+    >
       <PageStack>
         {screen.isGuest && (
           <p className="rounded-xl border border-amber-900/40 bg-amber-950/30 px-4 py-3 text-xs text-amber-200/90 md:px-5 md:text-sm">
-            비회원 모드입니다. 여기서 입력한 예수금·매매는 브라우저에만 저장되며, 탭을 닫으면
-            사라집니다. 회원가입하면 서버에 안전하게 보관됩니다.
+            {t('myInfo.guestNotice')}
           </p>
         )}
 
         {screen.isLoading && (
-          <p className="text-sm text-muted-foreground">불러오는 중...</p>
+          <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
         )}
 
         {screen.data && (
@@ -33,25 +37,21 @@ export function MyInfoPage() {
 
             <section id="capital" className="scroll-mt-6">
               <Surface variant="section" className="mb-4 space-y-1">
-                <h2 className="text-base font-semibold md:text-lg">예수금·투자 원금</h2>
-                <p className="text-xs text-muted-foreground md:text-sm">
-                  투자 원금 설정, 입금·출금으로 예수금을 자유롭게 조정할 수 있습니다.
-                </p>
+                <h2 className="text-base font-semibold md:text-lg">{t('myInfo.capitalTitle')}</h2>
+                <p className="text-xs text-muted-foreground md:text-sm">{t('myInfo.capitalDesc')}</p>
               </Surface>
               <CapitalAndSimulationSection onPortfolioUpdated={screen.onPortfolioUpdated} />
             </section>
 
             <section id="stocks" className="scroll-mt-6 space-y-5">
               <Surface variant="section" className="space-y-1">
-                <h2 className="text-base font-semibold md:text-lg">매매 등록</h2>
-                <p className="text-xs text-muted-foreground md:text-sm">
-                  매수·매도를 등록하거나 매매 내역을 삭제해 보유 종목을 조정할 수 있습니다.
-                </p>
+                <h2 className="text-base font-semibold md:text-lg">{t('myInfo.tradesTitle')}</h2>
+                <p className="text-xs text-muted-foreground md:text-sm">{t('myInfo.tradesDesc')}</p>
               </Surface>
               <TransactionForm onSuccess={screen.onPortfolioUpdated} />
               <div>
                 <h3 className="mb-4 text-sm font-semibold text-muted-foreground md:text-base">
-                  매매 내역
+                  {t('myInfo.tradeHistory')}
                 </h3>
                 <TransactionList refreshKey={screen.refreshKey} />
               </div>
@@ -59,14 +59,13 @@ export function MyInfoPage() {
 
             <section id="tax" className="scroll-mt-6 space-y-5">
               <Surface variant="section" className="space-y-1">
-                <h2 className="text-base font-semibold md:text-lg">내 세금</h2>
+                <h2 className="text-base font-semibold md:text-lg">{t('myInfo.taxTitle')}</h2>
                 <p className="text-xs text-muted-foreground md:text-sm">
-                  조건을 선택하면 적용되는 세목과 보유·매매 기반 추정 세액을 확인할 수 있습니다.
-                  세금 기준 전체는{' '}
+                  {t('myInfo.taxDesc')}{' '}
                   <a href="/tax" className="text-primary underline-offset-2 hover:underline">
-                    세금 정보
-                  </a>
-                  탭에서 확인할 수 있습니다.
+                    {t('myInfo.taxLink')}
+                  </a>{' '}
+                  {t('myInfo.taxDescSuffix')}
                 </p>
               </Surface>
               <MyTaxSection refreshKey={screen.refreshKey} />

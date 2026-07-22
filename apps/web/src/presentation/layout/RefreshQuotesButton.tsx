@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslation } from 'react-i18next';
 import { cn } from '../lib/cn';
 
 interface Props {
@@ -9,6 +12,8 @@ interface Props {
 
 /** 대시보드 시세 갱신 — AppShell headerActions용 */
 export function RefreshQuotesButton({ onClick, loading, className, compact }: Props) {
+  const { t } = useTranslation();
+
   return (
     <button
       type="button"
@@ -20,7 +25,7 @@ export function RefreshQuotesButton({ onClick, loading, className, compact }: Pr
         className,
       )}
     >
-      {loading ? '시세 갱신 중...' : '시세 갱신'}
+      {loading ? t('common.refreshingQuotes') : t('common.refreshQuotes')}
     </button>
   );
 }

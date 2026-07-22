@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { LogOut, Settings } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { cn } from '../lib/cn';
 
@@ -15,6 +16,7 @@ interface Props {
 
 export function AppHeader({ title, subtitle, actions, className, showMobileLogout = true }: Props) {
   const { logout, isGuest } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <header
@@ -36,7 +38,7 @@ export function AppHeader({ title, subtitle, actions, className, showMobileLogou
             <Link
               href="/settings"
               className="rounded-lg border border-border-strong p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground md:hidden"
-              aria-label="계정 설정"
+              aria-label={t('nav.accountSettings')}
             >
               <Settings className="size-4" />
             </Link>
@@ -46,7 +48,7 @@ export function AppHeader({ title, subtitle, actions, className, showMobileLogou
               type="button"
               onClick={() => logout()}
               className="rounded-lg border border-border-strong p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground md:hidden"
-              aria-label="로그아웃"
+              aria-label={t('nav.logout')}
             >
               <LogOut className="size-4" />
             </button>

@@ -1,3 +1,13 @@
+export {
+  SUPPORTED_LOCALES,
+  DEFAULT_LOCALE,
+  LOCALE_STORAGE_KEY,
+  LOCALE_LABELS,
+  isSupportedLocale,
+  normalizeLocale,
+} from './i18n';
+export type { SupportedLocale } from './i18n';
+
 export { Market, TransactionType } from './enums';
 
 export const REFRESH_TOKEN_COOKIE = 'refreshToken';

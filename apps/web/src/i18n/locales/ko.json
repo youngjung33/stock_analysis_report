@@ -1,0 +1,1188 @@
+{
+  "common": {
+    "loading": "불러오는 중...",
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "confirm": "확인",
+    "close": "닫기",
+    "guest": "비회원",
+    "guestBadge": "(비회원)",
+    "lastRefreshed": "마지막 갱신: {{time}}",
+    "refreshQuotes": "시세 갱신",
+    "refreshingQuotes": "시세 갱신 중...",
+    "marketKr": "한국",
+    "marketUs": "미국",
+    "marketKrShort": "국내",
+    "marketUsShort": "해외",
+    "domestic": "국내",
+    "usMarket": "미국",
+    "symbol": "종목",
+    "quantity": "수량",
+    "unitPrice": "단가",
+    "memo": "메모",
+    "memoOptional": "메모 (선택)",
+    "type": "유형",
+    "content": "내용",
+    "effectiveDate": "적용일",
+    "tradeDate": "매매일",
+    "register": "등록",
+    "registering": "등록 중...",
+    "submitting": "제출 중...",
+    "empty": "없음",
+    "change": "변경",
+    "held": "보유",
+    "units": "주",
+    "countSuffix": "개",
+    "sharesSuffix": "주",
+    "yearSuffix": "년",
+    "backToDashboard": "투자 현황으로",
+    "backToLogin": "로그인으로 돌아가기",
+    "retry": "다시 시도",
+    "errorOccurred": "문제가 발생했습니다",
+    "tryAgainLater": "잠시 후 다시 시도해 주세요.",
+    "approx": "약",
+    "cash": "예수금",
+    "averageCost": "평단",
+    "currentPrice": "현재가",
+    "changePercent": "등락",
+    "changePercentRate": "등락률",
+    "marketValue": "평가금액",
+    "marketValueKrw": "평가금액 (원화)",
+    "unrealizedPnl": "평가 손익",
+    "unrealizedPnlKrw": "평가 손익 (원화)",
+    "realizedPnl": "실현 손익",
+    "realizedPnlKrw": "실현 손익 (원화)",
+    "unrealizedPnlShort": "미실현 손익",
+    "unrealizedPnlShortKrw": "미실현 손익 (원화)",
+    "marketColumn": "시장",
+    "weight": "비중",
+    "valuationKrw": "평가 (원화)",
+    "noneApplicable": "없음 (조세조약)",
+    "dash": "—",
+    "email": "이메일",
+    "newPassword": "새 비밀번호",
+    "newPasswordConfirm": "새 비밀번호 확인",
+    "rate": "세율",
+    "threshold": "기준·공제",
+    "filing": "신고",
+    "category": "구분",
+    "item": "항목",
+    "taxableBase": "과세표준",
+    "estimatedTax": "추정 세액",
+    "notice": "안내",
+    "expand": "펼치기",
+    "collapse": "접기",
+    "country": "국가",
+    "localWithholding": "현지 원천징수",
+    "domesticAdditional": "국내 추가",
+    "remarks": "비고",
+    "accountType": "유형",
+    "taxFreeLimit": "비과세 한도",
+    "overflow": "초과분",
+    "taxBracket": "과세표준 구간",
+    "taxRate": "세율",
+    "yearLabel": "{{year}}년",
+    "marginalRate": "한계세율",
+    "localTaxSuffix": "(+ 지방세)",
+    "fxRateBasis": "USD/KRW {{rate}} 기준",
+    "fxConversionNote": "원화 환산",
+    "welcomeRegistered": "회원가입을 환영합니다! 투자 내역을 시작해 보세요.",
+    "amountRequired": "금액을 입력해 주세요.",
+    "selectStockRequired": "종목을 검색해서 선택해 주세요.",
+    "requestFailed": "요청을 처리하지 못했습니다."
+  },
+  "meta": {
+    "title": "주식 투자 현황",
+    "description": "개인용 주식 매매·배당·세금 관리"
+  },
+  "nav": {
+    "mainMenu": "주 메뉴",
+    "bottomMenu": "하단 메뉴",
+    "dashboard": "투자 현황",
+    "dashboardShort": "홈",
+    "myInfo": "내 정보",
+    "myInfoShort": "내 정보",
+    "transactions": "매매·배당",
+    "transactionsShort": "매매",
+    "market": "시장 분석",
+    "marketShort": "시장",
+    "tax": "세금 정보",
+    "taxShort": "세금",
+    "accountSettings": "계정 설정",
+    "logout": "로그아웃"
+  },
+  "auth": {
+    "username": "아이디",
+    "password": "비밀번호",
+    "passwordConfirm": "비밀번호 확인",
+    "emailOptional": "이메일 (선택)",
+    "login": "로그인",
+    "loggingIn": "로그인 중...",
+    "register": "회원가입",
+    "registering": "가입 중...",
+    "loginSubtitle": "로그인 후 매매와 시세를 관리하세요.",
+    "registerSubtitle": "회원가입 후 투자 내역을 관리하세요.",
+    "orWithUsername": "또는 아이디로",
+    "checkDuplicate": "중복 확인",
+    "formatHint": "형식: {{hint}}",
+    "alreadyHaveAccount": "이미 계정이 있으신가요?",
+    "noAccount": "계정이 없으신가요?",
+    "forgotPassword": "비밀번호를 잊으셨나요?",
+    "guestBrowseTitle": "비회원으로 둘러보기",
+    "guestBrowseDesc": "서버에 저장되지 않으며, 이 브라우저 탭을 닫으면 데이터가 사라집니다.",
+    "guestEnter": "비회원으로 입장",
+    "guestEntering": "입장 중...",
+    "oauthFailed": "소셜 로그인에 실패했습니다.",
+    "oauthCancelled": "소셜 로그인이 취소되었습니다.",
+    "oauthLoading": "소셜 로그인 불러오는 중...",
+    "oauthStartFailed": "소셜 로그인을 시작하지 못했습니다.",
+    "oauthNotConfigured": "소셜 로그인은 관리자 설정 후 사용할 수 있습니다.",
+    "guestLoginFailed": "비회원 로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+    "usernameChecking": "아이디 확인 중...",
+    "usernameCheckFailed": "아이디 확인에 실패했습니다.",
+    "forgotPasswordTitle": "비밀번호 찾기",
+    "forgotPasswordDesc": "가입 시 등록한 이메일로 재설정 링크를 보냅니다.",
+    "forgotPasswordSubmit": "재설정 링크 받기",
+    "forgotPasswordSending": "발송 중...",
+    "forgotPasswordSuccess": "등록된 이메일이 있으면 재설정 링크를 보냈습니다.",
+    "resetPasswordTitle": "비밀번호 재설정",
+    "resetPasswordSubmit": "비밀번호 변경",
+    "resetPasswordChanging": "변경 중...",
+    "resetPasswordSuccess": "비밀번호가 변경되었습니다. 로그인해 주세요.",
+    "resetPasswordFailed": "비밀번호 재설정에 실패했습니다.",
+    "resetLinkInvalid": "유효하지 않은 재설정 링크입니다."
+  },
+  "settings": {
+    "title": "계정 설정",
+    "language": "언어",
+    "languageDesc": "변경 즉시 앱 전체에 적용됩니다.",
+    "email": "이메일",
+    "emailVerified": "인증됨",
+    "emailUnverified": "미인증",
+    "requestVerificationCode": "인증 코드 받기",
+    "saveAndIssueCode": "저장 · 코드 발급",
+    "verificationCode": "인증 코드 (6자리)",
+    "verify": "인증하기",
+    "changePassword": "비밀번호 변경",
+    "currentPassword": "현재 비밀번호",
+    "newPassword": "새 비밀번호",
+    "newPasswordConfirm": "새 비밀번호 확인",
+    "changePasswordButton": "비밀번호 변경",
+    "socialAccounts": "소셜 로그인 연동",
+    "noSocialAccounts": "연동된 소셜 계정이 없습니다.",
+    "unlink": "연동 해제",
+    "unlinkConfirm": "{{provider}} 연동을 해제할까요?",
+    "deleteAccount": "회원탈퇴",
+    "deleteAccountDesc": "탈퇴 시 매매 내역, 관심종목, 소셜 연동 등 계정 데이터가 DB에서 영구 삭제됩니다.",
+    "deletePasswordConfirm": "비밀번호 확인",
+    "deleteAccountButton": "회원탈퇴",
+    "deleteConfirm": "탈퇴 시 거래·관심종목·연동 계정 등 모든 데이터가 삭제되며 복구할 수 없습니다. 정말 탈퇴할까요?",
+    "verificationCodeToast": "인증 코드: {{code}}",
+    "loadProfileFailed": "계정 정보를 불러오지 못했습니다.",
+    "changeEmailFailed": "이메일 변경에 실패했습니다.",
+    "alreadyVerified": "이미 인증된 이메일입니다.",
+    "issueCodeFailed": "인증 코드 발급에 실패했습니다.",
+    "verifySuccess": "이메일 인증이 완료되었습니다.",
+    "verifyFailed": "인증 코드가 올바르지 않습니다.",
+    "passwordChanged": "비밀번호가 변경되었습니다.",
+    "passwordChangeFailed": "비밀번호 변경에 실패했습니다.",
+    "unlinkSuccess": "소셜 계정 연동을 해제했습니다.",
+    "unlinkFailed": "연동 해제에 실패했습니다.",
+    "deleteFailed": "회원탈퇴에 실패했습니다."
+  },
+  "errors": {
+    "serverError": "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+    "globalTitle": "문제가 발생했습니다",
+    "globalMessage": "잠시 후 다시 시도해 주세요.",
+    "VALIDATION": "입력값을 확인해 주세요.",
+    "NOT_FOUND": "요청한 정보를 찾을 수 없습니다.",
+    "CONFLICT": "요청을 처리할 수 없습니다. 이미 존재하는 데이터입니다.",
+    "INTERNAL": "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+    "DB_UNAVAILABLE": "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+    "RATE_LIMIT": "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
+    "AUTH_UNAUTHORIZED": "로그인이 필요합니다.",
+    "AUTH_INVALID_CREDENTIALS": "아이디 또는 비밀번호가 올바르지 않습니다.",
+    "AUTH_SOCIAL_ONLY": "소셜 로그인으로 가입한 계정입니다. 소셜 로그인을 이용해 주세요.",
+    "AUTH_INVALID_REFRESH": "세션이 만료되었습니다. 다시 로그인해 주세요.",
+    "AUTH_INVALID_ACCESS": "인증 정보가 유효하지 않습니다.",
+    "AUTH_LOGIN_REQUIRED": "아이디와 비밀번호를 입력해 주세요.",
+    "AUTH_USERNAME_INVALID": "아이디 형식이 올바르지 않습니다.",
+    "AUTH_USERNAME_TAKEN": "이미 사용 중인 아이디입니다.",
+    "AUTH_EMAIL_INVALID": "올바른 이메일 형식이 아닙니다.",
+    "AUTH_EMAIL_TAKEN": "이미 사용 중인 이메일입니다.",
+    "AUTH_PASSWORD_INVALID": "비밀번호 형식이 올바르지 않습니다.",
+    "AUTH_PASSWORD_MISMATCH": "비밀번호 확인이 일치하지 않습니다.",
+    "AUTH_REGISTER_FIELDS_REQUIRED": "회원가입 필수 항목을 모두 입력해 주세요.",
+    "AUTH_OAUTH_PROVIDER_INVALID": "지원하지 않는 소셜 로그인입니다.",
+    "AUTH_OAUTH_NOT_CONFIGURED": "소셜 로그인이 아직 설정되지 않았습니다.",
+    "AUTH_OAUTH_STATE_INVALID": "소셜 로그인 인증이 만료되었습니다. 다시 시도해 주세요.",
+    "AUTH_OAUTH_FAILED": "소셜 로그인에 실패했습니다. 다시 시도해 주세요.",
+    "AUTH_TOKEN_INVALID": "링크가 유효하지 않거나 만료되었습니다.",
+    "AUTH_CURRENT_PASSWORD_INVALID": "현재 비밀번호가 올바르지 않습니다.",
+    "AUTH_OAUTH_UNLINK_FORBIDDEN": "다른 로그인 수단을 먼저 설정해 주세요.",
+    "AUTH_EMAIL_REQUIRED": "이메일이 필요합니다.",
+    "CASH_INSUFFICIENT": "가용 현금이 부족합니다.",
+    "CASH_AMOUNT_INVALID": "금액을 확인해 주세요.",
+    "dashboardLoadFailed": "투자 현황을 불러오지 못했습니다.",
+    "marketAnalysisLoadFailed": "시장 분석을 불러오지 못했습니다.",
+    "stockQuoteLoadFailed": "종목 시세를 불러오지 못했습니다.",
+    "quoteRefreshFailed": "시세 갱신에 실패했습니다."
+  },
+  "dashboard": {
+    "title": "투자 현황",
+    "subtitle": "{{name}}님",
+    "guestNotice": "비회원 모드입니다. 매매 데이터는 서버에 저장되지 않으며, 탭을 닫으면 사라집니다.",
+    "loading": "투자 현황 불러오는 중...",
+    "loadingCapital": "예수금·비중 조정 불러오는 중..."
+  },
+  "myInfo": {
+    "title": "내 정보",
+    "subtitle": "{{name}}님의 투자 정보",
+    "guestNotice": "비회원 모드입니다. 여기서 입력한 예수금·매매는 브라우저에만 저장되며, 탭을 닫으면 사라집니다. 회원가입하면 서버에 안전하게 보관됩니다.",
+    "capitalTitle": "예수금·투자 원금",
+    "capitalDesc": "투자 원금 설정, 입금·출금으로 예수금을 자유롭게 조정할 수 있습니다.",
+    "tradesTitle": "매매 등록",
+    "tradesDesc": "매수·매도를 등록하거나 매매 내역을 삭제해 보유 종목을 조정할 수 있습니다.",
+    "tradeHistory": "매매 내역",
+    "taxTitle": "내 세금",
+    "taxDesc": "조건을 선택하면 적용되는 세목과 보유·매매 기반 추정 세액을 확인할 수 있습니다. 세금 기준 전체는",
+    "taxLink": "세금 정보",
+    "taxDescSuffix": "탭에서 확인할 수 있습니다."
+  },
+  "transactions": {
+    "title": "매매·배당",
+    "corporateActions": "배당·분할·합병 내역",
+    "tradeHistory": "매매 내역",
+    "form": {
+      "title": "매매 등록",
+      "tradeType": "매매 구분",
+      "buy": "매수",
+      "sell": "매도"
+    },
+    "list": {
+      "loading": "매매 내역 불러오는 중...",
+      "empty": "등록된 매매가 없습니다."
+    },
+    "types": {
+      "BUY": "매수",
+      "SELL": "매도"
+    },
+    "toast": {
+      "registered": "매매가 등록되었습니다.",
+      "registerFailed": "매매 등록에 실패했습니다.",
+      "deleted": "매매가 삭제되었습니다.",
+      "deleteFailed": "매매 삭제에 실패했습니다."
+    },
+    "confirm": {
+      "delete": "이 매매 내역을 삭제할까요?"
+    }
+  },
+  "corporateAction": {
+    "form": {
+      "title": "배당·분할·합병 등록",
+      "description": "배당금 입금, 주식분할, 합병 전환 등을 투자·세금 계산에 반영합니다.",
+      "dividendAmount": "배당 총액",
+      "splitRatio": "분할 비율 (2 = 1→2)",
+      "targetQuantity": "받는 수량",
+      "targetPrice": "전환 단가 (매입가)",
+      "cashCompensation": "현금 보상 (선택)",
+      "missingFields": "종목과 적용일을 입력하세요."
+    },
+    "list": {
+      "loading": "배당·분할·합병 내역 불러오는 중...",
+      "empty": "등록된 배당·분할·합병 내역이 없습니다."
+    },
+    "types": {
+      "DIVIDEND": "배당",
+      "SPLIT": "주식분할",
+      "MERGER": "합병"
+    },
+    "detail": {
+      "split": "1→{{ratio}}",
+      "mergerTarget": "→ {{symbol}}",
+      "mergerQuantity": "{{quantity}}주",
+      "mergerCash": "현금 {{amount}}"
+    },
+    "toast": {
+      "registered": "배당·분할·합병 내역이 등록되었습니다.",
+      "registerFailed": "등록에 실패했습니다.",
+      "deleted": "내역이 삭제되었습니다.",
+      "deleteFailed": "삭제에 실패했습니다."
+    },
+    "confirm": {
+      "delete": "이 내역을 삭제할까요?"
+    }
+  },
+  "onboarding": {
+    "title": "투자 내역을 시작해 보세요",
+    "guestDesc": "비회원 모드입니다. 투자 원금과 보유 종목을 등록하면 투자 현황에서 한눈에 확인할 수 있습니다. (탭을 닫으면 데이터가 사라집니다)",
+    "memberDesc": "아직 등록된 투자 원금이나 보유 종목이 없습니다. 아래 단계대로 입력해 주세요.",
+    "step1Title": "1. 투자 원금·예수금 등록",
+    "step1Desc": "투자 가능한 원화·달러 예수금을 입력합니다. 이후 입금·출금도 자유롭게 조정할 수 있습니다.",
+    "step2Title": "2. 매매 등록",
+    "step2Desc": "매수·매도 내역을 등록하면 보유 종목과 손익이 자동으로 계산됩니다.",
+    "cta": "내 정보에서 등록하기"
+  },
+  "capital": {
+    "title": "투자 원금 · 예수금",
+    "cashSummary": "예수금 {{krw}}{{usd}}",
+    "krwLabel": "원화 (KRW)",
+    "usdLabel": "달러 (USD)",
+    "krwPlaceholder": "예: 10,000,000",
+    "usdPlaceholder": "예: 5,000",
+    "setCapital": "투자 원금 설정",
+    "depositKrw": "KRW 입금",
+    "withdrawKrw": "KRW 출금",
+    "depositUsd": "USD 입금",
+    "withdrawUsd": "USD 출금",
+    "refreshing": "잔액 반영 중...",
+    "simulationTitle": "비중 시뮬레이션",
+    "simulationDesc": "목표 비중 기준 제안 (참고용).",
+    "actionKeep": "유지",
+    "actionTrim": "비중 축소",
+    "actionAdd": "매수 검토",
+    "actionReserveCash": "남는 예수금",
+    "targetAllocationTitle": "목표 비중 · 집중도",
+    "targetKrPercent": "국내 %",
+    "targetUsPercent": "해외(미국) %",
+    "maxWeightPercent": "종목 최대 비중 %",
+    "saveTarget": "목표 저장",
+    "simulationStatsTitle": "비중 조정 제안",
+    "statTotalAssets": "총 자산",
+    "statCashWeight": "현금 비중",
+    "statMarketSplit": "국내 / 해외 (주식)",
+    "statProjectedCash": "조정 후 예수금",
+    "suggestedTrade": "{{quantity}}주 · 약 {{amount}}",
+    "suggestedAmount": "약 {{amount}}",
+    "memoInitialCapital": "투자 원금",
+    "memoInitialCapitalUsd": "투자 원금 (USD)",
+    "memoDeposit": "입금",
+    "memoWithdraw": "출금",
+    "toast": {
+      "capitalSet": "투자 원금이 반영되었습니다.",
+      "capitalSetFailed": "투자 원금 등록에 실패했습니다.",
+      "depositSuccess": "입금이 반영되었습니다.",
+      "depositFailed": "입금에 실패했습니다.",
+      "withdrawSuccess": "출금이 반영되었습니다.",
+      "withdrawFailed": "출금에 실패했습니다.",
+      "targetSaved": "목표 비중이 저장되었습니다.",
+      "targetSaveFailed": "설정 저장에 실패했습니다."
+    }
+  },
+  "tax": {
+    "guideTitle": "한국 거주자 주식 세금 안내",
+    "guideIntro": "2026년 기준 국세청·소득세법 참고 요약입니다. 실제 신고·납부는 국세청·세무 전문가 확인이 필요합니다.",
+    "profileTitle": "내 세금 조건",
+    "profileDesc": "본인 상황을 선택하면 적용되는 세목과 보유·매매 기반 추정 세액을 확인할 수 있습니다.",
+    "taxYear": "과세 연도",
+    "investorType": "투자자 유형",
+    "investorGeneral": "일반 투자자",
+    "investorGeneralDesc": "코스피·코스닥 매매차익 비과세",
+    "investorMajor": "국내 대주주",
+    "investorMajorDesc": "시총 50억+ 또는 지분 1%+ — 매매차익 과세",
+    "investMarkets": "투자 시장",
+    "investDomestic": "국내 주식 (KR)",
+    "investDomesticDesc": "배당·증권거래세·국내 규정",
+    "investForeign": "해외 주식 (US 등)",
+    "investForeignDesc": "양도소득세·해외 배당",
+    "foreignDividendSource": "해외 배당 원천지",
+    "localWithholdingShort": "현지 {{rate}}%",
+    "isaSection": "세제혜택 계좌 (ISA)",
+    "isaSectionDesc": "ISA 계좌 내 순소득은 비과세 한도·9.9% 분리과세로 별도 계산됩니다. 거래를 ISA/일반으로 구분하지 않았다면 비율로 나눕니다.",
+    "isaTaxFreeLimit": "비과세 {{limit}}만 원",
+    "isaIncomeShare": "ISA 소득 비율 ({{percent}}%)",
+    "isaIncomeShareDesc": "배당·매매·기타 금융소득 중 ISA 계좌 비율 (직접 입력이 있으면 아래 값 우선)",
+    "isaNetIncomeOverride": "ISA 순소득 직접 입력 (원, 선택)",
+    "isaNetIncomePlaceholder": "비율로 자동 추정",
+    "pensionSection": "연금저축 납입 (세액공제)",
+    "pensionSectionDesc": "근로소득자 연금저축 납입액 — 연 600만 원 한도, 13.2% 세액공제 추정",
+    "otherFinancialIncome": "기타 금융소득 (원)",
+    "otherFinancialIncomeDesc": "예금 이자·채권 이자 등 (배당 제외)",
+    "otherIncomeBracket": "연간 기타 소득 (근로·사업)",
+    "otherIncomeBracketDesc": "종합소득세 누진 구간 산정용 — 해당하는 구간을 선택하세요",
+    "marginalRateLabel": "한계세율 {{rate}} (+ 지방세)",
+    "applicableTitle": "나에게 적용되는 세금",
+    "applicableDesc": "선택한 조건 기준 {{count}}개 세목 · 전체 기준은",
+    "applicableDescLink": "세금 정보",
+    "applicableDescSuffix": "에서 확인",
+    "applicableRateFiling": "세율 {{rate}} · {{filing}}",
+    "rulesReferenceTitle": "세목별 기준",
+    "rulesReferenceCount": "{{count}}개 항목",
+    "rulesReferenceSubtitle": "국세청·소득세법 기준 — {{count}}개 항목",
+    "loadingEstimate": "거래·배당 데이터 불러오는 중...",
+    "noTransactions": "{{year}}년 매도·배당 내역이 없습니다. 거래·배당·분할·합병을 등록하면 추정 세액이 표시됩니다.",
+    "guideLinkHint": "세금 기준 전체·국가별 배당·누진세 구간은",
+    "guideLink": "세금 정보",
+    "guideLinkSuffix": "를 참고하세요.",
+    "estimate": {
+      "compactTitle": "보유·매매 기반 추정 세액",
+      "yearTitle": "{{year}}년 추정 세금",
+      "basis": "등록된 거래·배당 기준 · 환율",
+      "fxApplied": "₩{{rate}}/USD",
+      "fxNotApplied": "미적용",
+      "pensionCreditApplied": "연금 세액공제 {{credit}} 반영 · 공제 전 {{before}}",
+      "domesticGain": "국내 매매차익",
+      "exemptGeneral": "비과세 (일반)",
+      "taxable": "과세",
+      "foreignNetGain": "해외 순매매차익",
+      "taxableBase": "과세표준 {{amount}}",
+      "dividendTotal": "배당 (국내+해외)",
+      "comprehensiveTax": "종합과세 대상 (일반 계좌)",
+      "separationTax": "분리과세 (15.4% 등)",
+      "financialIncomeTotal": "금융소득 합계",
+      "regularAccountThreshold": "일반 계좌 · 기준 2,000만 원",
+      "isaNetIncome": "ISA 순소득",
+      "isaTaxDetail": "ISA 세금 {{tax}} · 절세 추정 {{saved}}",
+      "pensionCredit": "연금저축 세액공제",
+      "pensionCreditSub": "납입 공제 (추정)",
+      "lineItemsTitle": "세목별 내역",
+      "disclaimerForeignGain": "해외주식 양도세는 다음 해 5월 1~31일 확정신고·납부 대상입니다.",
+      "disclaimerComprehensive": "배당·금융소득 2,000만 원 초과 시 5월 종합소득세 신고가 필요합니다."
+    },
+    "guide": {
+      "bulletFinancialTax": "금융투자소득세(금투세)는 2026년 기준 미시행·폐지 논의 중",
+      "bulletForeignGain": "해외주식 양도세 — 다음 해 5월 1~31일 확정신고",
+      "bulletComprehensive": "금융소득(이자+배당) 2,000만 원 초과 시 종합과세",
+      "shelterAccountsTitle": "세제혜택 계좌 (ISA·연금저축)",
+      "shelterAccountsDesc": "ISA(개인종합자산관리계좌)는 계좌 내 손익통산 후 순소득에 대해 비과세 한도를 적용하고, 초과분은 9.9% 분리과세합니다. ISA로 과세된 소득은 금융소득종합과세(2,000만 원) 합산에서 제외됩니다.",
+      "taxFreeLimitPerYear": "{{limit}}만 원/년",
+      "isaOverflowRate": "9.9% 분리과세",
+      "pensionCreditDesc": "연금저축 납입은 근로소득자에게 납입액의 13.2% 세액공제(연 600만 원 한도)가 적용됩니다. 본 앱 추정에서는 배당·매매 세금과 별도로 표시합니다.",
+      "foreignDividendTitle": "국가별 해외 배당 원천징수",
+      "capitalDeductionTitle": "양도소득 기본공제",
+      "capitalDeductionDesc": "해외주식·국내 대주주 양도소득 — 연간 250만 원 (국내·해외 합산 1회). 일반 투자자의 국내 상장주식 매매차익은 비과세입니다.",
+      "incomeTaxBracketsTitle": "종합소득세 누진 구간 (금융소득종합과세)",
+      "incomeTaxBracketsDesc": "금융소득 2,000만 원 초과 시 이자·배당 전액이 다른 소득과 합산되어 아래 구간별 세율(+ 지방세 10%)이 적용됩니다.",
+      "filingScheduleTitle": "신고 일정 요약"
+    }
+  },
+  "market": {
+    "title": "시장 분석",
+    "detailTitle": "시장 심층 분석",
+    "detailSubtitle": "변동성 · 경기 · 업종 · 차트 지표",
+    "sentimentTitle": "시장 정세 요약",
+    "sentimentDesc": "대표 종목 오늘 시세 기준 · 변동성·업종·차트 지표는 상세 페이지",
+    "detailAnalysisLink": "상세 분석 →",
+    "loadingQuotes": "시세 불러오는 중...",
+    "regionKr": "🇰🇷 한국",
+    "regionUs": "🇺🇸 미국",
+    "avgChange": "평균 {{percent}}",
+    "avgChangeDetail": "평균 등락 {{percent}}",
+    "upDownCount": "↑{{up}} ↓{{down}}",
+    "deepAnalysisDesc": "VIX · 환율 · 국채 · 섹터 RS · SMA/RSI/MACD/볼린저/스토캐스틱 · 뉴스",
+    "disclaimer": "Yahoo Finance·Google News·Finnhub(선택) 기반 참고용 분석이며 투자 권유가 아닙니다.",
+    "watchlistPrefix": "관심 종목:",
+    "seeMoreInDetail": "상세에서 더 보기",
+    "deepAnalysisTitle": "시장 정세 · 심층 분석",
+    "deepAnalysisLoading": "경기·지수·업종·뉴스 분석 중… (최대 25초)",
+    "expandAnalysis": "왜 그렇게 보는지 · 근거 ▼",
+    "collapseAnalysis": "분석 접기 ▲",
+    "latestHeadlines": "최신 헤드라인",
+    "indicatorDetails": "지표별 상세 해석",
+    "stockQuickLinks": "종목 바로가기",
+    "panels": {
+      "macroTitle": "경기 · 변동성 · 환율 · 금리",
+      "macroSubtitle": "VIX · USD/KRW · 미국 국채 수익률",
+      "indexTitle": "주요 지수 · 기술적 지표",
+      "indexSubtitle": "SMA · RSI · MACD · 볼린저 · 스토캐스틱",
+      "indexName": "지수",
+      "price": "가격",
+      "oneDay": "1일",
+      "bollinger": "볼린저",
+      "trend": "추세",
+      "sectorTitle": "업종 ETF 상대강도",
+      "sectorSubtitle": "1주·1달 수익률 — SPY / KODEX 200 대비 자금 이동 관찰",
+      "todayChange": "당일 {{percent}}",
+      "macroOneDay": "1일 {{percent}}",
+      "macroKrwValue": "{{value}}원",
+      "oneWeek": "1주 {{percent}}",
+      "sectorBenchmark": "{{title}} · 기준지수 {{benchmark}}",
+      "sectorUs": "🇺🇸 미국",
+      "sectorKr": "🇰🇷 한국",
+      "chartLink": "차트 ↗"
+    }
+  },
+  "guest": {
+    "displayName": "비회원"
+  },
+  "watchlist": {
+    "title": "관심종목",
+    "desc": "보유와 별도로 추적할 종목을 등록하세요.",
+    "loading": "불러오는 중...",
+    "empty": "등록된 관심종목이 없습니다.",
+    "heldBadge": "보유",
+    "toast": {
+      "addSuccess": "관심종목에 추가했습니다.",
+      "addFailed": "관심종목 추가에 실패했습니다.",
+      "removeSuccess": "관심종목에서 삭제했습니다.",
+      "removeFailed": "관심종목 삭제에 실패했습니다."
+    }
+  },
+  "stock": {
+    "detail": {
+      "title": "종목 상세",
+      "myHolding": "내 보유",
+      "myHoldingLoading": "내 보유 정보 불러오는 중...",
+      "periodPrices": "기간별 시세",
+      "periodPricesHint": "기간 버튼을 누르면 해당 구간 시세를 조회합니다",
+      "currentPriceLabel": "현재가 ({{range}} 기준)",
+      "loadingChart": "차트 불러오는 중...",
+      "noChartData": "차트 데이터가 없습니다.",
+      "loadingQuote": "조회 중...",
+      "fetchedAt": "조회 시각: {{time}}"
+    },
+    "chart": {
+      "loading": "차트 불러오는 중...",
+      "empty": "차트 데이터가 없습니다.",
+      "ariaLabel": "종목 가격 차트"
+    },
+    "search": {
+      "selectedStock": "선택된 종목",
+      "market": "시장",
+      "marketKrOption": "한국 (KR)",
+      "marketUsOption": "미국 (US)",
+      "searchLabel": "종목 검색",
+      "placeholderKr": "종목명 또는 코드 (예: 삼성전자, 005930)",
+      "placeholderUs": "Ticker or name (e.g. AAPL)",
+      "searching": "검색 중...",
+      "noResults": "검색 결과가 없습니다.",
+      "selectHint": "검색 결과에서 종목을 선택해야 거래를 등록할 수 있습니다.",
+      "searchFailed": "종목 검색에 실패했습니다. 잠시 후 다시 시도해 주세요."
+    }
+  },
+  "quoteRange": {
+    "1d": "오늘",
+    "3d": "3일",
+    "1w": "1주",
+    "1mo": "1달",
+    "3mo": "3달",
+    "6mo": "6달",
+    "ytd": "올해",
+    "1y": "1년",
+    "5y": "5년",
+    "10y": "10년",
+    "max": "최대"
+  },
+  "quotes": {
+    "featured": {
+      "title": "주요 종목 시세",
+      "subtitle": "대표 한국·미국 종목 · 진입 시 오늘 시세를 일괄 조회합니다",
+      "tableHint": "종목을 클릭하면 상세·기간별 시세를 볼 수 있습니다",
+      "krTitle": "🇰🇷 한국 주식",
+      "usTitle": "🇺🇸 미국 주식",
+      "loading": "시세 불러오는 중...",
+      "querying": "조회 중...",
+      "unavailable": "조회 불가",
+      "todayChangeTitle": "오늘 기준 등락",
+      "loadFailed": "주요 종목 시세를 불러오지 못했습니다."
+    },
+    "refresh": {
+      "successTitle": "시세 갱신 완료",
+      "warningTitle": "일부 종목만 갱신됨",
+      "errorTitle": "시세 갱신 실패",
+      "marketUpdated": "{{market}} {{count}}건 갱신: {{symbols}}",
+      "refreshBlocked": "갱신 불가 ({{symbols}}) — {{reason}}",
+      "queryFailed": "조회 실패 ({{symbols}}) — {{reason}}"
+    },
+    "notice": {
+      "title": "시세 API 안내",
+      "finnhubHint": "설정된 API만 시세를 가져옵니다. 미국 주식은 Finnhub API 키(FINNHUB_API_KEY)가 필요합니다.",
+      "providerAvailable": "{{label}} — 이용 가능",
+      "providerUnavailable": "{{label}} — 이용 불가{{hint}}"
+    }
+  },
+  "portfolio": {
+    "summary": {
+      "totalAssetsKrw": "총 자산 (원화)",
+      "cashKrw": "예수금 (원화)",
+      "totalCostBasis": "총 매입금액",
+      "totalCostBasisKrw": "총 매입금액 (원화)",
+      "totalMarketValue": "총 평가금액",
+      "totalMarketValueKrw": "총 평가금액 (원화)",
+      "todayPnl": "당일 손익",
+      "unrealizedPnl": "평가 손익",
+      "realizedPnl": "실현 손익",
+      "holdingsCount": "보유 종목",
+      "holdingsCountValue": "{{count}}개"
+    },
+    "holdings": {
+      "empty": "보유 종목이 없습니다. 매매를 등록해 보세요."
+    },
+    "allocation": {
+      "title": "자산 배분 (원화 기준)",
+      "marketSplit": "KR {{kr}}% · 해외 {{us}}%"
+    },
+    "periodReturns": {
+      "title": "기간 수익률 (원화 가중)",
+      "loading": "기간 수익률 불러오는 중...",
+      "coverage": "시세 반영률 {{percent}}%"
+    },
+    "benchmark": {
+      "title": "지수 대비 수익률",
+      "portfolioReturn": "내 수익률 {{percent}}",
+      "alpha": "({{value}}%p)"
+    },
+    "insights": {
+      "title": "보유 종목 차트·뉴스",
+      "empty": "보유 종목 분석 정보가 없습니다.",
+      "rsiLabel": "RSI {{rsi}} · {{label}}"
+    }
+  },
+  "pages": {
+    "stockDetail": {
+      "title": "종목 상세",
+      "marketQueryRequired": "market 쿼리(KR 또는 US)가 필요합니다."
+    },
+    "tax": {
+      "title": "세금 정보"
+    },
+    "globalError": {
+      "title": "문제가 발생했습니다",
+      "message": "잠시 후 다시 시도해 주세요.",
+      "retry": "다시 시도"
+    }
+  },
+  "shared": {
+    "sentiment": {
+      "strong_bull": "강세",
+      "bull": "우호",
+      "neutral": "혼조",
+      "bear": "약세",
+      "strong_bear": "급락"
+    },
+    "tag": {
+      "momentum": "상승 흐름",
+      "watchlist": "관심",
+      "pullback": "조정 구간",
+      "defensive": "방어"
+    },
+    "periods": {
+      "1mo": "1달",
+      "3mo": "3달",
+      "ytd": "올해",
+      "max": "전체"
+    },
+    "tax": {
+      "rules": {
+        "kr-capital-general": {
+          "category": "국내주식 · 양도",
+          "title": "일반 투자자 매매차익",
+          "summary": "코스피·코스닥 상장주식을 대주주가 아닌 경우 매매차익 비과세",
+          "rateLabel": "0% (비과세)",
+          "thresholdLabel": "해당 없음",
+          "filingLabel": "신고 불필요",
+          "notes": [
+            "금융투자소득세(금투세)는 2026년 기준 미시행·폐지 논의",
+            "대주주·비상장주식은 별도 과세"
+          ]
+        },
+        "kr-capital-major": {
+          "category": "국내주식 · 양도",
+          "title": "대주주 매매차익",
+          "summary": "종목당 시가총액 50억 원 이상 또는 지분 1% 이상 보유 시 양도소득세",
+          "rateLabel": "22% (3억 이하) / 27.5% (3억 초과, 지방세 포함)",
+          "thresholdLabel": "기본공제 250만 원/년",
+          "filingLabel": "다음 해 5월 확정신고",
+          "notes": [
+            "국내·해외 주식 양도손익 통산 가능 (2020.1.1 이후)",
+            "필요경비: 수수료 등 (증빙 필요)"
+          ]
+        },
+        "kr-dividend": {
+          "category": "국내주식 · 배당",
+          "title": "배당소득 (분리과세)",
+          "summary": "국내 배당금 원천징수 후 입금",
+          "rateLabel": "15.4% (14% + 지방 1.4%)",
+          "thresholdLabel": "금융소득(이자+배당) 2,000만 원 이하 시 분리과세 종결",
+          "filingLabel": "2,000만 원 초과 시 5월 종합소득세 신고",
+          "notes": [
+            "예금 이자·채권 이자·국내외 배당 합산",
+            "초과 시 전액 종합과세 (누진 6~45% + 지방세)"
+          ]
+        },
+        "kr-securities-tax": {
+          "category": "국내주식 · 매도",
+          "title": "증권거래세",
+          "summary": "매도 시 매도 대금에 부과 (매수 시에도 소액 부과)",
+          "rateLabel": "약 0.18~0.23% (시장·종목별 상이)",
+          "thresholdLabel": "공제 없음",
+          "filingLabel": "원천징수 (별도 신고 없음)",
+          "notes": [
+            "코스피 약 0.18%, 코스닥 약 0.20~0.23% (농어촌특별세 포함)",
+            "본 추정치는 0.20% 적용"
+          ]
+        },
+        "us-capital": {
+          "category": "해외주식 · 양도",
+          "title": "해외주식 매매차익",
+          "summary": "모든 거주자 — 연간 양도차익 과세",
+          "rateLabel": "22% (지방세 포함)",
+          "thresholdLabel": "기본공제 250만 원/년 (국내·해외 합산 1회)",
+          "filingLabel": "다음 해 5월 1~31일 확정신고",
+          "notes": [
+            "같은 해 해외주식 손익 통산",
+            "환율: 매수·매도 각각 선입선출 또는 거래일 환율 (본 앱은 단일 환율 추정)"
+          ]
+        },
+        "us-dividend": {
+          "category": "해외주식 · 배당",
+          "title": "해외 배당소득",
+          "summary": "현지 원천징수 + 국내 추가 과세 (조세조약)",
+          "rateLabel": "국가별 상이 (미국 15% 등)",
+          "thresholdLabel": "금융소득 2,000만 원 이하라도 해외 배당은 5월 신고 권장",
+          "filingLabel": "5월 확정신고 (외국납부세액공제)",
+          "notes": [
+            "2,000만 원 이하·국내 원천징수만 해당 시 분리과세 종결",
+            "해외 배당은 원천징수 여부와 관계없이 신고 의무 (공제 목적)"
+          ]
+        },
+        "financial-comprehensive": {
+          "category": "공통",
+          "title": "금융소득종합과세",
+          "summary": "이자 + 배당 합산 초과 시 누진세",
+          "rateLabel": "6% ~ 45% (+ 지방세 10%)",
+          "thresholdLabel": "2,000만 원/년",
+          "filingLabel": "5월 종합소득세",
+          "notes": [
+            "초과 시 금융소득 전액이 종합과세 대상",
+            "이미 원천징수한 세액은 공제"
+          ]
+        },
+        "isa-account": {
+          "category": "세제혜택 계좌",
+          "title": "ISA (개인종합자산관리계좌)",
+          "summary": "계좌 내 순소득 손익통산 후 비과세 한도·9.9% 분리과세",
+          "rateLabel": "비과세 한도 내 0% / 초과 9.9%",
+          "thresholdLabel": "일반형 200만 원 · 서민·노후형 400만 원",
+          "filingLabel": "만기·해지 시 또는 연간 정산 (금융사)",
+          "notes": [
+            "주식·ETF·펀드·예금 등 통합, 의무 가입 3년",
+            "ISA 분리과세 소득은 금융소득종합과세 합산에서 제외 (9.9%로 종결)",
+            "증권거래세 등 별도 세목은 그대로 부과"
+          ]
+        },
+        "pension-savings": {
+          "category": "세제혜택 계좌",
+          "title": "연금저축 납입 공제",
+          "summary": "근로소득자 연금저축 납입액 세액공제 (본 추정은 단순 13.2%)",
+          "rateLabel": "납입액의 13.2% (연 600만 원 한도)",
+          "thresholdLabel": "최대 약 79.2만 원 세액공제",
+          "filingLabel": "연말정산 또는 5월 확정신고",
+          "notes": [
+            "IRP·퇴직연금 합산 한도는 별도",
+            "배당·매매차익과는 별개 — 납입 공제"
+          ]
+        }
+      },
+      "isa": {
+        "none": {
+          "label": "해당 없음",
+          "description": "일반 위탁·종합 계좌만 사용"
+        },
+        "general": {
+          "label": "ISA 일반형",
+          "description": "순소득 200만 원까지 비과세, 초과분 9.9% 분리과세"
+        },
+        "worker": {
+          "label": "ISA 서민형·농어민형",
+          "description": "순소득 400만 원까지 비과세 (소득 요건 충족 시)"
+        },
+        "senior": {
+          "label": "ISA 노후형",
+          "description": "만 65세 이상, 순소득 400만 원까지 비과세"
+        }
+      },
+      "otherIncome": {
+        "under_14m": {
+          "label": "1,400만 원 이하",
+          "rateLabel": "6%"
+        },
+        "14m_50m": {
+          "label": "1,400만~5,000만 원",
+          "rateLabel": "15%"
+        },
+        "50m_88m": {
+          "label": "5,000만~8,800만 원",
+          "rateLabel": "24%"
+        },
+        "88m_150m": {
+          "label": "8,800만~1.5억 원",
+          "rateLabel": "35%"
+        },
+        "150m_300m": {
+          "label": "1.5억~3억 원",
+          "rateLabel": "38%"
+        },
+        "300m_500m": {
+          "label": "3억~5억 원",
+          "rateLabel": "40%"
+        },
+        "500m_1b": {
+          "label": "5억~10억 원",
+          "rateLabel": "42%"
+        },
+        "over_1b": {
+          "label": "10억 원 초과",
+          "rateLabel": "45%"
+        }
+      },
+      "foreignDividend": {
+        "US": {
+          "label": "미국",
+          "note": "한·미 조세조약 — 국내 추가 과세 없음 (5월 신고·외국납부세액공제)"
+        },
+        "JP": {
+          "label": "일본",
+          "note": "조세조약 — 국내 추가 과세 없음"
+        },
+        "CN": {
+          "label": "중국",
+          "note": "현지 10% + 국내 차액 약 4.4% (지방세 별도)"
+        },
+        "HK": {
+          "label": "홍콩",
+          "note": "현지 원천징수 없음 — 국내 15.4% 신고"
+        },
+        "UK": {
+          "label": "영국",
+          "note": "현지 원천징수 없음 — 국내 15.4% 신고"
+        },
+        "OTHER": {
+          "label": "기타",
+          "note": "국가별 조세조약·현지 세율 확인 필요"
+        }
+      },
+      "applicableStatus": {
+        "applies": "적용",
+        "exempt": "비과세",
+        "conditional": "조건부",
+        "not_applicable": "해당 없음"
+      },
+      "applicableReasons": {
+        "kr-capital-general": {
+          "not_applicable": "국내 주식 미투자",
+          "exempt": "일반 투자자 — 코스피·코스닥 매매차익 비과세"
+        },
+        "kr-capital-major": {
+          "applies": "대주주 — 국·해외 양도손익 통산 과세",
+          "not_applicable": "일반 투자자"
+        },
+        "kr-dividend": {
+          "not_applicable": "국내 주식 미투자",
+          "conditional": "금융소득 2,000만 원 초과 — 종합과세 전환",
+          "applies": "배당 수령 시 15.4% 원천징수"
+        },
+        "kr-securities-tax": {
+          "applies": "국내 주식 매도 시 매도 대금의 약 0.20% 부과",
+          "not_applicable": "국내 주식 미투자"
+        },
+        "us-capital": {
+          "not_applicable": "해외 주식 미투자",
+          "conditional": "대주주 — 국내 대주주 양도세에 통산",
+          "applies": "해외 매매차익 — 250만 원 공제 후 22%"
+        },
+        "us-dividend": {
+          "not_applicable": "해외 주식 미투자",
+          "conditional": "{{country}} 배당 — {{withholding}}, 5월 신고",
+          "applies": "{{country}} 배당 — {{withholding}}, 5월 신고"
+        },
+        "financial-comprehensive": {
+          "applies": "금융소득 2,000만 원 초과 — 누진세 적용",
+          "conditional": "금융소득 합계 2,000만 원 이하 — 분리과세 유지"
+        },
+        "isa-account": {
+          "not_applicable": "ISA 미사용",
+          "applies": "순소득 {{limit}}만 원까지 비과세, 초과 9.9%"
+        },
+        "pension-savings": {
+          "applies": "납입 {{amount}}원 — 세액공제 추정",
+          "conditional": "납입액 입력 시 세액공제 추정"
+        }
+      },
+      "estimateLines": {
+        "kr-gain-major": {
+          "category": "국내·해외",
+          "label": "대주주 양도소득세 (국·해외 통산)",
+          "note": "순손익 {{amount}}원"
+        },
+        "kr-gain-exempt": {
+          "category": "국내주식",
+          "label": "매매차익 (비과세)",
+          "note": "일반 투자자 코스피·코스닥"
+        },
+        "us-gain": {
+          "category": "해외주식",
+          "label": "양도소득세 (250만 원 공제 후)",
+          "note": "일반 계좌 순손익 {{amount}}원"
+        },
+        "kr-stt": {
+          "category": "국내주식",
+          "label": "증권거래세 (매도)"
+        },
+        "fin-comprehensive": {
+          "category": "배당·금융",
+          "label": "금융소득종합과세 (추정)",
+          "note": "금융소득 2,000만 원 초과"
+        },
+        "kr-div": {
+          "category": "국내주식",
+          "label": "배당소득 원천징수 (일반 계좌)"
+        },
+        "us-div": {
+          "category": "해외주식",
+          "label": "배당 ({{country}}, 일반 계좌)"
+        },
+        "isa-tax": {
+          "category": "세제혜택 계좌",
+          "label": "ISA 분리과세",
+          "note": "순소득 {{net}}원 · 비과세 {{limit}}원"
+        }
+      },
+      "disclaimers": {
+        "0": "본 추정은 참고용이며, 실제 세액·신고 의무는 국세청·세무사 확인이 필요합니다.",
+        "1": "해외주식 환산은 단일 환율(현재 또는 입력값)로 단순 추정합니다. 실제는 거래일별 환율·선입선출 적용.",
+        "2": "증권거래세·대주주 요건·필요경비(수수료)는 반영하지 않았거나 단순화했습니다.",
+        "3": "금융투자소득세(금투세)는 미반영 (2026년 기준 미시행 가정).",
+        "4": "ISA는 계좌 단위 손익통산·비율 분할로 단순 추정합니다. 실제는 금융사 정산·만기 시 확정됩니다."
+      }
+    },
+    "simulation": {
+      "headline": {
+        "noCapital": "투자 원금을 설정하면 맞춤 비중 제안이 시작됩니다",
+        "withAssets": "총 자산 {{totalAssets}} · 예수금 {{cashPercent}}%"
+      },
+      "description": {
+        "underweight": "{{region}} 비중이 목표 대비 {{gap}}%p 부족합니다. 아래 매수 제안을 참고하세요.",
+        "overweight": "{{region}} 비중이 목표 대비 {{gap}}%p 과다합니다. 아래 매수 제안을 참고하세요.",
+        "balanced": "시장·종목 비중이 목표에 근접합니다. 과집중 종목 조정과 현금 배분을 확인하세요."
+      },
+      "reason": {
+        "withinTarget": "목표 비중 내 — 유지",
+        "smallHolding": "소량 보유 — 유지",
+        "trimWeight": "비중 {{weight}}% → 목표 {{target}}% 이하로 조정 검토",
+        "trimUnitTooSmall": "과집중이나 매도 단위 미달 — 관찰",
+        "addRecommendation": "추천 내용 참고",
+        "reserveCash": "조정 후 남는 예수금 — 추가 매수·비상금으로 활용"
+      },
+      "cashName": "가용 현금"
+    },
+    "market": {
+      "categories": {
+        "breadth": "시장 폭",
+        "index": "지수·차트",
+        "technical": "기술적 지표",
+        "news": "뉴스·이슈",
+        "macro": "경기·심리",
+        "sector": "업종 상대강도",
+        "recommendation": "종목 관찰"
+      },
+      "sentiment": {
+        "headline": "{{market}} 대표 종목 · {{sentiment}}",
+        "noData": "시세 데이터가 부족해 정세를 판단하기 어렵습니다.",
+        "description": {
+          "strong_bull": "대표주 평균 {{avg}}%. 상승 {{up}} · 하락 {{down}} — 단기 상승세 우세.",
+          "bull": "대표주 평균 {{avg}}%. 상승 {{up}} · 하락 {{down}} — 완만한 상승 분위기.",
+          "neutral": "대표주 평균 {{avg}}%. 상승 {{up}} · 하락 {{down}} — 뚜렷한 방향성 없음.",
+          "bear": "대표주 평균 {{avg}}%. 상승 {{up}} · 하락 {{down}} — 조정·매도 우위.",
+          "strong_bear": "대표주 평균 {{avg}}%. 상승 {{up}} · 하락 {{down}} — 전반적 약세."
+        },
+        "marketLabel": {
+          "kr": "한국",
+          "us": "미국"
+        }
+      },
+      "recommendation": {
+        "momentumStrong": "대표주 중 오늘 가장 강한 흐름. 추세 지속 여부 확인.",
+        "bullWatchlist": "강세장 속 {{name}} — 동반 상승·상대 강도 관찰.",
+        "bearPullback": "대표주 조정폭 큼. 과매도·반등 신호 여부 관찰.",
+        "bearDefensive": "약세장에서 상대적으로 견조한 {{name}} — 방어적 관심.",
+        "neutralMomentum": "혼조장 속 {{name}} 상대 강세 — 방향성 확인.",
+        "neutralWatchlist": "혼조장에서 조정 받는 {{name}} — 지지선·반등 관찰."
+      },
+      "insights": {
+        "regions": {
+          "usGlobal": "미국·글로벌"
+        },
+        "breadth": {
+          "title": "{{region}} 대표주 {{up}}↑ {{down}}↓ — {{bias}}",
+          "summary": "{{region}} 대표 {{count}}종 평균 {{avg}}. 상승·하락 비율 {{ratio}}.",
+          "bias": {
+            "up": "상승 우위",
+            "down": "하락 우위"
+          },
+          "reasoning": {
+            "bullish": "상승 종목 수가 하락 종목보다 확실히 많으면 위험 선호 심리가 강한 편입니다. 소수 대형주만 오르는 것보다 전반적으로 오르는 편이 건강합니다.",
+            "bearish": "하락 종목이 우세하면 단기적으로 매도 압력·위험 회피 심리가 강합니다. 지수만 버티는지, 대표주 전반이 약한지 함께 확인하는 것이 좋습니다.",
+            "neutral": "상승·하락이 엇갈리면 방향성이 분명하지 않습니다. 추세 추종보다 개별 종목·업종 차별화가 큰 장세로 해석합니다."
+          }
+        },
+        "indexTrend": {
+          "title": "{{name}} — {{trend}}",
+          "summary": "현재 {{price}} · 1일 {{change}} · {{trend}}",
+          "reasoning": "지수 이동평균 배열은 기관·개인 트레이더가 많이 보는 추세 필터입니다. 종가가 단기·중기 이평 위에 있고 이평이 정배열이면 상승 추세, 그 반대면 조정·약세로 해석합니다."
+        },
+        "indexRsi": {
+          "title": "{{name}} RSI(14) {{rsi}} — {{zone}}",
+          "summary": "RSI {{rsi}}. {{zoneSummary}}.",
+          "reasoning": "RSI(14)는 최근 14일 상대적 강도를 0~100으로 나타냅니다. 70 이상은 단기 과매수, 30 이하는 과매도로 많이 해석하지만, 강한 추세장에서는 오래 머물 수 있어 지표 단독 매매 신호로 쓰지 않습니다."
+        },
+        "indexMacd": {
+          "title": "{{name}} MACD {{side}}{{alignedSuffix}}",
+          "summary": "MACD {{macd}}. {{aligned}}.",
+          "reasoning": "MACD는 12·26일 EMA 차이로 모멘텀 변화를 봅니다. 0선 위 전환 + 종가가 SMA20 위면 단기 매수세 우위, 0선 아래면 조정·약세 압력으로 해석하는 트레이더가 많습니다."
+        },
+        "indexBb": {
+          "title": "{{name}} 볼린저(20,2) — {{label}}",
+          "summary": "%B {{percentB}}% · 밴드폭 {{bandwidth}}%",
+          "reasoning": "볼린저 밴드는 20일 SMA ± 2σ입니다. %B가 1에 가까우면 상단 밴드 돌파(과열), 0에 가까우면 하단(과매도). 밴드폭 축소 후 확대는 변동성 폭발(squeeze) 전조로 보는 경우가 많습니다."
+        },
+        "indexStoch": {
+          "title": "{{name}} 스토캐스틱 — {{label}} (K {{k}} / D {{d}})",
+          "summary": "%K·%D 교차와 80/20 구간으로 단기 모멘텀을 봅니다.",
+          "reasoning": "스토캐스틱은 최근 N일 range 대비 종가 위치입니다. 80 이상 과매수·20 이하 과매도, K가 D를 상향 돌파하면 단기 매수 신호로 쓰는 트레이더가 많습니다(추세장에서는 실패 잦음)."
+        },
+        "macroPanel": {
+          "title": "{{name}} — {{interpret}}",
+          "reasoning": {
+            "vix": "VIX는 S&P 500 옵션 implied vol 기반 공포지수입니다. 주식 매수·헤지 비용·심리를 읽는 대표 지표로 CNBC·Bloomberg·트레이더 터미널에 상시 노출됩니다.",
+            "fx": "USD/KRW는 한국 증시 외국인 수급·수출주 실적·수입물가에 직결되는 핵심 변수입니다. 급격한 원화 약세는 변동성 확대 신호로 해석되기도 합니다.",
+            "yield": "미국 국채 수익률 곡선은 할인율·경기 기대·Fed 정책을 반영합니다. 10Y·5Y·3M 스프레드(역전)는 리세션 watchlist에 포함됩니다."
+          }
+        },
+        "sectorOverview": {
+          "title": "{{region}} 업종 — 1주 상대강도 1위 {{sector}}",
+          "summary": "{{name}} 1주 상대강도 {{rs}} (기준 {{benchmark}} 대비)",
+          "reasoning": "업종 ETF 상대강도는 기준지수 대비 초과 수익입니다. 상대강도가 높은 업종으로 자금이 이동하는지, 낮은 업종이 추격 매수인지 함정인지 함께 판단합니다."
+        },
+        "newsEmpty": {
+          "title": "뉴스 헤드라인 수집 제한",
+          "summary": "뉴스 피드를 가져오지 못했습니다. 아래 링크에서 직접 확인해 주세요.",
+          "reasoning": "뉴스 API·RSS는 일시적 차단 또는 키 미설정으로 실패할 수 있습니다. 정세 판단 시 뉴스는 시세·지표와 교차 확인하는 것이 좋습니다."
+        },
+        "news": {
+          "title": "{{region}} 최근 헤드라인 — {{toneLabel}}",
+          "summaryFallback": "{{headline}}",
+          "tone": {
+            "bullish": "긍정 키워드 우세",
+            "bearish": "부정 키워드 우세",
+            "neutral": "혼재"
+          },
+          "reasoning": "헤드라인 키워드(상승·하락·우려 등)로 대략적 뉴스 톤을 분류했습니다. 단일 기사보다 여러 출처의 흐름을 보는 것이 중요하며, 이미 가격에 반영됐을 수 있습니다."
+        },
+        "macroGlobal": {
+          "titleDiverge": "한·미 시장 온도차",
+          "titleSync": "한·미 동조/혼조",
+          "summaryDiverge": "한국 {{krAvg}} · 미국 {{usAvg}} — 지역별 온도차",
+          "summarySync": "한국 {{krAvg}} · 미국 {{usAvg}}",
+          "reasoningDiverge": "한국과 미국 대표주 평균 등락이 크게 다르면 환율·금리·업종 이슈 등 지역 요인이 작용 중일 수 있습니다. 환율(KRW/USD)과 함께 보는 것이 일반적입니다.",
+          "reasoningSync": "양 시장이 비슷한 방향이면 글로벌 투자 심리가 공통 변수일 가능성이 큽니다. 연준·원화·유가 등 경제 헤드라인과 교차 확인하세요."
+        },
+        "recommendation": {
+          "title": "[{{tag}}] {{name}}",
+          "reasoning": {
+            "momentum": "강한 당일·단기 수익률은 추세 추종 투자자가 관심 갖는 구간입니다. 거래량·지수 대비 상대강도를 함께 확인하면 허수 돌파를 줄일 수 있습니다.",
+            "pullback": "급락·조정 구간은 되돌림 매수와 추세 이탈 매도가 갈리는 지점입니다. 지지선·RSI 과매도·뉴스 악재 여부를 확인하세요.",
+            "defensive": "약세장에서도 버티는 종목은 변동성이 낮거나 실적·현금흐름이 받쳐주는 경우가 많습니다. 반등 시 상대적으로 늦게 따라오는 업종일 수 있습니다.",
+            "watchlist": "혼조장에서는 상대강도·배당·실적 일정 등 개별 재료가 더 중요합니다."
+          }
+        }
+      },
+      "trends": {
+        "mixed": "혼조",
+        "shortTermUp": "단기 상승 추세",
+        "midTermUp": "중기 상승 추세",
+        "shortTermPullback": "단기 조정",
+        "longTermDown": "장기 하락 채널"
+      },
+      "bollinger": {
+        "aboveUpper": "상단 이탈(과열)",
+        "nearUpper": "상단 밴드 근접",
+        "belowLower": "하단 이탈(과매도)",
+        "nearLower": "하단 밴드 근접",
+        "midBand": "밴드 중앙"
+      },
+      "stochastic": {
+        "overbought": "과매수",
+        "oversold": "과매도",
+        "kAboveD": "K>D 상승",
+        "kBelowD": "K<D 하락",
+        "neutral": "중립"
+      },
+      "strength": {
+        "strong": "강함",
+        "weak": "약함",
+        "normal": "보통"
+      },
+      "rsi": {
+        "overbought": "과매수",
+        "oversold": "과매도",
+        "neutral": "중립"
+      },
+      "rsiZone": {
+        "overbought": "과매수 구간",
+        "oversold": "과매도 구간",
+        "neutral": "중립"
+      },
+      "rsiZoneSummary": {
+        "overbought": "단기 과열 신호",
+        "oversold": "반등 관찰 구간",
+        "neutral": "극단 구간 아님"
+      },
+      "macdSide": {
+        "positive": "양전환",
+        "negative": "음전환"
+      },
+      "macdAligned": {
+        "aligned": "모멘텀·추세 정합",
+        "weak": "모멘텀 약화 가능"
+      },
+      "macdAlignedSuffix": {
+        "yes": " + 단기 이평 상회",
+        "no": ""
+      },
+      "macro": {
+        "vix": {
+          "extremeFear": "극단적 공포",
+          "extremeFearDetail": "VIX 30+는 패닉·급락장에서 흔합니다. 변동성 자체가 크므로 단기 반등(공포 매수) vs 추세 지속을 구분해야 합니다.",
+          "elevatedFear": "불안 고조",
+          "elevatedFearDetail": "투자자 헤지·매도 수요가 늘어난 상태. 리스크 자산 조정 압력이 커질 수 있습니다.",
+          "normal": "보통",
+          "normalDetail": "역사적 평균(약 15~20) 근처. 특별한 공포·탐욕 신호는 약합니다.",
+          "lowVol": "낮은 변동성",
+          "lowVolDetail": "시장이 안심·채무모드에 가깝습니다. 다만 VIX 극저는 역으로 조정(complacency) 경고로 보는 트레이더도 많습니다."
+        },
+        "fx": {
+          "krwWeak": "원화 약세",
+          "krwWeakDetail": "달러당 {{rate}}원대 — 원화 약세는 외국인 수급·수출주엔 순풍, 수입·외채·성장주엔 부담으로 해석되는 경우가 많습니다.",
+          "krwStrong": "원화 강세",
+          "krwStrongDetail": "원화 강세 구간 — 국내 유동성·수입물가에는 긍정적이나 수출·외국인 매수엔 제약 요인이 될 수 있습니다.",
+          "stable": "보합",
+          "stableDetail": "환율 변동이 크지 않아 매크로 변수로서 영향이 제한적입니다."
+        },
+        "yield": {
+          "rising": "금리 상승 압력",
+          "risingDetail": "{{name}} 수익률 상승은 금융여건 경화·성장주 밸류에이션 압박으로 연결됩니다. Fed 정책·물가 기대를 함께 보세요.",
+          "falling": "금리 하락",
+          "fallingDetail": "국채 수익률 하락은 risk-on·성장주에 우호적일 수 있으나 경기 둔화 우려와 겹칠 수 있습니다.",
+          "highRegime": "고금리 구간",
+          "highRegimeDetail": "{{yield}}% — 2020년대 고금리 regime. 할인율 상승으로 장기 성장주 멀티플에 부담.",
+          "stable": "안정",
+          "stableDetail": "{{yield}}% — 단기적으로 큰 re-pricing 압력은 제한적."
+        }
+      },
+      "sectors": {
+        "bySymbol": {
+          "XLK": "기술",
+          "SMH": "반도체",
+          "XLF": "금융",
+          "XLE": "에너지",
+          "XLV": "헬스케어",
+          "091160.KS": "반도체",
+          "091170.KS": "금융",
+          "091180.KS": "자동차"
+        }
+      }
+    }
+  }
+}

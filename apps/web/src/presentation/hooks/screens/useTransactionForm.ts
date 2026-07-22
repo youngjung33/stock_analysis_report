@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Market, StockSearchResult, TransactionType } from '@sar/shared';
 import { parseAmountInput } from '@sar/shared';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
@@ -8,6 +9,7 @@ import { useToast } from '../../components/Toast';
 import { useServices } from '../useServices';
 
 export function useTransactionForm(onSuccess: () => void) {
+  const { t } = useTranslation();
   const { createTransactionUseCase } = useServices();
   const { showError, showSuccess } = useToast();
   const [selectedStock, setSelectedStock] = useState<StockSearchResult | null>(null);
@@ -28,7 +30,7 @@ export function useTransactionForm(onSuccess: () => void) {
     e.preventDefault();
 
     if (!selectedStock) {
-      showError('종목을 검색해서 선택해 주세요.');
+      showError(t('common.selectStockRequired'));
       return;
     }
 
@@ -49,10 +51,10 @@ export function useTransactionForm(onSuccess: () => void) {
       setQuantity('');
       setPrice('');
       setMemo('');
-      showSuccess('매매가 등록되었습니다.');
+      showSuccess(t('transactions.toast.registered'));
       onSuccess();
     } catch (err) {
-      showError(getErrorMessage(err, '매매 등록에 실패했습니다.'));
+      showError(getErrorMessage(err, t('transactions.toast.registerFailed')));
     } finally {
       setLoading(false);
     }

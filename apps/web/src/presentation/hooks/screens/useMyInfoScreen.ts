@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../useAuth';
 import { useDashboard } from '../useDashboard';
 
 export function useMyInfoScreen() {
+  const { t } = useTranslation();
   const { username, isGuest } = useAuth();
   const { data, isLoading, reload } = useDashboard();
   const [refreshKey, setRefreshKey] = useState(0);
@@ -15,7 +17,7 @@ export function useMyInfoScreen() {
   }
 
   return {
-    displayName: isGuest ? '비회원' : username,
+    displayName: isGuest ? t('guest.displayName') : username,
     isGuest,
     data,
     isLoading,

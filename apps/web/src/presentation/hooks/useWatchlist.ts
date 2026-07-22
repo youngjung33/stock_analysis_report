@@ -1,12 +1,14 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Market } from '@sar/shared';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
 import { useToast } from '../components/Toast';
 import { useServices } from './useServices';
 
 export function useWatchlist(holdingSymbols: { symbol: string; market: Market }[] = []) {
+  const { t } = useTranslation();
   const { listWatchlistUseCase, addWatchlistUseCase, removeWatchlistUseCase } = useServices();
   const { showError, showSuccess } = useToast();
   const queryClient = useQueryClient();
@@ -32,18 +34,18 @@ export function useWatchlist(holdingSymbols: { symbol: string; market: Market }[
   async function add(input: { symbol: string; name: string; market: Market }) {
     try {
       await addMutation.mutateAsync(input);
-      showSuccess('관심종목에 추가했습니다.');
+      showSuccess(t('watchlist.toast.addSuccess'));
     } catch (err) {
-      showError(getErrorMessage(err, '관심종목 추가에 실패했습니다.'));
+      showError(getErrorMessage(err, t('watchlist.toast.addFailed')));
     }
   }
 
   async function remove(id: string) {
     try {
       await deleteMutation.mutateAsync(id);
-      showSuccess('관심종목에서 삭제했습니다.');
+      showSuccess(t('watchlist.toast.removeSuccess'));
     } catch (err) {
-      showError(getErrorMessage(err, '관심종목 삭제에 실패했습니다.'));
+      showError(getErrorMessage(err, t('watchlist.toast.removeFailed')));
     }
   }
 

@@ -19,8 +19,14 @@ export interface RegionSentiment {
   upCount: number;
   downCount: number;
   flatCount: number;
+  /** @deprecated use headlineKey */
   headline: string;
+  /** @deprecated use descriptionKey */
   description: string;
+  headlineKey: string;
+  headlineParams?: Record<string, string | number>;
+  descriptionKey: string;
+  descriptionParams?: Record<string, string | number>;
 }
 
 export type RecommendationTag = 'momentum' | 'watchlist' | 'pullback' | 'defensive';
@@ -33,8 +39,12 @@ export interface StockRecommendation {
   currentPrice: number;
   changePercent: number;
   tag: RecommendationTag;
+  /** @deprecated use tag + translateTag */
   tagLabel: string;
+  /** @deprecated use reasonKey */
   reason: string;
+  reasonKey: string;
+  reasonParams?: Record<string, string | number>;
 }
 
 export interface MarketInsightsResult {
@@ -102,6 +112,7 @@ export function computeRegionSentiment(market: Market, quotes: QuoteInsightInput
   const valid = validQuotes(quotes);
 
   if (valid.length === 0) {
+    const marketKey = market === Market.KR ? 'kr' : 'us';
     return {
       market,
       label: 'neutral',
@@ -111,6 +122,9 @@ export function computeRegionSentiment(market: Market, quotes: QuoteInsightInput
       flatCount: 0,
       headline: regionHeadline(market, 'neutral'),
       description: '시세 데이터가 부족해 정세를 판단하기 어렵습니다.',
+      headlineKey: 'shared.market.sentiment.headline',
+      headlineParams: { market: marketKey, sentiment: 'neutral' },
+      descriptionKey: 'shared.market.sentiment.noData',
     };
   }
 
@@ -119,6 +133,8 @@ export function computeRegionSentiment(market: Market, quotes: QuoteInsightInput
   const downCount = valid.filter((q) => q.changePercent < -0.05).length;
   const flatCount = valid.length - upCount - downCount;
   const label = sentimentFromAvg(avgChangePercent);
+
+  const marketKey = market === Market.KR ? 'kr' : 'us';
 
   return {
     market,
@@ -129,6 +145,15 @@ export function computeRegionSentiment(market: Market, quotes: QuoteInsightInput
     flatCount,
     headline: regionHeadline(market, label),
     description: regionDescription(market, label, avgChangePercent, upCount, downCount),
+    headlineKey: 'shared.market.sentiment.headline',
+    headlineParams: { market: marketKey, sentiment: label },
+    descriptionKey: `shared.market.sentiment.description.${label}`,
+    descriptionParams: {
+      market: marketKey,
+      avg: `${avgChangePercent >= 0 ? '+' : ''}${avgChangePercent.toFixed(2)}`,
+      up: upCount,
+      down: downCount,
+    },
   };
 }
 
@@ -148,6 +173,8 @@ function toRecommendation(
   quote: QuoteInsightInput & { changePercent: number; currentPrice: number },
   tag: RecommendationTag,
   reason: string,
+  reasonKey: string,
+  reasonParams?: Record<string, string | number>,
 ): StockRecommendation {
   return {
     symbol: quote.symbol,
@@ -159,6 +186,8 @@ function toRecommendation(
     tag,
     tagLabel: TAG_LABEL_KO[tag],
     reason,
+    reasonKey,
+    reasonParams,
   };
 }
 
@@ -167,7 +196,7 @@ function pickForMarket(
   market: Market,
   sentiment: RegionSentiment,
 ): StockRecommendation[] {
-  const region = market === Market.KR ? '국내' : '미국';
+  const region = market === Market.KR ? 'domestic' : 'us';
   const pool = quotes.filter((q) => q.market === market);
   if (pool.length === 0) return [];
 
@@ -185,6 +214,8 @@ function pickForMarket(
         top,
         'momentum',
         `${region} 대표주 중 오늘 가장 강한 흐름. 추세 지속 여부 확인.`,
+        'shared.market.recommendation.momentumStrong',
+        { market: region, name: top.name },
       ),
     );
     if (sortedDesc[1] && sortedDesc[1].symbol !== top.symbol) {
@@ -193,6 +224,8 @@ function pickForMarket(
           sortedDesc[1],
           'watchlist',
           `강세장 속 ${sortedDesc[1].name} — 동반 상승·상대 강도 관찰.`,
+          'shared.market.recommendation.bullWatchlist',
+          { name: sortedDesc[1].name },
         ),
       );
     }
@@ -203,6 +236,8 @@ function pickForMarket(
         laggard,
         'pullback',
         `${region} 대표주 조정폭 큼. 과매도·반등 신호 여부 관찰.`,
+        'shared.market.recommendation.bearPullback',
+        { market: region },
       ),
     );
     const resilient = [...pool].sort(byChangeDesc).find((q) => q.changePercent >= -0.3);
@@ -212,6 +247,8 @@ function pickForMarket(
           resilient,
           'defensive',
           `약세장에서 상대적으로 견조한 ${resilient.name} — 방어적 관심.`,
+          'shared.market.recommendation.bearDefensive',
+          { name: resilient.name },
         ),
       );
     }
@@ -223,6 +260,8 @@ function pickForMarket(
         leader,
         'momentum',
         `혼조장 속 ${leader.name} 상대 강세 — 방향성 확인.`,
+        'shared.market.recommendation.neutralMomentum',
+        { name: leader.name },
       ),
     );
     if (laggard.symbol !== leader.symbol) {
@@ -231,6 +270,8 @@ function pickForMarket(
           laggard,
           'watchlist',
           `혼조장에서 조정 받는 ${laggard.name} — 지지선·반등 관찰.`,
+          'shared.market.recommendation.neutralWatchlist',
+          { name: laggard.name },
         ),
       );
     }

@@ -7,6 +7,7 @@ import { AuthProvider } from '@/presentation/hooks/useAuth';
 import { ServicesProvider } from '@/presentation/hooks/useServices';
 import { ToastProvider } from '@/presentation/components/Toast';
 import { createAppQueryClient } from '@/presentation/lib/query-config';
+import { I18nProvider } from '@/i18n';
 
 const queryClient = createAppQueryClient();
 
@@ -15,11 +16,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ServicesProvider services={services}>
-        <ToastProvider>
-          <AuthProvider>{children}</AuthProvider>
-        </ToastProvider>
-      </ServicesProvider>
+      <I18nProvider>
+        <ServicesProvider services={services}>
+          <ToastProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </ToastProvider>
+        </ServicesProvider>
+      </I18nProvider>
     </QueryClientProvider>
   );
 }

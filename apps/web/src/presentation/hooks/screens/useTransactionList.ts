@@ -1,12 +1,14 @@
 'use client';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
 import { useToast } from '../../components/Toast';
 import { useServices } from '../useServices';
 import { invalidatePortfolioLocal, MARKET_QUERY_KEYS, QUERY_STALE } from '../../lib/query-config';
 
 export function useTransactionList(refreshKey: number) {
+  const { t } = useTranslation();
   const { listTransactionsUseCase, deleteTransactionUseCase } = useServices();
   const queryClient = useQueryClient();
   const { showError, showSuccess } = useToast();
@@ -17,15 +19,15 @@ export function useTransactionList(refreshKey: number) {
   });
 
   async function handleDelete(id: string) {
-    if (!confirm('이 매매 내역을 삭제할까요?')) return;
+    if (!confirm(t('transactions.confirm.delete'))) return;
 
     try {
       await deleteTransactionUseCase.execute(id);
-      showSuccess('매매가 삭제되었습니다.');
+      showSuccess(t('transactions.toast.deleted'));
       await invalidatePortfolioLocal(queryClient);
       refetch();
     } catch (err) {
-      showError(getErrorMessage(err, '매매 삭제에 실패했습니다.'));
+      showError(getErrorMessage(err, t('transactions.toast.deleteFailed')));
     }
   }
 

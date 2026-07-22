@@ -1,11 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Market } from '@sar/shared';
 import { useToast } from '../components/Toast';
 import { useServices } from './useServices';
 
 export function useStockSearch(market: Market) {
+  const { t } = useTranslation();
   const { searchStocksUseCase } = useServices();
   const { showError } = useToast();
   const [query, setQuery] = useState('');
@@ -33,7 +35,7 @@ export function useStockSearch(market: Market) {
           setResults([]);
           if (lastErrorQuery.current !== trimmed) {
             lastErrorQuery.current = trimmed;
-            showError('종목 검색에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+            showError(t('stock.search.searchFailed'));
           }
         }
       } finally {
@@ -45,7 +47,7 @@ export function useStockSearch(market: Market) {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [query, market, searchStocksUseCase, showError]);
+  }, [query, market, searchStocksUseCase, showError, t]);
 
   const reset = useCallback(() => {
     setQuery('');

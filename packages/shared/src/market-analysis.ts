@@ -53,6 +53,12 @@ export interface AnalysisInsight {
   links: AnalysisLink[];
   tone: AnalysisTone;
   market: Market | 'global';
+  titleKey?: string;
+  titleParams?: Record<string, string | number>;
+  summaryKey?: string;
+  summaryParams?: Record<string, string | number>;
+  reasoningKey?: string;
+  reasoningParams?: Record<string, string | number>;
 }
 
 export interface IndexTechnicalInput {
@@ -74,13 +80,17 @@ export interface BollingerSnapshot {
   lower: number;
   percentB: number;
   bandwidthPct: number;
+  /** @deprecated use labelKey */
   label: string;
+  labelKey: string;
 }
 
 export interface StochasticSnapshot {
   k: number;
   d: number;
+  /** @deprecated use labelKey */
   label: string;
+  labelKey: string;
 }
 
 export interface IndexTechnicalSnapshot {
@@ -98,7 +108,9 @@ export interface IndexTechnicalSnapshot {
   stochastic: StochasticSnapshot | null;
   rangePositionPct: number | null;
   volumeRatio: number | null;
+  /** @deprecated use trendKey */
   trendLabel: string;
+  trendKey: string;
   chartUrl: string;
   tradingViewUrl: string;
 }
@@ -132,20 +144,20 @@ const CATEGORY_LABEL: Record<AnalysisCategory, string> = {
   recommendation: '종목 관찰',
 };
 
-function bollingerLabel(percentB: number): string {
-  if (percentB >= 1) return '상단 이탈(과열)';
-  if (percentB >= 0.8) return '상단 밴드 근접';
-  if (percentB <= 0) return '하단 이탈(과매도)';
-  if (percentB <= 0.2) return '하단 밴드 근접';
-  return '밴드 중앙';
+function bollingerLabel(percentB: number): { label: string; labelKey: string } {
+  if (percentB >= 1) return { label: '상단 이탈(과열)', labelKey: 'shared.market.bollinger.aboveUpper' };
+  if (percentB >= 0.8) return { label: '상단 밴드 근접', labelKey: 'shared.market.bollinger.nearUpper' };
+  if (percentB <= 0) return { label: '하단 이탈(과매도)', labelKey: 'shared.market.bollinger.belowLower' };
+  if (percentB <= 0.2) return { label: '하단 밴드 근접', labelKey: 'shared.market.bollinger.nearLower' };
+  return { label: '밴드 중앙', labelKey: 'shared.market.bollinger.midBand' };
 }
 
-function stochasticLabel(k: number, d: number): string {
-  if (k >= 80 && d >= 80) return '과매수';
-  if (k <= 20 && d <= 20) return '과매도';
-  if (k > d) return 'K>D 상승';
-  if (k < d) return 'K<D 하락';
-  return '중립';
+function stochasticLabel(k: number, d: number): { label: string; labelKey: string } {
+  if (k >= 80 && d >= 80) return { label: '과매수', labelKey: 'shared.market.stochastic.overbought' };
+  if (k <= 20 && d <= 20) return { label: '과매도', labelKey: 'shared.market.stochastic.oversold' };
+  if (k > d) return { label: 'K>D 상승', labelKey: 'shared.market.stochastic.kAboveD' };
+  if (k < d) return { label: 'K<D 하락', labelKey: 'shared.market.stochastic.kBelowD' };
+  return { label: '중립', labelKey: 'shared.market.stochastic.neutral' };
 }
 
 export function buildIndexSnapshot(input: IndexTechnicalInput): IndexTechnicalSnapshot | null {
@@ -164,15 +176,23 @@ export function buildIndexSnapshot(input: IndexTechnicalInput): IndexTechnicalSn
   const stoch = stochastic(input.highs, input.lows, closes);
 
   let trendLabel = '혼조';
+  let trendKey = 'shared.market.trends.mixed';
   if (sma20 !== null && sma50 !== null && currentPrice > sma20 && sma20 > sma50) {
     trendLabel = '단기 상승 추세';
+    trendKey = 'shared.market.trends.shortTermUp';
   } else if (sma50 !== null && sma200 !== null && currentPrice > sma50 && sma50 > sma200) {
     trendLabel = '중기 상승 추세';
+    trendKey = 'shared.market.trends.midTermUp';
   } else if (sma20 !== null && currentPrice < sma20) {
     trendLabel = '단기 조정';
+    trendKey = 'shared.market.trends.shortTermPullback';
   } else if (sma200 !== null && currentPrice < sma200) {
     trendLabel = '장기 하락 채널';
+    trendKey = 'shared.market.trends.longTermDown';
   }
+
+  const bbLabel = bb ? bollingerLabel(bb.percentB) : null;
+  const stochLabel = stoch ? stochasticLabel(stoch.k, stoch.d) : null;
 
   return {
     yahooSymbol: input.yahooSymbol,
@@ -192,15 +212,17 @@ export function buildIndexSnapshot(input: IndexTechnicalInput): IndexTechnicalSn
           lower: bb.lower,
           percentB: bb.percentB,
           bandwidthPct: bb.bandwidthPct,
-          label: bollingerLabel(bb.percentB),
+          label: bbLabel!.label,
+          labelKey: bbLabel!.labelKey,
         }
       : null,
     stochastic: stoch
-      ? { k: stoch.k, d: stoch.d, label: stochasticLabel(stoch.k, stoch.d) }
+      ? { k: stoch.k, d: stoch.d, label: stochLabel!.label, labelKey: stochLabel!.labelKey }
       : null,
     rangePositionPct: rangePos,
     volumeRatio: volRatio,
     trendLabel,
+    trendKey,
     chartUrl: input.chartUrl,
     tradingViewUrl: input.tradingViewUrl,
   };
@@ -234,6 +256,8 @@ function breadthInsights(
     const leader = [...valid].sort((a, b) => (b.changePercent ?? 0) - (a.changePercent ?? 0))[0];
     const laggard = [...valid].sort((a, b) => (a.changePercent ?? 0) - (b.changePercent ?? 0))[0];
     const region = market === Market.KR ? '한국' : '미국';
+    const regionKey = market === Market.KR ? 'kr' : 'us';
+    const biasKey = adRatio >= 1 ? 'up' : 'down';
 
     const tone: AnalysisTone =
       sentiment.label === 'strong_bull' || sentiment.label === 'bull'
@@ -254,6 +278,26 @@ function breadthInsights(
             : adRatio < 0.7
               ? '하락 종목이 우세하면 단기적으로 매도 압력·위험 회피 심리가 강합니다. 지수만 버티는지, 대표주 전반이 약한지 함께 확인하는 것이 좋습니다.'
               : '상승·하락이 엇갈리면 방향성이 분명하지 않습니다. 추세 추종보다 개별 종목·업종 차별화가 큰 장세로 해석합니다.',
+        titleKey: 'shared.market.insights.breadth.title',
+        titleParams: {
+          regionKey,
+          up: sentiment.upCount,
+          down: sentiment.downCount,
+          biasKey,
+        },
+        summaryKey: 'shared.market.insights.breadth.summary',
+        summaryParams: {
+          regionKey,
+          count: valid.length,
+          avg: formatPct(sentiment.avgChangePercent),
+          ratio: adRatio.toFixed(2),
+        },
+        reasoningKey:
+          adRatio > 1.5
+            ? 'shared.market.insights.breadth.reasoning.bullish'
+            : adRatio < 0.7
+              ? 'shared.market.insights.breadth.reasoning.bearish'
+              : 'shared.market.insights.breadth.reasoning.neutral',
         evidence: [
           `평균 등락 ${formatPct(sentiment.avgChangePercent)}`,
           `상승 ${sentiment.upCount} · 하락 ${sentiment.downCount} · 보합 ${sentiment.flatCount}`,
@@ -292,6 +336,15 @@ function indexInsights(indices: IndexTechnicalSnapshot[]): AnalysisInsight[] {
         summary: `현재 ${formatNum(idx.currentPrice)} · 1일 ${formatPct(idx.changePercent1d)} · ${idx.trendLabel}`,
         reasoning:
           '지수 이동평균 배열은 기관·개인 트레이더가 많이 보는 추세 필터입니다. 종가가 단기·중기 이평 위에 있고 이평이 정배열이면 상승 추세, 그 반대면 조정·약세로 해석합니다.',
+        titleKey: 'shared.market.insights.indexTrend.title',
+        titleParams: { name: idx.name, trendKey: idx.trendKey },
+        summaryKey: 'shared.market.insights.indexTrend.summary',
+        summaryParams: {
+          price: formatNum(idx.currentPrice),
+          change: formatPct(idx.changePercent1d),
+          trendKey: idx.trendKey,
+        },
+        reasoningKey: 'shared.market.insights.indexTrend.reasoning',
         evidence: [
           idx.sma20 !== null ? `SMA20 ${formatNum(idx.sma20)} (${idx.currentPrice >= idx.sma20 ? '위' : '아래'})` : 'SMA20 —',
           idx.sma50 !== null ? `SMA50 ${formatNum(idx.sma50)}` : 'SMA50 —',
@@ -305,7 +358,11 @@ function indexInsights(indices: IndexTechnicalSnapshot[]): AnalysisInsight[] {
           { label: 'TradingView', url: idx.tradingViewUrl },
         ],
         tone:
-          idx.trendLabel.includes('상승') ? 'bullish' : idx.trendLabel.includes('조정') || idx.trendLabel.includes('하락') ? 'bearish' : 'neutral',
+          idx.trendKey.includes('Up') || idx.trendKey.includes('midTerm')
+            ? 'bullish'
+            : idx.trendKey.includes('Pullback') || idx.trendKey.includes('Down')
+              ? 'bearish'
+              : 'neutral',
         market: idx.market,
       }),
     );
@@ -321,6 +378,18 @@ function indexInsights(indices: IndexTechnicalSnapshot[]): AnalysisInsight[] {
           summary: `RSI ${idx.rsi14.toFixed(1)}. ${overbought ? '단기 과열 신호' : oversold ? '반등 관찰 구간' : '극단 구간 아님'}.`,
           reasoning:
             'RSI(14)는 최근 14일 상대적 강도를 0~100으로 나타냅니다. 70 이상은 단기 과매수, 30 이하는 과매도로 많이 해석하지만, 강한 추세장에서는 오래 머물 수 있어 지표 단독 매매 신호로 쓰지 않습니다.',
+          titleKey: 'shared.market.insights.indexRsi.title',
+          titleParams: {
+            name: idx.name,
+            rsi: idx.rsi14.toFixed(1),
+            zoneKey: overbought ? 'overbought' : oversold ? 'oversold' : 'neutral',
+          },
+          summaryKey: 'shared.market.insights.indexRsi.summary',
+          summaryParams: {
+            rsi: idx.rsi14.toFixed(1),
+            zoneKey: overbought ? 'overbought' : oversold ? 'oversold' : 'neutral',
+          },
+          reasoningKey: 'shared.market.insights.indexRsi.reasoning',
           evidence: [
             `RSI(14) = ${idx.rsi14.toFixed(1)}`,
             idx.macd !== null ? `MACD(12,26) ${idx.macd >= 0 ? '양수' : '음수'} (${idx.macd.toFixed(2)})` : 'MACD —',
@@ -348,6 +417,18 @@ function indexInsights(indices: IndexTechnicalSnapshot[]): AnalysisInsight[] {
           summary: `MACD ${idx.macd.toFixed(2)}. ${macdBull ? '모멘텀·추세 정합' : '모멘텀 약화 가능'}.`,
           reasoning:
             'MACD는 12·26일 EMA 차이로 모멘텀 변화를 봅니다. 0선 위 전환 + 종가가 SMA20 위면 단기 매수세 우위, 0선 아래면 조정·약세 압력으로 해석하는 트레이더가 많습니다.',
+          titleKey: 'shared.market.insights.indexMacd.title',
+          titleParams: {
+            name: idx.name,
+            sideKey: idx.macd >= 0 ? 'positive' : 'negative',
+            aligned: macdBull ? 'yes' : 'no',
+          },
+          summaryKey: 'shared.market.insights.indexMacd.summary',
+          summaryParams: {
+            macd: idx.macd.toFixed(2),
+            alignedKey: macdBull ? 'aligned' : 'weak',
+          },
+          reasoningKey: 'shared.market.insights.indexMacd.reasoning',
           evidence: [`MACD ${idx.macd.toFixed(2)}`, `SMA20 ${formatNum(idx.sma20)}`],
           links: [
             { label: 'Investopedia MACD', url: 'https://www.investopedia.com/terms/m/macd.asp' },
@@ -371,6 +452,14 @@ function indexInsights(indices: IndexTechnicalSnapshot[]): AnalysisInsight[] {
           summary: `%B ${(bb.percentB * 100).toFixed(0)}% · 밴드폭 ${bb.bandwidthPct.toFixed(1)}%`,
           reasoning:
             '볼린저 밴드는 20일 SMA ± 2σ입니다. %B가 1에 가까우면 상단 밴드 돌파(과열), 0에 가까우면 하단(과매도). 밴드폭 축소 후 확대는 변동성 폭발(squeeze) 전조로 보는 경우가 많습니다.',
+          titleKey: 'shared.market.insights.indexBb.title',
+          titleParams: { name: idx.name, labelKey: bb.labelKey },
+          summaryKey: 'shared.market.insights.indexBb.summary',
+          summaryParams: {
+            percentB: (bb.percentB * 100).toFixed(0),
+            bandwidth: bb.bandwidthPct.toFixed(1),
+          },
+          reasoningKey: 'shared.market.insights.indexBb.reasoning',
           evidence: [
             `상단 ${formatNum(bb.upper)} · 중심 ${formatNum(bb.middle)} · 하단 ${formatNum(bb.lower)}`,
             `현재가 ${formatNum(idx.currentPrice)} (%B ${bb.percentB.toFixed(2)})`,
@@ -397,6 +486,15 @@ function indexInsights(indices: IndexTechnicalSnapshot[]): AnalysisInsight[] {
           summary: `%K·%D 교차와 80/20 구간으로 단기 모멘텀을 봅니다.`,
           reasoning:
             '스토캐스틱은 최근 N일 range 대비 종가 위치입니다. 80 이상 과매수·20 이하 과매도, K가 D를 상향 돌파하면 단기 매수 신호로 쓰는 트레이더가 많습니다(추세장에서는 실패 잦음).',
+          titleKey: 'shared.market.insights.indexStoch.title',
+          titleParams: {
+            name: idx.name,
+            labelKey: st.labelKey,
+            k: st.k.toFixed(0),
+            d: st.d.toFixed(0),
+          },
+          summaryKey: 'shared.market.insights.indexStoch.summary',
+          reasoningKey: 'shared.market.insights.indexStoch.reasoning',
           evidence: [`%K ${st.k.toFixed(1)}`, `%D ${st.d.toFixed(1)}`, `상태: ${st.label}`],
           links: [
             { label: 'Investopedia Stochastic', url: 'https://www.investopedia.com/terms/s/stochasticoscillator.asp' },
@@ -425,6 +523,11 @@ function macroPanelInsights(macro: MacroIndicatorSnapshot[]): AnalysisInsight[] 
           : m.kind === 'fx'
             ? 'USD/KRW는 한국 증시 외국인 수급·수출주 실적·수입물가에 직결되는 핵심 변수입니다. 급격한 원화 약세는 변동성 확대 신호로 해석되기도 합니다.'
             : '미국 국채 수익률 곡선은 할인율·경기 기대·Fed 정책을 반영합니다. 10Y·5Y·3M 스프레드(역전)는 리세션 watchlist에 포함됩니다.',
+      titleKey: 'shared.market.insights.macroPanel.title',
+      titleParams: { name: m.name, interpretKey: m.interpretKey },
+      summaryKey: m.interpretDetailKey,
+      summaryParams: m.interpretDetailParams,
+      reasoningKey: `shared.market.insights.macroPanel.reasoning.${m.kind}`,
       evidence: [
         `현재 ${m.unit === 'krw' ? `${m.value.toFixed(1)}원` : m.unit === 'pct' ? `${m.value.toFixed(2)}%` : m.value.toFixed(2)}`,
         `1일 변화 ${formatPct(m.changePercent1d)}`,
@@ -464,6 +567,19 @@ function sectorInsights(sectors: SectorEtfSnapshot[]): AnalysisInsight[] {
         summary: `${leader.name} 1주 상대강도 ${formatPct(leader.rsBenchmark1w)} (기준 ${market === Market.US ? 'SPY' : 'KODEX200'} 대비)`,
         reasoning:
           '업종 ETF 상대강도는 기준지수 대비 초과 수익입니다. 상대강도가 높은 업종으로 자금이 이동하는지, 낮은 업종이 추격 매수인지 함정인지 함께 판단합니다.',
+        titleKey: 'shared.market.insights.sectorOverview.title',
+        titleParams: {
+          regionKey: market === Market.US ? 'us' : 'kr',
+          sectorSymbol: leader.yahooSymbol,
+          sectorLabel: leader.sectorLabel,
+        },
+        summaryKey: 'shared.market.insights.sectorOverview.summary',
+        summaryParams: {
+          name: leader.name,
+          rs: formatPct(leader.rsBenchmark1w),
+          benchmark: market === Market.US ? 'SPY' : 'KODEX200',
+        },
+        reasoningKey: 'shared.market.insights.sectorOverview.reasoning',
         evidence: [
           `주도 ${leader.sectorLabel} RS(1주) ${formatPct(leader.rsBenchmark1w)} · 1달 ${formatPct(leader.rsBenchmark1mo)}`,
           `부진 ${laggard.sectorLabel} RS(1주) ${formatPct(laggard.rsBenchmark1w)}`,
@@ -504,6 +620,9 @@ function newsInsights(news: NewsAnalysisInput[]): AnalysisInsight[] {
         title: '뉴스 헤드라인 수집 제한',
         summary: '뉴스 피드를 가져오지 못했습니다. 아래 링크에서 직접 확인해 주세요.',
         reasoning: '뉴스 API·RSS는 일시적 차단 또는 키 미설정으로 실패할 수 있습니다. 정세 판단 시 뉴스는 시세·지표와 교차 확인하는 것이 좋습니다.',
+        titleKey: 'shared.market.insights.newsEmpty.title',
+        summaryKey: 'shared.market.insights.newsEmpty.summary',
+        reasoningKey: 'shared.market.insights.newsEmpty.reasoning',
         evidence: ['Finnhub 키 미설정 시 미국 Finnhub 뉴스 생략', 'Google News RSS는 네트워크 상태에 따라 지연될 수 있음'],
         links: [
           { label: 'Google 뉴스 — 코스피', url: 'https://news.google.com/search?q=코스피+증시&hl=ko' },
@@ -538,6 +657,14 @@ function newsInsights(news: NewsAnalysisInput[]): AnalysisInsight[] {
         summary: subset[0]?.title ?? '',
         reasoning:
           '헤드라인 키워드(상승·하락·우려 등)로 대략적 뉴스 톤을 분류했습니다. 단일 기사보다 여러 출처의 흐름을 보는 것이 중요하며, 이미 가격에 반영됐을 수 있습니다.',
+        titleKey: 'shared.market.insights.news.title',
+        titleParams: {
+          regionKey: market === Market.KR ? 'kr' : 'usGlobal',
+          toneKey: tone,
+        },
+        summaryKey: 'shared.market.insights.news.summaryFallback',
+        summaryParams: { headline: subset[0]?.title ?? '' },
+        reasoningKey: 'shared.market.insights.news.reasoning',
         evidence: [
           `분석 기사 ${subset.length}건 · 긍정 ${bull} · 부정 ${bear}`,
           ...headlines,
@@ -569,6 +696,19 @@ function macroInsight(kr: RegionSentiment, us: RegionSentiment): AnalysisInsight
     reasoning: diverge
       ? '한국과 미국 대표주 평균 등락이 크게 다르면 환율·금리·업종 이슈 등 지역 요인이 작용 중일 수 있습니다. 환율(KRW/USD)과 함께 보는 것이 일반적입니다.'
       : '양 시장이 비슷한 방향이면 글로벌 투자 심리가 공통 변수일 가능성이 큽니다. 연준·원화·유가 등 경제 헤드라인과 교차 확인하세요.',
+    titleKey: diverge
+      ? 'shared.market.insights.macroGlobal.titleDiverge'
+      : 'shared.market.insights.macroGlobal.titleSync',
+    summaryKey: diverge
+      ? 'shared.market.insights.macroGlobal.summaryDiverge'
+      : 'shared.market.insights.macroGlobal.summarySync',
+    summaryParams: {
+      krAvg: formatPct(kr.avgChangePercent),
+      usAvg: formatPct(us.avgChangePercent),
+    },
+    reasoningKey: diverge
+      ? 'shared.market.insights.macroGlobal.reasoningDiverge'
+      : 'shared.market.insights.macroGlobal.reasoningSync',
     evidence: [
       `한국 정세 ${kr.label} (평균 ${formatPct(kr.avgChangePercent)})`,
       `미국 정세 ${us.label} (평균 ${formatPct(us.avgChangePercent)})`,
@@ -598,6 +738,11 @@ function recommendationInsights(recommendations: StockRecommendation[]): Analysi
             : rec.tag === 'defensive'
               ? '약세장에서도 버티는 종목은 변동성이 낮거나 실적·현금흐름이 받쳐주는 경우가 많습니다. 반등 시 상대적으로 늦게 따라오는 업종일 수 있습니다.'
               : '혼조장에서는 상대강도·배당·실적 일정 등 개별 재료가 더 중요합니다.',
+      titleKey: 'shared.market.insights.recommendation.title',
+      titleParams: { tagKey: rec.tag, name: rec.name },
+      summaryKey: rec.reasonKey,
+      summaryParams: rec.reasonParams,
+      reasoningKey: `shared.market.insights.recommendation.reasoning.${rec.tag}`,
       evidence: [
         `현재가 ${rec.currentPrice.toLocaleString()} ${rec.currency}`,
         `당일 등락 ${formatPct(rec.changePercent)}`,

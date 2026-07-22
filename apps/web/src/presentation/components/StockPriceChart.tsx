@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { QuoteChartRange } from '@sar/shared';
 import { StockPricePoint } from '@/client/domain/models';
 
@@ -15,31 +16,31 @@ const WIDTH = 640;
 const HEIGHT = 240;
 const PAD = { top: 20, right: 16, bottom: 32, left: 52 };
 
-function formatAxisDate(timestamp: string, range: QuoteChartRange): string {
+function formatAxisDate(timestamp: string, range: QuoteChartRange, locale: string): string {
   const date = new Date(timestamp);
   if (range === '1d') {
-    return date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
   }
   if (range === '3d' || range === '1w') {
-    return date.toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' });
+    return date.toLocaleDateString(locale, { month: 'numeric', day: 'numeric' });
   }
   if (range === '1mo' || range === '3mo' || range === '6mo' || range === 'ytd') {
-    return date.toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' });
+    return date.toLocaleDateString(locale, { month: 'numeric', day: 'numeric' });
   }
-  return date.toLocaleDateString('ko-KR', { year: '2-digit', month: 'numeric' });
+  return date.toLocaleDateString(locale, { year: '2-digit', month: 'numeric' });
 }
 
-function formatTooltipDate(timestamp: string, range: QuoteChartRange): string {
+function formatTooltipDate(timestamp: string, range: QuoteChartRange, locale: string): string {
   const date = new Date(timestamp);
   if (range === '1d') {
-    return date.toLocaleString('ko-KR', {
+    return date.toLocaleString(locale, {
       month: 'numeric',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
     });
   }
-  return date.toLocaleDateString('ko-KR', {
+  return date.toLocaleDateString(locale, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -68,6 +69,7 @@ function indexFromClientX(svg: SVGSVGElement, clientX: number, pointCount: numbe
 }
 
 export function StockPriceChart({ points, range, changePercent, currency }: Props) {
+  const { t, i18n } = useTranslation();
   const svgRef = useRef<SVGSVGElement>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
@@ -116,7 +118,7 @@ export function StockPriceChart({ points, range, changePercent, currency }: Prop
   if (points.length < 2) {
     return (
       <div className="flex h-56 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/30">
-        <p className="text-sm text-slate-500">차트 데이터가 없습니다.</p>
+        <p className="text-sm text-slate-500">{t('stock.chart.empty')}</p>
       </div>
     );
   }
@@ -158,7 +160,7 @@ export function StockPriceChart({ points, range, changePercent, currency }: Prop
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         className="h-56 w-full touch-none select-none"
         role="img"
-        aria-label="종목 가격 차트"
+        aria-label={t('stock.chart.ariaLabel')}
       >
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
@@ -222,7 +224,7 @@ export function StockPriceChart({ points, range, changePercent, currency }: Prop
             fill="#64748b"
             fontSize="10"
           >
-            {formatAxisDate(point.timestamp, range)}
+            {formatAxisDate(point.timestamp, range, i18n.language)}
           </text>
         ))}
 
@@ -256,7 +258,7 @@ export function StockPriceChart({ points, range, changePercent, currency }: Prop
           }}
           aria-live="polite"
         >
-          <p className="text-slate-400">{formatTooltipDate(active.point.timestamp, range)}</p>
+          <p className="text-slate-400">{formatTooltipDate(active.point.timestamp, range, i18n.language)}</p>
           <p className="mt-0.5 font-semibold text-white">{formatPrice(active.point.close, currency)}</p>
         </div>
       )}

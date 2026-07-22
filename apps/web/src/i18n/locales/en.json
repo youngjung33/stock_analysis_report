@@ -1,0 +1,1188 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "close": "Close",
+    "guest": "Guest",
+    "guestBadge": "(Guest)",
+    "lastRefreshed": "Last updated: {{time}}",
+    "refreshQuotes": "Refresh quotes",
+    "refreshingQuotes": "Refreshing quotes...",
+    "marketKr": "Korea",
+    "marketUs": "United States",
+    "marketKrShort": "Domestic",
+    "marketUsShort": "Foreign",
+    "domestic": "Domestic",
+    "usMarket": "US",
+    "symbol": "Symbol",
+    "quantity": "Quantity",
+    "unitPrice": "Unit price",
+    "memo": "Memo",
+    "memoOptional": "Memo (optional)",
+    "type": "Type",
+    "content": "Details",
+    "effectiveDate": "Effective date",
+    "tradeDate": "Trade date",
+    "register": "Register",
+    "registering": "Registering...",
+    "submitting": "Submitting...",
+    "empty": "None",
+    "change": "Change",
+    "held": "Held",
+    "units": "shares",
+    "countSuffix": "",
+    "sharesSuffix": " shares",
+    "yearSuffix": "",
+    "backToDashboard": "Back to portfolio",
+    "backToLogin": "Back to login",
+    "retry": "Try again",
+    "errorOccurred": "Something went wrong",
+    "tryAgainLater": "Please try again later.",
+    "approx": "approx.",
+    "cash": "Cash",
+    "averageCost": "Avg cost",
+    "currentPrice": "Current price",
+    "changePercent": "Change",
+    "changePercentRate": "Change %",
+    "marketValue": "Market value",
+    "marketValueKrw": "Market value (KRW)",
+    "unrealizedPnl": "Unrealized P&L",
+    "unrealizedPnlKrw": "Unrealized P&L (KRW)",
+    "realizedPnl": "Realized P&L",
+    "realizedPnlKrw": "Realized P&L (KRW)",
+    "unrealizedPnlShort": "Unrealized P&L",
+    "unrealizedPnlShortKrw": "Unrealized P&L (KRW)",
+    "marketColumn": "Market",
+    "weight": "Weight",
+    "valuationKrw": "Value (KRW)",
+    "noneApplicable": "None (tax treaty)",
+    "dash": "—",
+    "email": "Email",
+    "newPassword": "New password",
+    "newPasswordConfirm": "Confirm new password",
+    "rate": "Rate",
+    "threshold": "Threshold / deduction",
+    "filing": "Filing",
+    "category": "Category",
+    "item": "Item",
+    "taxableBase": "Taxable base",
+    "estimatedTax": "Est. tax",
+    "notice": "Notice",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "country": "Country",
+    "localWithholding": "Local withholding",
+    "domesticAdditional": "Additional KR tax",
+    "remarks": "Notes",
+    "accountType": "Type",
+    "taxFreeLimit": "Tax-free limit",
+    "overflow": "Overflow",
+    "taxBracket": "Tax bracket",
+    "taxRate": "Tax rate",
+    "yearLabel": "{{year}}",
+    "marginalRate": "Marginal rate",
+    "localTaxSuffix": "(+ local tax)",
+    "fxRateBasis": "USD/KRW {{rate}} basis",
+    "fxConversionNote": "KRW conversion",
+    "welcomeRegistered": "Welcome! Start building your portfolio.",
+    "amountRequired": "Please enter an amount.",
+    "selectStockRequired": "Search and select a stock.",
+    "requestFailed": "Could not process the request."
+  },
+  "meta": {
+    "title": "Stock Portfolio",
+    "description": "Personal stock trading, dividends, and tax management"
+  },
+  "nav": {
+    "mainMenu": "Main menu",
+    "bottomMenu": "Bottom menu",
+    "dashboard": "Portfolio",
+    "dashboardShort": "Home",
+    "myInfo": "My Info",
+    "myInfoShort": "My Info",
+    "transactions": "Trades & Dividends",
+    "transactionsShort": "Trades",
+    "market": "Market Analysis",
+    "marketShort": "Market",
+    "tax": "Tax Guide",
+    "taxShort": "Tax",
+    "accountSettings": "Account settings",
+    "logout": "Log out"
+  },
+  "auth": {
+    "username": "Username",
+    "password": "Password",
+    "passwordConfirm": "Confirm password",
+    "emailOptional": "Email (optional)",
+    "login": "Log in",
+    "loggingIn": "Logging in...",
+    "register": "Sign up",
+    "registering": "Signing up...",
+    "loginSubtitle": "Log in to manage trades and quotes.",
+    "registerSubtitle": "Sign up to manage your investment history.",
+    "orWithUsername": "Or with username",
+    "checkDuplicate": "Check availability",
+    "formatHint": "Format: {{hint}}",
+    "alreadyHaveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?",
+    "forgotPassword": "Forgot password?",
+    "guestBrowseTitle": "Browse as guest",
+    "guestBrowseDesc": "Data is not saved to the server and disappears when you close this tab.",
+    "guestEnter": "Enter as guest",
+    "guestEntering": "Entering...",
+    "oauthFailed": "Social login failed.",
+    "oauthCancelled": "Social login was cancelled.",
+    "oauthLoading": "Loading social login...",
+    "oauthStartFailed": "Could not start social login.",
+    "oauthNotConfigured": "Social login will be available after admin configuration.",
+    "guestLoginFailed": "Guest login failed. Please try again later.",
+    "usernameChecking": "Checking username...",
+    "usernameCheckFailed": "Could not check username.",
+    "forgotPasswordTitle": "Forgot password",
+    "forgotPasswordDesc": "We'll send a reset link to your registered email.",
+    "forgotPasswordSubmit": "Send reset link",
+    "forgotPasswordSending": "Sending...",
+    "forgotPasswordSuccess": "If the email is registered, a reset link has been sent.",
+    "resetPasswordTitle": "Reset password",
+    "resetPasswordSubmit": "Change password",
+    "resetPasswordChanging": "Changing...",
+    "resetPasswordSuccess": "Password changed. Please log in.",
+    "resetPasswordFailed": "Could not reset password.",
+    "resetLinkInvalid": "Invalid reset link."
+  },
+  "settings": {
+    "title": "Account settings",
+    "language": "Language",
+    "languageDesc": "Changes apply immediately across the app.",
+    "email": "Email",
+    "emailVerified": "Verified",
+    "emailUnverified": "Unverified",
+    "requestVerificationCode": "Send verification code",
+    "saveAndIssueCode": "Save · Send code",
+    "verificationCode": "Verification code (6 digits)",
+    "verify": "Verify",
+    "changePassword": "Change password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "newPasswordConfirm": "Confirm new password",
+    "changePasswordButton": "Change password",
+    "socialAccounts": "Social login",
+    "noSocialAccounts": "No linked social accounts.",
+    "unlink": "Unlink",
+    "unlinkConfirm": "Unlink {{provider}}?",
+    "deleteAccount": "Delete account",
+    "deleteAccountDesc": "All account data including trades, watchlist, and social links will be permanently deleted.",
+    "deletePasswordConfirm": "Confirm password",
+    "deleteAccountButton": "Delete account",
+    "deleteConfirm": "All data will be deleted and cannot be recovered. Are you sure you want to delete your account?",
+    "verificationCodeToast": "Verification code: {{code}}",
+    "loadProfileFailed": "Failed to load account info.",
+    "changeEmailFailed": "Failed to change email.",
+    "alreadyVerified": "Email is already verified.",
+    "issueCodeFailed": "Failed to send verification code.",
+    "verifySuccess": "Email verified successfully.",
+    "verifyFailed": "Invalid verification code.",
+    "passwordChanged": "Password changed successfully.",
+    "passwordChangeFailed": "Failed to change password.",
+    "unlinkSuccess": "Social account unlinked.",
+    "unlinkFailed": "Failed to unlink account.",
+    "deleteFailed": "Failed to delete account."
+  },
+  "errors": {
+    "serverError": "A temporary error occurred. Please try again later.",
+    "globalTitle": "Something went wrong",
+    "globalMessage": "Please try again later.",
+    "VALIDATION": "Please check your input.",
+    "NOT_FOUND": "The requested information was not found.",
+    "CONFLICT": "Cannot process request. Data already exists.",
+    "INTERNAL": "A temporary error occurred. Please try again later.",
+    "DB_UNAVAILABLE": "A temporary error occurred. Please try again later.",
+    "RATE_LIMIT": "Too many requests. Please try again later.",
+    "AUTH_UNAUTHORIZED": "Login required.",
+    "AUTH_INVALID_CREDENTIALS": "Invalid username or password.",
+    "AUTH_SOCIAL_ONLY": "This account uses social login only.",
+    "AUTH_INVALID_REFRESH": "Session expired. Please log in again.",
+    "AUTH_INVALID_ACCESS": "Invalid authentication.",
+    "AUTH_LOGIN_REQUIRED": "Please enter username and password.",
+    "AUTH_USERNAME_INVALID": "Invalid username format.",
+    "AUTH_USERNAME_TAKEN": "Username is already taken.",
+    "AUTH_EMAIL_INVALID": "Invalid email format.",
+    "AUTH_EMAIL_TAKEN": "Email is already in use.",
+    "AUTH_PASSWORD_INVALID": "Invalid password format.",
+    "AUTH_PASSWORD_MISMATCH": "Passwords do not match.",
+    "AUTH_REGISTER_FIELDS_REQUIRED": "Please fill in all required fields.",
+    "AUTH_OAUTH_PROVIDER_INVALID": "Unsupported social login provider.",
+    "AUTH_OAUTH_NOT_CONFIGURED": "Social login is not configured.",
+    "AUTH_OAUTH_STATE_INVALID": "Social login expired. Please try again.",
+    "AUTH_OAUTH_FAILED": "Social login failed. Please try again.",
+    "AUTH_TOKEN_INVALID": "Link is invalid or expired.",
+    "AUTH_CURRENT_PASSWORD_INVALID": "Current password is incorrect.",
+    "AUTH_OAUTH_UNLINK_FORBIDDEN": "Set up another login method first.",
+    "AUTH_EMAIL_REQUIRED": "Email is required.",
+    "CASH_INSUFFICIENT": "Insufficient cash balance.",
+    "CASH_AMOUNT_INVALID": "Please check the amount.",
+    "dashboardLoadFailed": "Failed to load portfolio.",
+    "marketAnalysisLoadFailed": "Failed to load market analysis.",
+    "stockQuoteLoadFailed": "Failed to load stock quotes.",
+    "quoteRefreshFailed": "Failed to refresh quotes."
+  },
+  "dashboard": {
+    "title": "Portfolio",
+    "subtitle": "{{name}}",
+    "guestNotice": "Guest mode: trade data is not saved to the server and disappears when you close the tab.",
+    "loading": "Loading portfolio...",
+    "loadingCapital": "Loading cash & allocation..."
+  },
+  "myInfo": {
+    "title": "My Info",
+    "subtitle": "{{name}}'s investment info",
+    "guestNotice": "Guest mode: cash and trades are stored in this browser only. Sign up to save securely on the server.",
+    "capitalTitle": "Cash & invested capital",
+    "capitalDesc": "Set invested capital and adjust cash with deposits and withdrawals.",
+    "tradesTitle": "Record trades",
+    "tradesDesc": "Register buys/sells or delete trade history to adjust holdings.",
+    "tradeHistory": "Trade history",
+    "taxTitle": "My taxes",
+    "taxDesc": "Select your conditions to see applicable taxes and estimated amounts from your holdings and trades. See the",
+    "taxLink": "Tax Guide",
+    "taxDescSuffix": "tab for full tax reference."
+  },
+  "transactions": {
+    "title": "Trades & Dividends",
+    "corporateActions": "Dividends · Splits · Mergers",
+    "tradeHistory": "Trade history",
+    "form": {
+      "title": "Record trade",
+      "tradeType": "Trade type",
+      "buy": "Buy",
+      "sell": "Sell"
+    },
+    "list": {
+      "loading": "Loading trade history...",
+      "empty": "No trades registered."
+    },
+    "types": {
+      "BUY": "Buy",
+      "SELL": "Sell"
+    },
+    "toast": {
+      "registered": "Trade registered.",
+      "registerFailed": "Failed to register trade.",
+      "deleted": "Trade deleted.",
+      "deleteFailed": "Failed to delete trade."
+    },
+    "confirm": {
+      "delete": "Delete this trade?"
+    }
+  },
+  "corporateAction": {
+    "form": {
+      "title": "Register dividend · split · merger",
+      "description": "Reflect dividends, stock splits, and merger conversions in investment and tax calculations.",
+      "dividendAmount": "Total dividend",
+      "splitRatio": "Split ratio (2 = 1→2)",
+      "targetQuantity": "Shares received",
+      "targetPrice": "Conversion price (cost basis)",
+      "cashCompensation": "Cash compensation (optional)",
+      "missingFields": "Please enter a stock and effective date."
+    },
+    "list": {
+      "loading": "Loading corporate actions...",
+      "empty": "No dividends, splits, or mergers registered."
+    },
+    "types": {
+      "DIVIDEND": "Dividend",
+      "SPLIT": "Stock split",
+      "MERGER": "Merger"
+    },
+    "detail": {
+      "split": "1→{{ratio}}",
+      "mergerTarget": "→ {{symbol}}",
+      "mergerQuantity": "{{quantity}} shares",
+      "mergerCash": "Cash {{amount}}"
+    },
+    "toast": {
+      "registered": "Corporate action registered.",
+      "registerFailed": "Failed to register.",
+      "deleted": "Entry deleted.",
+      "deleteFailed": "Failed to delete."
+    },
+    "confirm": {
+      "delete": "Delete this entry?"
+    }
+  },
+  "onboarding": {
+    "title": "Get started with your portfolio",
+    "guestDesc": "Guest mode: register capital and holdings to see your portfolio at a glance. (Data disappears when you close the tab)",
+    "memberDesc": "No invested capital or holdings yet. Follow the steps below.",
+    "step1Title": "1. Register capital & cash",
+    "step1Desc": "Enter available KRW and USD cash. You can adjust with deposits and withdrawals later.",
+    "step2Title": "2. Record trades",
+    "step2Desc": "Register buy/sell history to auto-calculate holdings and P&L.",
+    "cta": "Register in My Info"
+  },
+  "capital": {
+    "title": "Invested capital · Cash",
+    "cashSummary": "Cash {{krw}}{{usd}}",
+    "krwLabel": "KRW",
+    "usdLabel": "USD",
+    "krwPlaceholder": "e.g. 10,000,000",
+    "usdPlaceholder": "e.g. 5,000",
+    "setCapital": "Set invested capital",
+    "depositKrw": "KRW deposit",
+    "withdrawKrw": "KRW withdraw",
+    "depositUsd": "USD deposit",
+    "withdrawUsd": "USD withdraw",
+    "refreshing": "Updating balance...",
+    "simulationTitle": "Allocation simulation",
+    "simulationDesc": "Suggested actions based on target weights (reference only).",
+    "actionKeep": "Hold",
+    "actionTrim": "Trim",
+    "actionAdd": "Consider buy",
+    "actionReserveCash": "Reserve cash",
+    "targetAllocationTitle": "Target allocation · concentration",
+    "targetKrPercent": "Domestic %",
+    "targetUsPercent": "Foreign (US) %",
+    "maxWeightPercent": "Max position %",
+    "saveTarget": "Save targets",
+    "simulationStatsTitle": "Rebalancing suggestions",
+    "statTotalAssets": "Total assets",
+    "statCashWeight": "Cash weight",
+    "statMarketSplit": "Domestic / foreign (stocks)",
+    "statProjectedCash": "Projected cash",
+    "suggestedTrade": "{{quantity}} shares · approx. {{amount}}",
+    "suggestedAmount": "approx. {{amount}}",
+    "memoInitialCapital": "Invested capital",
+    "memoInitialCapitalUsd": "Invested capital (USD)",
+    "memoDeposit": "Deposit",
+    "memoWithdraw": "Withdrawal",
+    "toast": {
+      "capitalSet": "Invested capital updated.",
+      "capitalSetFailed": "Failed to set invested capital.",
+      "depositSuccess": "Deposit applied.",
+      "depositFailed": "Deposit failed.",
+      "withdrawSuccess": "Withdrawal applied.",
+      "withdrawFailed": "Withdrawal failed.",
+      "targetSaved": "Target allocation saved.",
+      "targetSaveFailed": "Failed to save settings."
+    }
+  },
+  "tax": {
+    "guideTitle": "Tax guide for Korean residents",
+    "guideIntro": "Summary based on 2026 NTS and income tax law. Confirm actual filing with a tax professional.",
+    "profileTitle": "My tax conditions",
+    "profileDesc": "Select your situation to see applicable taxes and estimated amounts from holdings and trades.",
+    "taxYear": "Tax year",
+    "investorType": "Investor type",
+    "investorGeneral": "General investor",
+    "investorGeneralDesc": "KRX gains tax-exempt for non-major shareholders",
+    "investorMajor": "Major shareholder (KR)",
+    "investorMajorDesc": "Market cap 5B+ KRW or 1%+ stake — gains taxed",
+    "investMarkets": "Markets",
+    "investDomestic": "Domestic stocks (KR)",
+    "investDomesticDesc": "Dividends, securities tax, domestic rules",
+    "investForeign": "Foreign stocks (US, etc.)",
+    "investForeignDesc": "Capital gains tax, foreign dividends",
+    "foreignDividendSource": "Foreign dividend source",
+    "localWithholdingShort": "Local {{rate}}%",
+    "isaSection": "Tax-advantaged accounts (ISA)",
+    "isaSectionDesc": "ISA net income is calculated separately with tax-free limits and 9.9% separate taxation. If trades are not tagged ISA/regular, income is split by ratio.",
+    "isaTaxFreeLimit": "Tax-free {{limit}}M KRW",
+    "isaIncomeShare": "ISA income share ({{percent}}%)",
+    "isaIncomeShareDesc": "Share of dividends, trades, and other financial income in ISA (direct input below takes priority)",
+    "isaNetIncomeOverride": "ISA net income override (KRW, optional)",
+    "isaNetIncomePlaceholder": "Auto-estimate from ratio",
+    "pensionSection": "Pension savings contribution (tax credit)",
+    "pensionSectionDesc": "Employee pension savings — 6M KRW annual limit, 13.2% tax credit estimate",
+    "otherFinancialIncome": "Other financial income (KRW)",
+    "otherFinancialIncomeDesc": "Deposit interest, bond interest, etc. (excluding dividends)",
+    "otherIncomeBracket": "Annual other income (employment/business)",
+    "otherIncomeBracketDesc": "For comprehensive income tax brackets — select your bracket",
+    "marginalRateLabel": "Marginal rate {{rate}} (+ local tax)",
+    "applicableTitle": "Taxes that apply to you",
+    "applicableDesc": "{{count}} tax items based on your selections · See full reference in",
+    "applicableDescLink": "Tax Guide",
+    "applicableDescSuffix": "",
+    "applicableRateFiling": "Rate {{rate}} · {{filing}}",
+    "rulesReferenceTitle": "Tax rules reference",
+    "rulesReferenceCount": "{{count}} items",
+    "rulesReferenceSubtitle": "NTS / income tax law — {{count}} items",
+    "loadingEstimate": "Loading trades and dividends...",
+    "noTransactions": "No sales or dividends in {{year}}. Register trades, dividends, splits, or mergers to see estimates.",
+    "guideLinkHint": "For full tax rules, foreign dividend withholding, and brackets, see",
+    "guideLink": "Tax Guide",
+    "guideLinkSuffix": ".",
+    "estimate": {
+      "compactTitle": "Estimated tax from holdings & trades",
+      "yearTitle": "{{year}} estimated tax",
+      "basis": "Based on registered trades & dividends · FX",
+      "fxApplied": "₩{{rate}}/USD",
+      "fxNotApplied": "N/A",
+      "pensionCreditApplied": "Pension credit {{credit}} applied · Before credit {{before}}",
+      "domesticGain": "Domestic capital gain",
+      "exemptGeneral": "Tax-exempt (general)",
+      "taxable": "Taxable",
+      "foreignNetGain": "Foreign net trading gain",
+      "taxableBase": "Taxable base {{amount}}",
+      "dividendTotal": "Dividends (domestic + foreign)",
+      "comprehensiveTax": "Comprehensive taxation (regular account)",
+      "separationTax": "Separate taxation (15.4%, etc.)",
+      "financialIncomeTotal": "Total financial income",
+      "regularAccountThreshold": "Regular account · 20M KRW threshold",
+      "isaNetIncome": "ISA net income",
+      "isaTaxDetail": "ISA tax {{tax}} · Est. savings {{saved}}",
+      "pensionCredit": "Pension savings tax credit",
+      "pensionCreditSub": "Contribution credit (estimate)",
+      "lineItemsTitle": "Tax line items",
+      "disclaimerForeignGain": "Foreign stock capital gains must be reported and paid May 1–31 of the following year.",
+      "disclaimerComprehensive": "If financial income exceeds 20M KRW, comprehensive income tax filing is required in May."
+    },
+    "guide": {
+      "bulletFinancialTax": "Financial investment income tax is not in effect as of 2026 (under review/repeal)",
+      "bulletForeignGain": "Foreign stock capital gains — report May 1–31 next year",
+      "bulletComprehensive": "Financial income (interest + dividends) over 20M KRW triggers comprehensive taxation",
+      "shelterAccountsTitle": "Tax-advantaged accounts (ISA · pension savings)",
+      "shelterAccountsDesc": "ISA net income after account-level netting gets a tax-free limit; overflow is taxed at 9.9%. ISA-taxed income is excluded from the 20M KRW comprehensive threshold.",
+      "taxFreeLimitPerYear": "{{limit}}M KRW/year",
+      "isaOverflowRate": "9.9% separate taxation",
+      "pensionCreditDesc": "Pension savings contributions qualify for a 13.2% tax credit (6M KRW annual limit). Shown separately from dividend/trading taxes in this app.",
+      "foreignDividendTitle": "Foreign dividend withholding by country",
+      "capitalDeductionTitle": "Capital gains basic deduction",
+      "capitalDeductionDesc": "Foreign stocks and major shareholder gains — 2.5M KRW annual deduction (once for domestic + foreign combined). General investors' KRX listed gains are tax-exempt.",
+      "incomeTaxBracketsTitle": "Comprehensive income tax brackets (financial income)",
+      "incomeTaxBracketsDesc": "When financial income exceeds 20M KRW, all interest and dividends are combined with other income and taxed at the brackets below (+ 10% local tax).",
+      "filingScheduleTitle": "Filing schedule summary"
+    }
+  },
+  "market": {
+    "title": "Market Analysis",
+    "detailTitle": "In-depth market analysis",
+    "detailSubtitle": "Volatility · Economy · Sectors · Chart indicators",
+    "sentimentTitle": "Market sentiment summary",
+    "sentimentDesc": "Featured stocks today · See volatility, sectors, and chart indicators on the detail page",
+    "detailAnalysisLink": "Detailed analysis →",
+    "loadingQuotes": "Loading quotes...",
+    "regionKr": "🇰🇷 Korea",
+    "regionUs": "🇺🇸 United States",
+    "avgChange": "Avg {{percent}}",
+    "avgChangeDetail": "Avg change {{percent}}",
+    "upDownCount": "↑{{up}} ↓{{down}}",
+    "deepAnalysisDesc": "VIX · FX · Treasuries · Sector RS · SMA/RSI/MACD/Bollinger/Stochastic · News",
+    "disclaimer": "Reference analysis based on Yahoo Finance, Google News, and Finnhub (optional). Not investment advice.",
+    "watchlistPrefix": "Watchlist:",
+    "seeMoreInDetail": "See more in detail",
+    "deepAnalysisTitle": "Market outlook · deep analysis",
+    "deepAnalysisLoading": "Analyzing economy, indices, sectors, news… (up to 25s)",
+    "expandAnalysis": "Why this view · rationale ▼",
+    "collapseAnalysis": "Collapse analysis ▲",
+    "latestHeadlines": "Latest headlines",
+    "indicatorDetails": "Indicator breakdown",
+    "stockQuickLinks": "Quick stock links",
+    "panels": {
+      "macroTitle": "Economy · volatility · FX · rates",
+      "macroSubtitle": "VIX · USD/KRW · US Treasury yields",
+      "indexTitle": "Major indices · technical indicators",
+      "indexSubtitle": "SMA · RSI · MACD · Bollinger · Stochastic",
+      "indexName": "Index",
+      "price": "Price",
+      "oneDay": "1D",
+      "bollinger": "Bollinger",
+      "trend": "Trend",
+      "sectorTitle": "Sector ETF relative strength",
+      "sectorSubtitle": "1W · 1M returns vs SPY / KODEX 200",
+      "todayChange": "Today {{percent}}",
+      "macroOneDay": "1D {{percent}}",
+      "macroKrwValue": "{{value}} KRW",
+      "oneWeek": "1W {{percent}}",
+      "sectorBenchmark": "{{title}} · Benchmark {{benchmark}}",
+      "sectorUs": "🇺🇸 United States",
+      "sectorKr": "🇰🇷 Korea",
+      "chartLink": "Chart ↗"
+    }
+  },
+  "guest": {
+    "displayName": "Guest"
+  },
+  "watchlist": {
+    "title": "Watchlist",
+    "desc": "Track stocks separately from your holdings.",
+    "loading": "Loading...",
+    "empty": "No watchlist items.",
+    "heldBadge": "Held",
+    "toast": {
+      "addSuccess": "Added to watchlist.",
+      "addFailed": "Failed to add to watchlist.",
+      "removeSuccess": "Removed from watchlist.",
+      "removeFailed": "Failed to remove from watchlist."
+    }
+  },
+  "stock": {
+    "detail": {
+      "title": "Stock detail",
+      "myHolding": "My holding",
+      "myHoldingLoading": "Loading holding info...",
+      "periodPrices": "Price by period",
+      "periodPricesHint": "Select a period to load quotes for that range",
+      "currentPriceLabel": "Current price ({{range}} basis)",
+      "loadingChart": "Loading chart...",
+      "noChartData": "No chart data.",
+      "loadingQuote": "Loading...",
+      "fetchedAt": "Fetched at: {{time}}"
+    },
+    "chart": {
+      "loading": "Loading chart...",
+      "empty": "No chart data.",
+      "ariaLabel": "Stock price chart"
+    },
+    "search": {
+      "selectedStock": "Selected stock",
+      "market": "Market",
+      "marketKrOption": "Korea (KR)",
+      "marketUsOption": "United States (US)",
+      "searchLabel": "Search stocks",
+      "placeholderKr": "Name or code (e.g. Samsung, 005930)",
+      "placeholderUs": "Ticker or name (e.g. AAPL)",
+      "searching": "Searching...",
+      "noResults": "No results.",
+      "selectHint": "Select a stock from search results to register a trade.",
+      "searchFailed": "Stock search failed. Please try again later."
+    }
+  },
+  "quoteRange": {
+    "1d": "Today",
+    "3d": "3D",
+    "1w": "1W",
+    "1mo": "1M",
+    "3mo": "3M",
+    "6mo": "6M",
+    "ytd": "YTD",
+    "1y": "1Y",
+    "5y": "5Y",
+    "10y": "10Y",
+    "max": "Max"
+  },
+  "quotes": {
+    "featured": {
+      "title": "Featured quotes",
+      "subtitle": "Representative KR/US stocks · loads today's quotes on entry",
+      "tableHint": "Click a stock for detail and historical quotes",
+      "krTitle": "🇰🇷 Korean stocks",
+      "usTitle": "🇺🇸 US stocks",
+      "loading": "Loading quotes...",
+      "querying": "Loading...",
+      "unavailable": "Unavailable",
+      "todayChangeTitle": "Today's change",
+      "loadFailed": "Failed to load featured quotes."
+    },
+    "refresh": {
+      "successTitle": "Quotes refreshed",
+      "warningTitle": "Partially refreshed",
+      "errorTitle": "Refresh failed",
+      "marketUpdated": "{{market}} {{count}} updated: {{symbols}}",
+      "refreshBlocked": "Cannot refresh ({{symbols}}) — {{reason}}",
+      "queryFailed": "Query failed ({{symbols}}) — {{reason}}"
+    },
+    "notice": {
+      "title": "Quote API notice",
+      "finnhubHint": "Only configured APIs fetch quotes. US stocks require a Finnhub API key (FINNHUB_API_KEY).",
+      "providerAvailable": "{{label}} — available",
+      "providerUnavailable": "{{label}} — unavailable{{hint}}"
+    }
+  },
+  "portfolio": {
+    "summary": {
+      "totalAssetsKrw": "Total assets (KRW)",
+      "cashKrw": "Cash (KRW)",
+      "totalCostBasis": "Total cost basis",
+      "totalCostBasisKrw": "Total cost basis (KRW)",
+      "totalMarketValue": "Total market value",
+      "totalMarketValueKrw": "Total market value (KRW)",
+      "todayPnl": "Today's P&L",
+      "unrealizedPnl": "Unrealized P&L",
+      "realizedPnl": "Realized P&L",
+      "holdingsCount": "Holdings",
+      "holdingsCountValue": "{{count}}"
+    },
+    "holdings": {
+      "empty": "No holdings. Register a trade to get started."
+    },
+    "allocation": {
+      "title": "Asset allocation (KRW basis)",
+      "marketSplit": "KR {{kr}}% · Foreign {{us}}%"
+    },
+    "periodReturns": {
+      "title": "Period returns (KRW-weighted)",
+      "loading": "Loading period returns...",
+      "coverage": "Quote coverage {{percent}}%"
+    },
+    "benchmark": {
+      "title": "Returns vs benchmark",
+      "portfolioReturn": "My return {{percent}}",
+      "alpha": "({{value}}%p)"
+    },
+    "insights": {
+      "title": "Holdings charts & news",
+      "empty": "No holdings analysis available.",
+      "rsiLabel": "RSI {{rsi}} · {{label}}"
+    }
+  },
+  "pages": {
+    "stockDetail": {
+      "title": "Stock detail",
+      "marketQueryRequired": "market query parameter (KR or US) is required."
+    },
+    "tax": {
+      "title": "Tax guide"
+    },
+    "globalError": {
+      "title": "Something went wrong",
+      "message": "Please try again later.",
+      "retry": "Try again"
+    }
+  },
+  "shared": {
+    "sentiment": {
+      "strong_bull": "Strong bull",
+      "bull": "Bullish",
+      "neutral": "Neutral",
+      "bear": "Bearish",
+      "strong_bear": "Sharp decline"
+    },
+    "tag": {
+      "momentum": "Momentum",
+      "watchlist": "Watchlist",
+      "pullback": "Pullback",
+      "defensive": "Defensive"
+    },
+    "periods": {
+      "1mo": "1M",
+      "3mo": "3M",
+      "ytd": "YTD",
+      "max": "All"
+    },
+    "tax": {
+      "rules": {
+        "kr-capital-general": {
+          "category": "Domestic · capital gains",
+          "title": "General investor trading gains",
+          "summary": "KRX listed gains tax-exempt for non-major shareholders",
+          "rateLabel": "0% (exempt)",
+          "thresholdLabel": "N/A",
+          "filingLabel": "No filing required",
+          "notes": [
+            "Financial investment income tax not in effect as of 2026",
+            "Major shareholders and unlisted stocks taxed separately"
+          ]
+        },
+        "kr-capital-major": {
+          "category": "Domestic · capital gains",
+          "title": "Major shareholder gains",
+          "summary": "Capital gains tax when market cap ≥ 5B KRW or stake ≥ 1%",
+          "rateLabel": "22% (≤300M KRW) / 27.5% (>300M KRW, incl. local tax)",
+          "thresholdLabel": "Basic deduction 2.5M KRW/year",
+          "filingLabel": "File by May next year",
+          "notes": [
+            "Domestic and foreign gains can be netted (from 2020.1.1)",
+            "Expenses such as fees require documentation"
+          ]
+        },
+        "kr-dividend": {
+          "category": "Domestic · dividends",
+          "title": "Dividend income (separate taxation)",
+          "summary": "Domestic dividends withheld at source",
+          "rateLabel": "15.4% (14% + 1.4% local)",
+          "thresholdLabel": "Separate taxation if financial income ≤ 20M KRW",
+          "filingLabel": "Comprehensive filing in May if over 20M KRW",
+          "notes": [
+            "Deposit interest, bond interest, and all dividends combined",
+            "Over threshold: all financial income taxed progressively (6–45% + local)"
+          ]
+        },
+        "kr-securities-tax": {
+          "category": "Domestic · sales",
+          "title": "Securities transaction tax",
+          "summary": "Levied on sale proceeds (small amount on buys too)",
+          "rateLabel": "Approx. 0.18–0.23% (varies by market)",
+          "thresholdLabel": "No deduction",
+          "filingLabel": "Withheld (no separate filing)",
+          "notes": [
+            "KOSPI ~0.18%, KOSDAQ ~0.20–0.23% (incl. rural special tax)",
+            "This app uses 0.20% for estimates"
+          ]
+        },
+        "us-capital": {
+          "category": "Foreign · capital gains",
+          "title": "Foreign stock trading gains",
+          "summary": "All residents — annual gains taxed",
+          "rateLabel": "22% (incl. local tax)",
+          "thresholdLabel": "Basic deduction 2.5M KRW/year (once for domestic + foreign)",
+          "filingLabel": "May 1–31 next year",
+          "notes": [
+            "Foreign stock gains/losses netted within the year",
+            "FX: FIFO or trade-date rate (this app uses a single rate estimate)"
+          ]
+        },
+        "us-dividend": {
+          "category": "Foreign · dividends",
+          "title": "Foreign dividend income",
+          "summary": "Local withholding + additional KR tax per treaty",
+          "rateLabel": "Varies by country (e.g. US 15%)",
+          "thresholdLabel": "May filing recommended even if financial income ≤ 20M KRW",
+          "filingLabel": "May filing (foreign tax credit)",
+          "notes": [
+            "Separate taxation final if ≤20M KRW and only domestic withholding",
+            "Foreign dividends must be reported regardless of withholding (for credit)"
+          ]
+        },
+        "financial-comprehensive": {
+          "category": "Common",
+          "title": "Comprehensive financial income tax",
+          "summary": "Progressive tax when interest + dividends exceed threshold",
+          "rateLabel": "6% – 45% (+ 10% local tax)",
+          "thresholdLabel": "20M KRW/year",
+          "filingLabel": "May comprehensive income tax",
+          "notes": [
+            "All financial income taxed when over threshold",
+            "Previously withheld tax is credited"
+          ]
+        },
+        "isa-account": {
+          "category": "Tax-advantaged accounts",
+          "title": "ISA (Individual Savings Account)",
+          "summary": "Account-level netting, tax-free limit, 9.9% on overflow",
+          "rateLabel": "0% within limit / 9.9% overflow",
+          "thresholdLabel": "General 2M KRW · Worker/senior 4M KRW",
+          "filingLabel": "At maturity/closure or annual settlement (broker)",
+          "notes": [
+            "Stocks, ETFs, funds, deposits combined; 3-year minimum",
+            "ISA separate tax excluded from 20M comprehensive threshold",
+            "Securities transaction tax still applies separately"
+          ]
+        },
+        "pension-savings": {
+          "category": "Tax-advantaged accounts",
+          "title": "Pension savings contribution credit",
+          "summary": "Tax credit on employee pension contributions (13.2% estimate)",
+          "rateLabel": "13.2% of contributions (6M KRW annual limit)",
+          "thresholdLabel": "Max ~792K KRW tax credit",
+          "filingLabel": "Year-end settlement or May filing",
+          "notes": [
+            "IRP and retirement pension have separate combined limits",
+            "Separate from dividend/trading taxes — contribution credit"
+          ]
+        }
+      },
+      "isa": {
+        "none": {
+          "label": "Not applicable",
+          "description": "Regular brokerage accounts only"
+        },
+        "general": {
+          "label": "ISA general",
+          "description": "2M KRW net income tax-free, 9.9% on overflow"
+        },
+        "worker": {
+          "label": "ISA worker/farmer",
+          "description": "4M KRW tax-free if income requirements met"
+        },
+        "senior": {
+          "label": "ISA senior",
+          "description": "Age 65+, 4M KRW net income tax-free"
+        }
+      },
+      "otherIncome": {
+        "under_14m": {
+          "label": "Up to 14M KRW",
+          "rateLabel": "6%"
+        },
+        "14m_50m": {
+          "label": "14M–50M KRW",
+          "rateLabel": "15%"
+        },
+        "50m_88m": {
+          "label": "50M–88M KRW",
+          "rateLabel": "24%"
+        },
+        "88m_150m": {
+          "label": "88M–150M KRW",
+          "rateLabel": "35%"
+        },
+        "150m_300m": {
+          "label": "150M–300M KRW",
+          "rateLabel": "38%"
+        },
+        "300m_500m": {
+          "label": "300M–500M KRW",
+          "rateLabel": "40%"
+        },
+        "500m_1b": {
+          "label": "500M–1B KRW",
+          "rateLabel": "42%"
+        },
+        "over_1b": {
+          "label": "Over 1B KRW",
+          "rateLabel": "45%"
+        }
+      },
+      "foreignDividend": {
+        "US": {
+          "label": "United States",
+          "note": "KR–US treaty — no additional KR tax (May filing for foreign tax credit)"
+        },
+        "JP": {
+          "label": "Japan",
+          "note": "Tax treaty — no additional KR tax"
+        },
+        "CN": {
+          "label": "China",
+          "note": "Local 10% + KR difference ~4.4% (local tax separate)"
+        },
+        "HK": {
+          "label": "Hong Kong",
+          "note": "No local withholding — report 15.4% in KR"
+        },
+        "UK": {
+          "label": "United Kingdom",
+          "note": "No local withholding — report 15.4% in KR"
+        },
+        "OTHER": {
+          "label": "Other",
+          "note": "Check treaty and local rates by country"
+        }
+      },
+      "applicableStatus": {
+        "applies": "Applies",
+        "exempt": "Exempt",
+        "conditional": "Conditional",
+        "not_applicable": "Not applicable"
+      },
+      "applicableReasons": {
+        "kr-capital-general": {
+          "not_applicable": "No domestic stock investments",
+          "exempt": "General investor — KRX gains tax-exempt"
+        },
+        "kr-capital-major": {
+          "applies": "Major shareholder — domestic and foreign gains netted",
+          "not_applicable": "General investor"
+        },
+        "kr-dividend": {
+          "not_applicable": "No domestic stock investments",
+          "conditional": "Financial income over 20M KRW — switches to comprehensive tax",
+          "applies": "15.4% withholding on dividends"
+        },
+        "kr-securities-tax": {
+          "applies": "~0.20% of sale proceeds on domestic stocks",
+          "not_applicable": "No domestic stock investments"
+        },
+        "us-capital": {
+          "not_applicable": "No foreign stock investments",
+          "conditional": "Major shareholder — netted with domestic major shareholder gains",
+          "applies": "Foreign trading gains — 2.5M KRW deduction then 22%"
+        },
+        "us-dividend": {
+          "not_applicable": "No foreign stock investments",
+          "conditional": "{{country}} dividends — {{withholding}}, May filing",
+          "applies": "{{country}} dividends — {{withholding}}, May filing"
+        },
+        "financial-comprehensive": {
+          "applies": "Financial income over 20M KRW — progressive tax",
+          "conditional": "Financial income ≤ 20M KRW — separate taxation maintained"
+        },
+        "isa-account": {
+          "not_applicable": "ISA not used",
+          "applies": "Tax-free up to {{limit}}M KRW net income, 9.9% on overflow"
+        },
+        "pension-savings": {
+          "applies": "Contribution {{amount}} KRW — estimated tax credit",
+          "conditional": "Enter contribution amount to estimate tax credit"
+        }
+      },
+      "estimateLines": {
+        "kr-gain-major": {
+          "category": "Domestic & foreign",
+          "label": "Major shareholder capital gains (domestic + foreign netted)",
+          "note": "Net P&L {{amount}} KRW"
+        },
+        "kr-gain-exempt": {
+          "category": "Domestic stocks",
+          "label": "Trading gains (tax-exempt)",
+          "note": "General investor KOSPI/KOSDAQ"
+        },
+        "us-gain": {
+          "category": "Foreign stocks",
+          "label": "Capital gains tax (after 2.5M KRW deduction)",
+          "note": "Regular account net P&L {{amount}} KRW"
+        },
+        "kr-stt": {
+          "category": "Domestic stocks",
+          "label": "Securities transaction tax (sell)"
+        },
+        "fin-comprehensive": {
+          "category": "Dividends & financial",
+          "label": "Financial income comprehensive tax (est.)",
+          "note": "Financial income over 20M KRW threshold"
+        },
+        "kr-div": {
+          "category": "Domestic stocks",
+          "label": "Dividend withholding (regular account)"
+        },
+        "us-div": {
+          "category": "Foreign stocks",
+          "label": "Dividend ({{country}}, regular account)"
+        },
+        "isa-tax": {
+          "category": "Tax-advantaged accounts",
+          "label": "ISA separate taxation",
+          "note": "Net income {{net}} KRW · tax-free {{limit}} KRW"
+        }
+      },
+      "disclaimers": {
+        "0": "This estimate is for reference only. Confirm actual tax and filing obligations with NTS or a tax professional.",
+        "1": "Foreign stock FX conversion uses a single rate (current or input). Actual filing uses trade-date rates and FIFO.",
+        "2": "Securities transaction tax, major shareholder rules, and expenses (commissions) are omitted or simplified.",
+        "3": "Financial investment income tax (2026: not in effect) is not included.",
+        "4": "ISA is estimated via account-level netting and income share split. Actual settlement is at financial institution maturity."
+      }
+    },
+    "simulation": {
+      "headline": {
+        "noCapital": "Set invested capital to start personalized allocation suggestions",
+        "withAssets": "Total assets {{totalAssets}} · Cash {{cashPercent}}%"
+      },
+      "description": {
+        "underweight": "{{region}} allocation is {{gap}}%p below target. See buy suggestions below.",
+        "overweight": "{{region}} allocation is {{gap}}%p above target. See buy suggestions below.",
+        "balanced": "Market and holding weights are near target. Review concentrated positions and cash allocation."
+      },
+      "reason": {
+        "withinTarget": "Within target weight — hold",
+        "smallHolding": "Small position — hold",
+        "trimWeight": "Weight {{weight}}% → consider trimming to {{target}}% or below",
+        "trimUnitTooSmall": "Overweight but below sell unit — watch",
+        "addRecommendation": "See recommendation details",
+        "reserveCash": "Remaining cash after adjustment — for additional buys or emergency reserve"
+      },
+      "cashName": "Available cash"
+    },
+    "market": {
+      "categories": {
+        "breadth": "Market breadth",
+        "index": "Index & charts",
+        "technical": "Technical indicators",
+        "news": "News & issues",
+        "macro": "Macro & sentiment",
+        "sector": "Sector relative strength",
+        "recommendation": "Stock watchlist"
+      },
+      "sentiment": {
+        "headline": "{{market}} featured stocks · {{sentiment}}",
+        "noData": "Insufficient quote data to assess sentiment.",
+        "description": {
+          "strong_bull": "Featured stocks avg {{avg}}%. Up {{up}} · Down {{down}} — strong short-term uptrend.",
+          "bull": "Featured stocks avg {{avg}}%. Up {{up}} · Down {{down}} — mild bullish tone.",
+          "neutral": "Featured stocks avg {{avg}}%. Up {{up}} · Down {{down}} — no clear direction.",
+          "bear": "Featured stocks avg {{avg}}%. Up {{up}} · Down {{down}} — correction/selling pressure.",
+          "strong_bear": "Featured stocks avg {{avg}}%. Up {{up}} · Down {{down}} — broad weakness."
+        },
+        "marketLabel": {
+          "kr": "Korea",
+          "us": "US"
+        }
+      },
+      "recommendation": {
+        "momentumStrong": "Strongest mover among {{market}} featured stocks today — check trend continuation.",
+        "bullWatchlist": "In bull market, {{name}} — watch relative strength.",
+        "bearPullback": "Large pullback among {{market}} featured stocks — watch oversold signals.",
+        "bearDefensive": "Relatively resilient {{name}} in bear market — defensive interest.",
+        "neutralMomentum": "Relative strength for {{name}} in mixed market — confirm direction.",
+        "neutralWatchlist": "{{name}} pulling back in mixed market — watch support."
+      },
+      "insights": {
+        "regions": {
+          "usGlobal": "US & global"
+        },
+        "breadth": {
+          "title": "{{region}} leaders {{up}}↑ {{down}}↓ — {{bias}}",
+          "summary": "{{region}} {{count}} featured stocks avg {{avg}}. Up/down ratio {{ratio}}.",
+          "bias": {
+            "up": "Upside bias",
+            "down": "Downside bias"
+          },
+          "reasoning": {
+            "bullish": "When rising names clearly outnumber fallers, risk appetite tends to be strong. Broad participation is healthier than a few large caps alone.",
+            "bearish": "When fallers dominate, short-term selling and risk-off sentiment may be elevated. Check whether the index holds while leaders weaken.",
+            "neutral": "Mixed up/down moves suggest no clear direction — stock and sector differentiation matters more than trend-following."
+          }
+        },
+        "indexTrend": {
+          "title": "{{name}} — {{trend}}",
+          "summary": "Price {{price}} · 1D {{change}} · {{trend}}",
+          "reasoning": "Moving-average alignment is a common trend filter. Price above short/medium MAs in bullish order suggests uptrend; the opposite suggests pullback or weakness."
+        },
+        "indexRsi": {
+          "title": "{{name}} RSI(14) {{rsi}} — {{zone}}",
+          "summary": "RSI {{rsi}}. {{zoneSummary}}.",
+          "reasoning": "RSI(14) measures relative strength over 14 sessions. Above 70 is often overbought, below 30 oversold — but strong trends can stay extreme; do not use RSI alone as a signal."
+        },
+        "indexMacd": {
+          "title": "{{name}} MACD {{side}}{{alignedSuffix}}",
+          "summary": "MACD {{macd}}. {{aligned}}.",
+          "reasoning": "MACD tracks 12/26 EMA momentum. Above zero with price above SMA20 often reads as bullish momentum; below zero suggests weakening momentum."
+        },
+        "indexBb": {
+          "title": "{{name}} Bollinger (20,2) — {{label}}",
+          "summary": "%B {{percentB}}% · Bandwidth {{bandwidth}}%",
+          "reasoning": "Bollinger bands are SMA20 ± 2σ. %B near 1 suggests upper-band breakout (overheated); near 0 suggests lower band (oversold). Squeeze then expansion often precedes volatility spikes."
+        },
+        "indexStoch": {
+          "title": "{{name}} Stochastic — {{label}} (K {{k}} / D {{d}})",
+          "summary": "Uses %K/%D cross and 80/20 zones for short-term momentum.",
+          "reasoning": "Stochastic measures close vs recent range. Above 80 overbought, below 20 oversold; K crossing above D is a common short-term buy signal (often fails in strong trends)."
+        },
+        "macroPanel": {
+          "title": "{{name}} — {{interpret}}",
+          "reasoning": {
+            "vix": "VIX is the S&P 500 implied-vol fear gauge — widely quoted on terminals and financial media.",
+            "fx": "USD/KRW affects foreign flows, exporters, imports, and growth names. Sharp KRW weakness can also signal higher volatility.",
+            "yield": "US Treasury yields reflect discount rates, growth expectations, and Fed policy. Curve spreads (e.g. 10Y–3M inversion) are on recession watchlists."
+          }
+        },
+        "sectorOverview": {
+          "title": "{{region}} sectors — 1W RS leader {{sector}}",
+          "summary": "{{name}} 1W relative strength {{rs}} vs {{benchmark}}",
+          "reasoning": "Sector ETF relative strength is excess return vs the benchmark. Judge whether leadership reflects rotation or a trap before chasing laggards."
+        },
+        "newsEmpty": {
+          "title": "News headlines unavailable",
+          "summary": "Could not fetch news feeds. Use the links below.",
+          "reasoning": "News APIs/RSS may fail temporarily or when keys are missing. Cross-check headlines with prices and indicators."
+        },
+        "news": {
+          "title": "{{region}} headlines — {{toneLabel}}",
+          "summaryFallback": "{{headline}}",
+          "tone": {
+            "bullish": "Positive keywords dominate",
+            "bearish": "Negative keywords dominate",
+            "neutral": "Mixed tone"
+          },
+          "reasoning": "Headline keywords (surge, drop, concern, etc.) give a rough tone scan. Flow across sources matters more than one article; prices may already reflect the news."
+        },
+        "macroGlobal": {
+          "titleDiverge": "Korea–US temperature gap",
+          "titleSync": "Korea–US in sync / mixed",
+          "summaryDiverge": "Korea {{krAvg}} · US {{usAvg}} — regional divergence",
+          "summarySync": "Korea {{krAvg}} · US {{usAvg}}",
+          "reasoningDiverge": "Large gaps in featured-stock averages may reflect FX, rates, or regional themes — often read alongside USD/KRW.",
+          "reasoningSync": "Similar direction in both markets suggests a common global driver — cross-check Fed, FX, and macro headlines."
+        },
+        "recommendation": {
+          "title": "[{{tag}}] {{name}}",
+          "reasoning": {
+            "momentum": "Strong daily/short-term returns attract trend followers — confirm volume and relative strength vs the index.",
+            "pullback": "Sharp drops are where bounce buyers and trend exits disagree — check support, RSI oversold, and news.",
+            "defensive": "Names holding up in weak markets often have lower volatility or solid fundamentals — they may lag on rebounds.",
+            "watchlist": "In mixed markets, individual catalysts (relative strength, dividends, earnings) matter more."
+          }
+        }
+      },
+      "trends": {
+        "mixed": "Mixed",
+        "shortTermUp": "Short-term uptrend",
+        "midTermUp": "Medium-term uptrend",
+        "shortTermPullback": "Short-term pullback",
+        "longTermDown": "Long-term down channel"
+      },
+      "bollinger": {
+        "aboveUpper": "Above upper band (overheated)",
+        "nearUpper": "Near upper band",
+        "belowLower": "Below lower band (oversold)",
+        "nearLower": "Near lower band",
+        "midBand": "Mid band"
+      },
+      "stochastic": {
+        "overbought": "Overbought",
+        "oversold": "Oversold",
+        "kAboveD": "K > D rising",
+        "kBelowD": "K < D falling",
+        "neutral": "Neutral"
+      },
+      "strength": {
+        "strong": "Strong",
+        "weak": "Weak",
+        "normal": "Normal"
+      },
+      "rsi": {
+        "overbought": "Overbought",
+        "oversold": "Oversold",
+        "neutral": "Neutral"
+      },
+      "rsiZone": {
+        "overbought": "Overbought zone",
+        "oversold": "Oversold zone",
+        "neutral": "Neutral"
+      },
+      "rsiZoneSummary": {
+        "overbought": "Short-term overheating signal",
+        "oversold": "Watch for bounce",
+        "neutral": "Not in an extreme zone"
+      },
+      "macdSide": {
+        "positive": "bullish crossover",
+        "negative": "bearish crossover"
+      },
+      "macdAligned": {
+        "aligned": "Momentum aligned with trend",
+        "weak": "Momentum may be weakening"
+      },
+      "macdAlignedSuffix": {
+        "yes": " + above SMA20",
+        "no": ""
+      },
+      "macro": {
+        "vix": {
+          "extremeFear": "Extreme fear",
+          "extremeFearDetail": "VIX 30+ often appears in panic selloffs. High vol itself — distinguish dead-cat bounce vs continued trend.",
+          "elevatedFear": "Elevated fear",
+          "elevatedFearDetail": "More hedging and selling demand — pressure on risk assets may increase.",
+          "normal": "Normal",
+          "normalDetail": "Near historical average (~15–20). No strong fear/greed signal.",
+          "lowVol": "Low volatility",
+          "lowVolDetail": "Market in complacency mode — very low VIX can warn of reversal for some traders."
+        },
+        "fx": {
+          "krwWeak": "KRW weakness",
+          "krwWeakDetail": "~{{rate}} KRW/USD — weak won often helps exporters/foreign flows but weighs on imports, debt, and growth names.",
+          "krwStrong": "KRW strength",
+          "krwStrongDetail": "Strong won — supportive for liquidity/imports but may constrain exports and foreign buying.",
+          "stable": "Stable",
+          "stableDetail": "FX moves are limited — macro impact from rates is modest."
+        },
+        "yield": {
+          "rising": "Rising yields",
+          "risingDetail": "{{name}} yield rising — tighter financial conditions and pressure on growth valuations. Watch Fed and inflation expectations.",
+          "falling": "Falling yields",
+          "fallingDetail": "Lower yields can support risk-on/growth but may overlap with slowdown concerns.",
+          "highRegime": "High-rate regime",
+          "highRegimeDetail": "{{yield}}% — 2020s higher-rate regime; rising discount rates weigh on long-duration growth multiples.",
+          "stable": "Stable",
+          "stableDetail": "{{yield}}% — limited near-term re-pricing pressure."
+        }
+      },
+      "sectors": {
+        "bySymbol": {
+          "XLK": "Technology",
+          "SMH": "Semiconductor",
+          "XLF": "Financials",
+          "XLE": "Energy",
+          "XLV": "Healthcare",
+          "091160.KS": "Semiconductor",
+          "091170.KS": "Financials",
+          "091180.KS": "Automotive"
+        }
+      }
+    }
+  }
+}

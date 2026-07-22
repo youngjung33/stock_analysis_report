@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import { useTaxScreen } from '../../hooks/screens/useTaxScreen';
 import { TaxProfileForm } from './TaxProfileForm';
 import { ApplicableTaxSummary } from './ApplicableTaxSummary';
@@ -13,6 +14,7 @@ interface Props {
 
 /** 내 정보 — 조건 선택 + 적용 세목 + 추정 세액 */
 export function MyTaxSection({ refreshKey = 0 }: Props) {
+  const { t } = useTranslation();
   const screen = useTaxScreen(refreshKey);
 
   return (
@@ -21,7 +23,7 @@ export function MyTaxSection({ refreshKey = 0 }: Props) {
       <ApplicableTaxSummary profile={screen.profile} estimate={screen.estimate} />
 
       {screen.loading && (
-        <p className="text-sm text-muted-foreground">거래·배당 데이터 불러오는 중...</p>
+        <p className="text-sm text-muted-foreground">{t('tax.loadingEstimate')}</p>
       )}
 
       {!screen.loading && screen.estimate && (
@@ -30,17 +32,16 @@ export function MyTaxSection({ refreshKey = 0 }: Props) {
 
       {!screen.loading && screen.estimate && screen.estimate.lines.length === 0 && (
         <Surface variant="section" className="text-sm text-muted-foreground">
-          {screen.profile.taxYear}년 매도·배당 내역이 없습니다. 거래·배당·분할·합병을 등록하면 추정
-          세액이 표시됩니다.
+          {t('tax.noTransactions', { year: screen.profile.taxYear })}
         </Surface>
       )}
 
       <p className="text-center text-xs text-muted-foreground">
-        세금 기준 전체·국가별 배당·누진세 구간은{' '}
+        {t('tax.guideLinkHint')}{' '}
         <Link href="/tax" className="text-primary underline-offset-2 hover:underline">
-          세금 정보
+          {t('tax.guideLink')}
         </Link>
-        를 참고하세요.
+        {t('tax.guideLinkSuffix')}
       </p>
     </div>
   );

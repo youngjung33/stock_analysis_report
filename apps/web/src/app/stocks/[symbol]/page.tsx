@@ -2,11 +2,13 @@
 
 import { Suspense } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { Market } from '@sar/shared';
 import { ProtectedRoute } from '@/presentation/routes/ProtectedRoute';
 import { StockDetailPage } from '@/presentation/pages/StockDetailPage';
 
 function StockDetailRouteInner() {
+  const { t } = useTranslation();
   const params = useParams<{ symbol: string }>();
   const searchParams = useSearchParams();
   const symbol = decodeURIComponent(params.symbol);
@@ -16,7 +18,7 @@ function StockDetailRouteInner() {
   if (!market) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-950 text-rose-400">
-        market 쿼리(KR 또는 US)가 필요합니다.
+        {t('pages.stockDetail.marketQueryRequired')}
       </div>
     );
   }
@@ -25,12 +27,14 @@ function StockDetailRouteInner() {
 }
 
 export default function StockDetailRoutePage() {
+  const { t } = useTranslation();
+
   return (
     <ProtectedRoute>
       <Suspense
         fallback={
           <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-300">
-            로딩 중...
+            {t('common.loading')}
           </div>
         }
       >

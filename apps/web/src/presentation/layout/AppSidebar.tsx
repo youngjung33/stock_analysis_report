@@ -2,9 +2,12 @@
 
 import Link from 'next/link';
 import { LogOut, Settings } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useAppNavItems } from '@/i18n';
+import { LanguageSelector } from '../components/LanguageSelector';
 import { useAuth } from '../hooks/useAuth';
 import { cn } from '../lib/cn';
-import { APP_BRAND, APP_NAV_ITEMS } from './nav-config';
+import { APP_BRAND } from './nav-config';
 import { useActiveNavSection } from './useActiveNavSection';
 
 interface Props {
@@ -13,7 +16,9 @@ interface Props {
 
 export function AppSidebar({ className }: Props) {
   const active = useActiveNavSection();
+  const navItems = useAppNavItems();
   const { username, logout, isGuest } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <aside
@@ -29,8 +34,8 @@ export function AppSidebar({ className }: Props) {
         </Link>
       </div>
 
-      <nav className="flex-1 space-y-1.5 px-4 py-5" aria-label="주 메뉴">
-        {APP_NAV_ITEMS.map((item) => {
+      <nav className="flex-1 space-y-1.5 px-4 py-5" aria-label={t('nav.mainMenu')}>
+        {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = active === item.id;
           return (
@@ -53,10 +58,14 @@ export function AppSidebar({ className }: Props) {
       </nav>
 
       <div className="border-t border-border p-5">
+        <div className="mb-4">
+          <p className="mb-2 text-[11px] font-medium text-muted-foreground">{t('settings.language')}</p>
+          <LanguageSelector />
+        </div>
         {username && (
           <p className="mb-3 truncate text-xs text-muted-foreground">
             {username}
-            {isGuest && <span className="ml-1 text-amber-400/90">(비회원)</span>}
+            {isGuest && <span className="ml-1 text-amber-400/90">{t('common.guestBadge')}</span>}
           </p>
         )}
         {!isGuest && (
@@ -65,7 +74,7 @@ export function AppSidebar({ className }: Props) {
             className="mb-2 flex w-full items-center justify-center gap-2 rounded-lg border border-border-strong px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           >
             <Settings className="size-4" aria-hidden />
-            계정 설정
+            {t('nav.accountSettings')}
           </Link>
         )}
         <button
@@ -74,7 +83,7 @@ export function AppSidebar({ className }: Props) {
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-border-strong px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
         >
           <LogOut className="size-4" aria-hidden />
-          로그아웃
+          {t('nav.logout')}
         </button>
       </div>
     </aside>

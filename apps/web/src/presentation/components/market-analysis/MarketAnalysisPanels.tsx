@@ -1,10 +1,18 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
 import {
   IndexTechnicalSnapshot,
   MacroIndicatorSnapshot,
   SectorEtfSnapshot,
 } from '@sar/shared';
+import {
+  translateBollingerLabel,
+  translateMacroIndicator,
+  translateSectorLabel,
+  translateStrengthLabel,
+  translateTrendLabel,
+} from '@/i18n/translate-shared';
 import { formatPercent, pnlClass } from '../../shared/formatters';
 
 const MACRO_TONE_BORDER: Record<string, string> = {
@@ -13,8 +21,8 @@ const MACRO_TONE_BORDER: Record<string, string> = {
   neutral: 'border-slate-700',
 };
 
-function formatMacroValue(m: MacroIndicatorSnapshot): string {
-  if (m.unit === 'krw') return `${m.value.toFixed(1)}원`;
+function formatMacroValue(m: MacroIndicatorSnapshot, t: (key: string, opts?: Record<string, unknown>) => string): string {
+  if (m.unit === 'krw') return t('market.panels.macroKrwValue', { value: m.value.toFixed(1) });
   if (m.unit === 'pct') return `${m.value.toFixed(2)}%`;
   return m.value.toFixed(2);
 }
@@ -26,6 +34,8 @@ export function MacroPanel({
   macro: MacroIndicatorSnapshot[];
   compact?: boolean;
 }) {
+  const { t } = useTranslation();
+
   if (macro.length === 0) return null;
 
   const vix = macro.find((m) => m.kind === 'vix');
@@ -35,8 +45,10 @@ export function MacroPanel({
   return (
     <div className="space-y-3">
       <div>
-        <h3 className={`font-semibold text-white ${compact ? 'text-sm' : ''}`}>경기 · 변동성 · 환율 · 금리</h3>
-        <p className="mt-0.5 text-xs text-slate-500">VIX · USD/KRW · 미국 국채 수익률</p>
+        <h3 className={`font-semibold text-white ${compact ? 'text-sm' : ''}`}>
+          {t('market.panels.macroTitle')}
+        </h3>
+        <p className="mt-0.5 text-xs text-slate-500">{t('market.panels.macroSubtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -66,6 +78,9 @@ function MacroCard({
   compact?: boolean;
   highlight?: boolean;
 }) {
+  const { t } = useTranslation();
+  const localized = translateMacroIndicator(item, t);
+
   return (
     <div
       className={`rounded-xl border bg-slate-950/50 p-4 ${MACRO_TONE_BORDER[item.tone]} ${highlight ? 'ring-1 ring-amber-500/20' : ''}`}
@@ -74,7 +89,7 @@ function MacroCard({
         <div>
           <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">{item.name}</p>
           <p className={`mt-1 font-semibold text-white ${compact ? 'text-lg' : 'text-xl'}`}>
-            {formatMacroValue(item)}
+            {formatMacroValue(item, t)}
           </p>
         </div>
         <span
@@ -86,13 +101,13 @@ function MacroCard({
                 : 'bg-slate-700 text-slate-300'
           }`}
         >
-          {item.interpretLabel}
+          {localized.interpretLabel}
         </span>
       </div>
       <p className={`mt-1 text-xs ${pnlClass(item.changePercent1d)}`}>
-        1일 {formatPercent(item.changePercent1d)}
+        {t('market.panels.macroOneDay', { percent: formatPercent(item.changePercent1d) })}
       </p>
-      <p className="mt-2 text-[11px] leading-relaxed text-slate-400">{item.interpretDetail}</p>
+      <p className="mt-2 text-[11px] leading-relaxed text-slate-400">{localized.interpretDetail}</p>
       <div className="mt-3 flex flex-wrap gap-1.5">
         <a
           href={item.chartUrl}
@@ -124,27 +139,31 @@ export function IndexTechnicalPanel({
   indices: IndexTechnicalSnapshot[];
   compact?: boolean;
 }) {
+  const { t } = useTranslation();
+
   if (indices.length === 0) return null;
 
   return (
     <div className="space-y-3">
       <div>
-        <h3 className={`font-semibold text-white ${compact ? 'text-sm' : ''}`}>주요 지수 · 기술적 지표</h3>
-        <p className="mt-0.5 text-xs text-slate-500">SMA · RSI · MACD · 볼린저 · 스토캐스틱</p>
+        <h3 className={`font-semibold text-white ${compact ? 'text-sm' : ''}`}>
+          {t('market.panels.indexTitle')}
+        </h3>
+        <p className="mt-0.5 text-xs text-slate-500">{t('market.panels.indexSubtitle')}</p>
       </div>
       <div className="overflow-x-auto rounded-xl border border-slate-800">
         <table className="min-w-full text-left text-xs">
           <thead className="bg-slate-900/90 text-[10px] uppercase tracking-wide text-slate-500">
             <tr>
-              <th className="px-3 py-2.5">지수</th>
-              <th className="px-3 py-2.5">가격</th>
-              <th className="px-3 py-2.5">1일</th>
+              <th className="px-3 py-2.5">{t('market.panels.indexName')}</th>
+              <th className="px-3 py-2.5">{t('market.panels.price')}</th>
+              <th className="px-3 py-2.5">{t('market.panels.oneDay')}</th>
               <th className="px-3 py-2.5">SMA20/50</th>
               <th className="px-3 py-2.5">RSI</th>
               <th className="px-3 py-2.5">MACD</th>
-              <th className="px-3 py-2.5">볼린저</th>
+              <th className="px-3 py-2.5">{t('market.panels.bollinger')}</th>
               <th className="px-3 py-2.5">Stoch</th>
-              <th className="px-3 py-2.5">추세</th>
+              <th className="px-3 py-2.5">{t('market.panels.trend')}</th>
               <th className="px-3 py-2.5" />
             </tr>
           </thead>
@@ -157,19 +176,19 @@ export function IndexTechnicalPanel({
                   {formatPercent(idx.changePercent1d)}
                 </td>
                 <td className="px-3 py-2.5 text-slate-400">
-                  {idx.sma20?.toFixed(0) ?? '—'} / {idx.sma50?.toFixed(0) ?? '—'}
+                  {idx.sma20?.toFixed(0) ?? t('common.dash')} / {idx.sma50?.toFixed(0) ?? t('common.dash')}
                 </td>
-                <td className="px-3 py-2.5 text-slate-300">{idx.rsi14?.toFixed(1) ?? '—'}</td>
+                <td className="px-3 py-2.5 text-slate-300">{idx.rsi14?.toFixed(1) ?? t('common.dash')}</td>
                 <td className={`px-3 py-2.5 ${idx.macd !== null ? (idx.macd >= 0 ? 'text-emerald-400' : 'text-rose-400') : 'text-slate-500'}`}>
-                  {idx.macd?.toFixed(2) ?? '—'}
+                  {idx.macd?.toFixed(2) ?? t('common.dash')}
                 </td>
                 <td className="px-3 py-2.5 text-slate-300">
-                  {idx.bollinger ? idx.bollinger.label : '—'}
+                  {idx.bollinger ? translateBollingerLabel(idx.bollinger, t) : t('common.dash')}
                 </td>
                 <td className="px-3 py-2.5 text-slate-300">
-                  {idx.stochastic ? `${idx.stochastic.k.toFixed(0)}/${idx.stochastic.d.toFixed(0)}` : '—'}
+                  {idx.stochastic ? `${idx.stochastic.k.toFixed(0)}/${idx.stochastic.d.toFixed(0)}` : t('common.dash')}
                 </td>
-                <td className="px-3 py-2.5 text-slate-300">{idx.trendLabel}</td>
+                <td className="px-3 py-2.5 text-slate-300">{translateTrendLabel(idx, t)}</td>
                 <td className="px-3 py-2.5">
                   <a
                     href={idx.chartUrl}
@@ -201,6 +220,8 @@ export function SectorStrengthPanel({
   sectors: SectorEtfSnapshot[];
   compact?: boolean;
 }) {
+  const { t } = useTranslation();
+
   if (sectors.length === 0) return null;
 
   const us = sectors.filter((s) => s.market === 'US');
@@ -209,11 +230,13 @@ export function SectorStrengthPanel({
   return (
     <div className="space-y-4">
       <div>
-        <h3 className={`font-semibold text-white ${compact ? 'text-sm' : ''}`}>업종 ETF 상대강도</h3>
-        <p className="mt-0.5 text-xs text-slate-500">1주·1달 수익률 — SPY / KODEX 200 대비 자금 이동 관찰</p>
+        <h3 className={`font-semibold text-white ${compact ? 'text-sm' : ''}`}>
+          {t('market.panels.sectorTitle')}
+        </h3>
+        <p className="mt-0.5 text-xs text-slate-500">{t('market.panels.sectorSubtitle')}</p>
       </div>
-      <SectorGroup title="🇺🇸 미국" sectors={us} benchmark="SPY" />
-      <SectorGroup title="🇰🇷 한국" sectors={kr} benchmark="KODEX200" />
+      <SectorGroup title={t('market.panels.sectorUs')} sectors={us} benchmark="SPY" />
+      <SectorGroup title={t('market.panels.sectorKr')} sectors={kr} benchmark="KODEX200" />
     </div>
   );
 }
@@ -227,26 +250,30 @@ function SectorGroup({
   sectors: SectorEtfSnapshot[];
   benchmark: string;
 }) {
+  const { t } = useTranslation();
+
   if (sectors.length === 0) return null;
 
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-950/30 p-4">
       <p className="text-xs font-medium text-slate-400">
-        {title} · 기준지수 {benchmark}
+        {t('market.panels.sectorBenchmark', { title, benchmark })}
       </p>
       <ul className="mt-3 space-y-3">
         {sectors.map((s) => (
           <li key={s.yahooSymbol}>
             <div className="flex items-center justify-between gap-2 text-xs">
               <div className="min-w-0 flex-1">
-                <span className="font-medium text-white">{s.sectorLabel}</span>
+                <span className="font-medium text-white">{translateSectorLabel(s, t)}</span>
                 <span className="ml-2 text-slate-500">{s.name}</span>
               </div>
               <div className="shrink-0 text-right">
                 <span className={`font-medium ${pnlClass(s.rsBenchmark1w)}`}>
-                  1주 {formatPercent(s.rsBenchmark1w)}
+                  {t('market.panels.oneWeek', { percent: formatPercent(s.rsBenchmark1w) })}
                 </span>
-                <span className="ml-2 text-slate-500">당일 {formatPercent(s.changePercent1d)}</span>
+                <span className="ml-2 text-slate-500">
+                  {t('market.panels.todayChange', { percent: formatPercent(s.changePercent1d) })}
+                </span>
               </div>
             </div>
             <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-800">
@@ -258,14 +285,14 @@ function SectorGroup({
               />
             </div>
             <div className="mt-1 flex justify-between text-[10px] text-slate-600">
-              <span>{s.strengthLabel} · #{s.strengthRank}</span>
+              <span>{translateStrengthLabel(s, t)} · #{s.strengthRank}</span>
               <a
                 href={s.chartUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-indigo-400 hover:text-indigo-300"
               >
-                차트 ↗
+                {t('market.panels.chartLink')}
               </a>
             </div>
           </li>

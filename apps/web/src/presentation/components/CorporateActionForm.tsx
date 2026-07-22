@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CorporateActionType, Market, parseAmountInput, StockSearchResult } from '@sar/shared';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
 import { useToast } from '../components/Toast';
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function CorporateActionForm({ onSuccess }: Props) {
+  const { t } = useTranslation();
   const { createCorporateActionUseCase } = useServices();
   const { showError, showSuccess } = useToast();
   const [type, setType] = useState<CorporateActionType>('DIVIDEND');
@@ -32,7 +34,7 @@ export function CorporateActionForm({ onSuccess }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!selectedStock || !effectiveAt) {
-      showError('종목과 적용일을 입력하세요.');
+      showError(t('corporateAction.form.missingFields'));
       return;
     }
 
@@ -53,12 +55,12 @@ export function CorporateActionForm({ onSuccess }: Props) {
         targetPrice: targetPrice ? parseAmountInput(targetPrice) : undefined,
         memo: memo || undefined,
       });
-      showSuccess('배당·분할·합병 내역이 등록되었습니다.');
+      showSuccess(t('corporateAction.toast.registered'));
       onSuccess?.();
       setCashAmount('');
       setMemo('');
     } catch (err) {
-      showError(getErrorMessage(err, '등록에 실패했습니다.'));
+      showError(getErrorMessage(err, t('corporateAction.toast.registerFailed')));
     } finally {
       setSubmitting(false);
     }
@@ -67,9 +69,9 @@ export function CorporateActionForm({ onSuccess }: Props) {
   return (
     <Surface as="form" variant="section" onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <h2 className="text-base font-semibold tracking-tight">배당·분할·합병 등록</h2>
+        <h2 className="text-base font-semibold tracking-tight">{t('corporateAction.form.title')}</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          배당금 입금, 주식분할, 합병 전환 등을 투자·세금 계산에 반영합니다.
+          {t('corporateAction.form.description')}
         </p>
       </div>
 
@@ -82,20 +84,20 @@ export function CorporateActionForm({ onSuccess }: Props) {
       />
 
       <div>
-        <label className="text-xs text-slate-400">유형</label>
+        <label className="text-xs text-slate-400">{t('common.type')}</label>
         <select
           value={type}
           onChange={(e) => setType(e.target.value as CorporateActionType)}
           className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white"
         >
-          <option value="DIVIDEND">배당</option>
-          <option value="SPLIT">주식분할</option>
-          <option value="MERGER">합병</option>
+          <option value="DIVIDEND">{t('corporateAction.types.DIVIDEND')}</option>
+          <option value="SPLIT">{t('corporateAction.types.SPLIT')}</option>
+          <option value="MERGER">{t('corporateAction.types.MERGER')}</option>
         </select>
       </div>
 
       <div>
-        <label className="text-xs text-slate-400">적용일</label>
+        <label className="text-xs text-slate-400">{t('common.effectiveDate')}</label>
         <input
           type="date"
           value={effectiveAt}
@@ -106,7 +108,7 @@ export function CorporateActionForm({ onSuccess }: Props) {
 
       {type === 'DIVIDEND' && (
         <div>
-          <label className="text-xs text-slate-400">배당 총액</label>
+          <label className="text-xs text-slate-400">{t('corporateAction.form.dividendAmount')}</label>
           <AmountInput
             value={cashAmount}
             onValueChange={setCashAmount}
@@ -118,7 +120,7 @@ export function CorporateActionForm({ onSuccess }: Props) {
 
       {type === 'SPLIT' && (
         <div>
-          <label className="text-xs text-slate-400">분할 비율 (2 = 1→2)</label>
+          <label className="text-xs text-slate-400">{t('corporateAction.form.splitRatio')}</label>
           <input
             type="number"
             value={splitRatio}
@@ -138,7 +140,7 @@ export function CorporateActionForm({ onSuccess }: Props) {
             onMarketChange={setTargetMarket}
           />
           <div>
-            <label className="text-xs text-slate-400">받는 수량</label>
+            <label className="text-xs text-slate-400">{t('corporateAction.form.targetQuantity')}</label>
             <input
               type="number"
               value={targetQuantity}
@@ -147,7 +149,7 @@ export function CorporateActionForm({ onSuccess }: Props) {
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">전환 단가 (매입가)</label>
+            <label className="text-xs text-slate-400">{t('corporateAction.form.targetPrice')}</label>
             <AmountInput
               value={targetPrice}
               onValueChange={setTargetPrice}
@@ -156,7 +158,7 @@ export function CorporateActionForm({ onSuccess }: Props) {
             />
           </div>
           <div>
-            <label className="text-xs text-slate-400">현금 보상 (선택)</label>
+            <label className="text-xs text-slate-400">{t('corporateAction.form.cashCompensation')}</label>
             <AmountInput
               value={cashAmount}
               onValueChange={setCashAmount}
@@ -168,7 +170,7 @@ export function CorporateActionForm({ onSuccess }: Props) {
       )}
 
       <div>
-        <label className="text-xs text-slate-400">메모</label>
+        <label className="text-xs text-slate-400">{t('common.memo')}</label>
         <input
           type="text"
           value={memo}
@@ -182,7 +184,7 @@ export function CorporateActionForm({ onSuccess }: Props) {
         disabled={submitting}
         className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
       >
-        {submitting ? '등록 중...' : '등록'}
+        {submitting ? t('common.registering') : t('common.register')}
       </button>
     </Surface>
   );

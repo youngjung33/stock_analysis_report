@@ -1,6 +1,8 @@
 'use client';
 
-import { QUOTE_CHART_RANGES, QUOTE_RANGE_LABELS, QuoteChartRange } from '@sar/shared';
+import { useTranslation } from 'react-i18next';
+import { QUOTE_CHART_RANGES, QuoteChartRange } from '@sar/shared';
+import { translateQuoteRange } from '@/i18n/translate-shared';
 
 interface Props {
   selected: QuoteChartRange;
@@ -9,6 +11,8 @@ interface Props {
 }
 
 export function StockRangeSelector({ selected, onSelect, disabled }: Props) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-wrap gap-1.5">
       {QUOTE_CHART_RANGES.map((range) => (
@@ -23,7 +27,7 @@ export function StockRangeSelector({ selected, onSelect, disabled }: Props) {
               : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
           } disabled:opacity-50`}
         >
-          {QUOTE_RANGE_LABELS[range]}
+          {translateQuoteRange(range, t)}
         </button>
       ))}
     </div>

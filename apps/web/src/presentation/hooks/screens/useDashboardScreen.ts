@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
 import { buildQuoteRefreshNotice, QuoteRefreshNotice } from '@/client/domain/services/quote-notice';
 import { useToast } from '../../components/Toast';
@@ -10,6 +11,7 @@ import { useDashboard } from '../useDashboard';
 import { useMarketStatus } from '../useMarketStatus';
 
 export function useDashboardScreen() {
+  const { t } = useTranslation();
   const { username, isGuest, logout } = useAuth();
   const { data, isLoading, error, reload, refresh } = useDashboard();
   const marketStatus = useMarketStatus();
@@ -21,31 +23,31 @@ export function useDashboardScreen() {
 
   useEffect(() => {
     if (searchParams.get('welcome') !== '1') return;
-    showSuccess('회원가입을 환영합니다! 투자 내역을 시작해 보세요.');
+    showSuccess(t('common.welcomeRegistered'));
     router.replace('/', { scroll: false });
-  }, [searchParams, showSuccess, router]);
+  }, [searchParams, showSuccess, router, t]);
 
   useEffect(() => {
     if (!error) return;
-    showError('투자 현황을 불러오지 못했습니다.');
-  }, [error, showError]);
+    showError(t('errors.dashboardLoadFailed'));
+  }, [error, showError, t]);
 
   async function handleRefresh() {
     setRefreshing(true);
     setRefreshNotice(null);
     try {
       const result = await refresh();
-      const notice = buildQuoteRefreshNotice(result);
+      const notice = buildQuoteRefreshNotice(result, t);
       if (!notice) return;
 
       if (notice.variant === 'error') {
-        showError(notice.lines[0] ?? '시세 갱신에 실패했습니다.');
+        showError(notice.lines[0] ?? t('errors.quoteRefreshFailed'));
         return;
       }
 
       setRefreshNotice(notice);
     } catch (err) {
-      showError(getErrorMessage(err, '시세 갱신에 실패했습니다.'));
+      showError(getErrorMessage(err, t('errors.quoteRefreshFailed')));
     } finally {
       setRefreshing(false);
     }
@@ -53,7 +55,7 @@ export function useDashboardScreen() {
 
   return {
     username,
-    displayName: isGuest ? '비회원' : username,
+    displayName: isGuest ? t('guest.displayName') : username,
     isGuest,
     logout,
     data,

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import {
   FEATURED_KR_STOCKS,
   FEATURED_US_STOCKS,
@@ -41,6 +42,7 @@ function QuoteRow({
   compact?: boolean;
   loading?: boolean;
 }) {
+  const { t } = useTranslation();
   const href = stockDetailHref(item.symbol, item.market);
   const hasPrice = item.currentPrice !== null;
 
@@ -57,7 +59,7 @@ function QuoteRow({
       <td className="px-4 py-2.5">
         <Link href={href} className="block text-slate-200 hover:text-indigo-300">
           {loading ? (
-            <span className="text-xs text-slate-500">조회 중...</span>
+            <span className="text-xs text-slate-500">{t('quotes.featured.querying')}</span>
           ) : hasPrice ? (
             formatNumber(item.currentPrice, item.currency)
           ) : (
@@ -65,7 +67,7 @@ function QuoteRow({
               className="text-xs text-slate-500"
               title={item.unavailableReason ?? undefined}
             >
-              조회 불가
+              {t('quotes.featured.unavailable')}
             </span>
           )}
         </Link>
@@ -73,11 +75,11 @@ function QuoteRow({
       <td className={`px-4 py-2.5 ${!loading && hasPrice ? pnlClass(item.changePercent) : 'text-slate-600'}`}>
         <Link href={href} className="block">
           {loading ? (
-            <span className="text-xs text-slate-500">—</span>
+            <span className="text-xs text-slate-500">{t('common.dash')}</span>
           ) : hasPrice ? (
-            <span title="오늘 기준 등락">{formatPercent(item.changePercent)}</span>
+            <span title={t('quotes.featured.todayChangeTitle')}>{formatPercent(item.changePercent)}</span>
           ) : (
-            <span className="text-xs text-slate-600">—</span>
+            <span className="text-xs text-slate-600">{t('common.dash')}</span>
           )}
         </Link>
       </td>
@@ -96,19 +98,21 @@ function QuoteTable({
   compact?: boolean;
   loading?: boolean;
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex h-full flex-col rounded-xl border border-slate-800 bg-slate-950/40">
       <div className="border-b border-slate-800 px-4 py-3">
         <h3 className="text-sm font-semibold text-white">{title}</h3>
-        <p className="mt-0.5 text-xs text-slate-500">종목을 클릭하면 상세·기간별 시세를 볼 수 있습니다</p>
+        <p className="mt-0.5 text-xs text-slate-500">{t('quotes.featured.tableHint')}</p>
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead className="bg-slate-900/80 text-xs text-slate-400">
             <tr>
-              <th className="px-4 py-2.5">종목</th>
-              <th className="px-4 py-2.5">현재가</th>
-              <th className="px-4 py-2.5">등락</th>
+              <th className="px-4 py-2.5">{t('common.symbol')}</th>
+              <th className="px-4 py-2.5">{t('common.currentPrice')}</th>
+              <th className="px-4 py-2.5">{t('common.change')}</th>
             </tr>
           </thead>
           <tbody>
@@ -128,9 +132,10 @@ function QuoteTable({
 }
 
 export function FeaturedQuotesSection({ compact }: Props) {
+  const { t, i18n } = useTranslation();
   const { data, isLoading, isError } = useFeaturedQuotes();
 
-  useErrorToast(isError, '주요 종목 시세를 불러오지 못했습니다.');
+  useErrorToast(isError, t('quotes.featured.loadFailed'));
 
   const krItems = data?.kr ?? (isLoading ? PLACEHOLDER_KR : []);
   const usItems = data?.us ?? (isLoading ? PLACEHOLDER_US : []);
@@ -138,20 +143,20 @@ export function FeaturedQuotesSection({ compact }: Props) {
   return (
     <section className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-white">주요 종목 시세</h2>
+        <h2 className="text-lg font-semibold text-white">{t('quotes.featured.title')}</h2>
         <p className="mt-1 text-xs text-slate-500">
-          대표 한국·미국 종목 · 진입 시 오늘 시세를 일괄 조회합니다
+          {t('quotes.featured.subtitle')}
           {data?.fetchedAt && (
             <span className="ml-1 text-slate-600">
-              · {new Date(data.fetchedAt).toLocaleString('ko-KR')}
+              · {new Date(data.fetchedAt).toLocaleString(i18n.language)}
             </span>
           )}
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <QuoteTable title="🇰🇷 한국 주식" items={krItems} compact={compact} loading={isLoading} />
-        <QuoteTable title="🇺🇸 미국 주식" items={usItems} compact={compact} loading={isLoading} />
+        <QuoteTable title={t('quotes.featured.krTitle')} items={krItems} compact={compact} loading={isLoading} />
+        <QuoteTable title={t('quotes.featured.usTitle')} items={usItems} compact={compact} loading={isLoading} />
       </div>
     </section>
   );

@@ -1,17 +1,22 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
 import {
   FOREIGN_DIVIDEND_WITHHOLDING,
   formatAmount,
   ISA_ACCOUNT_OPTIONS,
   OTHER_INCOME_BRACKETS,
-  PENSION_SAVINGS_ANNUAL_LIMIT_KRW,
   type ForeignDividendSource,
   type IsaAccountType,
   type KoreanTaxProfile,
   type OtherIncomeBracketId,
   parseAmountInput,
 } from '@sar/shared';
+import {
+  translateForeignDividendCountry,
+  translateIsaOption,
+  translateOtherIncomeBracket,
+} from '@/i18n';
 import { AmountInput } from '../../shared/AmountInput';
 import { Surface } from '../../design-system';
 import { cn } from '../../lib/cn';
@@ -131,27 +136,29 @@ function CheckOption({
 }
 
 export function TaxProfileForm({ profile, onChange }: Props) {
+  const { t, i18n } = useTranslation();
   const showForeignSource = profile.investsForeign;
   const bracketId = profile.otherIncomeBracketId ?? '14m_50m';
+  const locale = i18n.language;
 
   return (
     <Surface variant="section" className="space-y-5">
       <div>
-        <h3 className="text-base font-semibold">내 세금 조건</h3>
+        <h3 className="text-base font-semibold">{t('tax.profileTitle')}</h3>
         <p className="mt-1 text-xs text-muted-foreground md:text-sm">
-          본인 상황을 선택하면 적용되는 세목과 보유·매매 기반 추정 세액을 확인할 수 있습니다.
+          {t('tax.profileDesc')}
         </p>
       </div>
 
       <fieldset className="space-y-2">
-        <legend className="mb-2 text-xs font-medium text-muted-foreground">과세 연도</legend>
+        <legend className="mb-2 text-xs font-medium text-muted-foreground">{t('tax.taxYear')}</legend>
         <div className="flex flex-wrap gap-2">
           {YEAR_OPTIONS.map((y) => (
             <SelectBtn
               key={y}
               selected={profile.taxYear === y}
               onClick={() => onChange({ taxYear: y })}
-              label={`${y}년`}
+              label={t('common.yearLabel', { year: y })}
               className="min-w-[4.5rem] text-center"
             />
           ))}
@@ -159,56 +166,59 @@ export function TaxProfileForm({ profile, onChange }: Props) {
       </fieldset>
 
       <fieldset className="space-y-2">
-        <legend className="mb-2 text-xs font-medium text-muted-foreground">투자자 유형</legend>
+        <legend className="mb-2 text-xs font-medium text-muted-foreground">{t('tax.investorType')}</legend>
         <div className="grid gap-2 sm:grid-cols-2">
           <RadioOption
             name="investorType"
             checked={!profile.isMajorShareholder}
             onChange={() => onChange({ isMajorShareholder: false })}
-            label="일반 투자자"
-            description="코스피·코스닥 매매차익 비과세"
+            label={t('tax.investorGeneral')}
+            description={t('tax.investorGeneralDesc')}
           />
           <RadioOption
             name="investorType"
             checked={profile.isMajorShareholder}
             onChange={() => onChange({ isMajorShareholder: true })}
-            label="국내 대주주"
-            description="시총 50억+ 또는 지분 1%+ — 매매차익 과세"
+            label={t('tax.investorMajor')}
+            description={t('tax.investorMajorDesc')}
           />
         </div>
       </fieldset>
 
       <fieldset className="space-y-2">
-        <legend className="mb-2 text-xs font-medium text-muted-foreground">투자 시장</legend>
+        <legend className="mb-2 text-xs font-medium text-muted-foreground">{t('tax.investMarkets')}</legend>
         <div className="grid gap-2 sm:grid-cols-2">
           <CheckOption
             checked={profile.investsDomestic}
             onChange={(v) => onChange({ investsDomestic: v })}
-            label="국내 주식 (KR)"
-            description="배당·증권거래세·국내 규정"
+            label={t('tax.investDomestic')}
+            description={t('tax.investDomesticDesc')}
           />
           <CheckOption
             checked={profile.investsForeign}
             onChange={(v) => onChange({ investsForeign: v })}
-            label="해외 주식 (US 등)"
-            description="양도소득세·해외 배당"
+            label={t('tax.investForeign')}
+            description={t('tax.investForeignDesc')}
           />
         </div>
       </fieldset>
 
       {showForeignSource && (
         <fieldset className="space-y-2">
-          <legend className="mb-2 text-xs font-medium text-muted-foreground">해외 배당 원천지</legend>
+          <legend className="mb-2 text-xs font-medium text-muted-foreground">{t('tax.foreignDividendSource')}</legend>
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {(Object.keys(FOREIGN_DIVIDEND_WITHHOLDING) as ForeignDividendSource[]).map((key) => {
               const rule = FOREIGN_DIVIDEND_WITHHOLDING[key];
+              const country = translateForeignDividendCountry(key, t);
               return (
                 <SelectBtn
                   key={key}
                   selected={profile.foreignDividendSource === key}
                   onClick={() => onChange({ foreignDividendSource: key })}
-                  label={rule.label}
-                  subLabel={`현지 ${(rule.abroadRate * 100).toFixed(1)}%`}
+                  label={country.label}
+                  subLabel={t('tax.localWithholdingShort', {
+                    rate: `${(rule.abroadRate * 100).toFixed(1)}%`,
+                  })}
                 />
               );
             })}
@@ -217,27 +227,35 @@ export function TaxProfileForm({ profile, onChange }: Props) {
       )}
 
       <fieldset className="space-y-2">
-        <legend className="mb-2 text-xs font-medium text-muted-foreground">세제혜택 계좌 (ISA)</legend>
+        <legend className="mb-2 text-xs font-medium text-muted-foreground">{t('tax.isaSection')}</legend>
         <p className="text-[11px] text-muted-foreground md:text-xs">
-          ISA 계좌 내 순소득은 비과세 한도·9.9% 분리과세로 별도 계산됩니다. 거래를 ISA/일반으로
-          구분하지 않았다면 비율로 나눕니다.
+          {t('tax.isaSectionDesc')}
         </p>
         <div className="grid gap-2 sm:grid-cols-2">
-          {ISA_ACCOUNT_OPTIONS.map((opt) => (
-            <SelectBtn
-              key={opt.id}
-              selected={profile.isaType === opt.id}
-              onClick={() => onChange({ isaType: opt.id as IsaAccountType })}
-              label={opt.label}
-              subLabel={opt.id === 'none' ? opt.description : `비과세 ${(opt.taxFreeLimitKrw / 10_000).toLocaleString('ko-KR')}만 원`}
-            />
-          ))}
+          {ISA_ACCOUNT_OPTIONS.map((opt) => {
+            const isa = translateIsaOption(opt.id as IsaAccountType, t);
+            return (
+              <SelectBtn
+                key={opt.id}
+                selected={profile.isaType === opt.id}
+                onClick={() => onChange({ isaType: opt.id as IsaAccountType })}
+                label={isa.label}
+                subLabel={
+                  opt.id === 'none'
+                    ? isa.description
+                    : t('tax.isaTaxFreeLimit', {
+                        limit: (opt.taxFreeLimitKrw / 10_000).toLocaleString(locale),
+                      })
+                }
+              />
+            );
+          })}
         </div>
         {profile.isaType !== 'none' && (
           <div className="mt-3 space-y-3 rounded-lg border border-border bg-muted/20 p-4">
             <div>
               <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-                ISA 소득 비율 ({profile.isaIncomeSharePercent}%)
+                {t('tax.isaIncomeShare', { percent: profile.isaIncomeSharePercent })}
               </label>
               <input
                 type="range"
@@ -249,19 +267,19 @@ export function TaxProfileForm({ profile, onChange }: Props) {
                 className="w-full accent-primary"
               />
               <p className="mt-1 text-[11px] text-muted-foreground">
-                배당·매매·기타 금융소득 중 ISA 계좌 비율 (직접 입력이 있으면 아래 값 우선)
+                {t('tax.isaIncomeShareDesc')}
               </p>
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-                ISA 순소득 직접 입력 (원, 선택)
+                {t('tax.isaNetIncomeOverride')}
               </label>
               <AmountInput
                 className="w-full max-w-md rounded-lg border border-border-strong bg-muted px-3 py-2 text-sm"
                 value={formatKrwInputValue(profile.isaNetIncomeOverrideKrw)}
                 onValueChange={(v) => onChange({ isaNetIncomeOverrideKrw: parseAmountInput(v) ?? 0 })}
                 formatOptions={{ maxFractionDigits: 0 }}
-                placeholder="비율로 자동 추정"
+                placeholder={t('tax.isaNetIncomePlaceholder')}
               />
             </div>
           </div>
@@ -269,10 +287,9 @@ export function TaxProfileForm({ profile, onChange }: Props) {
       </fieldset>
 
       <fieldset className="space-y-2">
-        <legend className="mb-2 text-xs font-medium text-muted-foreground">연금저축 납입 (세액공제)</legend>
+        <legend className="mb-2 text-xs font-medium text-muted-foreground">{t('tax.pensionSection')}</legend>
         <p className="text-[11px] text-muted-foreground md:text-xs">
-          근로소득자 연금저축 납입액 — 연 {(PENSION_SAVINGS_ANNUAL_LIMIT_KRW / 10_000).toLocaleString('ko-KR')}만
-          원 한도, 13.2% 세액공제 추정
+          {t('tax.pensionSectionDesc')}
         </p>
         <AmountInput
           className="w-full max-w-md rounded-lg border border-border-strong bg-muted px-3 py-2 text-sm"
@@ -284,9 +301,9 @@ export function TaxProfileForm({ profile, onChange }: Props) {
       </fieldset>
 
       <fieldset className="space-y-2">
-        <legend className="mb-2 text-xs font-medium text-muted-foreground">기타 금융소득 (원)</legend>
+        <legend className="mb-2 text-xs font-medium text-muted-foreground">{t('tax.otherFinancialIncome')}</legend>
         <p className="text-[11px] text-muted-foreground md:text-xs">
-          예금 이자·채권 이자 등 (배당 제외)
+          {t('tax.otherFinancialIncomeDesc')}
         </p>
         <AmountInput
           className="w-full max-w-md rounded-lg border border-border-strong bg-muted px-3 py-2 text-sm"
@@ -298,20 +315,23 @@ export function TaxProfileForm({ profile, onChange }: Props) {
       </fieldset>
 
       <fieldset className="space-y-2">
-        <legend className="mb-2 text-xs font-medium text-muted-foreground">연간 기타 소득 (근로·사업)</legend>
+        <legend className="mb-2 text-xs font-medium text-muted-foreground">{t('tax.otherIncomeBracket')}</legend>
         <p className="text-[11px] text-muted-foreground md:text-xs">
-          종합소득세 누진 구간 산정용 — 해당하는 구간을 선택하세요
+          {t('tax.otherIncomeBracketDesc')}
         </p>
         <div className="grid gap-2 sm:grid-cols-2">
-          {OTHER_INCOME_BRACKETS.map((bracket) => (
-            <SelectBtn
-              key={bracket.id}
-              selected={bracketId === bracket.id}
-              onClick={() => onChange({ otherIncomeBracketId: bracket.id as OtherIncomeBracketId })}
-              label={bracket.label}
-              subLabel={`한계세율 ${bracket.rateLabel} (+ 지방세)`}
-            />
-          ))}
+          {OTHER_INCOME_BRACKETS.map((bracket) => {
+            const translated = translateOtherIncomeBracket(bracket.id as OtherIncomeBracketId, t);
+            return (
+              <SelectBtn
+                key={bracket.id}
+                selected={bracketId === bracket.id}
+                onClick={() => onChange({ otherIncomeBracketId: bracket.id as OtherIncomeBracketId })}
+                label={translated.label}
+                subLabel={t('tax.marginalRateLabel', { rate: translated.rateLabel })}
+              />
+            );
+          })}
         </div>
       </fieldset>
     </Surface>

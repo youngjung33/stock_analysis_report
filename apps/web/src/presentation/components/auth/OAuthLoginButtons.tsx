@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
 import { OAuthProviderMeta } from '@sar/shared';
 
 interface Props {
@@ -16,14 +17,16 @@ export function OAuthLoginButtons({
   disabled,
   onProviderClick,
 }: Props) {
+  const { t } = useTranslation();
+
   if (loading) {
-    return <p className="text-center text-xs text-muted-foreground">소셜 로그인 불러오는 중...</p>;
+    return <p className="text-center text-xs text-muted-foreground">{t('auth.oauthLoading')}</p>;
   }
 
   if (providers.length === 0) {
     return (
       <p className="text-center text-xs text-muted-foreground">
-        소셜 로그인은 관리자 설정 후 사용할 수 있습니다.
+        {t('auth.oauthNotConfigured')}
       </p>
     );
   }

@@ -1,22 +1,29 @@
 'use client';
 
 import { formatCashAmount, type SimulationAction, type SimulationActionType } from '@sar/shared';
+import { useTranslation } from 'react-i18next';
+import {
+  translateSimulationDescription,
+  translateSimulationHeadline,
+  translateSimulationReason,
+  translateTag,
+} from '@/i18n';
 import { Surface } from '../design-system';
 import { AmountInput } from '../shared/AmountInput';
 import { useCapitalScreen } from '../hooks/screens/useCapitalScreen';
-
-const ACTION_LABEL: Record<SimulationActionType, string> = {
-  keep: '유지',
-  trim: '비중 축소',
-  add: '매수 검토',
-  reserve_cash: '남는 예수금',
-};
 
 const ACTION_CLASS: Record<SimulationActionType, string> = {
   keep: 'border-slate-700 bg-slate-900/40',
   trim: 'border-amber-800/50 bg-amber-950/30',
   add: 'border-emerald-800/50 bg-emerald-950/30',
   reserve_cash: 'border-indigo-800/50 bg-indigo-950/30',
+};
+
+const ACTION_LABEL_KEY: Record<SimulationActionType, string> = {
+  keep: 'capital.actionKeep',
+  trim: 'capital.actionTrim',
+  add: 'capital.actionAdd',
+  reserve_cash: 'capital.actionReserveCash',
 };
 
 interface Props {
@@ -26,44 +33,47 @@ interface Props {
 export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
   const screen = useCapitalScreen(onPortfolioUpdated);
   const sim = screen.simulation?.simulation;
+  const { t } = useTranslation();
 
   if (screen.loading) {
-    return <p className="text-sm text-muted-foreground">예수금·비중 조정 불러오는 중...</p>;
+    return <p className="text-sm text-muted-foreground">{t('dashboard.loadingCapital')}</p>;
   }
 
   return (
     <div className="space-y-6">
       {screen.refreshing && (
-        <p className="text-xs text-muted-foreground">잔액 반영 중...</p>
+        <p className="text-xs text-muted-foreground">{t('capital.refreshing')}</p>
       )}
       <Surface variant="section" className="space-y-4">
         <div>
-          <h2 className="text-base font-semibold md:text-lg">투자 원금 · 예수금</h2>
+          <h2 className="text-base font-semibold md:text-lg">{t('capital.title')}</h2>
           <p className="mt-1 text-xs text-muted-foreground md:text-sm">
-            예수금 {screen.cashLabelKrw}
-            {screen.cashUsd > 0 && ` · ${screen.cashLabelUsd}`}
+            {t('capital.cashSummary', {
+              krw: screen.cashLabelKrw,
+              usd: screen.cashUsd > 0 ? ` · ${screen.cashLabelUsd}` : '',
+            })}
           </p>
         </div>
 
         <form onSubmit={screen.handleInitialCapital} className="grid gap-3 md:grid-cols-2">
           <label className="block">
-            <span className="text-xs text-muted-foreground">원화 (KRW)</span>
+            <span className="text-xs text-muted-foreground">{t('capital.krwLabel')}</span>
             <AmountInput
               className="mt-1 w-full rounded-lg border border-border-strong bg-muted px-3 py-2 text-sm"
               value={screen.krwAmount}
               onValueChange={screen.setKrwAmount}
               formatOptions={{ maxFractionDigits: 0 }}
-              placeholder="예: 10,000,000"
+              placeholder={t('capital.krwPlaceholder')}
             />
           </label>
           <label className="block">
-            <span className="text-xs text-muted-foreground">달러 (USD)</span>
+            <span className="text-xs text-muted-foreground">{t('capital.usdLabel')}</span>
             <AmountInput
               className="mt-1 w-full rounded-lg border border-border-strong bg-muted px-3 py-2 text-sm"
               value={screen.usdAmount}
               onValueChange={screen.setUsdAmount}
               formatOptions={{ maxFractionDigits: 2 }}
-              placeholder="예: 5,000"
+              placeholder={t('capital.usdPlaceholder')}
             />
           </label>
           <div className="flex flex-wrap gap-2 md:col-span-2">
@@ -72,7 +82,7 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
               disabled={screen.saving}
               className="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
             >
-              투자 원금 설정
+              {t('capital.setCapital')}
             </button>
             <button
               type="button"
@@ -80,7 +90,7 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
               onClick={() => screen.handleDeposit('KRW')}
               className="rounded-lg border border-border-strong px-3 py-2 text-sm hover:bg-accent"
             >
-              KRW 입금
+              {t('capital.depositKrw')}
             </button>
             <button
               type="button"
@@ -88,7 +98,7 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
               onClick={() => screen.handleWithdraw('KRW')}
               className="rounded-lg border border-border-strong px-3 py-2 text-sm hover:bg-accent"
             >
-              KRW 출금
+              {t('capital.withdrawKrw')}
             </button>
             <button
               type="button"
@@ -96,7 +106,7 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
               onClick={() => screen.handleDeposit('USD')}
               className="rounded-lg border border-border-strong px-3 py-2 text-sm hover:bg-accent"
             >
-              USD 입금
+              {t('capital.depositUsd')}
             </button>
             <button
               type="button"
@@ -104,17 +114,17 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
               onClick={() => screen.handleWithdraw('USD')}
               className="rounded-lg border border-border-strong px-3 py-2 text-sm hover:bg-accent"
             >
-              USD 출금
+              {t('capital.withdrawUsd')}
             </button>
           </div>
         </form>
       </Surface>
 
       <Surface variant="section" className="space-y-4">
-        <h2 className="text-base font-semibold md:text-lg">목표 비중 · 집중도</h2>
+        <h2 className="text-base font-semibold md:text-lg">{t('capital.targetAllocationTitle')}</h2>
         <form onSubmit={screen.handleSavePreferences} className="grid gap-3 sm:grid-cols-3">
           <label className="block">
-            <span className="text-xs text-muted-foreground">국내 %</span>
+            <span className="text-xs text-muted-foreground">{t('capital.targetKrPercent')}</span>
             <input
               type="number"
               min="0"
@@ -125,7 +135,7 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
             />
           </label>
           <label className="block">
-            <span className="text-xs text-muted-foreground">해외(미국) %</span>
+            <span className="text-xs text-muted-foreground">{t('capital.targetUsPercent')}</span>
             <input
               type="number"
               min="0"
@@ -136,7 +146,7 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
             />
           </label>
           <label className="block">
-            <span className="text-xs text-muted-foreground">종목 최대 비중 %</span>
+            <span className="text-xs text-muted-foreground">{t('capital.maxWeightPercent')}</span>
             <input
               type="number"
               min="5"
@@ -151,7 +161,7 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
             disabled={screen.saving}
             className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground sm:col-span-3 sm:w-fit disabled:opacity-50"
           >
-            목표 저장
+            {t('capital.saveTarget')}
           </button>
         </form>
       </Surface>
@@ -159,29 +169,33 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
       {sim && (
         <Surface variant="section" className="space-y-4">
           <div>
-            <h2 className="text-base font-semibold md:text-lg">비중 조정 제안</h2>
-            <p className="mt-1 text-sm font-medium text-foreground">{sim.headline}</p>
-            <p className="mt-1 text-xs text-muted-foreground md:text-sm">{sim.description}</p>
+            <h2 className="text-base font-semibold md:text-lg">{t('capital.simulationStatsTitle')}</h2>
+            <p className="mt-1 text-sm font-medium text-foreground">
+              {translateSimulationHeadline(sim, t)}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground md:text-sm">
+              {translateSimulationDescription(sim, t)}
+            </p>
           </div>
 
           <dl className="grid grid-cols-2 gap-3 text-xs md:grid-cols-4 md:text-sm">
             <div>
-              <dt className="text-muted-foreground">총 자산</dt>
+              <dt className="text-muted-foreground">{t('capital.statTotalAssets')}</dt>
               <dd className="font-semibold">{formatCashAmount(sim.totalAssetsKrw, 'KRW')}</dd>
             </div>
             <div>
-              <dt className="text-muted-foreground">현금 비중</dt>
+              <dt className="text-muted-foreground">{t('capital.statCashWeight')}</dt>
               <dd className="font-semibold">{sim.cashPercent.toFixed(1)}%</dd>
             </div>
             <div>
-              <dt className="text-muted-foreground">국내 / 해외 (주식)</dt>
+              <dt className="text-muted-foreground">{t('capital.statMarketSplit')}</dt>
               <dd className="font-semibold">
                 {sim.stockAllocationByMarket.krPercent.toFixed(0)}% /{' '}
                 {sim.stockAllocationByMarket.usPercent.toFixed(0)}%
               </dd>
             </div>
             <div>
-              <dt className="text-muted-foreground">조정 후 예수금</dt>
+              <dt className="text-muted-foreground">{t('capital.statProjectedCash')}</dt>
               <dd className="font-semibold">
                 {formatCashAmount(sim.projectedCashTotalKrw, 'KRW')}
               </dd>
@@ -196,21 +210,30 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="rounded bg-slate-800 px-2 py-0.5 text-xs font-medium">
-                    {ACTION_LABEL[action.type]}
+                    {t(ACTION_LABEL_KEY[action.type])}
                   </span>
-                  {action.tagLabel && (
-                    <span className="text-xs text-emerald-400">{action.tagLabel}</span>
+                  {action.tagLabel && action.tag && (
+                    <span className="text-xs text-emerald-400">{translateTag(action.tag, t)}</span>
                   )}
                   <span className="font-semibold text-foreground">
-                    {action.symbol === 'CASH' ? action.name : `${action.symbol} · ${action.name}`}
+                    {action.symbol === 'CASH'
+                      ? t('shared.simulation.cashName')
+                      : `${action.symbol} · ${action.name}`}
                   </span>
                 </div>
-                <p className="mt-2 text-xs text-muted-foreground md:text-sm">{action.reason}</p>
+                <p className="mt-2 text-xs text-muted-foreground md:text-sm">
+                  {translateSimulationReason(action, t)}
+                </p>
                 {action.suggestedAmountKrw !== null && action.type !== 'keep' && (
                   <p className="mt-2 text-sm font-medium text-foreground">
                     {action.suggestedQuantity
-                      ? `${action.suggestedQuantity}주 · 약 ${formatCashAmount(action.suggestedAmountKrw, 'KRW')}`
-                      : `약 ${formatCashAmount(action.suggestedAmountKrw, 'KRW')}`}
+                      ? t('capital.suggestedTrade', {
+                          quantity: action.suggestedQuantity,
+                          amount: formatCashAmount(action.suggestedAmountKrw, 'KRW'),
+                        })
+                      : t('capital.suggestedAmount', {
+                          amount: formatCashAmount(action.suggestedAmountKrw, 'KRW'),
+                        })}
                   </p>
                 )}
               </li>

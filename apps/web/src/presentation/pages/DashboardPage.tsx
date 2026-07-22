@@ -1,6 +1,7 @@
 'use client';
 
 import { isPortfolioEmpty } from '@sar/shared';
+import { useTranslation } from 'react-i18next';
 import { useDashboardScreen } from '../hooks/screens/useDashboardScreen';
 import { PageStack } from '../design-system';
 import { PortfolioOnboardingSection } from '../features/onboarding/PortfolioOnboardingSection';
@@ -25,13 +26,14 @@ import { AppShell, RefreshQuotesButton } from '../layout';
 export function DashboardPage() {
   const screen = useDashboardScreen();
   const analysis = usePortfolioAnalysis();
+  const { t, i18n } = useTranslation();
   const showOnboarding =
     screen.data != null && isPortfolioEmpty(screen.data.summary);
 
   return (
     <AppShell
-      title="투자 현황"
-      subtitle={`${screen.displayName}님`}
+      title={t('dashboard.title')}
+      subtitle={t('dashboard.subtitle', { name: screen.displayName })}
       headerActions={
         <RefreshQuotesButton compact onClick={screen.handleRefresh} loading={screen.refreshing} />
       }
@@ -39,7 +41,7 @@ export function DashboardPage() {
       <PageStack>
         {screen.isGuest && (
           <p className="rounded-xl border border-amber-900/40 bg-amber-950/30 px-4 py-3 text-xs text-amber-200/90 md:px-5 md:text-sm">
-            비회원 모드입니다. 매매 데이터는 서버에 저장되지 않으며, 탭을 닫으면 사라집니다.
+            {t('dashboard.guestNotice')}
           </p>
         )}
 
@@ -51,12 +53,14 @@ export function DashboardPage() {
 
         {screen.data?.lastRefreshedAt && (
           <p className="text-xs text-muted-foreground md:text-sm">
-            마지막 갱신: {new Date(screen.data.lastRefreshedAt).toLocaleString('ko-KR')}
+            {t('common.lastRefreshed', {
+              time: new Date(screen.data.lastRefreshedAt).toLocaleString(i18n.language),
+            })}
           </p>
         )}
 
         {screen.isLoading && (
-          <p className="text-sm text-muted-foreground md:text-base">투자 현황 불러오는 중...</p>
+          <p className="text-sm text-muted-foreground md:text-base">{t('dashboard.loading')}</p>
         )}
 
         {screen.data && (

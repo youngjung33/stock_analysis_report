@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   AUTH_PASSWORD_HINT,
   AUTH_USERNAME_HINT,
@@ -18,6 +19,7 @@ import { useServices } from '../useServices';
 export type UsernameCheckStatus = 'idle' | 'checking' | 'available' | 'unavailable';
 
 export function useLoginScreen() {
+  const { t } = useTranslation();
   const { login, register, startOAuthLogin, loginAsGuest, isAuthenticated } = useAuth();
   const { listOAuthProvidersUseCase, checkUsernameAvailabilityUseCase } = useServices();
   const { showError, showSuccess } = useToast();
@@ -64,7 +66,7 @@ export function useLoginScreen() {
     }
 
     setUsernameCheckStatus('checking');
-    setUsernameCheckMessage('아이디 확인 중...');
+    setUsernameCheckMessage(t('auth.usernameChecking'));
 
     try {
       const result = await checkUsernameAvailabilityUseCase.execute(username.trim());
@@ -85,7 +87,7 @@ export function useLoginScreen() {
         showError(result.message);
       }
     } catch (err) {
-      const message = getErrorMessage(err, '아이디 확인에 실패했습니다.');
+      const message = getErrorMessage(err, t('auth.usernameCheckFailed'));
       setUsernameCheckStatus('unavailable');
       setUsernameCheckMessage(message);
       setFieldErrors((prev) => ({ ...prev, username: message }));
@@ -107,7 +109,7 @@ export function useLoginScreen() {
 
       if (Object.keys(errors).length > 0) {
         setFieldErrors(errors);
-        showError(Object.values(errors)[0] ?? '입력값을 확인해 주세요.');
+        showError(Object.values(errors)[0] ?? t('errors.VALIDATION'));
         return;
       }
 
@@ -138,7 +140,7 @@ export function useLoginScreen() {
         await login(username, password);
       }
     } catch (err) {
-      showError(getErrorMessage(err, '요청을 처리하지 못했습니다.'));
+      showError(getErrorMessage(err, t('common.requestFailed')));
     } finally {
       setLoading(false);
     }
@@ -149,7 +151,7 @@ export function useLoginScreen() {
     try {
       await loginAsGuest();
     } catch {
-      showError('비회원 로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      showError(t('auth.guestLoginFailed'));
     } finally {
       setGuestLoading(false);
     }
@@ -162,11 +164,11 @@ export function useLoginScreen() {
         const redirectUri = `${window.location.origin}/api/auth/oauth/${provider}/callback`;
         await startOAuthLogin(provider, redirectUri);
       } catch (err) {
-        showError(getErrorMessage(err, '소셜 로그인을 시작하지 못했습니다.'));
+        showError(getErrorMessage(err, t('auth.oauthStartFailed')));
         setOauthLoading(false);
       }
     },
-    [startOAuthLogin, showError],
+    [startOAuthLogin, showError, t],
   );
 
   return {

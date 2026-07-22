@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AuthFieldHint } from '../components/auth/AuthFormAlert';
 import { OAuthLoginButtons } from '../components/auth/OAuthLoginButtons';
 import { useToast } from '../components/Toast';
@@ -21,6 +22,7 @@ export function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { showError } = useToast();
+  const { t } = useTranslation();
   const oauthError = searchParams.get('oauthError');
 
   useEffect(() => {
@@ -32,11 +34,11 @@ export function LoginPage() {
   useEffect(() => {
     if (!oauthError) return;
     if (oauthError === 'auth_failed') {
-      showError('소셜 로그인에 실패했습니다.');
+      showError(t('auth.oauthFailed'));
     } else {
-      showError('소셜 로그인이 취소되었습니다.');
+      showError(t('auth.oauthCancelled'));
     }
-  }, [oauthError, showError]);
+  }, [oauthError, showError, t]);
 
   if (screen.isAuthenticated) {
     return null;
@@ -54,7 +56,7 @@ export function LoginPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{APP_BRAND.name}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {isRegister ? '회원가입 후 투자 내역을 관리하세요.' : '로그인 후 매매와 시세를 관리하세요.'}
+            {isRegister ? t('auth.registerSubtitle') : t('auth.loginSubtitle')}
           </p>
         </div>
 
@@ -70,12 +72,12 @@ export function LoginPage() {
             <div className="w-full border-t border-border" />
           </div>
           <div className="relative flex justify-center text-xs">
-            <span className="bg-card px-2 text-muted-foreground">또는 아이디로</span>
+            <span className="bg-card px-2 text-muted-foreground">{t('auth.orWithUsername')}</span>
           </div>
         </div>
 
         <label className="block">
-          <span className="text-sm text-muted-foreground">아이디</span>
+          <span className="text-sm text-muted-foreground">{t('auth.username')}</span>
           <div className="mt-1 flex gap-2">
             <input
               className="min-w-0 flex-1 rounded-lg border border-border-strong bg-muted px-3 py-2 text-foreground outline-none focus:border-primary"
@@ -91,7 +93,7 @@ export function LoginPage() {
                 disabled={screen.loading || screen.usernameCheckStatus === 'checking'}
                 className="shrink-0 rounded-lg border border-border-strong px-3 py-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-50"
               >
-                중복 확인
+                {t('auth.checkDuplicate')}
               </button>
             )}
           </div>
@@ -99,7 +101,7 @@ export function LoginPage() {
             message={
               screen.fieldErrors.username ||
               (isRegister
-                ? screen.usernameCheckMessage || `형식: ${screen.usernameHint}`
+                ? screen.usernameCheckMessage || t('auth.formatHint', { hint: screen.usernameHint })
                 : undefined)
             }
             tone={screen.fieldErrors.username ? 'error' : usernameHintTone(screen.usernameCheckStatus)}
@@ -108,7 +110,7 @@ export function LoginPage() {
 
         {isRegister && (
           <label className="block">
-            <span className="text-sm text-muted-foreground">이메일 (선택)</span>
+            <span className="text-sm text-muted-foreground">{t('auth.emailOptional')}</span>
             <input
               type="text"
               inputMode="email"
@@ -123,7 +125,7 @@ export function LoginPage() {
         )}
 
         <label className="block">
-          <span className="text-sm text-muted-foreground">비밀번호</span>
+          <span className="text-sm text-muted-foreground">{t('auth.password')}</span>
           <input
             type="password"
             className="mt-1 w-full rounded-lg border border-border-strong bg-muted px-3 py-2 text-foreground outline-none focus:border-primary"
@@ -139,7 +141,7 @@ export function LoginPage() {
 
         {isRegister && (
           <label className="block">
-            <span className="text-sm text-muted-foreground">비밀번호 확인</span>
+            <span className="text-sm text-muted-foreground">{t('auth.passwordConfirm')}</span>
             <input
               type="password"
               className="mt-1 w-full rounded-lg border border-border-strong bg-muted px-3 py-2 text-foreground outline-none focus:border-primary"
@@ -158,44 +160,42 @@ export function LoginPage() {
         >
           {screen.loading
             ? isRegister
-              ? '가입 중...'
-              : '로그인 중...'
+              ? t('auth.registering')
+              : t('auth.loggingIn')
             : isRegister
-              ? '회원가입'
-              : '로그인'}
+              ? t('auth.register')
+              : t('auth.login')}
         </button>
 
         <p className="text-center text-sm text-muted-foreground">
-          {isRegister ? '이미 계정이 있으신가요?' : '계정이 없으신가요?'}{' '}
+          {isRegister ? t('auth.alreadyHaveAccount') : t('auth.noAccount')}{' '}
           <button
             type="button"
             className="text-primary hover:underline"
             onClick={() => screen.setMode(isRegister ? 'login' : 'register')}
           >
-            {isRegister ? '로그인' : '회원가입'}
+            {isRegister ? t('auth.login') : t('auth.register')}
           </button>
         </p>
 
         {!isRegister && (
           <p className="text-center text-sm">
             <Link href="/forgot-password" className="text-muted-foreground hover:text-primary hover:underline">
-              비밀번호를 잊으셨나요?
+              {t('auth.forgotPassword')}
             </Link>
           </p>
         )}
 
         <div className="rounded-xl border border-border bg-muted/50 p-4">
-          <p className="text-sm font-medium">비회원으로 둘러보기</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            서버에 저장되지 않으며, 이 브라우저 탭을 닫으면 데이터가 사라집니다.
-          </p>
+          <p className="text-sm font-medium">{t('auth.guestBrowseTitle')}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{t('auth.guestBrowseDesc')}</p>
           <button
             type="button"
             onClick={screen.handleGuestLogin}
             disabled={screen.loading || screen.guestLoading || screen.oauthLoading}
             className="mt-3 w-full rounded-lg border border-border-strong py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-50"
           >
-            {screen.guestLoading ? '입장 중...' : '비회원으로 입장'}
+            {screen.guestLoading ? t('auth.guestEntering') : t('auth.guestEnter')}
           </button>
         </div>
       </form>

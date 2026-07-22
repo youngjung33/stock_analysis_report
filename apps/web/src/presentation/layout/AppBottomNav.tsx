@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
+import { useAppNavItems } from '@/i18n';
 import { useActiveNavSection } from './useActiveNavSection';
 import { cn } from '../lib/cn';
-import { APP_NAV_ITEMS } from './nav-config';
 
 interface Props {
   className?: string;
@@ -11,6 +12,8 @@ interface Props {
 
 export function AppBottomNav({ className }: Props) {
   const active = useActiveNavSection();
+  const navItems = useAppNavItems();
+  const { t } = useTranslation();
 
   return (
     <nav
@@ -18,10 +21,10 @@ export function AppBottomNav({ className }: Props) {
         'fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card/95 backdrop-blur-md',
         className,
       )}
-      aria-label="하단 메뉴"
+      aria-label={t('nav.bottomMenu')}
     >
       <div className="grid h-(--height-bottom-nav) grid-cols-5">
-        {APP_NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = active === item.id;
           return (

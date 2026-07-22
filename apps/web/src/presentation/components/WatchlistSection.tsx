@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import { Market, StockSearchResult } from '@sar/shared';
 import { stockDetailHref } from '../shared/stock-routes';
 import { StockSearchField } from '../shared/StockSearchField';
@@ -13,14 +14,15 @@ interface Props {
 }
 
 export function WatchlistSection({ holdingSymbols }: Props) {
+  const { t } = useTranslation();
   const [market, setMarket] = useState<Market>(Market.KR);
   const [selected, setSelected] = useState<StockSearchResult | null>(null);
   const { items, isLoading, add, remove, isHeld } = useWatchlist(holdingSymbols);
 
   return (
     <Surface>
-      <h2 className="text-base font-semibold tracking-tight">관심종목</h2>
-      <p className="mt-2 text-sm text-muted-foreground">보유와 별도로 추적할 종목을 등록하세요.</p>
+      <h2 className="text-base font-semibold tracking-tight">{t('watchlist.title')}</h2>
+      <p className="mt-2 text-sm text-muted-foreground">{t('watchlist.desc')}</p>
 
       <div className="mt-6 max-w-xl">
         <StockSearchField
@@ -37,9 +39,9 @@ export function WatchlistSection({ holdingSymbols }: Props) {
       </div>
 
       {isLoading ? (
-        <p className="mt-4 text-sm text-slate-400">불러오는 중...</p>
+        <p className="mt-4 text-sm text-slate-400">{t('watchlist.loading')}</p>
       ) : items.length === 0 ? (
-        <p className="mt-4 text-sm text-slate-500">등록된 관심종목이 없습니다.</p>
+        <p className="mt-4 text-sm text-slate-500">{t('watchlist.empty')}</p>
       ) : (
         <ul className="mt-6 space-y-3">
           {items.map((item) => (
@@ -57,7 +59,7 @@ export function WatchlistSection({ holdingSymbols }: Props) {
                 <span className="ml-2 text-xs text-slate-500">{item.name}</span>
                 {isHeld(item.symbol, item.market) && (
                   <span className="ml-2 rounded bg-emerald-950 px-1.5 py-0.5 text-xs text-emerald-400">
-                    보유
+                    {t('watchlist.heldBadge')}
                   </span>
                 )}
               </div>
@@ -66,7 +68,7 @@ export function WatchlistSection({ holdingSymbols }: Props) {
                 onClick={() => remove(item.id)}
                 className="text-xs text-rose-400 hover:text-rose-300"
               >
-                삭제
+                {t('common.delete')}
               </button>
             </li>
           ))}

@@ -1,11 +1,14 @@
 'use client';
 
+import { useTranslation } from 'react-i18next';
 import { MarketAnalysisDetailSection } from '../components/MarketAnalysisDetailSection';
 import { AppShell } from '../layout';
 
 export function MarketAnalysisPage() {
+  const { t } = useTranslation();
+
   return (
-    <AppShell title="시장 심층 분석" subtitle="변동성 · 경기 · 업종 · 차트 지표">
+    <AppShell title={t('market.detailTitle')} subtitle={t('market.detailSubtitle')}>
       <MarketAnalysisDetailSection compact />
     </AppShell>
   );

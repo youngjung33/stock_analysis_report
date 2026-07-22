@@ -1,6 +1,7 @@
 'use client';
 
 import { AlertCircle, CheckCircle2, Info, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   createContext,
   useCallback,
@@ -49,6 +50,7 @@ function ToastCard({
   toast: ToastItem;
   onDismiss: (id: string) => void;
 }) {
+  const { t } = useTranslation();
   const Icon = VARIANT_ICON[toast.variant];
 
   return (
@@ -65,7 +67,7 @@ function ToastCard({
         type="button"
         onClick={() => onDismiss(toast.id)}
         className="shrink-0 rounded-md p-0.5 opacity-70 transition hover:opacity-100"
-        aria-label="닫기"
+        aria-label={t('common.close')}
       >
         <X className="size-4" />
       </button>

@@ -3,12 +3,14 @@
 import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
 import { useToast } from '@/presentation/components/Toast';
 import { useServices } from '@/presentation/hooks/useServices';
 import { APP_BRAND } from '@/presentation/layout';
 
 function ResetPasswordForm() {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const token = searchParams.get('token') ?? '';
   const { resetPasswordUseCase } = useServices();
@@ -22,17 +24,17 @@ function ResetPasswordForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!token) {
-      showError('유효하지 않은 재설정 링크입니다.');
+      showError(t('auth.resetLinkInvalid'));
       return;
     }
 
     setLoading(true);
     try {
       await resetPasswordUseCase.execute({ token, password, passwordConfirm });
-      showSuccess('비밀번호가 변경되었습니다. 로그인해 주세요.');
+      showSuccess(t('auth.resetPasswordSuccess'));
       router.replace('/login');
     } catch (err) {
-      showError(getErrorMessage(err, '비밀번호 재설정에 실패했습니다.'));
+      showError(getErrorMessage(err, t('auth.resetPasswordFailed')));
     } finally {
       setLoading(false);
     }
@@ -40,9 +42,9 @@ function ResetPasswordForm() {
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto mt-8 w-full max-w-md space-y-4 rounded-xl border border-border bg-card p-6">
-      <h1 className="text-xl font-semibold">비밀번호 재설정</h1>
+      <h1 className="text-xl font-semibold">{t('auth.resetPasswordTitle')}</h1>
       <label className="block">
-        <span className="text-sm text-muted-foreground">새 비밀번호</span>
+        <span className="text-sm text-muted-foreground">{t('common.newPassword')}</span>
         <input
           type="password"
           className="mt-1 w-full rounded-lg border border-border-strong bg-muted px-3 py-2"
@@ -51,7 +53,7 @@ function ResetPasswordForm() {
         />
       </label>
       <label className="block">
-        <span className="text-sm text-muted-foreground">새 비밀번호 확인</span>
+        <span className="text-sm text-muted-foreground">{t('common.newPasswordConfirm')}</span>
         <input
           type="password"
           className="mt-1 w-full rounded-lg border border-border-strong bg-muted px-3 py-2"
@@ -64,11 +66,11 @@ function ResetPasswordForm() {
         disabled={loading}
         className="w-full rounded-lg bg-primary py-2.5 font-medium text-primary-foreground disabled:opacity-50"
       >
-        {loading ? '변경 중...' : '비밀번호 변경'}
+        {loading ? t('auth.resetPasswordChanging') : t('auth.resetPasswordSubmit')}
       </button>
       <p className="text-center text-sm">
         <Link href="/login" className="text-primary hover:underline">
-          로그인으로 돌아가기
+          {t('common.backToLogin')}
         </Link>
       </p>
     </form>

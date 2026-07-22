@@ -1,6 +1,8 @@
 'use client';
 
-import { FINANCIAL_INCOME_THRESHOLD_KRW, type KoreanTaxEstimate } from '@sar/shared';
+import { useTranslation } from 'react-i18next';
+import { type KoreanTaxEstimate } from '@sar/shared';
+import { translateTaxDisclaimer, translateTaxLineItem } from '@/i18n';
 import { formatNumber } from '../../shared/formatters';
 import { Surface } from '../../design-system';
 
@@ -11,6 +13,7 @@ interface Props {
 }
 
 export function TaxEstimateResult({ estimate, usdKrwRate, compact = false }: Props) {
+  const { t } = useTranslation();
   const displayTax =
     estimate.pensionTaxCreditKrw > 0
       ? estimate.totalEstimatedTaxAfterCreditKrw
@@ -24,11 +27,15 @@ export function TaxEstimateResult({ estimate, usdKrwRate, compact = false }: Pro
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h3 className="text-base font-semibold md:text-lg">
-              {compact ? '보유·매매 기반 추정 세액' : `${estimate.year}년 추정 세금`}
+              {compact
+                ? t('tax.estimate.compactTitle')
+                : t('tax.estimate.yearTitle', { year: estimate.year })}
             </h3>
             <p className="mt-1 text-xs text-muted-foreground md:text-sm">
-              등록된 거래·배당 기준 · 환율{' '}
-              {usdKrwRate ? `₩${usdKrwRate.toLocaleString('ko-KR')}/USD` : '미적용'}
+              {t('tax.estimate.basis')}{' '}
+              {usdKrwRate
+                ? t('tax.estimate.fxApplied', { rate: usdKrwRate.toLocaleString() })
+                : t('tax.estimate.fxNotApplied')}
             </p>
           </div>
           <div className="text-right">
@@ -37,8 +44,10 @@ export function TaxEstimateResult({ estimate, usdKrwRate, compact = false }: Pro
             </p>
             {estimate.pensionTaxCreditKrw > 0 && (
               <p className="mt-0.5 text-[11px] text-muted-foreground md:text-xs">
-                연금 세액공제 {formatNumber(estimate.pensionTaxCreditKrw, 'KRW')} 반영
-                · 공제 전 {formatNumber(estimate.totalEstimatedTaxKrw, 'KRW')}
+                {t('tax.estimate.pensionCreditApplied', {
+                  credit: formatNumber(estimate.pensionTaxCreditKrw, 'KRW'),
+                  before: formatNumber(estimate.totalEstimatedTaxKrw, 'KRW'),
+                })}
               </p>
             )}
           </div>
@@ -46,31 +55,37 @@ export function TaxEstimateResult({ estimate, usdKrwRate, compact = false }: Pro
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
-            label="국내 매매차익"
+            label={t('tax.estimate.domesticGain')}
             value={formatNumber(estimate.domesticCapitalGainKrw, 'KRW')}
-            sub={estimate.domesticCapitalGainTaxKrw === 0 ? '비과세 (일반)' : '과세'}
+            sub={
+              estimate.domesticCapitalGainTaxKrw === 0
+                ? t('tax.estimate.exemptGeneral')
+                : t('tax.estimate.taxable')
+            }
           />
           <StatCard
-            label="해외 순매매차익"
+            label={t('tax.estimate.foreignNetGain')}
             value={formatNumber(estimate.foreignCapitalGainNetKrw, 'KRW')}
-            sub={`과세표준 ${formatNumber(estimate.foreignCapitalGainTaxableKrw, 'KRW')}`}
+            sub={t('tax.estimate.taxableBase', {
+              amount: formatNumber(estimate.foreignCapitalGainTaxableKrw, 'KRW'),
+            })}
           />
           <StatCard
-            label="배당 (국내+해외)"
+            label={t('tax.estimate.dividendTotal')}
             value={formatNumber(
               estimate.domesticDividendGrossKrw + estimate.foreignDividendGrossKrw,
               'KRW',
             )}
             sub={
               estimate.requiresComprehensiveTax
-                ? '종합과세 대상 (일반 계좌)'
-                : '분리과세 (15.4% 등)'
+                ? t('tax.estimate.comprehensiveTax')
+                : t('tax.estimate.separationTax')
             }
           />
           <StatCard
-            label="금융소득 합계"
+            label={t('tax.estimate.financialIncomeTotal')}
             value={formatNumber(estimate.totalFinancialIncomeKrw, 'KRW')}
-            sub={`일반 계좌 · 기준 ${(FINANCIAL_INCOME_THRESHOLD_KRW / 10_000).toLocaleString('ko-KR')}만 원`}
+            sub={t('tax.estimate.regularAccountThreshold')}
           />
         </div>
 
@@ -78,16 +93,19 @@ export function TaxEstimateResult({ estimate, usdKrwRate, compact = false }: Pro
           <div className="grid gap-3 sm:grid-cols-2">
             {estimate.isaNetIncomeKrw > 0 && (
               <StatCard
-                label="ISA 순소득"
+                label={t('tax.estimate.isaNetIncome')}
                 value={formatNumber(estimate.isaNetIncomeKrw, 'KRW')}
-                sub={`ISA 세금 ${formatNumber(estimate.isaTaxKrw, 'KRW')} · 절세 추정 ${formatNumber(estimate.isaTaxSavedKrw, 'KRW')}`}
+                sub={t('tax.estimate.isaTaxDetail', {
+                  tax: formatNumber(estimate.isaTaxKrw, 'KRW'),
+                  saved: formatNumber(estimate.isaTaxSavedKrw, 'KRW'),
+                })}
               />
             )}
             {estimate.pensionTaxCreditKrw > 0 && (
               <StatCard
-                label="연금저축 세액공제"
+                label={t('tax.estimate.pensionCredit')}
                 value={formatNumber(estimate.pensionTaxCreditKrw, 'KRW')}
-                sub="납입 공제 (추정)"
+                sub={t('tax.estimate.pensionCreditSub')}
               />
             )}
           </div>
@@ -96,25 +114,27 @@ export function TaxEstimateResult({ estimate, usdKrwRate, compact = false }: Pro
 
       {estimate.lines.length > 0 && (
         <Surface variant="section" className="overflow-x-auto">
-          <h4 className="mb-3 text-sm font-semibold md:text-base">세목별 내역</h4>
+          <h4 className="mb-3 text-sm font-semibold md:text-base">{t('tax.estimate.lineItemsTitle')}</h4>
           <table className="w-full min-w-[480px] text-left text-xs md:text-sm">
             <thead>
               <tr className="border-b border-border text-muted-foreground">
-                <th className="pb-2 pr-3 font-medium">구분</th>
-                <th className="pb-2 pr-3 font-medium">항목</th>
-                <th className="pb-2 pr-3 text-right font-medium">과세표준</th>
-                <th className="pb-2 pr-3 text-right font-medium">세율</th>
-                <th className="pb-2 text-right font-medium">추정 세액</th>
+                <th className="pb-2 pr-3 font-medium">{t('common.category')}</th>
+                <th className="pb-2 pr-3 font-medium">{t('common.item')}</th>
+                <th className="pb-2 pr-3 text-right font-medium">{t('common.taxableBase')}</th>
+                <th className="pb-2 pr-3 text-right font-medium">{t('common.rate')}</th>
+                <th className="pb-2 text-right font-medium">{t('common.estimatedTax')}</th>
               </tr>
             </thead>
             <tbody>
-              {estimate.lines.map((line) => (
+              {estimate.lines.map((line) => {
+                const localized = translateTaxLineItem(line, t);
+                return (
                 <tr key={line.id} className="border-b border-border/60">
-                  <td className="py-2.5 pr-3 text-muted-foreground">{line.category}</td>
+                  <td className="py-2.5 pr-3 text-muted-foreground">{localized.category}</td>
                   <td className="py-2.5 pr-3">
-                    {line.label}
-                    {line.note && (
-                      <span className="mt-0.5 block text-[11px] text-muted-foreground">{line.note}</span>
+                    {localized.label}
+                    {localized.note && (
+                      <span className="mt-0.5 block text-[11px] text-muted-foreground">{localized.note}</span>
                     )}
                   </td>
                   <td className="py-2.5 pr-3 text-right tabular-nums">
@@ -127,20 +147,21 @@ export function TaxEstimateResult({ estimate, usdKrwRate, compact = false }: Pro
                     {formatNumber(line.taxKrw, 'KRW')}
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </Surface>
       )}
 
       <Surface variant="section" className="space-y-2 border-amber-900/30 bg-amber-950/20">
-        <h4 className="text-sm font-semibold text-amber-200/90">안내</h4>
+        <h4 className="text-sm font-semibold text-amber-200/90">{t('common.notice')}</h4>
         <ul className="list-inside list-disc space-y-1 text-[11px] text-amber-200/70 md:text-xs">
-          {estimate.disclaimers.map((d) => (
-            <li key={d}>{d}</li>
+          {estimate.disclaimers.map((d, i) => (
+            <li key={d}>{translateTaxDisclaimer(i, d, t)}</li>
           ))}
-          <li>해외주식 양도세는 다음 해 5월 1~31일 확정신고·납부 대상입니다.</li>
-          <li>배당·금융소득 2,000만 원 초과 시 5월 종합소득세 신고가 필요합니다.</li>
+          <li>{t('tax.estimate.disclaimerForeignGain')}</li>
+          <li>{t('tax.estimate.disclaimerComprehensive')}</li>
         </ul>
       </Surface>
     </div>

@@ -3,58 +3,61 @@ import { ArrowLeftRight, LayoutDashboard, LineChart, Receipt, UserCircle } from 
 
 export type NavSectionId = 'dashboard' | 'my-info' | 'transactions' | 'market' | 'tax';
 
-export interface AppNavItem {
+export interface AppNavItemDef {
   id: NavSectionId;
   href: string;
-  label: string;
-  shortLabel: string;
+  labelKey: string;
+  shortLabelKey: string;
   icon: LucideIcon;
   /** pathname prefix match (exact if ends without *) */
   match: (pathname: string) => boolean;
 }
 
-export const APP_NAV_ITEMS: AppNavItem[] = [
+export const APP_NAV_ITEM_DEFS: AppNavItemDef[] = [
   {
     id: 'dashboard',
     href: '/',
-    label: '투자 현황',
-    shortLabel: '홈',
+    labelKey: 'nav.dashboard',
+    shortLabelKey: 'nav.dashboardShort',
     icon: LayoutDashboard,
     match: (pathname) => pathname === '/' || pathname.startsWith('/stocks'),
   },
   {
     id: 'my-info',
     href: '/my-info',
-    label: '내 정보',
-    shortLabel: '내 정보',
+    labelKey: 'nav.myInfo',
+    shortLabelKey: 'nav.myInfoShort',
     icon: UserCircle,
     match: (pathname) => pathname.startsWith('/my-info'),
   },
   {
     id: 'transactions',
     href: '/transactions',
-    label: '매매·배당',
-    shortLabel: '매매',
+    labelKey: 'nav.transactions',
+    shortLabelKey: 'nav.transactionsShort',
     icon: ArrowLeftRight,
     match: (pathname) => pathname.startsWith('/transactions'),
   },
   {
     id: 'market',
     href: '/market/analysis',
-    label: '시장 분석',
-    shortLabel: '시장',
+    labelKey: 'nav.market',
+    shortLabelKey: 'nav.marketShort',
     icon: LineChart,
     match: (pathname) => pathname.startsWith('/market'),
   },
   {
     id: 'tax',
     href: '/tax',
-    label: '세금 정보',
-    shortLabel: '세금',
+    labelKey: 'nav.tax',
+    shortLabelKey: 'nav.taxShort',
     icon: Receipt,
     match: (pathname) => pathname.startsWith('/tax'),
   },
 ];
+
+/** @deprecated use useAppNavItems() for translated labels */
+export const APP_NAV_ITEMS = APP_NAV_ITEM_DEFS;
 
 export const APP_BRAND = {
   name: 'SAR Portfolio',

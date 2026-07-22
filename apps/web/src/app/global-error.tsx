@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import i18n from '@/i18n/config';
 
 export default function GlobalError({
   error,
@@ -20,16 +21,16 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <html lang="ko">
+    <html lang={i18n.language}>
       <body className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4 text-slate-200">
-        <h1 className="text-lg font-semibold">문제가 발생했습니다</h1>
-        <p className="mt-2 text-sm text-slate-400">잠시 후 다시 시도해 주세요.</p>
+        <h1 className="text-lg font-semibold">{i18n.t('pages.globalError.title')}</h1>
+        <p className="mt-2 text-sm text-slate-400">{i18n.t('pages.globalError.message')}</p>
         <button
           type="button"
           onClick={() => reset()}
           className="mt-6 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
         >
-          다시 시도
+          {i18n.t('pages.globalError.retry')}
         </button>
       </body>
     </html>

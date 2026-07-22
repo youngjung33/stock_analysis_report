@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { CashLedgerType, formatCashAmount, parseAmountInput } from '@sar/shared';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
 import { useToast } from '../../components/Toast';
@@ -14,6 +15,7 @@ import {
 import { invalidatePortfolioLocal } from '../../lib/query-config';
 
 export function useCapitalScreen(onUpdated?: () => void) {
+  const { t } = useTranslation();
   const { recordCashEntryUseCase, updatePortfolioPreferencesUseCase } = useServices();
   const queryClient = useQueryClient();
   const { showError, showSuccess } = useToast();
@@ -54,7 +56,7 @@ export function useCapitalScreen(onUpdated?: () => void) {
       const krw = parseAmountInput(krwAmount);
       const usd = parseAmountInput(usdAmount);
       if ((!Number.isFinite(krw) || krw <= 0) && (!Number.isFinite(usd) || usd <= 0)) {
-        showError('금액을 입력해 주세요.');
+        showError(t('common.amountRequired'));
         return;
       }
       if (Number.isFinite(krw) && krw > 0) {
@@ -62,7 +64,7 @@ export function useCapitalScreen(onUpdated?: () => void) {
           currency: 'KRW',
           type: CashLedgerType.INITIAL,
           amount: krw,
-          memo: '투자 원금',
+          memo: t('capital.memoInitialCapital'),
         });
       }
       if (Number.isFinite(usd) && usd > 0) {
@@ -70,15 +72,15 @@ export function useCapitalScreen(onUpdated?: () => void) {
           currency: 'USD',
           type: CashLedgerType.INITIAL,
           amount: usd,
-          memo: '투자 원금 (USD)',
+          memo: t('capital.memoInitialCapitalUsd'),
         });
       }
       setKrwAmount('');
       setUsdAmount('');
-      showSuccess('투자 원금이 반영되었습니다.');
+      showSuccess(t('capital.toast.capitalSet'));
       await notifyPortfolioChange();
     } catch (err) {
-      showError(getErrorMessage(err, '투자 원금 등록에 실패했습니다.'));
+      showError(getErrorMessage(err, t('capital.toast.capitalSetFailed')));
     } finally {
       setSaving(false);
     }
@@ -88,7 +90,7 @@ export function useCapitalScreen(onUpdated?: () => void) {
     const raw = currency === 'KRW' ? krwAmount : usdAmount;
     const amount = parseAmountInput(raw);
     if (!amount || amount <= 0) {
-      showError('금액을 입력해 주세요.');
+      showError(t('common.amountRequired'));
       return;
     }
     setSaving(true);
@@ -97,14 +99,14 @@ export function useCapitalScreen(onUpdated?: () => void) {
         currency,
         type: CashLedgerType.DEPOSIT,
         amount,
-        memo: '입금',
+        memo: t('capital.memoDeposit'),
       });
       if (currency === 'KRW') setKrwAmount('');
       else setUsdAmount('');
-      showSuccess('입금이 반영되었습니다.');
+      showSuccess(t('capital.toast.depositSuccess'));
       await notifyPortfolioChange();
     } catch (err) {
-      showError(getErrorMessage(err, '입금에 실패했습니다.'));
+      showError(getErrorMessage(err, t('capital.toast.depositFailed')));
     } finally {
       setSaving(false);
     }
@@ -114,7 +116,7 @@ export function useCapitalScreen(onUpdated?: () => void) {
     const raw = currency === 'KRW' ? krwAmount : usdAmount;
     const amount = parseAmountInput(raw);
     if (!amount || amount <= 0) {
-      showError('금액을 입력해 주세요.');
+      showError(t('common.amountRequired'));
       return;
     }
     setSaving(true);
@@ -123,14 +125,14 @@ export function useCapitalScreen(onUpdated?: () => void) {
         currency,
         type: CashLedgerType.WITHDRAW,
         amount,
-        memo: '출금',
+        memo: t('capital.memoWithdraw'),
       });
       if (currency === 'KRW') setKrwAmount('');
       else setUsdAmount('');
-      showSuccess('출금이 반영되었습니다.');
+      showSuccess(t('capital.toast.withdrawSuccess'));
       await notifyPortfolioChange();
     } catch (err) {
-      showError(getErrorMessage(err, '출금에 실패했습니다.'));
+      showError(getErrorMessage(err, t('capital.toast.withdrawFailed')));
     } finally {
       setSaving(false);
     }
@@ -145,10 +147,10 @@ export function useCapitalScreen(onUpdated?: () => void) {
         targetUsPercent: targetUs,
         maxSingleWeightPercent: maxWeight,
       });
-      showSuccess('목표 비중이 저장되었습니다.');
+      showSuccess(t('capital.toast.targetSaved'));
       await notifyPortfolioChange();
     } catch (err) {
-      showError(getErrorMessage(err, '설정 저장에 실패했습니다.'));
+      showError(getErrorMessage(err, t('capital.toast.targetSaveFailed')));
     } finally {
       setSaving(false);
     }

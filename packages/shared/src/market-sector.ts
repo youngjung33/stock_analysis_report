@@ -23,16 +23,18 @@ export interface SectorEtfSnapshot {
   changePercent1mo: number | null;
   rsBenchmark1w: number | null;
   rsBenchmark1mo: number | null;
+  /** @deprecated use strengthKey */
   strengthLabel: string;
+  strengthKey: string;
   strengthRank: number;
   chartUrl: string;
 }
 
-function strengthFromRs(rs1w: number | null, rs1mo: number | null): string {
+function strengthFromRs(rs1w: number | null, rs1mo: number | null): { label: string; key: string } {
   const rs = rs1w ?? rs1mo ?? 0;
-  if (rs >= 2) return '강함';
-  if (rs <= -2) return '약함';
-  return '보통';
+  if (rs >= 2) return { label: '강함', key: 'shared.market.strength.strong' };
+  if (rs <= -2) return { label: '약함', key: 'shared.market.strength.weak' };
+  return { label: '보통', key: 'shared.market.strength.normal' };
 }
 
 export function buildSectorSnapshot(input: SectorSeriesInput): SectorEtfSnapshot | null {
@@ -47,6 +49,7 @@ export function buildSectorSnapshot(input: SectorSeriesInput): SectorEtfSnapshot
 
   const rs1w = change1w !== null && bench1w !== null ? change1w - bench1w : null;
   const rs1mo = change1mo !== null && bench1mo !== null ? change1mo - bench1mo : null;
+  const strength = strengthFromRs(rs1w, rs1mo);
 
   return {
     yahooSymbol: input.yahooSymbol,
@@ -59,7 +62,8 @@ export function buildSectorSnapshot(input: SectorSeriesInput): SectorEtfSnapshot
     changePercent1mo: change1mo,
     rsBenchmark1w: rs1w,
     rsBenchmark1mo: rs1mo,
-    strengthLabel: strengthFromRs(rs1w, rs1mo),
+    strengthLabel: strength.label,
+    strengthKey: strength.key,
     strengthRank: 0,
     chartUrl: input.chartUrl,
   };

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useTransactionList } from '../../hooks/screens/useTransactionList';
 import { formatNumber } from '../../shared/formatters';
 
@@ -6,13 +7,15 @@ interface Props {
 }
 
 function EmptyTransactions() {
+  const { t } = useTranslation();
+
   return (
     <>
       <div className="hidden rounded-xl border border-dashed border-slate-700 p-6 text-center text-slate-400 md:block">
-        등록된 매매가 없습니다.
+        {t('transactions.list.empty')}
       </div>
       <div className="rounded-xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-400 md:hidden">
-        등록된 매매가 없습니다.
+        {t('transactions.list.empty')}
       </div>
     </>
   );
@@ -25,17 +28,20 @@ function TransactionTable({
   data: NonNullable<ReturnType<typeof useTransactionList>['data']>;
   handleDelete: (id: string) => void;
 }) {
+  const { t, i18n } = useTranslation();
+  const dateLocale = i18n.language === 'ko' ? 'ko-KR' : 'en-US';
+
   return (
     <div className="hidden overflow-x-auto rounded-xl border border-slate-800 md:block">
       <table className="min-w-full text-left text-sm">
         <thead className="bg-slate-900 text-slate-400">
           <tr>
-            <th className="px-4 py-3">매매일</th>
-            <th className="px-4 py-3">종목</th>
-            <th className="px-4 py-3">유형</th>
-            <th className="px-4 py-3">수량</th>
-            <th className="px-4 py-3">단가</th>
-            <th className="px-4 py-3">메모</th>
+            <th className="px-4 py-3">{t('common.tradeDate')}</th>
+            <th className="px-4 py-3">{t('common.symbol')}</th>
+            <th className="px-4 py-3">{t('common.type')}</th>
+            <th className="px-4 py-3">{t('common.quantity')}</th>
+            <th className="px-4 py-3">{t('common.unitPrice')}</th>
+            <th className="px-4 py-3">{t('common.memo')}</th>
             <th className="px-4 py-3"></th>
           </tr>
         </thead>
@@ -43,7 +49,7 @@ function TransactionTable({
           {data.map((tx) => (
             <tr key={tx.id} className="border-t border-slate-800">
               <td className="px-4 py-3 text-slate-300">
-                {new Date(tx.tradedAt).toLocaleDateString('ko-KR')}
+                {new Date(tx.tradedAt).toLocaleDateString(dateLocale)}
               </td>
               <td className="px-4 py-3">
                 <div className="text-white">{tx.stock?.symbol}</div>
@@ -52,7 +58,7 @@ function TransactionTable({
               <td
                 className={`px-4 py-3 ${tx.type === 'BUY' ? 'text-emerald-400' : 'text-rose-400'}`}
               >
-                {tx.type === 'BUY' ? '매수' : '매도'}
+                {t(`transactions.types.${tx.type}`)}
               </td>
               <td className="px-4 py-3 text-slate-300">{tx.quantity}</td>
               <td className="px-4 py-3 text-slate-300">
@@ -65,7 +71,7 @@ function TransactionTable({
                   onClick={() => handleDelete(tx.id)}
                   className="text-sm text-rose-400 hover:text-rose-300"
                 >
-                  삭제
+                  {t('common.delete')}
                 </button>
               </td>
             </tr>
@@ -83,6 +89,9 @@ function TransactionCardList({
   data: NonNullable<ReturnType<typeof useTransactionList>['data']>;
   handleDelete: (id: string) => void;
 }) {
+  const { t, i18n } = useTranslation();
+  const dateLocale = i18n.language === 'ko' ? 'ko-KR' : 'en-US';
+
   return (
     <ul className="space-y-3 md:hidden">
       {data.map((tx) => (
@@ -95,26 +104,26 @@ function TransactionCardList({
             <span
               className={`text-xs font-medium ${tx.type === 'BUY' ? 'text-emerald-400' : 'text-rose-400'}`}
             >
-              {tx.type === 'BUY' ? '매수' : '매도'}
+              {t(`transactions.types.${tx.type}`)}
             </span>
           </div>
           <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
             <div>
-              <dt className="text-slate-500">매매일</dt>
+              <dt className="text-slate-500">{t('common.tradeDate')}</dt>
               <dd className="text-slate-200">
-                {new Date(tx.tradedAt).toLocaleDateString('ko-KR')}
+                {new Date(tx.tradedAt).toLocaleDateString(dateLocale)}
               </dd>
             </div>
             <div>
-              <dt className="text-slate-500">수량</dt>
+              <dt className="text-slate-500">{t('common.quantity')}</dt>
               <dd className="text-slate-200">{tx.quantity}</dd>
             </div>
             <div>
-              <dt className="text-slate-500">단가</dt>
+              <dt className="text-slate-500">{t('common.unitPrice')}</dt>
               <dd className="text-slate-200">{formatNumber(tx.price, tx.stock?.currency)}</dd>
             </div>
             <div>
-              <dt className="text-slate-500">메모</dt>
+              <dt className="text-slate-500">{t('common.memo')}</dt>
               <dd className="text-slate-400">{tx.memo ?? '-'}</dd>
             </div>
           </dl>
@@ -123,7 +132,7 @@ function TransactionCardList({
             onClick={() => handleDelete(tx.id)}
             className="mt-3 text-sm text-rose-400 hover:text-rose-300"
           >
-            삭제
+            {t('common.delete')}
           </button>
         </li>
       ))}
@@ -133,10 +142,11 @@ function TransactionCardList({
 
 /** responsive 거래 내역 — mobile 카드 / desktop 테이블 */
 export function TransactionList({ refreshKey }: Props) {
+  const { t } = useTranslation();
   const { data, isLoading, handleDelete } = useTransactionList(refreshKey);
 
   if (isLoading) {
-    return <p className="text-sm text-slate-400 md:text-base">매매 내역 불러오는 중...</p>;
+    return <p className="text-sm text-slate-400 md:text-base">{t('transactions.list.loading')}</p>;
   }
 
   if (!data?.length) {

@@ -2,20 +2,15 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { OAUTH_PROVIDER_META, OAuthProviderId } from '@sar/shared';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
 import { useToast } from '../../components/Toast';
 import { useAuth } from '../useAuth';
 import { useServices } from '../useServices';
 
-function showVerificationCodeToast(
-  showSuccess: (msg: string) => void,
-  verificationCode: string,
-) {
-  showSuccess(`인증 코드: ${verificationCode}`);
-}
-
 export function useSettingsScreen() {
+  const { t } = useTranslation();
   const { isGuest, logout } = useAuth();
   const {
     getAccountUseCase,
@@ -49,11 +44,11 @@ export function useSettingsScreen() {
       setProfile(data);
       setEmail(data.email ?? '');
     } catch (err) {
-      showError(getErrorMessage(err, '계정 정보를 불러오지 못했습니다.'));
+      showError(getErrorMessage(err, t('settings.loadProfileFailed')));
     } finally {
       setLoading(false);
     }
-  }, [getAccountUseCase, showError]);
+  }, [getAccountUseCase, showError, t]);
 
   useEffect(() => {
     if (isGuest) {
@@ -68,11 +63,11 @@ export function useSettingsScreen() {
     setSaving(true);
     try {
       const result = await changeEmailUseCase.execute(email.trim());
-      showVerificationCodeToast(showSuccess, result.verificationCode);
+      showSuccess(t('settings.verificationCodeToast', { code: result.verificationCode }));
       setVerificationCode('');
       await reload();
     } catch (err) {
-      showError(getErrorMessage(err, '이메일 변경에 실패했습니다.'));
+      showError(getErrorMessage(err, t('settings.changeEmailFailed')));
     } finally {
       setSaving(false);
     }
@@ -83,12 +78,12 @@ export function useSettingsScreen() {
     try {
       const result = await requestEmailVerificationUseCase.execute();
       if (!result) {
-        showSuccess('이미 인증된 이메일입니다.');
+        showSuccess(t('settings.alreadyVerified'));
         return;
       }
-      showVerificationCodeToast(showSuccess, result.verificationCode);
+      showSuccess(t('settings.verificationCodeToast', { code: result.verificationCode }));
     } catch (err) {
-      showError(getErrorMessage(err, '인증 코드 발급에 실패했습니다.'));
+      showError(getErrorMessage(err, t('settings.issueCodeFailed')));
     } finally {
       setSaving(false);
     }
@@ -99,11 +94,11 @@ export function useSettingsScreen() {
     setSaving(true);
     try {
       await confirmEmailVerificationUseCase.execute(verificationCode.trim());
-      showSuccess('이메일 인증이 완료되었습니다.');
+      showSuccess(t('settings.verifySuccess'));
       setVerificationCode('');
       await reload();
     } catch (err) {
-      showError(getErrorMessage(err, '인증 코드가 올바르지 않습니다.'));
+      showError(getErrorMessage(err, t('settings.verifyFailed')));
     } finally {
       setSaving(false);
     }
@@ -118,38 +113,34 @@ export function useSettingsScreen() {
         newPassword,
         newPasswordConfirm,
       });
-      showSuccess('비밀번호가 변경되었습니다.');
+      showSuccess(t('settings.passwordChanged'));
       setCurrentPassword('');
       setNewPassword('');
       setNewPasswordConfirm('');
       await reload();
     } catch (err) {
-      showError(getErrorMessage(err, '비밀번호 변경에 실패했습니다.'));
+      showError(getErrorMessage(err, t('settings.passwordChangeFailed')));
     } finally {
       setSaving(false);
     }
   }
 
   async function handleUnlink(provider: OAuthProviderId) {
-    if (!confirm(`${OAUTH_PROVIDER_META[provider].label} 연동을 해제할까요?`)) return;
+    if (!confirm(t('settings.unlinkConfirm', { provider: OAUTH_PROVIDER_META[provider].label }))) return;
     setSaving(true);
     try {
       await unlinkOAuthUseCase.execute(provider);
-      showSuccess('소셜 계정 연동을 해제했습니다.');
+      showSuccess(t('settings.unlinkSuccess'));
       await reload();
     } catch (err) {
-      showError(getErrorMessage(err, '연동 해제에 실패했습니다.'));
+      showError(getErrorMessage(err, t('settings.unlinkFailed')));
     } finally {
       setSaving(false);
     }
   }
 
   async function handleDeleteAccount() {
-    if (
-      !confirm(
-        '탈퇴 시 거래·관심종목·연동 계정 등 모든 데이터가 삭제되며 복구할 수 없습니다. 정말 탈퇴할까요?',
-      )
-    ) {
+    if (!confirm(t('settings.deleteConfirm'))) {
       return;
     }
 
@@ -161,7 +152,7 @@ export function useSettingsScreen() {
       await logout().catch(() => undefined);
       router.replace('/login');
     } catch (err) {
-      showError(getErrorMessage(err, '회원탈퇴에 실패했습니다.'));
+      showError(getErrorMessage(err, t('settings.deleteFailed')));
     } finally {
       setSaving(false);
     }
