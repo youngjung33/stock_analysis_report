@@ -1,8 +1,30 @@
-import { OAuthProviderId } from '@sar/shared';
-import { AppErrorCode } from '@sar/shared';
+import { AppErrorCode, type ApiSuccessResult } from '@sar/shared';
+import { AppError } from '../../domain/errors/app-error';
+import { parseApiSuccessResult } from '../../domain/errors/api-success';
 import { apiClient } from '../api/client';
 import { toAppError } from '../../domain/errors/api-error';
-import { AccountProfile, EmailVerificationIssued, IAccountRepository } from '../../domain/repositories/account.repository';
+import {
+  AccountProfile,
+  EmailVerificationSuccess,
+  IAccountRepository,
+} from '../../domain/repositories/account.repository';
+
+function requireSuccessResult(data: unknown): ApiSuccessResult {
+  const result = parseApiSuccessResult(data);
+  if (!result) {
+    throw new AppError('Invalid API success response', AppErrorCode.INTERNAL);
+  }
+  return result;
+}
+
+function toEmailVerificationSuccess(data: unknown): EmailVerificationSuccess {
+  const base = requireSuccessResult(data);
+  const verificationCode =
+    data && typeof data === 'object' && 'verificationCode' in data
+      ? (data as { verificationCode?: string }).verificationCode
+      : undefined;
+  return { ...base, verificationCode };
+}
 
 export class ApiAccountRepository implements IAccountRepository {
   async getProfile(): Promise<AccountProfile> {
@@ -20,31 +42,26 @@ export class ApiAccountRepository implements IAccountRepository {
     newPasswordConfirm: string;
   }) {
     try {
-      await apiClient.post('/account/password', input);
+      const { data } = await apiClient.post('/account/password', input);
+      return requireSuccessResult(data);
     } catch (error) {
       throw toAppError(error, AppErrorCode.INTERNAL);
     }
   }
 
-  async changeEmail(email: string): Promise<EmailVerificationIssued> {
+  async changeEmail(email: string): Promise<EmailVerificationSuccess> {
     try {
-      const { data } = await apiClient.post<EmailVerificationIssued & { ok: boolean; message: string }>(
-        '/account/email',
-        { email },
-      );
-      return { verificationCode: data.verificationCode };
+      const { data } = await apiClient.post('/account/email', { email });
+      return toEmailVerificationSuccess(data);
     } catch (error) {
       throw toAppError(error, AppErrorCode.INTERNAL);
     }
   }
 
-  async requestEmailVerification(): Promise<EmailVerificationIssued | null> {
+  async requestEmailVerification(): Promise<EmailVerificationSuccess> {
     try {
-      const { data } = await apiClient.post<EmailVerificationIssued & { ok: boolean; message: string }>(
-        '/account/verify-email',
-      );
-      if (!data.verificationCode) return null;
-      return { verificationCode: data.verificationCode };
+      const { data } = await apiClient.post('/account/verify-email');
+      return toEmailVerificationSuccess(data);
     } catch (error) {
       throw toAppError(error, AppErrorCode.INTERNAL);
     }
@@ -52,15 +69,17 @@ export class ApiAccountRepository implements IAccountRepository {
 
   async confirmEmailVerification(code: string) {
     try {
-      await apiClient.post('/account/confirm-email', { code });
+      const { data } = await apiClient.post('/account/confirm-email', { code });
+      return requireSuccessResult(data);
     } catch (error) {
       throw toAppError(error, AppErrorCode.AUTH_TOKEN_INVALID);
     }
   }
 
-  async unlinkOAuth(provider: OAuthProviderId) {
+  async unlinkOAuth(provider: import('@sar/shared').OAuthProviderId) {
     try {
-      await apiClient.delete(`/account/oauth/${provider}`);
+      const { data } = await apiClient.delete(`/account/oauth/${provider}`);
+      return requireSuccessResult(data);
     } catch (error) {
       throw toAppError(error, AppErrorCode.INTERNAL);
     }
@@ -68,7 +87,8 @@ export class ApiAccountRepository implements IAccountRepository {
 
   async requestPasswordReset(email: string) {
     try {
-      await apiClient.post('/auth/forgot-password', { email });
+      const { data } = await apiClient.post('/auth/forgot-password', { email });
+      return requireSuccessResult(data);
     } catch (error) {
       throw toAppError(error, AppErrorCode.INTERNAL);
     }
@@ -76,7 +96,8 @@ export class ApiAccountRepository implements IAccountRepository {
 
   async resetPassword(input: { token: string; password: string; passwordConfirm: string }) {
     try {
-      await apiClient.post('/auth/reset-password', input);
+      const { data } = await apiClient.post('/auth/reset-password', input);
+      return requireSuccessResult(data);
     } catch (error) {
       throw toAppError(error, AppErrorCode.AUTH_TOKEN_INVALID);
     }
@@ -84,7 +105,8 @@ export class ApiAccountRepository implements IAccountRepository {
 
   async deleteAccount(input: { password?: string }) {
     try {
-      await apiClient.delete('/account', { data: input });
+      const { data } = await apiClient.delete('/account', { data: input });
+      return requireSuccessResult(data);
     } catch (error) {
       throw toAppError(error, AppErrorCode.INTERNAL);
     }

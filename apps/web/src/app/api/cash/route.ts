@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { CashLedgerType } from '@sar/shared';
+import { AppErrorCode, CashLedgerType } from '@sar/shared';
 import { getServerServices } from '@/server/container';
 import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     };
 
     if (!body.currency || !body.type || !body.amount) {
-      throw new ValidationError('currency, type, amount are required');
+      throw new ValidationError(AppErrorCode.VALIDATION);
     }
 
     const { recordCashEntryUseCase } = getServerServices();

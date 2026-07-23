@@ -1,3 +1,4 @@
+import { AppErrorCode, AppSuccessCode, apiSuccessBody } from '@sar/shared';
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest) {
     };
 
     if (!body.currentPassword || !body.newPassword || body.newPasswordConfirm === undefined) {
-      throw new ValidationError('currentPassword, newPassword, newPasswordConfirm are required');
+      throw new ValidationError(AppErrorCode.AUTH_REGISTER_FIELDS_REQUIRED);
     }
 
     const { changePasswordUseCase } = getServerServices();
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
       newPassword: body.newPassword,
       newPasswordConfirm: body.newPasswordConfirm,
     });
-    return jsonData({ ok: true });
+    return jsonData(apiSuccessBody(AppSuccessCode.ACCOUNT_PASSWORD_CHANGED));
   } catch (error) {
     return handleRouteError(error);
   }

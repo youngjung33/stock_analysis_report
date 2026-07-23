@@ -1,3 +1,4 @@
+import { AppErrorCode, AppSuccessCode, apiSuccessBody } from '@sar/shared';
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
@@ -14,7 +15,7 @@ export async function POST(req: NextRequest) {
     };
 
     if (!body.token || !body.password || body.passwordConfirm === undefined) {
-      throw new ValidationError('token, password, passwordConfirm are required');
+      throw new ValidationError(AppErrorCode.AUTH_REGISTER_FIELDS_REQUIRED);
     }
 
     const { resetPasswordUseCase } = getServerServices();
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
       password: body.password,
       passwordConfirm: body.passwordConfirm,
     });
-    return jsonData({ ok: true, message: '비밀번호가 변경되었습니다.' });
+    return jsonData(apiSuccessBody(AppSuccessCode.AUTH_PASSWORD_RESET_COMPLETE));
   } catch (error) {
     return handleRouteError(error);
   }

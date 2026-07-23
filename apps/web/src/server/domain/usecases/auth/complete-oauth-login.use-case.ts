@@ -1,4 +1,4 @@
-import { isOAuthProvider } from '@sar/shared';
+import { AppErrorCode, isOAuthProvider } from '@sar/shared';
 import { AuthenticationError, ValidationError } from '../../errors/domain.errors';
 import { IOAuthProviderPort } from '../../ports/oauth-provider.port';
 import {
@@ -34,7 +34,7 @@ export class CompleteOAuthLoginUseCase {
 
   async execute(input: CompleteOAuthLoginInput): Promise<CompleteOAuthLoginResult> {
     if (!isOAuthProvider(input.provider)) {
-      throw new ValidationError('지원하지 않는 OAuth 제공자입니다.');
+      throw new ValidationError(AppErrorCode.AUTH_OAUTH_PROVIDER_INVALID);
     }
 
     const provider = input.provider;
@@ -42,12 +42,12 @@ export class CompleteOAuthLoginUseCase {
     const state = input.state.trim();
 
     if (!code || !state) {
-      throw new ValidationError('OAuth code와 state가 필요합니다.');
+      throw new ValidationError(AppErrorCode.AUTH_OAUTH_CODE_STATE_REQUIRED);
     }
 
     const storedState = await this.oauthStateRepo.consume(state, provider);
     if (!storedState) {
-      throw new AuthenticationError('OAuth state가 유효하지 않거나 만료되었습니다.');
+      throw new AuthenticationError(AppErrorCode.AUTH_OAUTH_STATE_INVALID);
     }
 
     const profile = await this.oauthProvider.exchangeAuthorizationCode({
@@ -63,7 +63,7 @@ export class CompleteOAuthLoginUseCase {
     if (existingAccount) {
       const user = await this.userRepo.findById(existingAccount.userId);
       if (!user) {
-        throw new AuthenticationError('연결된 사용자를 찾을 수 없습니다.');
+        throw new AuthenticationError(AppErrorCode.NOT_FOUND);
       }
       const session = await this.authSession.issueForUser(user);
       return { ...session, isNewUser: false };

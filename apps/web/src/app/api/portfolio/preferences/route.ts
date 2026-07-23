@@ -1,3 +1,4 @@
+import { AppErrorCode } from '@sar/shared';
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
@@ -28,7 +29,7 @@ export async function PUT(req: NextRequest) {
       body.targetUsPercent === undefined ||
       body.maxSingleWeightPercent === undefined
     ) {
-      throw new ValidationError('targetKrPercent, targetUsPercent, maxSingleWeightPercent required');
+      throw new ValidationError(AppErrorCode.VALIDATION);
     }
 
     const { updatePortfolioPreferencesUseCase } = getServerServices();

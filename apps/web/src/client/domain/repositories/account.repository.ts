@@ -1,8 +1,8 @@
-import { OAuthProviderId } from '@sar/shared';
+import { ApiSuccessResult, OAuthProviderId } from '@sar/shared';
 
-export interface EmailVerificationIssued {
-  verificationCode: string;
-}
+export type EmailVerificationSuccess = ApiSuccessResult & {
+  verificationCode?: string;
+};
 
 export interface AccountProfile {
   username: string;
@@ -18,12 +18,12 @@ export interface IAccountRepository {
     currentPassword: string;
     newPassword: string;
     newPasswordConfirm: string;
-  }): Promise<void>;
-  changeEmail(email: string): Promise<EmailVerificationIssued>;
-  requestEmailVerification(): Promise<EmailVerificationIssued | null>;
-  confirmEmailVerification(code: string): Promise<void>;
-  unlinkOAuth(provider: OAuthProviderId): Promise<void>;
-  requestPasswordReset(email: string): Promise<void>;
-  resetPassword(input: { token: string; password: string; passwordConfirm: string }): Promise<void>;
-  deleteAccount(input: { password?: string }): Promise<void>;
+  }): Promise<ApiSuccessResult>;
+  changeEmail(email: string): Promise<EmailVerificationSuccess>;
+  requestEmailVerification(): Promise<EmailVerificationSuccess>;
+  confirmEmailVerification(code: string): Promise<ApiSuccessResult>;
+  unlinkOAuth(provider: OAuthProviderId): Promise<ApiSuccessResult>;
+  requestPasswordReset(email: string): Promise<ApiSuccessResult>;
+  resetPassword(input: { token: string; password: string; passwordConfirm: string }): Promise<ApiSuccessResult>;
+  deleteAccount(input: { password?: string }): Promise<ApiSuccessResult>;
 }

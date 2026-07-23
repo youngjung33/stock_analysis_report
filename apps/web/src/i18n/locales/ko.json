@@ -126,6 +126,8 @@
     "orWithUsername": "또는 아이디로",
     "checkDuplicate": "중복 확인",
     "formatHint": "형식: {{hint}}",
+    "usernameHint": "3~32자, 영문·숫자·밑줄(_)",
+    "passwordHint": "8~64자, 영문과 숫자 각 1자 이상",
     "alreadyHaveAccount": "이미 계정이 있으신가요?",
     "noAccount": "계정이 없으신가요?",
     "forgotPassword": "비밀번호를 잊으셨나요?",
@@ -138,6 +140,14 @@
     "oauthLoading": "소셜 로그인 불러오는 중...",
     "oauthStartFailed": "소셜 로그인을 시작하지 못했습니다.",
     "oauthNotConfigured": "소셜 로그인은 관리자 설정 후 사용할 수 있습니다.",
+    "oauth": {
+      "signIn": {
+        "GOOGLE": "Google로 로그인",
+        "APPLE": "Apple로 로그인",
+        "NAVER": "네이버로 로그인",
+        "KAKAO": "카카오로 로그인"
+      }
+    },
     "guestLoginFailed": "비회원 로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.",
     "usernameChecking": "아이디 확인 중...",
     "usernameCheckFailed": "아이디 확인에 실패했습니다.",
@@ -145,11 +155,9 @@
     "forgotPasswordDesc": "가입 시 등록한 이메일로 재설정 링크를 보냅니다.",
     "forgotPasswordSubmit": "재설정 링크 받기",
     "forgotPasswordSending": "발송 중...",
-    "forgotPasswordSuccess": "등록된 이메일이 있으면 재설정 링크를 보냈습니다.",
     "resetPasswordTitle": "비밀번호 재설정",
     "resetPasswordSubmit": "비밀번호 변경",
     "resetPasswordChanging": "변경 중...",
-    "resetPasswordSuccess": "비밀번호가 변경되었습니다. 로그인해 주세요.",
     "resetPasswordFailed": "비밀번호 재설정에 실패했습니다.",
     "resetLinkInvalid": "유효하지 않은 재설정 링크입니다."
   },
@@ -178,16 +186,11 @@
     "deletePasswordConfirm": "비밀번호 확인",
     "deleteAccountButton": "회원탈퇴",
     "deleteConfirm": "탈퇴 시 거래·관심종목·연동 계정 등 모든 데이터가 삭제되며 복구할 수 없습니다. 정말 탈퇴할까요?",
-    "verificationCodeToast": "인증 코드: {{code}}",
     "loadProfileFailed": "계정 정보를 불러오지 못했습니다.",
     "changeEmailFailed": "이메일 변경에 실패했습니다.",
-    "alreadyVerified": "이미 인증된 이메일입니다.",
     "issueCodeFailed": "인증 코드 발급에 실패했습니다.",
-    "verifySuccess": "이메일 인증이 완료되었습니다.",
     "verifyFailed": "인증 코드가 올바르지 않습니다.",
-    "passwordChanged": "비밀번호가 변경되었습니다.",
     "passwordChangeFailed": "비밀번호 변경에 실패했습니다.",
-    "unlinkSuccess": "소셜 계정 연동을 해제했습니다.",
     "unlinkFailed": "연동 해제에 실패했습니다.",
     "deleteFailed": "회원탈퇴에 실패했습니다."
   },
@@ -213,6 +216,7 @@
     "AUTH_EMAIL_TAKEN": "이미 사용 중인 이메일입니다.",
     "AUTH_PASSWORD_INVALID": "비밀번호 형식이 올바르지 않습니다.",
     "AUTH_PASSWORD_MISMATCH": "비밀번호 확인이 일치하지 않습니다.",
+    "AUTH_PASSWORD_CONFIRM_REQUIRED": "비밀번호 확인을 입력해 주세요.",
     "AUTH_REGISTER_FIELDS_REQUIRED": "회원가입 필수 항목을 모두 입력해 주세요.",
     "AUTH_OAUTH_PROVIDER_INVALID": "지원하지 않는 소셜 로그인입니다.",
     "AUTH_OAUTH_NOT_CONFIGURED": "소셜 로그인이 아직 설정되지 않았습니다.",
@@ -224,10 +228,29 @@
     "AUTH_EMAIL_REQUIRED": "이메일이 필요합니다.",
     "CASH_INSUFFICIENT": "가용 현금이 부족합니다.",
     "CASH_AMOUNT_INVALID": "금액을 확인해 주세요.",
+    "STOCK_REQUIRED": "종목을 검색해서 선택해 주세요.",
+    "HOLDING_INSUFFICIENT": "보유 수량이 부족합니다.",
+    "TRANSACTION_QUANTITY_INVALID": "수량은 0보다 커야 합니다.",
+    "TRANSACTION_PRICE_INVALID": "단가는 0보다 커야 합니다.",
+    "AUTH_OAUTH_REDIRECT_URI_REQUIRED": "OAuth redirect URI가 필요합니다.",
+    "AUTH_OAUTH_CODE_STATE_REQUIRED": "OAuth code와 state가 필요합니다.",
     "dashboardLoadFailed": "투자 현황을 불러오지 못했습니다.",
     "marketAnalysisLoadFailed": "시장 분석을 불러오지 못했습니다.",
     "stockQuoteLoadFailed": "종목 시세를 불러오지 못했습니다.",
     "quoteRefreshFailed": "시세 갱신에 실패했습니다."
+  },
+  "success": {
+    "AUTH_USERNAME_AVAILABLE": "사용 가능한 아이디입니다.",
+    "AUTH_EMAIL_ALREADY_VERIFIED": "이미 인증된 이메일입니다.",
+    "AUTH_EMAIL_VERIFICATION_ISSUED": "인증 코드가 발급되었습니다.",
+    "AUTH_EMAIL_VERIFICATION_ISSUED_toast": "인증 코드: {{code}}",
+    "AUTH_EMAIL_VERIFIED": "이메일 인증이 완료되었습니다.",
+    "AUTH_PASSWORD_RESET_REQUESTED": "등록된 이메일이 있으면 비밀번호 재설정 링크를 보냈습니다.",
+    "AUTH_PASSWORD_CHANGED": "비밀번호가 변경되었습니다.",
+    "AUTH_PASSWORD_RESET_COMPLETE": "비밀번호가 변경되었습니다. 로그인해 주세요.",
+    "ACCOUNT_PASSWORD_CHANGED": "비밀번호가 변경되었습니다.",
+    "ACCOUNT_OAUTH_UNLINKED": "소셜 계정 연동을 해제했습니다.",
+    "ACCOUNT_DELETED": "회원탈퇴가 완료되었습니다."
   },
   "dashboard": {
     "title": "투자 현황",
@@ -276,6 +299,10 @@
     },
     "confirm": {
       "delete": "이 매매 내역을 삭제할까요?"
+    },
+    "memo": {
+      "trade": "{{symbol}} · {{side}}",
+      "dividend": "{{symbol}} · 배당"
     }
   },
   "corporateAction": {
@@ -1086,6 +1113,63 @@
             "defensive": "약세장에서도 버티는 종목은 변동성이 낮거나 실적·현금흐름이 받쳐주는 경우가 많습니다. 반등 시 상대적으로 늦게 따라오는 업종일 수 있습니다.",
             "watchlist": "혼조장에서는 상대강도·배당·실적 일정 등 개별 재료가 더 중요합니다."
           }
+        },
+        "evidence": {
+          "avgChange": "평균 등락 {{avg}}",
+          "upDownFlat": "상승 {{up}} · 하락 {{down}} · 보합 {{flat}}",
+          "dispersion": "등락률 표준편차 {{value}}% ({{level}})",
+          "dispersionLevel": {
+            "high": "분산 큼",
+            "normal": "분산 보통"
+          },
+          "leaderLaggard": "주도 {{leaderName}} {{leaderPct}} · 부진 {{laggardName}} {{laggardPct}}",
+          "sma20": "SMA20 {{value}} ({{position}})",
+          "sma200": "SMA200 {{value}} ({{position}})",
+          "smaValue": "{{label}} {{value}}",
+          "smaMissing": "{{label}} —",
+          "smaPosition": {
+            "above": "위",
+            "below": "아래"
+          },
+          "rangePosition": "52주(구간) 범위 내 위치 {{pct}}% {{zone}}",
+          "rangeZone": {
+            "high": "(고점 근접)",
+            "low": "(저점 근접)",
+            "mid": ""
+          },
+          "rangeMissing": "구간 위치 —",
+          "rsiValue": "RSI(14) = {{rsi}}",
+          "macdSign": "MACD(12,26) {{sign}} ({{macd}})",
+          "macdSignValue": {
+            "positive": "양수",
+            "negative": "음수"
+          },
+          "macdMissing": "MACD —",
+          "macdLine": "MACD {{macd}}",
+          "volumeRatio": "거래량 / 20일 평균 {{ratio}}배 {{activity}}",
+          "volumeActivity": {
+            "active": "(활발)",
+            "normal": ""
+          },
+          "volumeMissing": "거래량 —",
+          "bollingerBands": "상단 {{upper}} · 중심 {{middle}} · 하단 {{lower}}",
+          "pricePercentB": "현재가 {{price}} (%B {{percentB}})",
+          "stochK": "%K {{k}}",
+          "stochD": "%D {{d}}",
+          "macroCurrent": "현재 {{value}}",
+          "macroChange1d": "1일 변화 {{change}}",
+          "sectorLeader": "주도 {{sector}} RS(1주) {{rs1w}} · 1달 {{rs1mo}}",
+          "sectorLaggard": "부진 {{sector}} RS(1주) {{rs1w}}",
+          "sectorRank": "#{{rank}} {{sector}} {{change}} (RS1w {{rs1w}})",
+          "newsFinnhubSkip": "Finnhub 키 미설정 시 미국 Finnhub 뉴스 생략",
+          "newsRssDelay": "Google News RSS는 네트워크 상태에 따라 지연될 수 있음",
+          "newsArticleCount": "분석 기사 {{count}}건 · 긍정 {{bull}} · 부정 {{bear}}",
+          "newsHeadline": "{{headline}}",
+          "regionSentiment": "{{region}} 정세 {{sentiment}} (평균 {{avg}})",
+          "tempGap": "온도차 {{gap}}%p",
+          "recPrice": "현재가 {{price}} {{currency}}",
+          "recChange": "당일 등락 {{change}}",
+          "recTag": "태그: {{tag}}"
         }
       },
       "trends": {

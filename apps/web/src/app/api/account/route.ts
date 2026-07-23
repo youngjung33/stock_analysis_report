@@ -1,3 +1,4 @@
+import { AppSuccessCode, apiSuccessBody } from '@sar/shared';
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
@@ -34,7 +35,7 @@ export async function DELETE(req: NextRequest) {
     const refreshToken = getRefreshToken(req);
     await logoutUseCase.execute(refreshToken).catch(() => undefined);
 
-    const res = jsonData({ ok: true, message: '회원탈퇴가 완료되었습니다.' });
+    const res = jsonData(apiSuccessBody(AppSuccessCode.ACCOUNT_DELETED));
     clearAccessCookie(res);
     clearRefreshCookie(res);
     return res;

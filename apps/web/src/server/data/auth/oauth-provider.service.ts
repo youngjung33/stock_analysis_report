@@ -1,4 +1,5 @@
 import {
+  AppErrorCode,
   OAuthProvider,
   OAuthProviderId,
   OAuthUserProfile,
@@ -100,7 +101,7 @@ export class EnvOAuthProviderService implements IOAuthProviderPort {
   }): string {
     const config = providerConfig(input.provider);
     if (!config) {
-      throw new ValidationError(`${input.provider} OAuth가 설정되지 않았습니다.`);
+      throw new ValidationError(AppErrorCode.AUTH_OAUTH_NOT_CONFIGURED);
     }
 
     const params = new URLSearchParams({
@@ -122,7 +123,7 @@ export class EnvOAuthProviderService implements IOAuthProviderPort {
   }): Promise<OAuthUserProfile> {
     const config = providerConfig(input.provider);
     if (!config) {
-      throw new ValidationError(`${input.provider} OAuth가 설정되지 않았습니다.`);
+      throw new ValidationError(AppErrorCode.AUTH_OAUTH_NOT_CONFIGURED);
     }
 
     const body = new URLSearchParams({
@@ -144,7 +145,7 @@ export class EnvOAuthProviderService implements IOAuthProviderPort {
     });
 
     if (!tokenRes.ok) {
-      throw new ValidationError(`${input.provider} OAuth token 교환에 실패했습니다.`);
+      throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
     }
 
     const tokenJson = (await tokenRes.json()) as {
@@ -170,18 +171,18 @@ export class EnvOAuthProviderService implements IOAuthProviderPort {
       case OAuthProvider.KAKAO:
         return this.fetchKakaoProfile(accessToken);
       default:
-        throw new ValidationError('지원하지 않는 OAuth 제공자입니다.');
+        throw new ValidationError(AppErrorCode.AUTH_OAUTH_PROVIDER_INVALID);
     }
   }
 
   private async fetchGoogleProfile(accessToken?: string): Promise<OAuthUserProfile> {
-    if (!accessToken) throw new ValidationError('Google access token이 없습니다.');
+    if (!accessToken) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
     const res = await fetch('https://openidconnect.googleapis.com/v1/userinfo', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    if (!res.ok) throw new ValidationError('Google 프로필 조회에 실패했습니다.');
+    if (!res.ok) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
     const json = (await res.json()) as { sub?: string; email?: string; name?: string };
-    if (!json.sub) throw new ValidationError('Google 사용자 ID를 확인할 수 없습니다.');
+    if (!json.sub) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
     return {
       provider: OAuthProvider.GOOGLE,
       providerUserId: json.sub,
@@ -191,14 +192,14 @@ export class EnvOAuthProviderService implements IOAuthProviderPort {
   }
 
   private parseAppleIdToken(idToken?: string): Promise<OAuthUserProfile> {
-    if (!idToken) throw new ValidationError('Apple id_token이 없습니다.');
+    if (!idToken) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
     const payloadPart = idToken.split('.')[1];
-    if (!payloadPart) throw new ValidationError('Apple id_token 형식이 올바르지 않습니다.');
+    if (!payloadPart) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
     const json = JSON.parse(Buffer.from(payloadPart, 'base64url').toString('utf8')) as {
       sub?: string;
       email?: string;
     };
-    if (!json.sub) throw new ValidationError('Apple 사용자 ID를 확인할 수 없습니다.');
+    if (!json.sub) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
     return Promise.resolve({
       provider: OAuthProvider.APPLE,
       providerUserId: json.sub,
@@ -208,16 +209,16 @@ export class EnvOAuthProviderService implements IOAuthProviderPort {
   }
 
   private async fetchNaverProfile(accessToken?: string): Promise<OAuthUserProfile> {
-    if (!accessToken) throw new ValidationError('Naver access token이 없습니다.');
+    if (!accessToken) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
     const res = await fetch('https://openapi.naver.com/v1/nid/me', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    if (!res.ok) throw new ValidationError('Naver 프로필 조회에 실패했습니다.');
+    if (!res.ok) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
     const json = (await res.json()) as {
       response?: { id?: string; email?: string; name?: string; nickname?: string };
     };
     const profile = json.response;
-    if (!profile?.id) throw new ValidationError('Naver 사용자 ID를 확인할 수 없습니다.');
+    if (!profile?.id) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
     return {
       provider: OAuthProvider.NAVER,
       providerUserId: profile.id,
@@ -227,16 +228,16 @@ export class EnvOAuthProviderService implements IOAuthProviderPort {
   }
 
   private async fetchKakaoProfile(accessToken?: string): Promise<OAuthUserProfile> {
-    if (!accessToken) throw new ValidationError('Kakao access token이 없습니다.');
+    if (!accessToken) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
     const res = await fetch('https://kapi.kakao.com/v2/user/me', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    if (!res.ok) throw new ValidationError('Kakao 프로필 조회에 실패했습니다.');
+    if (!res.ok) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
     const json = (await res.json()) as {
       id?: number;
       kakao_account?: { email?: string; profile?: { nickname?: string } };
     };
-    if (!json.id) throw new ValidationError('Kakao 사용자 ID를 확인할 수 없습니다.');
+    if (!json.id) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
     return {
       provider: OAuthProvider.KAKAO,
       providerUserId: String(json.id),

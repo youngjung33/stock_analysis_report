@@ -1,3 +1,4 @@
+import { AppErrorCode, AppSuccessCode, apiSuccessBody } from '@sar/shared';
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
@@ -9,15 +10,15 @@ export async function POST(req: NextRequest) {
     enforceRateLimit(req, 'auth:change-email', 'authRegister');
     const user = requireAuth(req);
     const body = (await req.json()) as { email?: string };
-    if (!body.email?.trim()) throw new ValidationError('email is required');
+    if (!body.email?.trim()) throw new ValidationError(AppErrorCode.AUTH_EMAIL_REQUIRED);
 
     const { changeEmailUseCase } = getServerServices();
     const result = await changeEmailUseCase.execute({ userId: user.userId, email: body.email });
-    return jsonData({
-      ok: true,
-      verificationCode: result.verificationCode,
-      message: '인증 코드가 발급되었습니다.',
-    });
+    return jsonData(
+      apiSuccessBody(AppSuccessCode.AUTH_EMAIL_VERIFICATION_ISSUED, {
+        verificationCode: result.verificationCode,
+      }),
+    );
   } catch (error) {
     return handleRouteError(error);
   }

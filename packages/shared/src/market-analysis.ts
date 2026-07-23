@@ -42,6 +42,11 @@ export interface AnalysisLink {
   url: string;
 }
 
+export interface EvidenceItem {
+  key: string;
+  params?: Record<string, string | number>;
+}
+
 export interface AnalysisInsight {
   id: string;
   category: AnalysisCategory;
@@ -49,7 +54,9 @@ export interface AnalysisInsight {
   title: string;
   summary: string;
   reasoning: string;
+  /** @deprecated use evidenceItems — Korean fallback for tests */
   evidence: string[];
+  evidenceItems?: EvidenceItem[];
   links: AnalysisLink[];
   tone: AnalysisTone;
   market: Market | 'global';
@@ -234,6 +241,10 @@ function insight(
   return { ...partial, categoryLabel: CATEGORY_LABEL[partial.category] };
 }
 
+function ev(key: string, params?: Record<string, string | number>): EvidenceItem {
+  return { key, params };
+}
+
 function breadthInsights(
   kr: RegionSentiment,
   us: RegionSentiment,
@@ -304,6 +315,24 @@ function breadthInsights(
           `등락률 표준편차 ${dispersion !== null ? dispersion.toFixed(2) : '-'}% (분산 ${dispersion !== null && dispersion > 1.5 ? '큼' : '보통'})`,
           `주도 ${leader.name} ${formatPct(leader.changePercent)} · 부진 ${laggard.name} ${formatPct(laggard.changePercent)}`,
         ],
+        evidenceItems: [
+          ev('shared.market.insights.evidence.avgChange', { avg: formatPct(sentiment.avgChangePercent) }),
+          ev('shared.market.insights.evidence.upDownFlat', {
+            up: sentiment.upCount,
+            down: sentiment.downCount,
+            flat: sentiment.flatCount,
+          }),
+          ev('shared.market.insights.evidence.dispersion', {
+            value: dispersion !== null ? dispersion.toFixed(2) : '-',
+            levelKey: dispersion !== null && dispersion > 1.5 ? 'high' : 'normal',
+          }),
+          ev('shared.market.insights.evidence.leaderLaggard', {
+            leaderName: leader.name,
+            leaderPct: formatPct(leader.changePercent),
+            laggardName: laggard.name,
+            laggardPct: formatPct(laggard.changePercent),
+          }),
+        ],
         links: [
           {
             label: market === Market.KR ? '네이버 금융 코스피' : 'Yahoo S&P 500',
@@ -353,6 +382,30 @@ function indexInsights(indices: IndexTechnicalSnapshot[]): AnalysisInsight[] {
             ? `52주(구간) 범위 내 위치 ${idx.rangePositionPct.toFixed(0)}% ${idx.rangePositionPct > 80 ? '(고점 근접)' : idx.rangePositionPct < 20 ? '(저점 근접)' : ''}`
             : '구간 위치 —',
         ],
+        evidenceItems: [
+          idx.sma20 !== null
+            ? ev('shared.market.insights.evidence.sma20', {
+                value: formatNum(idx.sma20),
+                positionKey: idx.currentPrice >= idx.sma20 ? 'above' : 'below',
+              })
+            : ev('shared.market.insights.evidence.smaMissing', { label: 'SMA20' }),
+          idx.sma50 !== null
+            ? ev('shared.market.insights.evidence.smaValue', { label: 'SMA50', value: formatNum(idx.sma50) })
+            : ev('shared.market.insights.evidence.smaMissing', { label: 'SMA50' }),
+          idx.sma200 !== null
+            ? ev('shared.market.insights.evidence.sma200', {
+                value: formatNum(idx.sma200),
+                positionKey: idx.currentPrice >= idx.sma200 ? 'above' : 'below',
+              })
+            : ev('shared.market.insights.evidence.smaMissing', { label: 'SMA200' }),
+          idx.rangePositionPct !== null
+            ? ev('shared.market.insights.evidence.rangePosition', {
+                pct: idx.rangePositionPct.toFixed(0),
+                zoneKey:
+                  idx.rangePositionPct > 80 ? 'high' : idx.rangePositionPct < 20 ? 'low' : 'mid',
+              })
+            : ev('shared.market.insights.evidence.rangeMissing'),
+        ],
         links: [
           { label: 'Yahoo Finance 차트', url: idx.chartUrl },
           { label: 'TradingView', url: idx.tradingViewUrl },
@@ -397,6 +450,21 @@ function indexInsights(indices: IndexTechnicalSnapshot[]): AnalysisInsight[] {
               ? `거래량 / 20일 평균 ${idx.volumeRatio.toFixed(2)}배 ${idx.volumeRatio > 1.3 ? '(활발)' : ''}`
               : '거래량 —',
           ],
+          evidenceItems: [
+            ev('shared.market.insights.evidence.rsiValue', { rsi: idx.rsi14.toFixed(1) }),
+            idx.macd !== null
+              ? ev('shared.market.insights.evidence.macdSign', {
+                  signKey: idx.macd >= 0 ? 'positive' : 'negative',
+                  macd: idx.macd.toFixed(2),
+                })
+              : ev('shared.market.insights.evidence.macdMissing'),
+            idx.volumeRatio !== null
+              ? ev('shared.market.insights.evidence.volumeRatio', {
+                  ratio: idx.volumeRatio.toFixed(2),
+                  activeKey: idx.volumeRatio > 1.3 ? 'active' : 'normal',
+                })
+              : ev('shared.market.insights.evidence.volumeMissing'),
+          ],
           links: [
             { label: 'Investopedia RSI', url: 'https://www.investopedia.com/terms/r/rsi.asp' },
             { label: 'Yahoo Finance 차트', url: idx.chartUrl },
@@ -430,6 +498,10 @@ function indexInsights(indices: IndexTechnicalSnapshot[]): AnalysisInsight[] {
           },
           reasoningKey: 'shared.market.insights.indexMacd.reasoning',
           evidence: [`MACD ${idx.macd.toFixed(2)}`, `SMA20 ${formatNum(idx.sma20)}`],
+          evidenceItems: [
+            ev('shared.market.insights.evidence.macdLine', { macd: idx.macd.toFixed(2) }),
+            ev('shared.market.insights.evidence.smaValue', { label: 'SMA20', value: formatNum(idx.sma20) }),
+          ],
           links: [
             { label: 'Investopedia MACD', url: 'https://www.investopedia.com/terms/m/macd.asp' },
             { label: 'TradingView', url: idx.tradingViewUrl },
@@ -464,6 +536,17 @@ function indexInsights(indices: IndexTechnicalSnapshot[]): AnalysisInsight[] {
             `상단 ${formatNum(bb.upper)} · 중심 ${formatNum(bb.middle)} · 하단 ${formatNum(bb.lower)}`,
             `현재가 ${formatNum(idx.currentPrice)} (%B ${bb.percentB.toFixed(2)})`,
           ],
+          evidenceItems: [
+            ev('shared.market.insights.evidence.bollingerBands', {
+              upper: formatNum(bb.upper),
+              middle: formatNum(bb.middle),
+              lower: formatNum(bb.lower),
+            }),
+            ev('shared.market.insights.evidence.pricePercentB', {
+              price: formatNum(idx.currentPrice),
+              percentB: bb.percentB.toFixed(2),
+            }),
+          ],
           links: [
             { label: 'Investopedia Bollinger', url: 'https://www.investopedia.com/terms/b/bollingerbands.asp' },
             { label: 'Yahoo 차트', url: idx.chartUrl },
@@ -496,6 +579,11 @@ function indexInsights(indices: IndexTechnicalSnapshot[]): AnalysisInsight[] {
           summaryKey: 'shared.market.insights.indexStoch.summary',
           reasoningKey: 'shared.market.insights.indexStoch.reasoning',
           evidence: [`%K ${st.k.toFixed(1)}`, `%D ${st.d.toFixed(1)}`, `상태: ${st.label}`],
+          evidenceItems: [
+            ev('shared.market.insights.evidence.stochK', { k: st.k.toFixed(1) }),
+            ev('shared.market.insights.evidence.stochD', { d: st.d.toFixed(1) }),
+            ev(st.labelKey),
+          ],
           links: [
             { label: 'Investopedia Stochastic', url: 'https://www.investopedia.com/terms/s/stochasticoscillator.asp' },
             { label: 'TradingView', url: idx.tradingViewUrl },
@@ -532,6 +620,19 @@ function macroPanelInsights(macro: MacroIndicatorSnapshot[]): AnalysisInsight[] 
         `현재 ${m.unit === 'krw' ? `${m.value.toFixed(1)}원` : m.unit === 'pct' ? `${m.value.toFixed(2)}%` : m.value.toFixed(2)}`,
         `1일 변화 ${formatPct(m.changePercent1d)}`,
         `해석: ${m.interpretLabel}`,
+      ],
+      evidenceItems: [
+        ev('shared.market.insights.evidence.macroCurrent', {
+          value:
+            m.unit === 'krw'
+              ? `${m.value.toFixed(1)}`
+              : m.unit === 'pct'
+                ? `${m.value.toFixed(2)}%`
+                : m.value.toFixed(2),
+          unitKey: m.unit,
+        }),
+        ev('shared.market.insights.evidence.macroChange1d', { change: formatPct(m.changePercent1d) }),
+        ev(m.interpretKey),
       ],
       links: [
         { label: 'Yahoo Finance', url: m.chartUrl },
@@ -588,6 +689,25 @@ function sectorInsights(sectors: SectorEtfSnapshot[]): AnalysisInsight[] {
               `#${s.strengthRank} ${s.sectorLabel} ${formatPct(s.changePercent1d)} (RS1w ${formatPct(s.rsBenchmark1w)})`,
           ),
         ],
+        evidenceItems: [
+          ev('shared.market.insights.evidence.sectorLeader', {
+            sector: leader.sectorLabel,
+            rs1w: formatPct(leader.rsBenchmark1w),
+            rs1mo: formatPct(leader.rsBenchmark1mo),
+          }),
+          ev('shared.market.insights.evidence.sectorLaggard', {
+            sector: laggard.sectorLabel,
+            rs1w: formatPct(laggard.rsBenchmark1w),
+          }),
+          ...list.map((s) =>
+            ev('shared.market.insights.evidence.sectorRank', {
+              rank: s.strengthRank,
+              sector: s.sectorLabel,
+              change: formatPct(s.changePercent1d),
+              rs1w: formatPct(s.rsBenchmark1w),
+            }),
+          ),
+        ],
         links: list.slice(0, 4).map((s) => ({ label: s.sectorLabel, url: s.chartUrl })),
         tone: (leader.rsBenchmark1w ?? 0) > 1 ? 'bullish' : (laggard.rsBenchmark1w ?? 0) < -1 ? 'bearish' : 'neutral',
         market,
@@ -624,6 +744,10 @@ function newsInsights(news: NewsAnalysisInput[]): AnalysisInsight[] {
         summaryKey: 'shared.market.insights.newsEmpty.summary',
         reasoningKey: 'shared.market.insights.newsEmpty.reasoning',
         evidence: ['Finnhub 키 미설정 시 미국 Finnhub 뉴스 생략', 'Google News RSS는 네트워크 상태에 따라 지연될 수 있음'],
+        evidenceItems: [
+          ev('shared.market.insights.evidence.newsFinnhubSkip'),
+          ev('shared.market.insights.evidence.newsRssDelay'),
+        ],
         links: [
           { label: 'Google 뉴스 — 코스피', url: 'https://news.google.com/search?q=코스피+증시&hl=ko' },
           { label: 'Google 뉴스 — US market', url: 'https://news.google.com/search?q=US+stock+market&hl=en-US' },
@@ -668,6 +792,16 @@ function newsInsights(news: NewsAnalysisInput[]): AnalysisInsight[] {
         evidence: [
           `분석 기사 ${subset.length}건 · 긍정 ${bull} · 부정 ${bear}`,
           ...headlines,
+        ],
+        evidenceItems: [
+          ev('shared.market.insights.evidence.newsArticleCount', {
+            count: subset.length,
+            bull,
+            bear,
+          }),
+          ...headlines.map((headline) =>
+            ev('shared.market.insights.evidence.newsHeadline', { headline }),
+          ),
         ],
         links: subset.slice(0, 5).map((n) => ({ label: n.source, url: n.url })),
         tone,
@@ -714,6 +848,19 @@ function macroInsight(kr: RegionSentiment, us: RegionSentiment): AnalysisInsight
       `미국 정세 ${us.label} (평균 ${formatPct(us.avgChangePercent)})`,
       `온도차 ${Math.abs(krAvg - usAvg).toFixed(2)}%p`,
     ],
+    evidenceItems: [
+      ev('shared.market.insights.evidence.regionSentiment', {
+        regionKey: 'kr',
+        labelKey: kr.label,
+        avg: formatPct(kr.avgChangePercent),
+      }),
+      ev('shared.market.insights.evidence.regionSentiment', {
+        regionKey: 'us',
+        labelKey: us.label,
+        avg: formatPct(us.avgChangePercent),
+      }),
+      ev('shared.market.insights.evidence.tempGap', { gap: Math.abs(krAvg - usAvg).toFixed(2) }),
+    ],
     links: [
       { label: 'Investing.com 환율', url: 'https://www.investing.com/currencies/usd-krw' },
       { label: 'FRED 경제지표', url: 'https://fred.stlouisfed.org/' },
@@ -747,6 +894,14 @@ function recommendationInsights(recommendations: StockRecommendation[]): Analysi
         `현재가 ${rec.currentPrice.toLocaleString()} ${rec.currency}`,
         `당일 등락 ${formatPct(rec.changePercent)}`,
         `태그: ${rec.tagLabel}`,
+      ],
+      evidenceItems: [
+        ev('shared.market.insights.evidence.recPrice', {
+          price: rec.currentPrice.toLocaleString(),
+          currency: rec.currency,
+        }),
+        ev('shared.market.insights.evidence.recChange', { change: formatPct(rec.changePercent) }),
+        ev('shared.market.insights.evidence.recTag', { tagKey: rec.tag }),
       ],
       links: [
         {

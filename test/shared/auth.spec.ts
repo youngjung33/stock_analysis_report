@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { AppErrorCode } from '@sar/shared';
 import {
   OAuthProvider,
   proposeUsernameFromOAuthProfile,
@@ -59,7 +60,7 @@ describe('validateRegisterInput', () => {
         password: 'password1',
         passwordConfirm: 'password2',
       }),
-    ).toBe('비밀번호 확인이 일치하지 않습니다.');
+    ).toBe('AUTH_PASSWORD_MISMATCH');
   });
 
   it('returns field errors map', () => {

@@ -1,4 +1,4 @@
-import { Market, TransactionType, CorporateActionType, CashLedgerType, computeCashBalances, DEFAULT_PORTFOLIO_PREFERENCES, type CashCurrency } from '@sar/shared';
+import { Market, TransactionType, CorporateActionType, CashLedgerType, computeCashBalances, DEFAULT_PORTFOLIO_PREFERENCES, formatDividendLedgerMemo, type CashCurrency } from '@sar/shared';
 import { Stock, Transaction, WatchlistItem } from '../../domain/models';
 
 const STORAGE_KEY = 'sar_guest_data';
@@ -188,7 +188,7 @@ export function saveGuestCorporateAction(input: {
       currency: stock.currency === 'USD' ? 'USD' : 'KRW',
       type: CashLedgerType.DIVIDEND,
       amount: input.cashAmount,
-      memo: input.memo ?? `${stock.symbol} 배당`,
+      memo: input.memo ?? formatDividendLedgerMemo(stock.symbol),
       refId: id,
       occurredAt: input.effectiveAt,
     });

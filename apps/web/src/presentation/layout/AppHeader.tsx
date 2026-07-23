@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { LogOut, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { LanguageSelector } from '../components/LanguageSelector';
 import { useAuth } from '../hooks/useAuth';
 import { cn } from '../lib/cn';
 
@@ -33,6 +34,7 @@ export function AppHeader({ title, subtitle, actions, className, showMobileLogou
           )}
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          <LanguageSelector variant="compact" />
           {actions}
           {!isGuest && (
             <Link

@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { translateLedgerMemo } from '@/i18n/translate-memo';
 import { useTransactionList } from '../../hooks/screens/useTransactionList';
 import { formatNumber } from '../../shared/formatters';
 
@@ -64,7 +65,7 @@ function TransactionTable({
               <td className="px-4 py-3 text-slate-300">
                 {formatNumber(tx.price, tx.stock?.currency)}
               </td>
-              <td className="px-4 py-3 text-slate-500">{tx.memo ?? '-'}</td>
+              <td className="px-4 py-3 text-slate-500">{translateLedgerMemo(tx.memo, t)}</td>
               <td className="px-4 py-3">
                 <button
                   type="button"
@@ -124,7 +125,7 @@ function TransactionCardList({
             </div>
             <div>
               <dt className="text-slate-500">{t('common.memo')}</dt>
-              <dd className="text-slate-400">{tx.memo ?? '-'}</dd>
+              <dd className="text-slate-400">{translateLedgerMemo(tx.memo, t)}</dd>
             </div>
           </dl>
           <button

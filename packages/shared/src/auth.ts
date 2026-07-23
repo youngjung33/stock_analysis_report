@@ -1,5 +1,5 @@
 /** SSO OAuth 제공자 (4종) */
-import { AppErrorCode, type ApiErrorBody } from './app-error-codes';
+import { AppErrorCode, APP_ERROR_MESSAGES, type ApiErrorBody } from './app-error-codes';
 
 export enum OAuthProvider {
   GOOGLE = 'GOOGLE',
@@ -21,6 +21,7 @@ export interface OAuthProviderMeta {
   id: OAuthProviderId;
   label: string;
   signInButtonSrc: string;
+  /** @deprecated UI uses auth.oauth.signIn.{id} locale key */
   signInButtonAlt: string;
 }
 
@@ -70,7 +71,7 @@ export interface OAuthUserProfile {
 
 export type RegisterField = 'username' | 'password' | 'passwordConfirm' | 'email';
 
-export type RegisterFieldErrors = Partial<Record<RegisterField, string>>;
+export type RegisterFieldErrors = Partial<Record<RegisterField, AppErrorCode>>;
 
 /** UI 안내 문구 */
 export const AUTH_USERNAME_HINT = '3~32자, 영문·숫자·밑줄(_)';
@@ -93,6 +94,14 @@ export function validateUsernameFormat(username: string): string | null {
   return null;
 }
 
+/** 아이디 형식 검증 — API 응답 code용 */
+export function validateUsernameFormatCode(username: string): AppErrorCode | null {
+  const trimmed = username.trim();
+  if (!trimmed) return AppErrorCode.AUTH_USERNAME_INVALID;
+  if (!USERNAME_PATTERN.test(trimmed)) return AppErrorCode.AUTH_USERNAME_INVALID;
+  return null;
+}
+
 export function validatePasswordFormat(password: string): string | null {
   if (!password) return '비밀번호를 입력해 주세요.';
   if (password.length < 8) {
@@ -107,39 +116,45 @@ export function validatePasswordFormat(password: string): string | null {
   return null;
 }
 
+export function validatePasswordFormatCode(password: string): AppErrorCode | null {
+  if (!password) return AppErrorCode.AUTH_PASSWORD_INVALID;
+  if (password.length < 8 || password.length > 64) return AppErrorCode.AUTH_PASSWORD_INVALID;
+  if (!PASSWORD_PATTERN.test(password)) return AppErrorCode.AUTH_PASSWORD_INVALID;
+  return null;
+}
+
 export function validateRegisterFields(input: RegisterInput): RegisterFieldErrors {
   const errors: RegisterFieldErrors = {};
   const username = input.username.trim();
   const email = input.email?.trim() ?? '';
 
-  const usernameError = validateUsernameFormat(username);
+  const usernameError = validateUsernameFormatCode(username);
   if (usernameError) errors.username = usernameError;
 
-  const passwordError = validatePasswordFormat(input.password);
+  const passwordError = validatePasswordFormatCode(input.password);
   if (passwordError) errors.password = passwordError;
 
   if (!input.passwordConfirm) {
-    errors.passwordConfirm = '비밀번호 확인을 입력해 주세요.';
+    errors.passwordConfirm = AppErrorCode.AUTH_PASSWORD_CONFIRM_REQUIRED;
   } else if (input.passwordConfirm !== input.password) {
-    errors.passwordConfirm = '비밀번호 확인이 일치하지 않습니다.';
+    errors.passwordConfirm = AppErrorCode.AUTH_PASSWORD_MISMATCH;
   }
 
   if (email && !EMAIL_PATTERN.test(email)) {
-    errors.email = '올바른 이메일 형식이 아닙니다. (예: name@example.com)';
+    errors.email = AppErrorCode.AUTH_EMAIL_INVALID;
   }
 
   return errors;
 }
 
-export function validateRegisterInput(input: RegisterInput): string | null {
+export function validateRegisterInput(input: RegisterInput): AppErrorCode | null {
   const errors = validateRegisterFields(input);
-  const first = Object.values(errors)[0];
-  return first ?? null;
+  return Object.values(errors)[0] ?? null;
 }
 
-export function validateLoginInput(username: string, password: string): string | null {
+export function validateLoginInput(username: string, password: string): AppErrorCode | null {
   if (!username.trim() || !password.trim()) {
-    return '아이디와 비밀번호를 입력해 주세요.';
+    return AppErrorCode.AUTH_LOGIN_REQUIRED;
   }
   return null;
 }
@@ -181,16 +196,16 @@ export function withUsernameSuffix(base: string, attempt: number): string {
 export function getRegisterValidationError(input: RegisterInput): ApiErrorBody | null {
   const fields = validateRegisterFields(input);
   if (fields.username) {
-    return { code: AppErrorCode.AUTH_USERNAME_INVALID, message: fields.username };
+    return { code: fields.username, message: APP_ERROR_MESSAGES[fields.username] };
   }
   if (fields.password) {
-    return { code: AppErrorCode.AUTH_PASSWORD_INVALID, message: fields.password };
+    return { code: fields.password, message: APP_ERROR_MESSAGES[fields.password] };
   }
   if (fields.passwordConfirm) {
-    return { code: AppErrorCode.AUTH_PASSWORD_MISMATCH, message: fields.passwordConfirm };
+    return { code: fields.passwordConfirm, message: APP_ERROR_MESSAGES[fields.passwordConfirm] };
   }
   if (fields.email) {
-    return { code: AppErrorCode.AUTH_EMAIL_INVALID, message: fields.email };
+    return { code: fields.email, message: APP_ERROR_MESSAGES[fields.email] };
   }
   return null;
 }

@@ -20,6 +20,7 @@ export const AppErrorCode = {
   AUTH_EMAIL_TAKEN: 'AUTH_EMAIL_TAKEN',
   AUTH_PASSWORD_INVALID: 'AUTH_PASSWORD_INVALID',
   AUTH_PASSWORD_MISMATCH: 'AUTH_PASSWORD_MISMATCH',
+  AUTH_PASSWORD_CONFIRM_REQUIRED: 'AUTH_PASSWORD_CONFIRM_REQUIRED',
   AUTH_REGISTER_FIELDS_REQUIRED: 'AUTH_REGISTER_FIELDS_REQUIRED',
 
   AUTH_OAUTH_PROVIDER_INVALID: 'AUTH_OAUTH_PROVIDER_INVALID',
@@ -34,6 +35,14 @@ export const AppErrorCode = {
 
   CASH_INSUFFICIENT: 'CASH_INSUFFICIENT',
   CASH_AMOUNT_INVALID: 'CASH_AMOUNT_INVALID',
+
+  STOCK_REQUIRED: 'STOCK_REQUIRED',
+  HOLDING_INSUFFICIENT: 'HOLDING_INSUFFICIENT',
+  TRANSACTION_QUANTITY_INVALID: 'TRANSACTION_QUANTITY_INVALID',
+  TRANSACTION_PRICE_INVALID: 'TRANSACTION_PRICE_INVALID',
+
+  AUTH_OAUTH_REDIRECT_URI_REQUIRED: 'AUTH_OAUTH_REDIRECT_URI_REQUIRED',
+  AUTH_OAUTH_CODE_STATE_REQUIRED: 'AUTH_OAUTH_CODE_STATE_REQUIRED',
 } as const;
 
 export type AppErrorCode = (typeof AppErrorCode)[keyof typeof AppErrorCode];
@@ -75,6 +84,7 @@ export const APP_ERROR_MESSAGES: Record<AppErrorCode, string> = {
   [AppErrorCode.AUTH_EMAIL_TAKEN]: '이미 사용 중인 이메일입니다.',
   [AppErrorCode.AUTH_PASSWORD_INVALID]: '비밀번호 형식이 올바르지 않습니다.',
   [AppErrorCode.AUTH_PASSWORD_MISMATCH]: '비밀번호 확인이 일치하지 않습니다.',
+  [AppErrorCode.AUTH_PASSWORD_CONFIRM_REQUIRED]: '비밀번호 확인을 입력해 주세요.',
   [AppErrorCode.AUTH_REGISTER_FIELDS_REQUIRED]: '회원가입 필수 항목을 모두 입력해 주세요.',
 
   [AppErrorCode.AUTH_OAUTH_PROVIDER_INVALID]: '지원하지 않는 소셜 로그인입니다.',
@@ -89,6 +99,14 @@ export const APP_ERROR_MESSAGES: Record<AppErrorCode, string> = {
 
   [AppErrorCode.CASH_INSUFFICIENT]: '가용 현금이 부족합니다.',
   [AppErrorCode.CASH_AMOUNT_INVALID]: '금액을 확인해 주세요.',
+
+  [AppErrorCode.STOCK_REQUIRED]: '종목을 검색해서 선택해 주세요.',
+  [AppErrorCode.HOLDING_INSUFFICIENT]: '보유 수량이 부족합니다.',
+  [AppErrorCode.TRANSACTION_QUANTITY_INVALID]: '수량은 0보다 커야 합니다.',
+  [AppErrorCode.TRANSACTION_PRICE_INVALID]: '단가는 0보다 커야 합니다.',
+
+  [AppErrorCode.AUTH_OAUTH_REDIRECT_URI_REQUIRED]: 'OAuth redirect URI가 필요합니다.',
+  [AppErrorCode.AUTH_OAUTH_CODE_STATE_REQUIRED]: 'OAuth code와 state가 필요합니다.',
 };
 
 const CODE_SET = new Set<string>(Object.values(AppErrorCode));

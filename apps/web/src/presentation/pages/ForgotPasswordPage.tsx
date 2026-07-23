@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
-import { getErrorMessage } from '@/client/domain/errors/app-error';
+import { formatApiSuccessMessage, getErrorMessage } from '@/client/domain/errors/app-error';
+import { FixedLanguageSelector } from '@/presentation/components/LanguageSelector';
 import { useToast } from '@/presentation/components/Toast';
 import { useServices } from '@/presentation/hooks/useServices';
 import { APP_BRAND } from '@/presentation/layout';
@@ -19,8 +20,8 @@ export function ForgotPasswordPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await requestPasswordResetUseCase.execute(email.trim());
-      showSuccess(t('auth.forgotPasswordSuccess'));
+      const result = await requestPasswordResetUseCase.execute(email.trim());
+      showSuccess(formatApiSuccessMessage(result));
     } catch (err) {
       showError(getErrorMessage(err, t('common.requestFailed')));
     } finally {
@@ -30,6 +31,7 @@ export function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-background px-4 py-10">
+      <FixedLanguageSelector />
       <p className="text-center text-lg font-semibold">{APP_BRAND.name}</p>
       <form
         onSubmit={handleSubmit}

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { OAuthProvider } from '@sar/shared';
+import { AppSuccessCode, OAuthProvider } from '@sar/shared';
 import {
   ChangeEmailUseCase,
   ChangePasswordUseCase,
@@ -29,6 +29,7 @@ describe('ChangeEmailUseCase (client)', () => {
     const result = await useCase.execute('new@example.com');
 
     expect(result.verificationCode).toBe('123456');
+    expect(result.code).toBe(AppSuccessCode.AUTH_EMAIL_VERIFICATION_ISSUED);
     expect(repo.changeEmail).toHaveBeenCalledWith('new@example.com');
   });
 });
@@ -57,7 +58,8 @@ describe('RequestEmailVerificationUseCase (client)', () => {
     const useCase = new RequestEmailVerificationUseCase(repo);
     const result = await useCase.execute();
 
-    expect(result?.verificationCode).toBe('654321');
+    expect(result.verificationCode).toBe('654321');
+    expect(result.code).toBe(AppSuccessCode.AUTH_EMAIL_VERIFICATION_ISSUED);
     expect(repo.requestEmailVerification).toHaveBeenCalled();
   });
 });

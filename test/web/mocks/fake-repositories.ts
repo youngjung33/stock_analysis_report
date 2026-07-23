@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import { Market, OAuthProvider, OAUTH_PROVIDER_META, TransactionType } from '@sar/shared';
+import { AppSuccessCode, Market, OAuthProvider, OAUTH_PROVIDER_META, TransactionType } from '@sar/shared';
 import {
   IAuthRepository,
   IAccountRepository,
@@ -22,7 +22,7 @@ export function createFakeAuthRepository(
     listOAuthProviders: vi.fn().mockResolvedValue([OAUTH_PROVIDER_META[OAuthProvider.GOOGLE]]),
     checkUsernameAvailability: vi.fn().mockResolvedValue({
       available: true,
-      message: '사용 가능한 아이디입니다.',
+      code: 'AUTH_USERNAME_AVAILABLE',
     }),
     startOAuthLogin: vi.fn().mockResolvedValue({
       authorizationUrl: 'https://oauth.example/authorize',
@@ -45,14 +45,20 @@ export function createFakeAccountRepository(
       hasPassword: true,
       oauthAccounts: [],
     }),
-    changePassword: vi.fn().mockResolvedValue(undefined),
-    changeEmail: vi.fn().mockResolvedValue({ verificationCode: '123456' }),
-    requestEmailVerification: vi.fn().mockResolvedValue({ verificationCode: '654321' }),
-    confirmEmailVerification: vi.fn().mockResolvedValue(undefined),
-    unlinkOAuth: vi.fn().mockResolvedValue(undefined),
-    requestPasswordReset: vi.fn().mockResolvedValue(undefined),
-    resetPassword: vi.fn().mockResolvedValue(undefined),
-    deleteAccount: vi.fn().mockResolvedValue(undefined),
+    changePassword: vi.fn().mockResolvedValue({ code: AppSuccessCode.ACCOUNT_PASSWORD_CHANGED }),
+    changeEmail: vi.fn().mockResolvedValue({
+      code: AppSuccessCode.AUTH_EMAIL_VERIFICATION_ISSUED,
+      verificationCode: '123456',
+    }),
+    requestEmailVerification: vi.fn().mockResolvedValue({
+      code: AppSuccessCode.AUTH_EMAIL_VERIFICATION_ISSUED,
+      verificationCode: '654321',
+    }),
+    confirmEmailVerification: vi.fn().mockResolvedValue({ code: AppSuccessCode.AUTH_EMAIL_VERIFIED }),
+    unlinkOAuth: vi.fn().mockResolvedValue({ code: AppSuccessCode.ACCOUNT_OAUTH_UNLINKED }),
+    requestPasswordReset: vi.fn().mockResolvedValue({ code: AppSuccessCode.AUTH_PASSWORD_RESET_REQUESTED }),
+    resetPassword: vi.fn().mockResolvedValue({ code: AppSuccessCode.AUTH_PASSWORD_RESET_COMPLETE }),
+    deleteAccount: vi.fn().mockResolvedValue({ code: AppSuccessCode.ACCOUNT_DELETED }),
     ...overrides,
   };
 }

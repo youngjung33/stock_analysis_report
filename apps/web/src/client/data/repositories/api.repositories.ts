@@ -32,6 +32,7 @@ import { apiClient } from '../api/client';
 import { tokenStorage } from '../auth/token-storage';
 import { AppErrorCode } from '@sar/shared';
 import { toAppError } from '../../domain/errors/api-error';
+import type { UsernameCheckResult } from '../../domain/errors/api-success';
 
 export class ApiAuthRepository implements IAuthRepository {
   async login(username: string, password: string): Promise<LoginResult> {
@@ -54,7 +55,7 @@ export class ApiAuthRepository implements IAuthRepository {
 
   async checkUsernameAvailability(username: string) {
     try {
-      const { data } = await apiClient.get<{ available: boolean; message: string }>(
+      const { data } = await apiClient.get<UsernameCheckResult>(
         '/auth/check-username',
         { params: { username } },
       );

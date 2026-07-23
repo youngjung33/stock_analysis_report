@@ -1,4 +1,4 @@
-import { AppErrorCode, CashLedgerType, TransactionType, computePosition } from '@sar/shared';
+import { AppErrorCode, CashLedgerType, TransactionType, computePosition, formatTradeLedgerMemo } from '@sar/shared';
 import { AppError } from '../../domain/errors/app-error';
 import { CreateTransactionInput, Transaction } from '../../domain/models';
 import { ITransactionRepository } from '../../domain/repositories';
@@ -16,7 +16,7 @@ import {
 export class GuestTransactionRepository implements ITransactionRepository {
   async create(input: CreateTransactionInput): Promise<Transaction> {
     if (!input.name?.trim()) {
-      throw new AppError('종목을 검색해서 선택해 주세요.');
+      throw new AppError('', AppErrorCode.STOCK_REQUIRED);
     }
 
     const stock = createGuestStock(input.stockSymbol, input.market, input.name);
@@ -34,7 +34,7 @@ export class GuestTransactionRepository implements ITransactionRepository {
         })),
       ).quantity;
       if (input.quantity > held) {
-        throw new AppError(`보유 수량이 부족합니다. 현재: ${held}`);
+        throw new AppError('', AppErrorCode.HOLDING_INSUFFICIENT);
       }
     }
 
@@ -42,7 +42,7 @@ export class GuestTransactionRepository implements ITransactionRepository {
       const balances = getGuestCashBalances();
       const available = currency === 'KRW' ? balances.krw : balances.usd;
       if (available < notional) {
-        throw new AppError('가용 현금이 부족합니다.', AppErrorCode.CASH_INSUFFICIENT);
+        throw new AppError('', AppErrorCode.CASH_INSUFFICIENT);
       }
     }
 
@@ -66,7 +66,10 @@ export class GuestTransactionRepository implements ITransactionRepository {
         input.type === TransactionType.BUY ? CashLedgerType.BUY_SETTLE : CashLedgerType.SELL_SETTLE,
       amount: notional,
       refId: tx.id,
-      memo: `${stock.symbol} ${input.type === TransactionType.BUY ? '매수' : '매도'}`,
+      memo: formatTradeLedgerMemo(
+        stock.symbol,
+        input.type === TransactionType.BUY ? 'BUY' : 'SELL',
+      ),
       occurredAt: input.tradedAt,
     });
 

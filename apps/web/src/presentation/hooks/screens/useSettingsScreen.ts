@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { OAUTH_PROVIDER_META, OAuthProviderId } from '@sar/shared';
-import { getErrorMessage } from '@/client/domain/errors/app-error';
+import { formatApiSuccessMessage, getErrorMessage } from '@/client/domain/errors/app-error';
 import { useToast } from '../../components/Toast';
 import { useAuth } from '../useAuth';
 import { useServices } from '../useServices';
@@ -63,7 +63,7 @@ export function useSettingsScreen() {
     setSaving(true);
     try {
       const result = await changeEmailUseCase.execute(email.trim());
-      showSuccess(t('settings.verificationCodeToast', { code: result.verificationCode }));
+      showSuccess(formatApiSuccessMessage(result));
       setVerificationCode('');
       await reload();
     } catch (err) {
@@ -77,11 +77,7 @@ export function useSettingsScreen() {
     setSaving(true);
     try {
       const result = await requestEmailVerificationUseCase.execute();
-      if (!result) {
-        showSuccess(t('settings.alreadyVerified'));
-        return;
-      }
-      showSuccess(t('settings.verificationCodeToast', { code: result.verificationCode }));
+      showSuccess(formatApiSuccessMessage(result));
     } catch (err) {
       showError(getErrorMessage(err, t('settings.issueCodeFailed')));
     } finally {
@@ -93,8 +89,8 @@ export function useSettingsScreen() {
     e.preventDefault();
     setSaving(true);
     try {
-      await confirmEmailVerificationUseCase.execute(verificationCode.trim());
-      showSuccess(t('settings.verifySuccess'));
+      const result = await confirmEmailVerificationUseCase.execute(verificationCode.trim());
+      showSuccess(formatApiSuccessMessage(result));
       setVerificationCode('');
       await reload();
     } catch (err) {
@@ -108,12 +104,12 @@ export function useSettingsScreen() {
     e.preventDefault();
     setSaving(true);
     try {
-      await changePasswordUseCase.execute({
+      const result = await changePasswordUseCase.execute({
         currentPassword,
         newPassword,
         newPasswordConfirm,
       });
-      showSuccess(t('settings.passwordChanged'));
+      showSuccess(formatApiSuccessMessage(result));
       setCurrentPassword('');
       setNewPassword('');
       setNewPasswordConfirm('');
@@ -129,8 +125,8 @@ export function useSettingsScreen() {
     if (!confirm(t('settings.unlinkConfirm', { provider: OAUTH_PROVIDER_META[provider].label }))) return;
     setSaving(true);
     try {
-      await unlinkOAuthUseCase.execute(provider);
-      showSuccess(t('settings.unlinkSuccess'));
+      const result = await unlinkOAuthUseCase.execute(provider);
+      showSuccess(formatApiSuccessMessage(result));
       await reload();
     } catch (err) {
       showError(getErrorMessage(err, t('settings.unlinkFailed')));

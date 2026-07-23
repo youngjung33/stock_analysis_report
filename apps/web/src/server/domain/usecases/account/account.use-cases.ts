@@ -3,7 +3,7 @@ import {
   AuthTokenType,
   OAuthProviderId,
   isOAuthProvider,
-  validatePasswordFormat,
+  validatePasswordFormatCode,
 } from '@sar/shared';
 import { AuthenticationError, ConflictError, ValidationError } from '../../errors/domain.errors';
 import { IEmailSenderPort } from '../../ports/email-sender.port';
@@ -75,8 +75,8 @@ export class ChangePasswordUseCase {
     if (input.newPassword !== input.newPasswordConfirm) {
       throw new ValidationError(AppErrorCode.AUTH_PASSWORD_MISMATCH);
     }
-    const pwError = validatePasswordFormat(input.newPassword);
-    if (pwError) throw new ValidationError(AppErrorCode.AUTH_PASSWORD_INVALID, pwError);
+    const pwError = validatePasswordFormatCode(input.newPassword);
+    if (pwError) throw new ValidationError(pwError);
 
     const user = await this.userRepo.findById(input.userId);
     if (!user?.passwordHash) {
@@ -203,8 +203,8 @@ export class ResetPasswordUseCase {
     if (input.password !== input.passwordConfirm) {
       throw new ValidationError(AppErrorCode.AUTH_PASSWORD_MISMATCH);
     }
-    const pwError = validatePasswordFormat(input.password);
-    if (pwError) throw new ValidationError(AppErrorCode.AUTH_PASSWORD_INVALID, pwError);
+    const pwError = validatePasswordFormatCode(input.password);
+    if (pwError) throw new ValidationError(pwError);
 
     const token = await this.authTokenRepo.consumeValid(
       hashAuthToken(input.token.trim()),

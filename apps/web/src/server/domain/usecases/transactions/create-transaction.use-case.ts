@@ -1,4 +1,4 @@
-import { AppErrorCode, CashLedgerType, TransactionType, computeCashBalances } from '@sar/shared';
+import { AppErrorCode, formatTradeLedgerMemo, CashLedgerType, TransactionType, computeCashBalances } from '@sar/shared';
 import { TransactionEntity } from '../../entities';
 import {
   CreateTransactionInput,
@@ -25,12 +25,15 @@ export class CreateTransactionUseCase {
 
   /** 종목·수량·단가 검증 후 거래 생성 — 매도 시 보유량·매수 시 현금 확인 */
   async execute(input: CreateTransactionInput): Promise<TransactionEntity> {
-    if (input.quantity <= 0 || input.price <= 0) {
-      throw new ValidationError('Quantity and price must be positive');
+    if (input.quantity <= 0) {
+      throw new ValidationError(AppErrorCode.TRANSACTION_QUANTITY_INVALID);
+    }
+    if (input.price <= 0) {
+      throw new ValidationError(AppErrorCode.TRANSACTION_PRICE_INVALID);
     }
 
     if (!input.name?.trim()) {
-      throw new ValidationError('종목을 검색해서 선택해 주세요.');
+      throw new ValidationError(AppErrorCode.STOCK_REQUIRED);
     }
 
     const symbol = input.stockSymbol.toUpperCase();
@@ -52,7 +55,7 @@ export class CreateTransactionUseCase {
       const existing = await this.transactionRepo.findByUserAndStock(input.userId, stock.id);
       const held = computePosition(existing).quantity;
       if (input.quantity > held) {
-        throw new ValidationError(`Insufficient holdings. Current: ${held}`);
+        throw new ValidationError(AppErrorCode.HOLDING_INSUFFICIENT);
       }
     }
 
@@ -64,10 +67,7 @@ export class CreateTransactionUseCase {
       const balances = computeCashBalances(entries);
       const available = currency === 'KRW' ? balances.krw : balances.usd;
       if (available < notional) {
-        throw new ValidationError(
-          AppErrorCode.CASH_INSUFFICIENT,
-          `가용 ${currency} ${available.toLocaleString()} — 필요 ${notional.toLocaleString()}`,
-        );
+        throw new ValidationError(AppErrorCode.CASH_INSUFFICIENT);
       }
     }
 
@@ -89,7 +89,10 @@ export class CreateTransactionUseCase {
       amount: notional,
       occurredAt: input.tradedAt,
       refId: tx.id,
-      memo: `${symbol} ${input.type === TransactionType.BUY ? '매수' : '매도'}`,
+      memo: formatTradeLedgerMemo(
+        symbol,
+        input.type === TransactionType.BUY ? 'BUY' : 'SELL',
+      ),
     });
 
     return tx;

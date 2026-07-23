@@ -4,7 +4,8 @@ import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-import { getErrorMessage } from '@/client/domain/errors/app-error';
+import { formatApiSuccessMessage, getErrorMessage } from '@/client/domain/errors/app-error';
+import { FixedLanguageSelector } from '@/presentation/components/LanguageSelector';
 import { useToast } from '@/presentation/components/Toast';
 import { useServices } from '@/presentation/hooks/useServices';
 import { APP_BRAND } from '@/presentation/layout';
@@ -30,8 +31,8 @@ function ResetPasswordForm() {
 
     setLoading(true);
     try {
-      await resetPasswordUseCase.execute({ token, password, passwordConfirm });
-      showSuccess(t('auth.resetPasswordSuccess'));
+      const result = await resetPasswordUseCase.execute({ token, password, passwordConfirm });
+      showSuccess(formatApiSuccessMessage(result));
       router.replace('/login');
     } catch (err) {
       showError(getErrorMessage(err, t('auth.resetPasswordFailed')));
@@ -80,6 +81,7 @@ function ResetPasswordForm() {
 export function ResetPasswordPage() {
   return (
     <div className="min-h-screen bg-background px-4 py-10">
+      <FixedLanguageSelector />
       <p className="text-center text-lg font-semibold">{APP_BRAND.name}</p>
       <Suspense fallback={null}>
         <ResetPasswordForm />

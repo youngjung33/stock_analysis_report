@@ -1,5 +1,6 @@
 import type { TFunction } from 'i18next';
 import {
+  type EvidenceItem,
   type AnalysisInsight,
   type ApplicableTaxStatus,
   type IsaAccountType,
@@ -337,13 +338,63 @@ export function translateRsiLabel(value: number | null, fallback: string, t: TFu
   return t('shared.market.rsi.neutral', { defaultValue: fallback });
 }
 
+function translateEvidenceItem(item: EvidenceItem, fallback: string, t: TFunction): string {
+  const params: Record<string, string | number> = { ...(item.params ?? {}) };
+
+  if (item.key === 'shared.market.insights.evidence.regionSentiment') {
+    const regionKey = String(params.regionKey ?? '');
+    const labelKey = String(params.labelKey ?? '');
+    return t(item.key, {
+      region: t(regionKey === 'kr' ? 'market.korea' : 'market.us'),
+      sentiment: t(`shared.market.sentiment.${labelKey}`),
+      avg: params.avg,
+      defaultValue: fallback,
+    });
+  }
+
+  if (item.key === 'shared.market.insights.evidence.dispersion' && params.levelKey) {
+    params.level = t(`shared.market.insights.evidence.dispersionLevel.${params.levelKey}`);
+    delete params.levelKey;
+  }
+  if (
+    (item.key === 'shared.market.insights.evidence.sma20' ||
+      item.key === 'shared.market.insights.evidence.sma200') &&
+    params.positionKey
+  ) {
+    params.position = t(`shared.market.insights.evidence.smaPosition.${params.positionKey}`);
+    delete params.positionKey;
+  }
+  if (item.key === 'shared.market.insights.evidence.rangePosition' && params.zoneKey) {
+    params.zone = t(`shared.market.insights.evidence.rangeZone.${params.zoneKey}`);
+    delete params.zoneKey;
+  }
+  if (item.key === 'shared.market.insights.evidence.macdSign' && params.signKey) {
+    params.sign = t(`shared.market.insights.evidence.macdSignValue.${params.signKey}`);
+    delete params.signKey;
+  }
+  if (item.key === 'shared.market.insights.evidence.volumeRatio' && params.activeKey) {
+    params.activity = t(`shared.market.insights.evidence.volumeActivity.${params.activeKey}`);
+    delete params.activeKey;
+  }
+  if (item.key === 'shared.market.insights.evidence.recTag' && params.tagKey) {
+    params.tag = t(`shared.market.tag.${params.tagKey}`);
+    delete params.tagKey;
+  }
+
+  return t(item.key, { ...params, defaultValue: fallback });
+}
+
 export function translateAnalysisInsight(
   insight: AnalysisInsight,
   t: TFunction,
-): Pick<AnalysisInsight, 'categoryLabel' | 'title' | 'summary' | 'reasoning'> {
+): Pick<AnalysisInsight, 'categoryLabel' | 'title' | 'summary' | 'reasoning'> & { evidence: string[] } {
   const categoryLabel = t(`shared.market.categories.${insight.category}`);
   const title = translateInsightField(insight.titleKey, insight.titleParams, insight.title, t);
   const summary = translateInsightField(insight.summaryKey, insight.summaryParams, insight.summary, t);
   const reasoning = translateInsightField(insight.reasoningKey, insight.reasoningParams, insight.reasoning, t);
-  return { categoryLabel, title, summary, reasoning };
+  const evidence =
+    insight.evidenceItems?.map((item, index) =>
+      translateEvidenceItem(item, insight.evidence[index] ?? '', t),
+    ) ?? insight.evidence;
+  return { categoryLabel, title, summary, reasoning, evidence };
 }

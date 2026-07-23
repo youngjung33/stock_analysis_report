@@ -89,10 +89,7 @@ export class SettleCashUseCase {
       const balances = computeCashBalances(entries);
       const available = input.currency === 'KRW' ? balances.krw : balances.usd;
       if (available < amount) {
-        throw new ValidationError(
-          AppErrorCode.CASH_INSUFFICIENT,
-          `가용 ${input.currency} ${available.toLocaleString()} — 필요 ${amount.toLocaleString()}`,
-        );
+        throw new ValidationError(AppErrorCode.CASH_INSUFFICIENT);
       }
     }
 

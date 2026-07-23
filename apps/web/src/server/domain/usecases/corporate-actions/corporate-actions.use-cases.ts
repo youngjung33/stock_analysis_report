@@ -1,4 +1,4 @@
-import { Market, resolveCurrency, resolveYahooSymbol, CashLedgerType } from '@sar/shared';
+import { formatDividendLedgerMemo, Market, resolveCurrency, resolveYahooSymbol, CashLedgerType } from '@sar/shared';
 import { CorporateActionEntity } from '../../entities';
 import { ICorporateActionRepository, ICashLedgerRepository, IStockRepository } from '../../repositories';
 import { SettleCashUseCase } from '../cash/cash.use-cases';
@@ -82,7 +82,7 @@ export class CreateCorporateActionUseCase {
         amount: input.cashAmount,
         occurredAt: input.effectiveAt,
         refId: action.id,
-        memo: `${stock.symbol} 배당`,
+        memo: formatDividendLedgerMemo(stock.symbol),
       });
     }
 

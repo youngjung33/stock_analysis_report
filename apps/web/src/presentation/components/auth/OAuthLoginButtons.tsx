@@ -40,12 +40,12 @@ export function OAuthLoginButtons({
           disabled={disabled}
           onClick={() => onProviderClick(provider.id)}
           className="flex h-11 w-full items-center justify-center rounded-lg border border-border bg-background transition hover:bg-accent disabled:opacity-50"
-          aria-label={provider.signInButtonAlt}
+          aria-label={t(`auth.oauth.signIn.${provider.id}`)}
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- OAuth 공식 버튼 에셋 URL */}
           <img
             src={provider.signInButtonSrc}
-            alt={provider.signInButtonAlt}
+            alt={t(`auth.oauth.signIn.${provider.id}`)}
             className="h-10 w-auto max-w-full object-contain"
             loading="lazy"
           />

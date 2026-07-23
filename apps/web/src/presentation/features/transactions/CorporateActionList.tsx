@@ -1,5 +1,6 @@
 import { CorporateActionType } from '@sar/shared';
 import { useTranslation } from 'react-i18next';
+import { translateLedgerMemo } from '@/i18n/translate-memo';
 import type { TFunction } from 'i18next';
 import { CorporateAction } from '@/client/domain/models';
 import { useCorporateActionList } from '../../hooks/screens/useCorporateActionList';
@@ -97,7 +98,7 @@ function CorporateActionTable({
                 {corporateActionTypeLabel(action.type, t)}
               </td>
               <td className="px-4 py-3 text-slate-300">{formatActionDetail(action, t)}</td>
-              <td className="px-4 py-3 text-slate-500">{action.memo ?? '-'}</td>
+              <td className="px-4 py-3 text-slate-500">{translateLedgerMemo(action.memo, t)}</td>
               <td className="px-4 py-3">
                 <button
                   type="button"
@@ -151,7 +152,7 @@ function CorporateActionCardList({
             </div>
             <div className="col-span-2">
               <dt className="text-slate-500">{t('common.memo')}</dt>
-              <dd className="text-slate-400">{action.memo ?? '-'}</dd>
+              <dd className="text-slate-400">{translateLedgerMemo(action.memo, t)}</dd>
             </div>
           </dl>
           <button

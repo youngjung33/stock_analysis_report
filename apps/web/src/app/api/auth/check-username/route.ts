@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { AppErrorCode } from '@sar/shared';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
 import { handleRouteError, jsonData } from '@/server/http/route-utils';
@@ -10,7 +11,7 @@ export async function GET(req: NextRequest) {
     enforceRateLimit(req, 'auth:check-username', 'authCheckUsername');
     const username = req.nextUrl.searchParams.get('username');
     if (!username?.trim()) {
-      throw new ValidationError('username query is required');
+      throw new ValidationError(AppErrorCode.AUTH_USERNAME_INVALID);
     }
 
     const { checkUsernameAvailabilityUseCase } = getServerServices();

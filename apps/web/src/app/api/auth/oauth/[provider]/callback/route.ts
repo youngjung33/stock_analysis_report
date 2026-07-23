@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { isOAuthProvider } from '@sar/shared';
+import { AppErrorCode, isOAuthProvider } from '@sar/shared';
 import { getServerServices } from '@/server/container';
 import { logApiError } from '@/server/http/route-error';
 import {
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
     provider = params.provider;
 
     if (!isOAuthProvider(provider)) {
-      throw new ValidationError('지원하지 않는 OAuth 제공자입니다.');
+      throw new ValidationError(AppErrorCode.AUTH_OAUTH_PROVIDER_INVALID);
     }
 
     const code = req.nextUrl.searchParams.get('code');
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
     }
 
     if (!code || !state) {
-      throw new ValidationError('OAuth code와 state가 필요합니다.');
+      throw new ValidationError(AppErrorCode.AUTH_OAUTH_CODE_STATE_REQUIRED);
     }
 
     const { completeOAuthLoginUseCase } = getServerServices();

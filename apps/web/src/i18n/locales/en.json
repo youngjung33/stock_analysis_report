@@ -126,6 +126,8 @@
     "orWithUsername": "Or with username",
     "checkDuplicate": "Check availability",
     "formatHint": "Format: {{hint}}",
+    "usernameHint": "3–32 characters, letters, numbers, underscore",
+    "passwordHint": "8–64 characters, at least one letter and one number",
     "alreadyHaveAccount": "Already have an account?",
     "noAccount": "Don't have an account?",
     "forgotPassword": "Forgot password?",
@@ -138,6 +140,14 @@
     "oauthLoading": "Loading social login...",
     "oauthStartFailed": "Could not start social login.",
     "oauthNotConfigured": "Social login will be available after admin configuration.",
+    "oauth": {
+      "signIn": {
+        "GOOGLE": "Sign in with Google",
+        "APPLE": "Sign in with Apple",
+        "NAVER": "Sign in with Naver",
+        "KAKAO": "Sign in with Kakao"
+      }
+    },
     "guestLoginFailed": "Guest login failed. Please try again later.",
     "usernameChecking": "Checking username...",
     "usernameCheckFailed": "Could not check username.",
@@ -145,11 +155,9 @@
     "forgotPasswordDesc": "We'll send a reset link to your registered email.",
     "forgotPasswordSubmit": "Send reset link",
     "forgotPasswordSending": "Sending...",
-    "forgotPasswordSuccess": "If the email is registered, a reset link has been sent.",
     "resetPasswordTitle": "Reset password",
     "resetPasswordSubmit": "Change password",
     "resetPasswordChanging": "Changing...",
-    "resetPasswordSuccess": "Password changed. Please log in.",
     "resetPasswordFailed": "Could not reset password.",
     "resetLinkInvalid": "Invalid reset link."
   },
@@ -178,16 +186,11 @@
     "deletePasswordConfirm": "Confirm password",
     "deleteAccountButton": "Delete account",
     "deleteConfirm": "All data will be deleted and cannot be recovered. Are you sure you want to delete your account?",
-    "verificationCodeToast": "Verification code: {{code}}",
     "loadProfileFailed": "Failed to load account info.",
     "changeEmailFailed": "Failed to change email.",
-    "alreadyVerified": "Email is already verified.",
     "issueCodeFailed": "Failed to send verification code.",
-    "verifySuccess": "Email verified successfully.",
     "verifyFailed": "Invalid verification code.",
-    "passwordChanged": "Password changed successfully.",
     "passwordChangeFailed": "Failed to change password.",
-    "unlinkSuccess": "Social account unlinked.",
     "unlinkFailed": "Failed to unlink account.",
     "deleteFailed": "Failed to delete account."
   },
@@ -213,6 +216,7 @@
     "AUTH_EMAIL_TAKEN": "Email is already in use.",
     "AUTH_PASSWORD_INVALID": "Invalid password format.",
     "AUTH_PASSWORD_MISMATCH": "Passwords do not match.",
+    "AUTH_PASSWORD_CONFIRM_REQUIRED": "Please confirm your password.",
     "AUTH_REGISTER_FIELDS_REQUIRED": "Please fill in all required fields.",
     "AUTH_OAUTH_PROVIDER_INVALID": "Unsupported social login provider.",
     "AUTH_OAUTH_NOT_CONFIGURED": "Social login is not configured.",
@@ -224,10 +228,29 @@
     "AUTH_EMAIL_REQUIRED": "Email is required.",
     "CASH_INSUFFICIENT": "Insufficient cash balance.",
     "CASH_AMOUNT_INVALID": "Please check the amount.",
+    "STOCK_REQUIRED": "Search and select a stock.",
+    "HOLDING_INSUFFICIENT": "Insufficient holdings.",
+    "TRANSACTION_QUANTITY_INVALID": "Quantity must be greater than zero.",
+    "TRANSACTION_PRICE_INVALID": "Price must be greater than zero.",
+    "AUTH_OAUTH_REDIRECT_URI_REQUIRED": "OAuth redirect URI is required.",
+    "AUTH_OAUTH_CODE_STATE_REQUIRED": "OAuth code and state are required.",
     "dashboardLoadFailed": "Failed to load portfolio.",
     "marketAnalysisLoadFailed": "Failed to load market analysis.",
     "stockQuoteLoadFailed": "Failed to load stock quotes.",
     "quoteRefreshFailed": "Failed to refresh quotes."
+  },
+  "success": {
+    "AUTH_USERNAME_AVAILABLE": "Username is available.",
+    "AUTH_EMAIL_ALREADY_VERIFIED": "Email is already verified.",
+    "AUTH_EMAIL_VERIFICATION_ISSUED": "Verification code has been issued.",
+    "AUTH_EMAIL_VERIFICATION_ISSUED_toast": "Verification code: {{code}}",
+    "AUTH_EMAIL_VERIFIED": "Email verification completed.",
+    "AUTH_PASSWORD_RESET_REQUESTED": "If the email is registered, a password reset link has been sent.",
+    "AUTH_PASSWORD_CHANGED": "Password has been changed.",
+    "AUTH_PASSWORD_RESET_COMPLETE": "Password changed. Please log in.",
+    "ACCOUNT_PASSWORD_CHANGED": "Password changed successfully.",
+    "ACCOUNT_OAUTH_UNLINKED": "Social account unlinked.",
+    "ACCOUNT_DELETED": "Account deletion completed."
   },
   "dashboard": {
     "title": "Portfolio",
@@ -276,6 +299,10 @@
     },
     "confirm": {
       "delete": "Delete this trade?"
+    },
+    "memo": {
+      "trade": "{{symbol}} · {{side}}",
+      "dividend": "{{symbol}} · Dividend"
     }
   },
   "corporateAction": {
@@ -1086,6 +1113,63 @@
             "defensive": "Names holding up in weak markets often have lower volatility or solid fundamentals — they may lag on rebounds.",
             "watchlist": "In mixed markets, individual catalysts (relative strength, dividends, earnings) matter more."
           }
+        },
+        "evidence": {
+          "avgChange": "Average change {{avg}}",
+          "upDownFlat": "Up {{up}} · Down {{down}} · Flat {{flat}}",
+          "dispersion": "Change stdev {{value}}% ({{level}})",
+          "dispersionLevel": {
+            "high": "High dispersion",
+            "normal": "Normal dispersion"
+          },
+          "leaderLaggard": "Leader {{leaderName}} {{leaderPct}} · Laggard {{laggardName}} {{laggardPct}}",
+          "sma20": "SMA20 {{value}} ({{position}})",
+          "sma200": "SMA200 {{value}} ({{position}})",
+          "smaValue": "{{label}} {{value}}",
+          "smaMissing": "{{label}} —",
+          "smaPosition": {
+            "above": "above",
+            "below": "below"
+          },
+          "rangePosition": "52-week range position {{pct}}% {{zone}}",
+          "rangeZone": {
+            "high": "(near high)",
+            "low": "(near low)",
+            "mid": ""
+          },
+          "rangeMissing": "Range position —",
+          "rsiValue": "RSI(14) = {{rsi}}",
+          "macdSign": "MACD(12,26) {{sign}} ({{macd}})",
+          "macdSignValue": {
+            "positive": "Positive",
+            "negative": "Negative"
+          },
+          "macdMissing": "MACD —",
+          "macdLine": "MACD {{macd}}",
+          "volumeRatio": "Volume / 20d avg {{ratio}}x {{activity}}",
+          "volumeActivity": {
+            "active": "(Active)",
+            "normal": ""
+          },
+          "volumeMissing": "Volume —",
+          "bollingerBands": "Upper {{upper}} · Mid {{middle}} · Lower {{lower}}",
+          "pricePercentB": "Price {{price}} (%B {{percentB}})",
+          "stochK": "%K {{k}}",
+          "stochD": "%D {{d}}",
+          "macroCurrent": "Current {{value}}",
+          "macroChange1d": "1D change {{change}}",
+          "sectorLeader": "Leader {{sector}} RS(1W) {{rs1w}} · 1M {{rs1mo}}",
+          "sectorLaggard": "Laggard {{sector}} RS(1W) {{rs1w}}",
+          "sectorRank": "#{{rank}} {{sector}} {{change}} (RS1W {{rs1w}})",
+          "newsFinnhubSkip": "US Finnhub news skipped when Finnhub key is not set",
+          "newsRssDelay": "Google News RSS may be delayed depending on network",
+          "newsArticleCount": "Articles {{count}} · Positive {{bull}} · Negative {{bear}}",
+          "newsHeadline": "{{headline}}",
+          "regionSentiment": "{{region}} mood {{sentiment}} (avg {{avg}})",
+          "tempGap": "Temperature gap {{gap}}%p",
+          "recPrice": "Price {{price}} {{currency}}",
+          "recChange": "Day change {{change}}",
+          "recTag": "Tag: {{tag}}"
         }
       },
       "trends": {

@@ -1,3 +1,4 @@
+import { AppSuccessCode, apiSuccessBody } from '@sar/shared';
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
@@ -10,13 +11,13 @@ export async function POST(req: NextRequest) {
     const { requestEmailVerificationUseCase } = getServerServices();
     const result = await requestEmailVerificationUseCase.execute(user.userId);
     if (!result) {
-      return jsonData({ ok: true, message: '이미 인증된 이메일입니다.' });
+      return jsonData(apiSuccessBody(AppSuccessCode.AUTH_EMAIL_ALREADY_VERIFIED));
     }
-    return jsonData({
-      ok: true,
-      verificationCode: result.verificationCode,
-      message: '인증 코드가 발급되었습니다.',
-    });
+    return jsonData(
+      apiSuccessBody(AppSuccessCode.AUTH_EMAIL_VERIFICATION_ISSUED, {
+        verificationCode: result.verificationCode,
+      }),
+    );
   } catch (error) {
     return handleRouteError(error);
   }

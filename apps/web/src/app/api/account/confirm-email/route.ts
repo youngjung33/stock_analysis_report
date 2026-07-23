@@ -1,3 +1,4 @@
+import { AppErrorCode, AppSuccessCode, apiSuccessBody } from '@sar/shared';
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
@@ -9,11 +10,11 @@ export async function POST(req: NextRequest) {
     enforceRateLimit(req, 'auth:confirm-email', 'authRegister');
     requireAuth(req);
     const body = (await req.json()) as { code?: string };
-    if (!body.code?.trim()) throw new ValidationError('code is required');
+    if (!body.code?.trim()) throw new ValidationError(AppErrorCode.VALIDATION);
 
     const { verifyEmailUseCase } = getServerServices();
     await verifyEmailUseCase.execute(body.code);
-    return jsonData({ ok: true, message: '이메일 인증이 완료되었습니다.' });
+    return jsonData(apiSuccessBody(AppSuccessCode.AUTH_EMAIL_VERIFIED));
   } catch (error) {
     return handleRouteError(error);
   }

@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { isOAuthProvider } from '@sar/shared';
+import { AppErrorCode, isOAuthProvider } from '@sar/shared';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
 import { handleRouteError, jsonData } from '@/server/http/route-utils';
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
     enforceRateLimit(req, 'auth:oauth-start', 'authOAuthStart');
     const { provider } = await context.params;
     if (!isOAuthProvider(provider)) {
-      throw new ValidationError('지원하지 않는 OAuth 제공자입니다.');
+      throw new ValidationError(AppErrorCode.AUTH_OAUTH_PROVIDER_INVALID);
     }
 
     const redirectUri =

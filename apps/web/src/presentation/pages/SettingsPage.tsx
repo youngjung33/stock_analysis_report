@@ -3,7 +3,6 @@
 import { OAUTH_PROVIDER_META } from '@sar/shared';
 import { useTranslation } from 'react-i18next';
 import { AppShell } from '../layout';
-import { LanguageSelector } from '../components/LanguageSelector';
 import { PageStack, Surface } from '../design-system';
 import { useSettingsScreen } from '../hooks/screens/useSettingsScreen';
 
@@ -15,14 +14,6 @@ export function SettingsPage() {
     <AppShell title={t('settings.title')} subtitle={screen.profile?.username ?? ''}>
       <PageStack>
         {screen.loading && <p className="text-sm text-muted-foreground">{t('common.loading')}</p>}
-
-        <Surface variant="section" className="space-y-3">
-          <div>
-            <h2 className="text-base font-semibold">{t('settings.language')}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">{t('settings.languageDesc')}</p>
-          </div>
-          <LanguageSelector />
-        </Surface>
 
         {screen.profile && (
           <>

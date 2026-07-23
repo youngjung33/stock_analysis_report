@@ -9,7 +9,7 @@ export class LoginUseCase {
   execute(username: string, password: string) {
     const validationError = validateLoginInput(username, password);
     if (validationError) {
-      throw new AppError(validationError);
+      throw new AppError('', validationError);
     }
     return this.authRepo.login(username, password);
   }

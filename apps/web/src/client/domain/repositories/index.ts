@@ -28,6 +28,7 @@ import {
   RegisterInput,
   StockSearchResult,
 } from '@sar/shared';
+import type { UsernameCheckResult } from '../errors/api-success';
 
 export interface CreateCorporateActionInput {
   stockSymbol: string;
@@ -48,7 +49,7 @@ export interface CreateCorporateActionInput {
 export interface IAuthRepository {
   login(username: string, password: string): Promise<LoginResult>;
   register(input: RegisterInput): Promise<RegisterResult>;
-  checkUsernameAvailability(username: string): Promise<{ available: boolean; message: string }>;
+  checkUsernameAvailability(username: string): Promise<UsernameCheckResult>;
   listOAuthProviders(): Promise<OAuthProviderMeta[]>;
   startOAuthLogin(
     provider: OAuthProviderId,

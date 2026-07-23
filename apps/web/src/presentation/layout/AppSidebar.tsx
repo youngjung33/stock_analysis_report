@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { LogOut, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppNavItems } from '@/i18n';
-import { LanguageSelector } from '../components/LanguageSelector';
 import { useAuth } from '../hooks/useAuth';
 import { cn } from '../lib/cn';
 import { APP_BRAND } from './nav-config';
@@ -58,13 +57,9 @@ export function AppSidebar({ className }: Props) {
       </nav>
 
       <div className="border-t border-border p-5">
-        <div className="mb-4">
-          <p className="mb-2 text-[11px] font-medium text-muted-foreground">{t('settings.language')}</p>
-          <LanguageSelector />
-        </div>
         {username && (
           <p className="mb-3 truncate text-xs text-muted-foreground">
-            {username}
+            {isGuest ? t('guest.displayName') : username}
             {isGuest && <span className="ml-1 text-amber-400/90">{t('common.guestBadge')}</span>}
           </p>
         )}

@@ -3,15 +3,14 @@
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  AUTH_PASSWORD_HINT,
-  AUTH_USERNAME_HINT,
   OAuthProviderId,
   OAuthProviderMeta,
   RegisterFieldErrors,
   validateRegisterFields,
-  validateUsernameFormat,
+  validateUsernameFormatCode,
+  isAppErrorCode,
 } from '@sar/shared';
-import { getErrorMessage } from '@/client/domain/errors/app-error';
+import { getErrorMessage, translateResponseCode, translateUsernameCheckResult } from '@/client/domain/errors/app-error';
 import { useToast } from '../../components/Toast';
 import { useAuth } from '../useAuth';
 import { useServices } from '../useServices';
@@ -56,12 +55,13 @@ export function useLoginScreen() {
   async function checkUsernameAvailability() {
     if (mode !== 'register') return;
 
-    const formatError = validateUsernameFormat(username);
-    if (formatError) {
+    const formatErrorCode = validateUsernameFormatCode(username);
+    if (formatErrorCode) {
+      const message = translateResponseCode(formatErrorCode);
       setUsernameCheckStatus('unavailable');
-      setUsernameCheckMessage(formatError);
-      setFieldErrors((prev) => ({ ...prev, username: formatError }));
-      showError(formatError);
+      setUsernameCheckMessage(message);
+      setFieldErrors((prev) => ({ ...prev, username: formatErrorCode }));
+      showError(message);
       return;
     }
 
@@ -70,27 +70,27 @@ export function useLoginScreen() {
 
     try {
       const result = await checkUsernameAvailabilityUseCase.execute(username.trim());
+      const message = translateUsernameCheckResult(result);
       setUsernameCheckStatus(result.available ? 'available' : 'unavailable');
-      setUsernameCheckMessage(result.message);
+      setUsernameCheckMessage(message);
       setFieldErrors((prev) => {
         const next = { ...prev };
         if (result.available) {
           delete next.username;
-        } else {
-          next.username = result.message;
+        } else if (isAppErrorCode(result.code)) {
+          next.username = result.code;
         }
         return next;
       });
       if (result.available) {
-        showSuccess(result.message);
+        showSuccess(message);
       } else {
-        showError(result.message);
+        showError(message);
       }
     } catch (err) {
       const message = getErrorMessage(err, t('auth.usernameCheckFailed'));
       setUsernameCheckStatus('unavailable');
       setUsernameCheckMessage(message);
-      setFieldErrors((prev) => ({ ...prev, username: message }));
       showError(message);
     }
   }
@@ -109,20 +109,24 @@ export function useLoginScreen() {
 
       if (Object.keys(errors).length > 0) {
         setFieldErrors(errors);
-        showError(Object.values(errors)[0] ?? t('errors.VALIDATION'));
+        const firstCode = Object.values(errors)[0];
+        showError(firstCode ? t(`errors.${firstCode}`) : t('errors.VALIDATION'));
         return;
       }
 
       const usernameResult = await checkUsernameAvailabilityUseCase.execute(username.trim());
       if (!usernameResult.available) {
+        const message = translateUsernameCheckResult(usernameResult);
         setUsernameCheckStatus('unavailable');
-        setUsernameCheckMessage(usernameResult.message);
-        setFieldErrors({ username: usernameResult.message });
-        showError(usernameResult.message);
+        setUsernameCheckMessage(message);
+        setFieldErrors(
+          isAppErrorCode(usernameResult.code) ? { username: usernameResult.code } : {},
+        );
+        showError(message);
         return;
       }
       setUsernameCheckStatus('available');
-      setUsernameCheckMessage(usernameResult.message);
+      setUsernameCheckMessage(translateUsernameCheckResult(usernameResult));
     }
 
     setLoading(true);
@@ -205,7 +209,7 @@ export function useLoginScreen() {
     handleSubmit,
     handleGuestLogin,
     handleOAuthLogin,
-    usernameHint: AUTH_USERNAME_HINT,
-    passwordHint: AUTH_PASSWORD_HINT,
+    usernameHint: t('auth.usernameHint'),
+    passwordHint: t('auth.passwordHint'),
   };
 }

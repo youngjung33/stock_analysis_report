@@ -1,4 +1,4 @@
-import { OAuthProviderId } from '@sar/shared';
+import { AppErrorCode, OAuthProviderId } from '@sar/shared';
 import { AppError } from '../../errors/app-error';
 import { IAuthRepository } from '../../repositories';
 
@@ -8,7 +8,7 @@ export class StartOAuthLoginUseCase {
 
   async execute(provider: OAuthProviderId, redirectUri: string) {
     if (!redirectUri.trim()) {
-      throw new AppError('OAuth redirect URI가 필요합니다.');
+      throw new AppError('', AppErrorCode.AUTH_OAUTH_REDIRECT_URI_REQUIRED);
     }
     return this.authRepo.startOAuthLogin(provider, redirectUri);
   }

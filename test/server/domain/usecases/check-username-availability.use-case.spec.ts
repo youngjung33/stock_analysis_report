@@ -1,4 +1,6 @@
+import { describe, expect, it } from 'vitest';
 import { CheckUsernameAvailabilityUseCase } from '@server/domain/usecases/auth/check-username-availability.use-case';
+import { AppErrorCode, AppSuccessCode } from '@sar/shared';
 import { createMockUser, createMockUserRepo } from '../../mocks/repositories.mock';
 
 describe('CheckUsernameAvailabilityUseCase', () => {
@@ -10,7 +12,7 @@ describe('CheckUsernameAvailabilityUseCase', () => {
     const result = await useCase.execute('new_user');
 
     expect(result.available).toBe(true);
-    expect(result.message).toContain('사용 가능');
+    expect(result.code).toBe(AppSuccessCode.AUTH_USERNAME_AVAILABLE);
   });
 
   it('returns unavailable for duplicate username', async () => {
@@ -21,14 +23,14 @@ describe('CheckUsernameAvailabilityUseCase', () => {
     const result = await useCase.execute('admin');
 
     expect(result.available).toBe(false);
-    expect(result.message).toContain('이미 사용');
+    expect(result.code).toBe(AppErrorCode.AUTH_USERNAME_TAKEN);
   });
 
-  it('returns format error for invalid username', async () => {
+  it('returns format error code for invalid username', async () => {
     const useCase = new CheckUsernameAvailabilityUseCase(createMockUserRepo());
     const result = await useCase.execute('ab');
 
     expect(result.available).toBe(false);
-    expect(result.message).toContain('아이디');
+    expect(result.code).toBe(AppErrorCode.AUTH_USERNAME_INVALID);
   });
 });

@@ -23,7 +23,7 @@ describe('auth API rate limit', () => {
         }),
       },
       checkUsernameAvailabilityUseCase: {
-        execute: vi.fn().mockResolvedValue({ available: true, message: '사용 가능' }),
+        execute: vi.fn().mockResolvedValue({ available: true, code: 'AUTH_USERNAME_AVAILABLE' }),
       },
     } as never);
   });

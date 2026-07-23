@@ -20,7 +20,7 @@ export class LoginUseCase {
   async execute(input: LoginInput) {
     const validationError = validateLoginInput(input.username, input.password);
     if (validationError) {
-      throw new ValidationError(AppErrorCode.AUTH_LOGIN_REQUIRED, validationError);
+      throw new ValidationError(validationError);
     }
 
     const user = await this.userRepo.findByUsername(input.username.trim());

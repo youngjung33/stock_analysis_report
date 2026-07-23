@@ -1,14 +1,24 @@
 'use client';
 
+import { AppErrorCode } from '@sar/shared';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { FixedLanguageSelector } from '../components/LanguageSelector';
 import { AuthFieldHint } from '../components/auth/AuthFormAlert';
 import { OAuthLoginButtons } from '../components/auth/OAuthLoginButtons';
 import { useToast } from '../components/Toast';
 import { useLoginScreen } from '../hooks/screens/useLoginScreen';
 import { APP_BRAND } from '../layout';
+
+function registerFieldError(
+  code: AppErrorCode | undefined,
+  t: ReturnType<typeof useTranslation>['t'],
+): string | undefined {
+  if (!code) return undefined;
+  return t(`errors.${code}`);
+}
 
 function usernameHintTone(status: ReturnType<typeof useLoginScreen>['usernameCheckStatus']) {
   if (status === 'available') return 'success' as const;
@@ -48,6 +58,7 @@ export function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-6">
+      <FixedLanguageSelector />
       <form
         noValidate
         onSubmit={screen.handleSubmit}
@@ -99,7 +110,7 @@ export function LoginPage() {
           </div>
           <AuthFieldHint
             message={
-              screen.fieldErrors.username ||
+              registerFieldError(screen.fieldErrors.username, t) ||
               (isRegister
                 ? screen.usernameCheckMessage || t('auth.formatHint', { hint: screen.usernameHint })
                 : undefined)
@@ -120,7 +131,7 @@ export function LoginPage() {
               autoComplete="email"
               placeholder="name@example.com"
             />
-            <AuthFieldHint message={screen.fieldErrors.email} tone="error" />
+            <AuthFieldHint message={registerFieldError(screen.fieldErrors.email, t)} tone="error" />
           </label>
         )}
 
@@ -134,7 +145,7 @@ export function LoginPage() {
             autoComplete={isRegister ? 'new-password' : 'current-password'}
           />
           <AuthFieldHint
-            message={screen.fieldErrors.password || (isRegister ? screen.passwordHint : undefined)}
+            message={registerFieldError(screen.fieldErrors.password, t) || (isRegister ? screen.passwordHint : undefined)}
             tone={screen.fieldErrors.password ? 'error' : 'muted'}
           />
         </label>
@@ -149,7 +160,7 @@ export function LoginPage() {
               onChange={(e) => screen.setPasswordConfirm(e.target.value)}
               autoComplete="new-password"
             />
-            <AuthFieldHint message={screen.fieldErrors.passwordConfirm} tone="error" />
+            <AuthFieldHint message={registerFieldError(screen.fieldErrors.passwordConfirm, t)} tone="error" />
           </label>
         )}
 
