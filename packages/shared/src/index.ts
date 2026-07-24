@@ -2,6 +2,7 @@ export {
   SUPPORTED_LOCALES,
   DEFAULT_LOCALE,
   LOCALE_STORAGE_KEY,
+  LOCALE_COOKIE_KEY,
   LOCALE_LABELS,
   isSupportedLocale,
   normalizeLocale,

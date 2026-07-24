@@ -1,16 +1,21 @@
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
+import { generateMetadataFromCookies, getServerLocale } from '@/i18n/server-metadata';
 import { Providers } from './providers';
 import './globals.css';
 import './globals.scss';
 
-export const metadata: Metadata = {
-  title: '주식 투자 현황',
-  description: '개인용 주식 매매·배당·세금 관리',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const cookieStore = await cookies();
+  return generateMetadataFromCookies(cookieStore, 'home');
+}
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const cookieStore = await cookies();
+  const locale = getServerLocale(cookieStore);
+
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body>
         <Providers>{children}</Providers>
       </body>

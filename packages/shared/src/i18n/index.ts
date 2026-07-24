@@ -7,6 +7,9 @@ export const DEFAULT_LOCALE: SupportedLocale = 'ko';
 
 export const LOCALE_STORAGE_KEY = 'sar_locale';
 
+/** SSR·middleware locale cookie (same value key as localStorage) */
+export const LOCALE_COOKIE_KEY = LOCALE_STORAGE_KEY;
+
 export const LOCALE_LABELS: Record<SupportedLocale, string> = {
   en: 'English',
   ko: '한국어',

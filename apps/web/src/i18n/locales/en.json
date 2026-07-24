@@ -94,7 +94,53 @@
   },
   "meta": {
     "title": "Stock Portfolio",
-    "description": "Personal stock trading, dividends, and tax management"
+    "description": "Personal stock trading, dividends, and tax management",
+    "siteName": "SAR Portfolio",
+    "keywords": "stock portfolio, trading, dividends, tax, investment tracker"
+  },
+  "seo": {
+    "pages": {
+      "home": {
+        "title": "Portfolio",
+        "description": "View holdings, profit and loss, and portfolio summary at a glance."
+      },
+      "login": {
+        "title": "Log in",
+        "description": "Log in to manage trades, quotes, and your investment history."
+      },
+      "forgotPassword": {
+        "title": "Forgot password",
+        "description": "Request a password reset link for your account."
+      },
+      "resetPassword": {
+        "title": "Reset password",
+        "description": "Set a new password for your account."
+      },
+      "settings": {
+        "title": "Account settings",
+        "description": "Manage email, password, social login, and account preferences."
+      },
+      "myInfo": {
+        "title": "My Info",
+        "description": "Manage cash, invested capital, trades, and tax profile."
+      },
+      "transactions": {
+        "title": "Trades & Dividends",
+        "description": "Record buys and sells and review dividend and corporate action history."
+      },
+      "market": {
+        "title": "Market Analysis",
+        "description": "Market sentiment, indices, sectors, and technical insights."
+      },
+      "tax": {
+        "title": "Tax Guide",
+        "description": "Korean tax rules reference and estimated tax from your portfolio."
+      },
+      "stock": {
+        "title": "{{symbol}}",
+        "description": "Stock quotes, charts, and details for {{symbol}}."
+      }
+    }
   },
   "nav": {
     "mainMenu": "Main menu",
