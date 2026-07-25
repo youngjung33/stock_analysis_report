@@ -3,13 +3,14 @@
 import { useEffect } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { usePathname } from 'next/navigation';
-import { DEFAULT_LOCALE, LOCALE_STORAGE_KEY, normalizeLocale } from '@sar/shared';
-import i18n, { changeAppLocale, getAppLocale } from './config';
+import { normalizeLocale, type SupportedLocale } from '@sar/shared';
+import i18n, { getAppLocale, syncI18nLocale, syncLocaleFromCookie } from './config';
 import { pathnameToSeoRoute } from './seo-routes';
 import { syncDocumentSeo } from './sync-document-seo';
 
 interface Props {
   children: React.ReactNode;
+  initialLocale: SupportedLocale;
 }
 
 function syncSeoForCurrentRoute(): void {
@@ -19,15 +20,14 @@ function syncSeoForCurrentRoute(): void {
 }
 
 /** Syncs html lang, locale storage/cookie, and document SEO on mount + language change */
-export function I18nProvider({ children }: Props) {
+export function I18nProvider({ children, initialLocale }: Props) {
   const pathname = usePathname();
+  const serverLocale = normalizeLocale(initialLocale);
+
+  syncI18nLocale(serverLocale);
 
   useEffect(() => {
-    const stored =
-      typeof localStorage !== 'undefined'
-        ? normalizeLocale(localStorage.getItem(LOCALE_STORAGE_KEY))
-        : DEFAULT_LOCALE;
-    changeAppLocale(stored);
+    syncLocaleFromCookie();
     syncSeoForCurrentRoute();
 
     const onLanguageChanged = () => syncSeoForCurrentRoute();

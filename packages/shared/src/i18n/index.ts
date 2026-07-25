@@ -5,9 +5,10 @@ export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
 export const DEFAULT_LOCALE: SupportedLocale = 'ko';
 
+/** Client-side locale cache (mirrors cookie; not read as source of truth) */
 export const LOCALE_STORAGE_KEY = 'sar_locale';
 
-/** SSR·middleware locale cookie (same value key as localStorage) */
+/** Locale source of truth for SSR, middleware, and client */
 export const LOCALE_COOKIE_KEY = LOCALE_STORAGE_KEY;
 
 export const LOCALE_LABELS: Record<SupportedLocale, string> = {

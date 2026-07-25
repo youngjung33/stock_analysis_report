@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
+import type { SupportedLocale } from '@sar/shared';
 import { wireAppServices } from '@/client/bootstrap';
 import { AuthProvider } from '@/presentation/hooks/useAuth';
 import { ServicesProvider } from '@/presentation/hooks/useServices';
@@ -11,12 +12,18 @@ import { I18nProvider } from '@/i18n';
 
 const queryClient = createAppQueryClient();
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({
+  children,
+  initialLocale,
+}: {
+  children: React.ReactNode;
+  initialLocale: SupportedLocale;
+}) {
   const services = useMemo(() => wireAppServices(), []);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <I18nProvider>
+      <I18nProvider initialLocale={initialLocale}>
         <ServicesProvider services={services}>
           <ToastProvider>
             <AuthProvider>{children}</AuthProvider>

@@ -90,6 +90,13 @@ export function buildPageMetadata(
   const { title, description } = getPageSeoCopy(locale, pageKey, params);
   const siteUrl = getSiteUrl();
   const ogLocale = locale === 'ko' ? 'ko_KR' : 'en_US';
+  const ogImageAlt = translateSeo(locale, 'meta.ogImageAlt');
+  const ogImage = {
+    url: '/opengraph-image',
+    width: 1200,
+    height: 630,
+    alt: ogImageAlt,
+  };
 
   return {
     metadataBase: new URL(siteUrl),
@@ -97,6 +104,10 @@ export function buildPageMetadata(
     description,
     applicationName: siteName,
     keywords: translateSeo(locale, 'meta.keywords'),
+    icons: {
+      icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+      apple: [{ url: '/apple-icon', type: 'image/png', sizes: '180x180' }],
+    },
     openGraph: {
       type: 'website',
       locale: ogLocale,
@@ -105,11 +116,13 @@ export function buildPageMetadata(
       title,
       description,
       url: siteUrl,
+      images: [ogImage],
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title,
       description,
+      images: [ogImage.url],
     },
     robots: {
       index: pageKey !== 'settings',

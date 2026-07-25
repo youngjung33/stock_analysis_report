@@ -96,7 +96,8 @@
     "title": "Stock Portfolio",
     "description": "Personal stock trading, dividends, and tax management",
     "siteName": "SAR Portfolio",
-    "keywords": "stock portfolio, trading, dividends, tax, investment tracker"
+    "keywords": "stock portfolio, trading, dividends, tax, investment tracker",
+    "ogImageAlt": "SAR Portfolio — stock portfolio and analysis dashboard preview"
   },
   "seo": {
     "pages": {

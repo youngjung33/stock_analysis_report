@@ -25,10 +25,16 @@ export function syncDocumentSeo(
   document.documentElement.lang = locale;
   document.title = title;
 
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const ogImage = origin ? `${origin}/opengraph-image` : '/opengraph-image';
+
   setMetaTag('description', description);
   setMetaTag('og:title', title, true);
   setMetaTag('og:description', description, true);
   setMetaTag('og:locale', ogLocale, true);
+  setMetaTag('og:image', ogImage, true);
+  setMetaTag('twitter:card', 'summary_large_image');
   setMetaTag('twitter:title', title);
   setMetaTag('twitter:description', description);
+  setMetaTag('twitter:image', ogImage);
 }

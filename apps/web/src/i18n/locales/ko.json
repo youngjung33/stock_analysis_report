@@ -96,7 +96,8 @@
     "title": "주식 투자 현황",
     "description": "개인용 주식 매매·배당·세금 관리",
     "siteName": "SAR Portfolio",
-    "keywords": "주식, 포트폴리오, 매매, 배당, 세금, 투자"
+    "keywords": "주식, 포트폴리오, 매매, 배당, 세금, 투자",
+    "ogImageAlt": "SAR Portfolio — 주식 투자·분석 대시보드 미리보기"
   },
   "seo": {
     "pages": {
