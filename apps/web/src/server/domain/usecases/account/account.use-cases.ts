@@ -4,6 +4,7 @@ import {
   OAuthProviderId,
   isOAuthProvider,
   validatePasswordFormatCode,
+  type SupportedLocale,
 } from '@sar/shared';
 import { AuthenticationError, ConflictError, ValidationError } from '../../errors/domain.errors';
 import { IEmailSenderPort } from '../../ports/email-sender.port';
@@ -24,6 +25,7 @@ import {
   hashAuthToken,
   isEmailVerificationCode,
 } from '../../../data/auth/auth-token.utils';
+import { buildPasswordResetEmail } from '@/i18n/email-templates';
 
 export interface AccountProfile {
   username: string;
@@ -166,7 +168,7 @@ export class RequestPasswordResetUseCase {
   ) {}
 
   /** 이메일 존재 여부와 관계없이 동일 응답 (계정 열거 방지) */
-  async execute(emailInput: string) {
+  async execute(emailInput: string, locale: SupportedLocale = 'ko') {
     const email = emailInput.trim().toLowerCase();
     if (!email) throw new ValidationError(AppErrorCode.AUTH_EMAIL_INVALID);
 
@@ -184,10 +186,11 @@ export class RequestPasswordResetUseCase {
     });
 
     const link = buildAppUrl(`/reset-password?token=${raw}`);
+    const emailContent = buildPasswordResetEmail(locale, link);
     await this.emailSender.send({
       to: email,
-      subject: '[SAR Portfolio] 비밀번호 재설정',
-      text: `비밀번호 재설정 링크입니다.\n\n${link}\n\n1시간 내에 유효합니다.`,
+      subject: emailContent.subject,
+      text: emailContent.text,
     });
   }
 }

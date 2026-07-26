@@ -1,7 +1,7 @@
+import { AppErrorCode, Market } from '@sar/shared';
 import { NextRequest } from 'next/server';
-import { Market } from '@sar/shared';
 import { getServerServices } from '@/server/container';
-import { BadRequestError } from '@/server/http/errors';
+import { ValidationError } from '@/server/domain/errors/domain.errors';
 import { enforceRateLimit } from '@/server/http/rate-limit';
 import { handleRouteError, jsonData } from '@/server/http/route-utils';
 
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       }));
 
     if (stocks.length === 0) {
-      throw new BadRequestError('stocks array required');
+      throw new ValidationError(AppErrorCode.MARKET_STOCKS_REQUIRED);
     }
 
     const { fetchQuotesUseCase } = getServerServices();

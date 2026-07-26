@@ -1,5 +1,7 @@
+import { AppErrorCode } from '@sar/shared';
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
+import { ValidationError } from '@/server/domain/errors/domain.errors';
 import { enforceRateLimit } from '@/server/http/rate-limit';
 import {
   handleRouteError,
@@ -13,7 +15,7 @@ export async function POST(req: NextRequest) {
     enforceRateLimit(req, 'auth:login', 'authLogin');
     const body = (await req.json()) as { username?: string; password?: string };
     if (!body.username || !body.password) {
-      return jsonData({ message: 'username and password required' }, { status: 400 });
+      throw new ValidationError(AppErrorCode.AUTH_LOGIN_REQUIRED);
     }
 
     const { loginUseCase } = getServerServices();

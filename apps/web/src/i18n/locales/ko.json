@@ -281,6 +281,13 @@
     "TRANSACTION_PRICE_INVALID": "단가는 0보다 커야 합니다.",
     "AUTH_OAUTH_REDIRECT_URI_REQUIRED": "OAuth redirect URI가 필요합니다.",
     "AUTH_OAUTH_CODE_STATE_REQUIRED": "OAuth code와 state가 필요합니다.",
+    "MARKET_INVALID": "market은 KR 또는 US여야 합니다.",
+    "MARKET_QUOTE_PARAMS_REQUIRED": "symbol과 market(KR|US)이 필요합니다.",
+    "MARKET_QUOTE_RANGE_INVALID": "range 값이 올바르지 않습니다.",
+    "MARKET_STOCKS_REQUIRED": "stocks 배열이 필요합니다.",
+    "WATCHLIST_FIELDS_REQUIRED": "symbol, name, market이 필요합니다.",
+    "CORPORATE_ACTION_FIELDS_REQUIRED": "stockSymbol, name, type, effectiveAt이 필요합니다.",
+    "HOLDING_PARAMS_REQUIRED": "symbol과 market이 필요합니다.",
     "dashboardLoadFailed": "투자 현황을 불러오지 못했습니다.",
     "marketAnalysisLoadFailed": "시장 분석을 불러오지 못했습니다.",
     "stockQuoteLoadFailed": "종목 시세를 불러오지 못했습니다.",
@@ -664,6 +671,18 @@
       "finnhubHint": "설정된 API만 시세를 가져옵니다. 미국 주식은 Finnhub API 키(FINNHUB_API_KEY)가 필요합니다.",
       "providerAvailable": "{{label}} — 이용 가능",
       "providerUnavailable": "{{label}} — 이용 불가{{hint}}"
+    },
+    "reason": {
+      "not_configured": "시세 API가 설정되지 않았습니다.",
+      "no_provider": "해당 시장용 시세 제공자가 없습니다.",
+      "fetch_error": "시세를 가져오지 못했습니다.",
+      "finnhub_api_key_required": "미국 주식 시세는 Finnhub API 키(FINNHUB_API_KEY, apps/web/.env)가 필요합니다."
+    }
+  },
+  "email": {
+    "passwordReset": {
+      "subject": "[SAR Portfolio] 비밀번호 재설정",
+      "body": "비밀번호 재설정 링크입니다.\n\n{{link}}\n\n1시간 내에 유효합니다."
     }
   },
   "portfolio": {
@@ -1160,6 +1179,26 @@
             "defensive": "약세장에서도 버티는 종목은 변동성이 낮거나 실적·현금흐름이 받쳐주는 경우가 많습니다. 반등 시 상대적으로 늦게 따라오는 업종일 수 있습니다.",
             "watchlist": "혼조장에서는 상대강도·배당·실적 일정 등 개별 재료가 더 중요합니다."
           }
+        },
+        "links": {
+          "tradingView": "TradingView",
+          "yahooFinanceChart": "Yahoo Finance 차트",
+          "yahooFinance": "Yahoo Finance",
+          "naverFinanceKospi": "네이버 금융 코스피",
+          "yahooSp500": "Yahoo S&P 500",
+          "naverFinance": "네이버 금융",
+          "investopediaRsi": "Investopedia RSI",
+          "investopediaMacd": "Investopedia MACD",
+          "investopediaBollinger": "Investopedia Bollinger",
+          "investopediaStochastic": "Investopedia Stochastic",
+          "cboeVix": "CBOE VIX",
+          "fred10y": "FRED 10Y",
+          "investingUsdKrw": "Investing.com USD/KRW",
+          "googleNewsKospi": "Google 뉴스 — 코스피",
+          "googleNewsUsMarket": "Google 뉴스 — US market",
+          "investingFx": "Investing.com 환율",
+          "fredIndicators": "FRED 경제지표",
+          "sectorChart": "{{sector}} 차트"
         },
         "evidence": {
           "avgChange": "평균 등락 {{avg}}",

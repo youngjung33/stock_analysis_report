@@ -225,6 +225,7 @@ export function createMockMarketData(
     ),
     isAvailable: vi.fn(() => true),
     unavailableReason: vi.fn(() => null),
+    unavailableReasonCode: vi.fn(() => null),
     fetchStockQuote: vi.fn().mockResolvedValue({ currentPrice: 150, changePercent: 2.5 }),
     fetchUsdKrwRate: vi.fn().mockResolvedValue(rate),
     fetchChartQuote: vi.fn(),

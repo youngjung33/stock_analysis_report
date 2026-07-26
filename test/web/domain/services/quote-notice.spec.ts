@@ -44,7 +44,6 @@ describe('buildQuoteRefreshNotice', () => {
           stockId: '2',
           symbol: 'AAPL',
           market: Market.US,
-          reason: 'FINNHUB_API_KEY가 설정되지 않았습니다.',
           reasonCode: 'not_configured',
         },
       ],
@@ -53,7 +52,7 @@ describe('buildQuoteRefreshNotice', () => {
     const notice = buildQuoteRefreshNotice(result, t);
     expect(notice?.variant).toBe('warning');
     expect(notice?.lines.some((line) => line.includes('AAPL'))).toBe(true);
-    expect(notice?.lines.some((line) => line.includes('FINNHUB_API_KEY'))).toBe(true);
+    expect(notice?.lines.some((line) => line.includes('시세 API'))).toBe(true);
   });
 
   it('returns error when nothing was updated', () => {
@@ -65,7 +64,6 @@ describe('buildQuoteRefreshNotice', () => {
           stockId: '2',
           symbol: 'AAPL',
           market: Market.US,
-          reason: 'FINNHUB_API_KEY가 설정되지 않았습니다.',
           reasonCode: 'not_configured',
         },
       ],

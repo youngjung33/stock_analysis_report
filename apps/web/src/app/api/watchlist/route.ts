@@ -1,7 +1,7 @@
+import { AppErrorCode, Market } from '@sar/shared';
 import { NextRequest } from 'next/server';
-import { Market } from '@sar/shared';
 import { getServerServices } from '@/server/container';
-import { BadRequestError } from '@/server/http/errors';
+import { ValidationError } from '@/server/domain/errors/domain.errors';
 import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
 
 export async function GET(req: NextRequest) {
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const market = body.market as Market;
     if (!body.symbol || !body.name || (market !== Market.KR && market !== Market.US)) {
-      throw new BadRequestError('symbol, name, market are required');
+      throw new ValidationError(AppErrorCode.WATCHLIST_FIELDS_REQUIRED);
     }
 
     const { addWatchlistUseCase } = getServerServices();

@@ -1,3 +1,6 @@
+'use client';
+
+import { formatCashLedgerMemo } from '@sar/shared';
 import type { TFunction } from 'i18next';
 
 const LEGACY_BUY = /^(.+)\s+매수$/;
@@ -5,10 +8,41 @@ const LEGACY_SELL = /^(.+)\s+매도$/;
 const LEGACY_DIVIDEND = /^(.+)\s+배당$/;
 const TYPED_TRADE = /^(.+)\s+(BUY|SELL)$/;
 const TYPED_DIVIDEND = /^(.+)\s+DIVIDEND$/;
+const TYPED_CASH = /^(INITIAL|DEPOSIT|WITHDRAW):(KRW|USD)$/;
 
-/** Ledger memo — supports legacy Korean and machine-readable BUY/SELL/DIVIDEND formats */
+const LEGACY_CASH_MEMOS: Record<string, string> = {
+  '투자 원금': 'capital.memoInitialCapital',
+  'Invested capital': 'capital.memoInitialCapital',
+  '투자 원금 (USD)': 'capital.memoInitialCapitalUsd',
+  'Invested capital (USD)': 'capital.memoInitialCapitalUsd',
+  입금: 'capital.memoDeposit',
+  Deposit: 'capital.memoDeposit',
+  출금: 'capital.memoWithdraw',
+  Withdrawal: 'capital.memoWithdraw',
+};
+
+function translateCashMemoKind(kind: string, currency: string, t: TFunction): string {
+  if (kind === 'INITIAL') {
+    return currency === 'USD'
+      ? t('capital.memoInitialCapitalUsd')
+      : t('capital.memoInitialCapital');
+  }
+  if (kind === 'DEPOSIT') return t('capital.memoDeposit');
+  if (kind === 'WITHDRAW') return t('capital.memoWithdraw');
+  return `${kind}:${currency}`;
+}
+
+/** Ledger memo — supports legacy Korean and machine-readable BUY/SELL/DIVIDEND/CASH formats */
 export function translateLedgerMemo(memo: string | null | undefined, t: TFunction): string {
   if (!memo) return '-';
+
+  const legacyCashKey = LEGACY_CASH_MEMOS[memo];
+  if (legacyCashKey) return t(legacyCashKey);
+
+  const typedCash = memo.match(TYPED_CASH);
+  if (typedCash) {
+    return translateCashMemoKind(typedCash[1], typedCash[2], t);
+  }
 
   const legacyBuy = memo.match(LEGACY_BUY);
   if (legacyBuy) {
@@ -41,3 +75,5 @@ export function translateLedgerMemo(memo: string | null | undefined, t: TFunctio
 
   return memo;
 }
+
+export { formatCashLedgerMemo };

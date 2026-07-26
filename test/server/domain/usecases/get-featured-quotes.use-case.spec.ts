@@ -27,7 +27,6 @@ describe('GetFeaturedQuotesUseCase', () => {
             stockId: 'featured-US-NVDA',
             symbol: 'NVDA',
             market: Market.US,
-            reason: 'FINNHUB_API_KEY',
             reasonCode: 'not_configured',
           },
         ],
@@ -41,6 +40,6 @@ describe('GetFeaturedQuotesUseCase', () => {
     expect(result.us.length).toBeGreaterThan(0);
     expect(result.kr.find((s) => s.symbol === '005930')?.currentPrice).toBe(70000);
     expect(result.us.find((s) => s.symbol === 'AAPL')?.currentPrice).toBe(180);
-    expect(result.us.find((s) => s.symbol === 'NVDA')?.unavailableReason).toContain('FINNHUB_API_KEY');
+    expect(result.us.find((s) => s.symbol === 'NVDA')?.unavailableReasonCode).toBe('not_configured');
   });
 });

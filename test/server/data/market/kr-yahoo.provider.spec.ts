@@ -26,7 +26,7 @@ describe('KrYahooMarketProvider', () => {
 
   it('is always available without API key', () => {
     expect(provider.isAvailable()).toBe(true);
-    expect(provider.unavailableReason()).toBeNull();
+    expect(provider.unavailableReasonCode()).toBeNull();
   });
 
   it('uses yahooSymbol when present', async () => {

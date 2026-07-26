@@ -1,7 +1,7 @@
+import { AppErrorCode, Market } from '@sar/shared';
 import { NextRequest } from 'next/server';
-import { Market } from '@sar/shared';
 import { getServerServices } from '@/server/container';
-import { BadRequestError } from '@/server/http/errors';
+import { ValidationError } from '@/server/domain/errors/domain.errors';
 import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
 
 export async function GET(req: NextRequest) {
@@ -21,10 +21,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const market = body.market as Market;
     if (!body.stockSymbol || !body.name || !body.type || !body.effectiveAt) {
-      throw new BadRequestError('stockSymbol, name, type, effectiveAt are required');
+      throw new ValidationError(AppErrorCode.CORPORATE_ACTION_FIELDS_REQUIRED);
     }
     if (market !== Market.KR && market !== Market.US) {
-      throw new BadRequestError('invalid market');
+      throw new ValidationError(AppErrorCode.MARKET_INVALID);
     }
 
     const { createCorporateActionUseCase } = getServerServices();

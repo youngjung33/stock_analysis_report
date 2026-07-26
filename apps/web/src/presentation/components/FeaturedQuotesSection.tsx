@@ -26,7 +26,7 @@ function toPlaceholder(stock: FeaturedStock): FeaturedStockQuote {
     currency: resolveCurrency(stock.market),
     currentPrice: null,
     changePercent: null,
-    unavailableReason: null,
+    unavailableReasonCode: null,
   };
 }
 
@@ -65,7 +65,11 @@ function QuoteRow({
           ) : (
             <span
               className="text-xs text-slate-500"
-              title={item.unavailableReason ?? undefined}
+              title={
+                item.unavailableReasonCode
+                  ? t(`quotes.reason.${item.unavailableReasonCode}`)
+                  : undefined
+              }
             >
               {t('quotes.featured.unavailable')}
             </span>

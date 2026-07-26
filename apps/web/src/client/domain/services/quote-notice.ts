@@ -1,11 +1,15 @@
 import type { TFunction } from 'i18next';
-import { Market } from '@sar/shared';
+import { Market, type QuoteFailureReasonCode, type QuoteSetupHintCode } from '@sar/shared';
 import { translateMarketLabel } from '@/i18n/translate-shared';
 import { RefreshQuoteResult } from '../models';
 
 export interface QuoteRefreshNotice {
   variant: 'success' | 'warning' | 'error';
   lines: string[];
+}
+
+function translateQuoteReason(code: QuoteFailureReasonCode | QuoteSetupHintCode, t: TFunction): string {
+  return t(`quotes.reason.${code}`);
 }
 
 function groupSucceededByMarket(
@@ -29,18 +33,17 @@ function groupSucceededByMarket(
 }
 
 function groupFailedByReason(failed: RefreshQuoteResult['failed'], t: TFunction): string[] {
-  const byReason = new Map<string, { symbols: string[]; reasonCode: string }>();
+  const byReason = new Map<QuoteFailureReasonCode, string[]>();
 
   for (const item of failed) {
-    const key = `${item.reasonCode}:${item.reason}`;
-    const entry = byReason.get(key) ?? { symbols: [], reasonCode: item.reasonCode };
-    entry.symbols.push(item.symbol);
-    byReason.set(key, { ...entry, reasonCode: item.reasonCode });
+    const list = byReason.get(item.reasonCode) ?? [];
+    list.push(item.symbol);
+    byReason.set(item.reasonCode, list);
   }
 
-  return [...byReason.entries()].map(([key, { symbols, reasonCode }]) => {
-    const reason = key.slice(reasonCode.length + 1);
+  return [...byReason.entries()].map(([reasonCode, symbols]) => {
     const symbolList = symbols.join(', ');
+    const reason = translateQuoteReason(reasonCode, t);
     if (reasonCode === 'not_configured' || reasonCode === 'no_provider') {
       return t('quotes.refresh.refreshBlocked', { symbols: symbolList, reason });
     }
@@ -76,16 +79,17 @@ export function buildQuoteRefreshNotice(
 }
 
 export function buildMarketStatusLines(
-  providers: { label: string; available: boolean; setupHint: string | null }[],
+  providers: { market: Market; available: boolean; setupHintCode: QuoteSetupHintCode | null }[],
   t: TFunction,
 ): string[] {
   return providers.map((provider) => {
+    const label = translateMarketLabel(provider.market, t);
     if (provider.available) {
-      return t('quotes.notice.providerAvailable', { label: provider.label });
+      return t('quotes.notice.providerAvailable', { label });
     }
-    return t('quotes.notice.providerUnavailable', {
-      label: provider.label,
-      hint: provider.setupHint ? `: ${provider.setupHint}` : '',
-    });
+    const hint = provider.setupHintCode
+      ? `: ${translateQuoteReason(provider.setupHintCode, t)}`
+      : '';
+    return t('quotes.notice.providerUnavailable', { label, hint });
   });
 }

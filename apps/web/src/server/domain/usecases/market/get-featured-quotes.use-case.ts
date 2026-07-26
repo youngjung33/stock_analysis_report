@@ -22,7 +22,7 @@ export class GetFeaturedQuotesUseCase {
 
     const { quotes, failed } = await this.fetchQuotesUseCase.execute(inputs);
     const quoteMap = new Map(quotes.map((q) => [q.stockId, q]));
-    const failedMap = new Map(failed.map((f) => [f.stockId, f.reason]));
+    const failedMap = new Map(failed.map((f) => [f.stockId, f.reasonCode]));
 
     const mapSection = (stocks: FeaturedStock[]) =>
       stocks.map((stock) => {
@@ -35,7 +35,7 @@ export class GetFeaturedQuotesUseCase {
           currency: resolveCurrency(stock.market),
           currentPrice: quote?.currentPrice ?? null,
           changePercent: quote?.changePercent ?? null,
-          unavailableReason: quote ? null : (failedMap.get(stockId) ?? '시세를 가져오지 못했습니다.'),
+          unavailableReasonCode: quote ? null : (failedMap.get(stockId) ?? 'fetch_error'),
         };
       });
 

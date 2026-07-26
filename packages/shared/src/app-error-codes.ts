@@ -43,6 +43,14 @@ export const AppErrorCode = {
 
   AUTH_OAUTH_REDIRECT_URI_REQUIRED: 'AUTH_OAUTH_REDIRECT_URI_REQUIRED',
   AUTH_OAUTH_CODE_STATE_REQUIRED: 'AUTH_OAUTH_CODE_STATE_REQUIRED',
+
+  MARKET_INVALID: 'MARKET_INVALID',
+  MARKET_QUOTE_PARAMS_REQUIRED: 'MARKET_QUOTE_PARAMS_REQUIRED',
+  MARKET_QUOTE_RANGE_INVALID: 'MARKET_QUOTE_RANGE_INVALID',
+  MARKET_STOCKS_REQUIRED: 'MARKET_STOCKS_REQUIRED',
+  WATCHLIST_FIELDS_REQUIRED: 'WATCHLIST_FIELDS_REQUIRED',
+  CORPORATE_ACTION_FIELDS_REQUIRED: 'CORPORATE_ACTION_FIELDS_REQUIRED',
+  HOLDING_PARAMS_REQUIRED: 'HOLDING_PARAMS_REQUIRED',
 } as const;
 
 export type AppErrorCode = (typeof AppErrorCode)[keyof typeof AppErrorCode];
@@ -107,6 +115,15 @@ export const APP_ERROR_MESSAGES: Record<AppErrorCode, string> = {
 
   [AppErrorCode.AUTH_OAUTH_REDIRECT_URI_REQUIRED]: 'OAuth redirect URI가 필요합니다.',
   [AppErrorCode.AUTH_OAUTH_CODE_STATE_REQUIRED]: 'OAuth code와 state가 필요합니다.',
+
+  [AppErrorCode.MARKET_INVALID]: 'market은 KR 또는 US여야 합니다.',
+  [AppErrorCode.MARKET_QUOTE_PARAMS_REQUIRED]: 'symbol과 market(KR|US)이 필요합니다.',
+  [AppErrorCode.MARKET_QUOTE_RANGE_INVALID]: 'range 값이 올바르지 않습니다.',
+  [AppErrorCode.MARKET_STOCKS_REQUIRED]: 'stocks 배열이 필요합니다.',
+  [AppErrorCode.WATCHLIST_FIELDS_REQUIRED]: 'symbol, name, market이 필요합니다.',
+  [AppErrorCode.CORPORATE_ACTION_FIELDS_REQUIRED]:
+    'stockSymbol, name, type, effectiveAt이 필요합니다.',
+  [AppErrorCode.HOLDING_PARAMS_REQUIRED]: 'symbol과 market이 필요합니다.',
 };
 
 const CODE_SET = new Set<string>(Object.values(AppErrorCode));

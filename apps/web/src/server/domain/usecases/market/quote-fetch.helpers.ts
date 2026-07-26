@@ -1,4 +1,4 @@
-import { Market } from '@sar/shared';
+import { Market, type QuoteFailureReasonCode } from '@sar/shared';
 import type { RefreshQuoteResult } from '../../entities';
 import type { IMarketDataProvider } from '../../ports/market-data.port';
 import type { StockEntity } from '../../entities';
@@ -14,14 +14,12 @@ interface QuoteStock {
 export function recordQuoteFailure(
   failed: QuoteFailure[],
   stock: QuoteStock,
-  reason: string,
-  reasonCode: QuoteFailure['reasonCode'],
+  reasonCode: QuoteFailureReasonCode,
 ): void {
   failed.push({
     stockId: stock.id,
     symbol: stock.symbol,
     market: stock.market,
-    reason,
     reasonCode,
   });
 }
@@ -34,34 +32,19 @@ export async function fetchQuoteForStock(
   const market = stock.market as Market;
 
   if (!marketData.supports(market)) {
-    recordQuoteFailure(
-      failed,
-      stock,
-      `${stock.market} 시장용 시세 API가 없습니다.`,
-      'no_provider',
-    );
+    recordQuoteFailure(failed, stock, 'no_provider');
     return null;
   }
 
   if (!marketData.isAvailable(market)) {
-    recordQuoteFailure(
-      failed,
-      stock,
-      marketData.unavailableReason(market) ?? '시세 API가 설정되지 않았습니다.',
-      'not_configured',
-    );
+    recordQuoteFailure(failed, stock, 'not_configured');
     return null;
   }
 
   try {
     return await marketData.fetchStockQuote(stock);
-  } catch (err) {
-    recordQuoteFailure(
-      failed,
-      stock,
-      err instanceof Error ? err.message : '시세 조회에 실패했습니다.',
-      'fetch_error',
-    );
+  } catch {
+    recordQuoteFailure(failed, stock, 'fetch_error');
     return null;
   }
 }

@@ -93,7 +93,6 @@ describe('RefreshQuotesUseCase', () => {
 
     expect(result.updated).toBe(0);
     expect(result.failed).toHaveLength(1);
-    expect(result.failed[0].reason).toBe('API down');
     expect(result.failed[0].reasonCode).toBe('fetch_error');
   });
 
@@ -154,7 +153,7 @@ describe('RefreshQuotesUseCase', () => {
     const marketData = createMockMarketData({
       supports: vi.fn((m) => m === Market.US),
       isAvailable: vi.fn((m) => m !== Market.US),
-      unavailableReason: vi.fn(() => 'FINNHUB_API_KEY가 설정되지 않았습니다.'),
+      unavailableReasonCode: vi.fn(() => 'finnhub_api_key_required'),
     });
 
     const useCase = new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, marketData);
@@ -162,7 +161,6 @@ describe('RefreshQuotesUseCase', () => {
 
     expect(marketData.fetchStockQuote).not.toHaveBeenCalled();
     expect(result.updated).toBe(0);
-    expect(result.failed[0].reason).toBe('FINNHUB_API_KEY가 설정되지 않았습니다.');
     expect(result.failed[0].reasonCode).toBe('not_configured');
   });
 

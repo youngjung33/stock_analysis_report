@@ -1,4 +1,4 @@
-import { Market } from '@sar/shared';
+import { Market, type QuoteSetupHintCode } from '@sar/shared';
 import { StockEntity } from '../../domain/entities';
 import { resolveYahooSymbol } from '../../domain/services/stock-symbol.resolver';
 import { fetchYahooChartQuote } from './yahoo-chart.client';
@@ -10,7 +10,7 @@ export class KrYahooMarketProvider {
   }
 
   label(): string {
-    return '한국 주식 (Yahoo Finance)';
+    return 'KR';
   }
 
   isAvailable(): boolean {
@@ -18,6 +18,10 @@ export class KrYahooMarketProvider {
   }
 
   unavailableReason(): string | null {
+    return null;
+  }
+
+  unavailableReasonCode(): QuoteSetupHintCode | null {
     return null;
   }
 

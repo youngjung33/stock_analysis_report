@@ -1,7 +1,7 @@
+import { AppErrorCode, Market, isQuoteChartRange } from '@sar/shared';
 import { NextRequest } from 'next/server';
-import { Market, isQuoteChartRange, QUOTE_CHART_RANGE_HINT } from '@sar/shared';
 import { getServerServices } from '@/server/container';
-import { BadRequestError } from '@/server/http/errors';
+import { ValidationError } from '@/server/domain/errors/domain.errors';
 import { enforceRateLimit } from '@/server/http/rate-limit';
 import { handleRouteError, jsonData } from '@/server/http/route-utils';
 
@@ -15,10 +15,10 @@ export async function GET(req: NextRequest) {
     const rangeParam = req.nextUrl.searchParams.get('range') ?? '1d';
 
     if (!symbol || (market !== Market.KR && market !== Market.US)) {
-      throw new BadRequestError('symbol and market (KR|US) are required');
+      throw new ValidationError(AppErrorCode.MARKET_QUOTE_PARAMS_REQUIRED);
     }
     if (!isQuoteChartRange(rangeParam)) {
-      throw new BadRequestError(`range must be one of: ${QUOTE_CHART_RANGE_HINT}`);
+      throw new ValidationError(AppErrorCode.MARKET_QUOTE_RANGE_INVALID);
     }
 
     const { getStockQuoteUseCase } = getServerServices();

@@ -2,6 +2,7 @@ import type { TFunction } from 'i18next';
 import {
   type EvidenceItem,
   type AnalysisInsight,
+  type AnalysisLink,
   type ApplicableTaxStatus,
   type IsaAccountType,
   type MacroIndicatorSnapshot,
@@ -387,7 +388,10 @@ function translateEvidenceItem(item: EvidenceItem, fallback: string, t: TFunctio
 export function translateAnalysisInsight(
   insight: AnalysisInsight,
   t: TFunction,
-): Pick<AnalysisInsight, 'categoryLabel' | 'title' | 'summary' | 'reasoning'> & { evidence: string[] } {
+): Pick<AnalysisInsight, 'categoryLabel' | 'title' | 'summary' | 'reasoning'> & {
+  evidence: string[];
+  links: AnalysisLink[];
+} {
   const categoryLabel = t(`shared.market.categories.${insight.category}`);
   const title = translateInsightField(insight.titleKey, insight.titleParams, insight.title, t);
   const summary = translateInsightField(insight.summaryKey, insight.summaryParams, insight.summary, t);
@@ -396,5 +400,11 @@ export function translateAnalysisInsight(
     insight.evidenceItems?.map((item, index) =>
       translateEvidenceItem(item, insight.evidence[index] ?? '', t),
     ) ?? insight.evidence;
-  return { categoryLabel, title, summary, reasoning, evidence };
+  const links = insight.links.map((link) => ({
+    ...link,
+    label: link.labelKey
+      ? t(link.labelKey, { defaultValue: link.label, ...(link.labelParams ?? {}) })
+      : link.label,
+  }));
+  return { categoryLabel, title, summary, reasoning, evidence, links };
 }

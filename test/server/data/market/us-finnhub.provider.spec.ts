@@ -25,13 +25,13 @@ describe('UsFinnhubMarketProvider', () => {
   it('is unavailable without API key', () => {
     const provider = createProvider(null);
     expect(provider.isAvailable()).toBe(false);
-    expect(provider.unavailableReason()).toContain('FINNHUB_API_KEY');
+    expect(provider.unavailableReasonCode()).toBe('finnhub_api_key_required');
   });
 
   it('is available when API key is set', () => {
     const provider = createProvider('test-key');
     expect(provider.isAvailable()).toBe(true);
-    expect(provider.unavailableReason()).toBeNull();
+    expect(provider.unavailableReasonCode()).toBeNull();
   });
 
   it('fetches quote from Finnhub when configured', async () => {

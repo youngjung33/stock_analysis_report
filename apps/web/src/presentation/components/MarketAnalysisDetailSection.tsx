@@ -119,7 +119,7 @@ function InsightCard({ item, compact }: { item: AnalysisInsight; compact?: boole
             ))}
           </ul>
           <div className="flex flex-wrap gap-2">
-            {item.links.map((link) => (
+            {localized.links.map((link) => (
               <a
                 key={link.url}
                 href={link.url}

@@ -281,6 +281,13 @@
     "TRANSACTION_PRICE_INVALID": "Price must be greater than zero.",
     "AUTH_OAUTH_REDIRECT_URI_REQUIRED": "OAuth redirect URI is required.",
     "AUTH_OAUTH_CODE_STATE_REQUIRED": "OAuth code and state are required.",
+    "MARKET_INVALID": "market must be KR or US.",
+    "MARKET_QUOTE_PARAMS_REQUIRED": "symbol and market (KR|US) are required.",
+    "MARKET_QUOTE_RANGE_INVALID": "Invalid range value.",
+    "MARKET_STOCKS_REQUIRED": "stocks array is required.",
+    "WATCHLIST_FIELDS_REQUIRED": "symbol, name, and market are required.",
+    "CORPORATE_ACTION_FIELDS_REQUIRED": "stockSymbol, name, type, and effectiveAt are required.",
+    "HOLDING_PARAMS_REQUIRED": "symbol and market are required.",
     "dashboardLoadFailed": "Failed to load portfolio.",
     "marketAnalysisLoadFailed": "Failed to load market analysis.",
     "stockQuoteLoadFailed": "Failed to load stock quotes.",
@@ -664,6 +671,18 @@
       "finnhubHint": "Only configured APIs fetch quotes. US stocks require a Finnhub API key (FINNHUB_API_KEY).",
       "providerAvailable": "{{label}} — available",
       "providerUnavailable": "{{label}} — unavailable{{hint}}"
+    },
+    "reason": {
+      "not_configured": "Quote API is not configured.",
+      "no_provider": "No quote provider for this market.",
+      "fetch_error": "Failed to fetch quote.",
+      "finnhub_api_key_required": "US quotes require a Finnhub API key (FINNHUB_API_KEY in apps/web/.env)."
+    }
+  },
+  "email": {
+    "passwordReset": {
+      "subject": "[SAR Portfolio] Reset your password",
+      "body": "Use the link below to reset your password.\n\n{{link}}\n\nThis link expires in 1 hour."
     }
   },
   "portfolio": {
@@ -1160,6 +1179,26 @@
             "defensive": "Names holding up in weak markets often have lower volatility or solid fundamentals — they may lag on rebounds.",
             "watchlist": "In mixed markets, individual catalysts (relative strength, dividends, earnings) matter more."
           }
+        },
+        "links": {
+          "tradingView": "TradingView",
+          "yahooFinanceChart": "Yahoo Finance chart",
+          "yahooFinance": "Yahoo Finance",
+          "naverFinanceKospi": "Naver Finance KOSPI",
+          "yahooSp500": "Yahoo S&P 500",
+          "naverFinance": "Naver Finance",
+          "investopediaRsi": "Investopedia RSI",
+          "investopediaMacd": "Investopedia MACD",
+          "investopediaBollinger": "Investopedia Bollinger",
+          "investopediaStochastic": "Investopedia Stochastic",
+          "cboeVix": "CBOE VIX",
+          "fred10y": "FRED 10Y",
+          "investingUsdKrw": "Investing.com USD/KRW",
+          "googleNewsKospi": "Google News — KOSPI",
+          "googleNewsUsMarket": "Google News — US market",
+          "investingFx": "Investing.com FX",
+          "fredIndicators": "FRED indicators",
+          "sectorChart": "{{sector}} chart"
         },
         "evidence": {
           "avgChange": "Average change {{avg}}",

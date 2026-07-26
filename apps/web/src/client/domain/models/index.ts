@@ -144,16 +144,14 @@ export interface RefreshQuoteResult {
     stockId: string;
     symbol: string;
     market: Market;
-    reason: string;
-    reasonCode: 'not_configured' | 'fetch_error' | 'no_provider';
+    reasonCode: import('@sar/shared').QuoteFailureReasonCode;
   }[];
 }
 
 export interface MarketProviderStatus {
   market: Market;
-  label: string;
   available: boolean;
-  setupHint: string | null;
+  setupHintCode: import('@sar/shared').QuoteSetupHintCode | null;
 }
 
 export interface FeaturedStockQuote {
@@ -163,7 +161,7 @@ export interface FeaturedStockQuote {
   currency: string;
   currentPrice: number | null;
   changePercent: number | null;
-  unavailableReason: string | null;
+  unavailableReasonCode: import('@sar/shared').QuoteUnavailableReasonCode | null;
   range?: import('@sar/shared').QuoteChartRange;
 }
 

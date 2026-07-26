@@ -1,4 +1,11 @@
-/** Cash ledger / trade memo — machine-readable; UI translates at display time */
+export type CashLedgerMemoKind = 'INITIAL' | 'DEPOSIT' | 'WITHDRAW';
+
+/** Cash ledger memo — machine-readable; UI translates at display time */
+export function formatCashLedgerMemo(kind: CashLedgerMemoKind, currency: 'KRW' | 'USD'): string {
+  return `${kind}:${currency}`;
+}
+
+/** Trade memo — machine-readable; UI translates at display time */
 export function formatTradeLedgerMemo(symbol: string, side: 'BUY' | 'SELL'): string {
   return `${symbol} ${side}`;
 }

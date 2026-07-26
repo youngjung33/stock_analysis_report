@@ -1,4 +1,4 @@
-import { Market } from '@sar/shared';
+import { Market, type QuoteSetupHintCode } from '@sar/shared';
 import { MarketProviderStatus } from '../../entities';
 import { IMarketDataProvider } from '../../ports/market-data.port';
 
@@ -6,7 +6,7 @@ import { IMarketDataProvider } from '../../ports/market-data.port';
 export class GetMarketStatusUseCase {
   constructor(private readonly marketData: IMarketDataProvider) {}
 
-  /** 시장별 available · setupHint 목록 */
+  /** 시장별 available · setupHintCode 목록 */
   execute(): MarketProviderStatus[] {
     const markets = [Market.KR, Market.US];
 
@@ -14,17 +14,15 @@ export class GetMarketStatusUseCase {
       if (!this.marketData.supports(market)) {
         return {
           market,
-          label: market === Market.KR ? '한국 주식' : '미국 주식',
           available: false,
-          setupHint: '시세 제공자가 설정되지 않았습니다.',
+          setupHintCode: 'no_provider' satisfies QuoteSetupHintCode,
         };
       }
 
       return {
         market,
-        label: this.marketData.label(market),
         available: this.marketData.isAvailable(market),
-        setupHint: this.marketData.unavailableReason(market),
+        setupHintCode: this.marketData.unavailableReasonCode(market),
       };
     });
   }

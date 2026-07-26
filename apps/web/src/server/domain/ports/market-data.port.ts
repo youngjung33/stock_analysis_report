@@ -1,4 +1,4 @@
-import { Market, QuoteChartRange, StockSearchResult } from '@sar/shared';
+import { Market, QuoteChartRange, StockSearchResult, type QuoteSetupHintCode } from '@sar/shared';
 import { QuoteResult, StockEntity } from '../entities';
 
 /** 차트 시세 한 점 (종가·시각) */
@@ -41,7 +41,9 @@ export interface IMarketDataProvider {
   supports(market: Market): boolean;
   label(market: Market): string;
   isAvailable(market: Market): boolean;
+  /** @deprecated use unavailableReasonCode — kept for internal logging */
   unavailableReason(market: Market): string | null;
+  unavailableReasonCode(market: Market): QuoteSetupHintCode | null;
   /** 보유·Featured 종목 현재가 (KR=Yahoo, US=Finnhub) */
   fetchStockQuote(stock: StockEntity): Promise<QuoteResult>;
   /** USD/KRW 환율 (Yahoo KRW=X) */

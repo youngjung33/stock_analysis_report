@@ -6,12 +6,9 @@ import { vi } from 'vitest';
 describe('GetMarketStatusUseCase', () => {
   it('returns availability for KR and US providers', () => {
     const marketData = createMockMarketData({
-      label: vi.fn((m: Market) =>
-        m === Market.KR ? '한국 주식 (Yahoo Finance)' : '미국 주식 (Finnhub)',
-      ),
       isAvailable: vi.fn((m: Market) => m === Market.KR),
-      unavailableReason: vi.fn((m: Market) =>
-        m === Market.US ? 'FINNHUB_API_KEY가 필요합니다.' : null,
+      unavailableReasonCode: vi.fn((m: Market) =>
+        m === Market.US ? 'finnhub_api_key_required' : null,
       ),
     });
 
@@ -21,6 +18,6 @@ describe('GetMarketStatusUseCase', () => {
     expect(status).toHaveLength(2);
     expect(status.find((s) => s.market === Market.KR)?.available).toBe(true);
     expect(status.find((s) => s.market === Market.US)?.available).toBe(false);
-    expect(status.find((s) => s.market === Market.US)?.setupHint).toContain('FINNHUB_API_KEY');
+    expect(status.find((s) => s.market === Market.US)?.setupHintCode).toBe('finnhub_api_key_required');
   });
 });

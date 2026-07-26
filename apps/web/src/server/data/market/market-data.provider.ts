@@ -39,6 +39,10 @@ export class MarketDataProvider implements IMarketDataProvider {
     return this.quoteAdapter(market).unavailableReason();
   }
 
+  unavailableReasonCode(market: Market) {
+    return this.quoteAdapter(market).unavailableReasonCode();
+  }
+
   fetchStockQuote(stock: StockEntity) {
     return this.quoteAdapter(stock.market as Market).fetchQuote(stock);
   }

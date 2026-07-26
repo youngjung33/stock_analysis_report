@@ -71,7 +71,17 @@ export type {
   OAuthUserProfile,
 } from './auth';
 
-export { formatTradeLedgerMemo, formatDividendLedgerMemo } from './ledger-memo';
+export {
+  formatCashLedgerMemo,
+  formatTradeLedgerMemo,
+  formatDividendLedgerMemo,
+} from './ledger-memo';
+export type { CashLedgerMemoKind } from './ledger-memo';
+export type {
+  QuoteFailureReasonCode,
+  QuoteSetupHintCode,
+  QuoteUnavailableReasonCode,
+} from './quote-reason-codes';
 
 export { computePosition } from './position-calculator';
 export type { PositionState, PositionTransaction } from './position-calculator';

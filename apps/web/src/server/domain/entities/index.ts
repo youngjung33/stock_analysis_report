@@ -1,4 +1,10 @@
-import { Market, TransactionType } from '@sar/shared';
+import {
+  Market,
+  TransactionType,
+  type QuoteFailureReasonCode,
+  type QuoteSetupHintCode,
+  type QuoteUnavailableReasonCode,
+} from '@sar/shared';
 
 export interface UserEntity {
   id: string;
@@ -141,9 +147,8 @@ export interface HoldingResult extends DashboardHolding {
 
 export interface MarketProviderStatus {
   market: Market;
-  label: string;
   available: boolean;
-  setupHint: string | null;
+  setupHintCode: QuoteSetupHintCode | null;
 }
 
 export interface RefreshQuoteResult {
@@ -153,8 +158,7 @@ export interface RefreshQuoteResult {
     stockId: string;
     symbol: string;
     market: Market;
-    reason: string;
-    reasonCode: 'not_configured' | 'fetch_error' | 'no_provider';
+    reasonCode: QuoteFailureReasonCode;
   }[];
 }
 
@@ -165,7 +169,7 @@ export interface FeaturedStockQuote {
   currency: string;
   currentPrice: number | null;
   changePercent: number | null;
-  unavailableReason: string | null;
+  unavailableReasonCode: QuoteUnavailableReasonCode | null;
 }
 
 export interface FeaturedQuotesResult {

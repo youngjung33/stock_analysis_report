@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { CashLedgerType, formatCashAmount, parseAmountInput } from '@sar/shared';
+import { CashLedgerType, formatCashAmount, formatCashLedgerMemo, parseAmountInput } from '@sar/shared';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
 import { useToast } from '../../components/Toast';
 import { useServices } from '../useServices';
@@ -64,7 +64,7 @@ export function useCapitalScreen(onUpdated?: () => void) {
           currency: 'KRW',
           type: CashLedgerType.INITIAL,
           amount: krw,
-          memo: t('capital.memoInitialCapital'),
+          memo: formatCashLedgerMemo('INITIAL', 'KRW'),
         });
       }
       if (Number.isFinite(usd) && usd > 0) {
@@ -72,7 +72,7 @@ export function useCapitalScreen(onUpdated?: () => void) {
           currency: 'USD',
           type: CashLedgerType.INITIAL,
           amount: usd,
-          memo: t('capital.memoInitialCapitalUsd'),
+          memo: formatCashLedgerMemo('INITIAL', 'USD'),
         });
       }
       setKrwAmount('');
@@ -99,7 +99,7 @@ export function useCapitalScreen(onUpdated?: () => void) {
         currency,
         type: CashLedgerType.DEPOSIT,
         amount,
-        memo: t('capital.memoDeposit'),
+        memo: formatCashLedgerMemo('DEPOSIT', currency),
       });
       if (currency === 'KRW') setKrwAmount('');
       else setUsdAmount('');
@@ -125,7 +125,7 @@ export function useCapitalScreen(onUpdated?: () => void) {
         currency,
         type: CashLedgerType.WITHDRAW,
         amount,
-        memo: t('capital.memoWithdraw'),
+        memo: formatCashLedgerMemo('WITHDRAW', currency),
       });
       if (currency === 'KRW') setKrwAmount('');
       else setUsdAmount('');

@@ -40,6 +40,8 @@ export type AnalysisTone = 'bullish' | 'bearish' | 'neutral';
 export interface AnalysisLink {
   label: string;
   url: string;
+  labelKey?: string;
+  labelParams?: Record<string, string | number>;
 }
 
 export interface EvidenceItem {
@@ -336,10 +338,15 @@ function breadthInsights(
         links: [
           {
             label: market === Market.KR ? '네이버 금융 코스피' : 'Yahoo S&P 500',
+            labelKey:
+              market === Market.KR
+                ? 'shared.market.insights.links.naverFinanceKospi'
+                : 'shared.market.insights.links.yahooSp500',
             url: market === Market.KR ? 'https://finance.naver.com/sise/' : 'https://finance.yahoo.com/quote/%5EGSPC/',
           },
           {
             label: 'TradingView',
+            labelKey: 'shared.market.insights.links.tradingView',
             url: market === Market.KR ? 'https://www.tradingview.com/symbols/KRX-KOSPI/' : 'https://www.tradingview.com/symbols/SP-SPX/',
           },
         ],
@@ -407,8 +414,8 @@ function indexInsights(indices: IndexTechnicalSnapshot[]): AnalysisInsight[] {
             : ev('shared.market.insights.evidence.rangeMissing'),
         ],
         links: [
-          { label: 'Yahoo Finance 차트', url: idx.chartUrl },
-          { label: 'TradingView', url: idx.tradingViewUrl },
+          { label: 'Yahoo Finance 차트', labelKey: 'shared.market.insights.links.yahooFinanceChart', url: idx.chartUrl },
+          { label: 'TradingView', labelKey: 'shared.market.insights.links.tradingView', url: idx.tradingViewUrl },
         ],
         tone:
           idx.trendKey.includes('Up') || idx.trendKey.includes('midTerm')
@@ -466,8 +473,8 @@ function indexInsights(indices: IndexTechnicalSnapshot[]): AnalysisInsight[] {
               : ev('shared.market.insights.evidence.volumeMissing'),
           ],
           links: [
-            { label: 'Investopedia RSI', url: 'https://www.investopedia.com/terms/r/rsi.asp' },
-            { label: 'Yahoo Finance 차트', url: idx.chartUrl },
+            { label: 'Investopedia RSI', labelKey: 'shared.market.insights.links.investopediaRsi', url: 'https://www.investopedia.com/terms/r/rsi.asp' },
+            { label: 'Yahoo Finance 차트', labelKey: 'shared.market.insights.links.yahooFinanceChart', url: idx.chartUrl },
           ],
           tone: overbought ? 'bearish' : oversold ? 'bullish' : 'neutral',
           market: idx.market,
@@ -503,8 +510,8 @@ function indexInsights(indices: IndexTechnicalSnapshot[]): AnalysisInsight[] {
             ev('shared.market.insights.evidence.smaValue', { label: 'SMA20', value: formatNum(idx.sma20) }),
           ],
           links: [
-            { label: 'Investopedia MACD', url: 'https://www.investopedia.com/terms/m/macd.asp' },
-            { label: 'TradingView', url: idx.tradingViewUrl },
+            { label: 'Investopedia MACD', labelKey: 'shared.market.insights.links.investopediaMacd', url: 'https://www.investopedia.com/terms/m/macd.asp' },
+            { label: 'TradingView', labelKey: 'shared.market.insights.links.tradingView', url: idx.tradingViewUrl },
           ],
           tone: macdBull ? 'bullish' : 'bearish',
           market: idx.market,
@@ -548,8 +555,8 @@ function indexInsights(indices: IndexTechnicalSnapshot[]): AnalysisInsight[] {
             }),
           ],
           links: [
-            { label: 'Investopedia Bollinger', url: 'https://www.investopedia.com/terms/b/bollingerbands.asp' },
-            { label: 'Yahoo 차트', url: idx.chartUrl },
+            { label: 'Investopedia Bollinger', labelKey: 'shared.market.insights.links.investopediaBollinger', url: 'https://www.investopedia.com/terms/b/bollingerbands.asp' },
+            { label: 'Yahoo 차트', labelKey: 'shared.market.insights.links.yahooFinanceChart', url: idx.chartUrl },
           ],
           tone,
           market: idx.market,
@@ -585,8 +592,8 @@ function indexInsights(indices: IndexTechnicalSnapshot[]): AnalysisInsight[] {
             ev(st.labelKey),
           ],
           links: [
-            { label: 'Investopedia Stochastic', url: 'https://www.investopedia.com/terms/s/stochasticoscillator.asp' },
-            { label: 'TradingView', url: idx.tradingViewUrl },
+            { label: 'Investopedia Stochastic', labelKey: 'shared.market.insights.links.investopediaStochastic', url: 'https://www.investopedia.com/terms/s/stochasticoscillator.asp' },
+            { label: 'TradingView', labelKey: 'shared.market.insights.links.tradingView', url: idx.tradingViewUrl },
           ],
           tone: overbought ? 'bearish' : oversold ? 'bullish' : 'neutral',
           market: idx.market,
@@ -635,13 +642,15 @@ function macroPanelInsights(macro: MacroIndicatorSnapshot[]): AnalysisInsight[] 
         ev(m.interpretKey),
       ],
       links: [
-        { label: 'Yahoo Finance', url: m.chartUrl },
-        ...(m.tradingViewUrl ? [{ label: 'TradingView', url: m.tradingViewUrl }] : []),
+        { label: 'Yahoo Finance', labelKey: 'shared.market.insights.links.yahooFinance', url: m.chartUrl },
+        ...(m.tradingViewUrl
+          ? [{ label: 'TradingView', labelKey: 'shared.market.insights.links.tradingView', url: m.tradingViewUrl }]
+          : []),
         ...(m.kind === 'vix'
-          ? [{ label: 'CBOE VIX', url: 'https://www.cboe.com/tradable_products/vix/' }]
+          ? [{ label: 'CBOE VIX', labelKey: 'shared.market.insights.links.cboeVix', url: 'https://www.cboe.com/tradable_products/vix/' }]
           : m.kind === 'yield'
-            ? [{ label: 'FRED 10Y', url: 'https://fred.stlouisfed.org/series/DGS10' }]
-            : [{ label: 'Investing.com USD/KRW', url: 'https://www.investing.com/currencies/usd-krw' }]),
+            ? [{ label: 'FRED 10Y', labelKey: 'shared.market.insights.links.fred10y', url: 'https://fred.stlouisfed.org/series/DGS10' }]
+            : [{ label: 'Investing.com USD/KRW', labelKey: 'shared.market.insights.links.investingUsdKrw', url: 'https://www.investing.com/currencies/usd-krw' }]),
       ],
       tone: m.tone as AnalysisTone,
       market: 'global',
@@ -708,7 +717,12 @@ function sectorInsights(sectors: SectorEtfSnapshot[]): AnalysisInsight[] {
             }),
           ),
         ],
-        links: list.slice(0, 4).map((s) => ({ label: s.sectorLabel, url: s.chartUrl })),
+        links: list.slice(0, 4).map((s) => ({
+          label: s.sectorLabel,
+          labelKey: 'shared.market.insights.links.sectorChart',
+          labelParams: { sector: s.sectorLabel },
+          url: s.chartUrl,
+        })),
         tone: (leader.rsBenchmark1w ?? 0) > 1 ? 'bullish' : (laggard.rsBenchmark1w ?? 0) < -1 ? 'bearish' : 'neutral',
         market,
       }),
@@ -749,8 +763,8 @@ function newsInsights(news: NewsAnalysisInput[]): AnalysisInsight[] {
           ev('shared.market.insights.evidence.newsRssDelay'),
         ],
         links: [
-          { label: 'Google 뉴스 — 코스피', url: 'https://news.google.com/search?q=코스피+증시&hl=ko' },
-          { label: 'Google 뉴스 — US market', url: 'https://news.google.com/search?q=US+stock+market&hl=en-US' },
+          { label: 'Google 뉴스 — 코스피', labelKey: 'shared.market.insights.links.googleNewsKospi', url: 'https://news.google.com/search?q=코스피+증시&hl=ko' },
+          { label: 'Google 뉴스 — US market', labelKey: 'shared.market.insights.links.googleNewsUsMarket', url: 'https://news.google.com/search?q=US+stock+market&hl=en-US' },
         ],
         tone: 'neutral',
         market: 'global',
@@ -862,8 +876,8 @@ function macroInsight(kr: RegionSentiment, us: RegionSentiment): AnalysisInsight
       ev('shared.market.insights.evidence.tempGap', { gap: Math.abs(krAvg - usAvg).toFixed(2) }),
     ],
     links: [
-      { label: 'Investing.com 환율', url: 'https://www.investing.com/currencies/usd-krw' },
-      { label: 'FRED 경제지표', url: 'https://fred.stlouisfed.org/' },
+      { label: 'Investing.com 환율', labelKey: 'shared.market.insights.links.investingFx', url: 'https://www.investing.com/currencies/usd-krw' },
+      { label: 'FRED 경제지표', labelKey: 'shared.market.insights.links.fredIndicators', url: 'https://fred.stlouisfed.org/' },
     ],
     tone,
     market: 'global',
@@ -906,6 +920,10 @@ function recommendationInsights(recommendations: StockRecommendation[]): Analysi
       links: [
         {
           label: rec.market === Market.KR ? '네이버 금융' : 'Yahoo Finance',
+          labelKey:
+            rec.market === Market.KR
+              ? 'shared.market.insights.links.naverFinance'
+              : 'shared.market.insights.links.yahooFinance',
           url:
             rec.market === Market.KR
               ? `https://finance.naver.com/item/main.naver?code=${rec.symbol}`
@@ -913,6 +931,7 @@ function recommendationInsights(recommendations: StockRecommendation[]): Analysi
         },
         {
           label: 'TradingView',
+          labelKey: 'shared.market.insights.links.tradingView',
           url: `https://www.tradingview.com/symbols/${rec.market === Market.KR ? 'KRX-' : ''}${rec.symbol}/`,
         },
       ],
