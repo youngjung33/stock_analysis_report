@@ -7,7 +7,7 @@ import {
 } from '@sar/shared';
 import en from './locales/en.json';
 import ko from './locales/ko.json';
-import type { SeoPageKey } from './seo-routes';
+import { seoPathForPageKey, type SeoPageKey } from './seo-routes';
 
 type LocaleBundle = typeof en;
 
@@ -68,7 +68,10 @@ export function getPageSeoCopy(
   const defaultDescription = translateSeo(locale, 'meta.description');
 
   if (pageKey === 'home') {
-    return { title: defaultTitle, description: defaultDescription };
+    return {
+      title: translateSeo(locale, 'seo.pages.home.title') || defaultTitle,
+      description: translateSeo(locale, 'seo.pages.home.description') || defaultDescription,
+    };
   }
 
   const pageTitle = translateSeo(locale, `seo.pages.${pageKey}.title`, params);
@@ -87,8 +90,11 @@ export function buildPageMetadata(
   params?: Record<string, string>,
 ): Metadata {
   const siteName = translateSeo(locale, 'meta.siteName');
+  const keywords = translateSeo(locale, 'meta.keywords');
   const { title, description } = getPageSeoCopy(locale, pageKey, params);
   const siteUrl = getSiteUrl();
+  const pathname = seoPathForPageKey(pageKey, params);
+  const pageUrl = new URL(pathname, siteUrl).toString();
   const ogLocale = locale === 'ko' ? 'ko_KR' : 'en_US';
   const ogImageAlt = translateSeo(locale, 'meta.ogImageAlt');
   const ogImage = {
@@ -97,13 +103,17 @@ export function buildPageMetadata(
     height: 630,
     alt: ogImageAlt,
   };
+  const indexable = pageKey !== 'settings';
 
   return {
     metadataBase: new URL(siteUrl),
     title: pageKey === 'home' ? title : { absolute: title },
     description,
     applicationName: siteName,
-    keywords: translateSeo(locale, 'meta.keywords'),
+    keywords,
+    alternates: {
+      canonical: pageUrl,
+    },
     icons: {
       icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
       apple: [{ url: '/apple-icon', type: 'image/png', sizes: '180x180' }],
@@ -115,7 +125,7 @@ export function buildPageMetadata(
       siteName,
       title,
       description,
-      url: siteUrl,
+      url: pageUrl,
       images: [ogImage],
     },
     twitter: {
@@ -125,7 +135,7 @@ export function buildPageMetadata(
       images: [ogImage.url],
     },
     robots: {
-      index: pageKey !== 'settings',
+      index: indexable,
       follow: true,
     },
   };
@@ -138,4 +148,22 @@ export async function generateMetadataFromCookies(
 ): Promise<Metadata> {
   const locale = getServerLocale(cookieStore);
   return buildPageMetadata(locale, pageKey, params);
+}
+
+export interface OgImageCopy {
+  siteName: string;
+  tagline: string;
+  features: string;
+  badge: string;
+  alt: string;
+}
+
+export function getOgImageCopy(locale: SupportedLocale): OgImageCopy {
+  return {
+    siteName: translateSeo(locale, 'meta.siteName'),
+    tagline: translateSeo(locale, 'meta.ogImageTagline'),
+    features: translateSeo(locale, 'meta.ogImageFeatures'),
+    badge: translateSeo(locale, 'meta.ogImageBadge'),
+    alt: translateSeo(locale, 'meta.ogImageAlt'),
+  };
 }

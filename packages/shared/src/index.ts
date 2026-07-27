@@ -9,6 +9,17 @@ export {
 } from './i18n';
 export type { SupportedLocale } from './i18n';
 
+export {
+  THEME_MODES,
+  DEFAULT_THEME,
+  THEME_STORAGE_KEY,
+  THEME_COOKIE_KEY,
+  THEME_LABELS,
+  isThemeMode,
+  normalizeTheme,
+} from './theme';
+export type { ThemeMode } from './theme';
+
 export { Market, TransactionType } from './enums';
 
 export const REFRESH_TOKEN_COOKIE = 'refreshToken';

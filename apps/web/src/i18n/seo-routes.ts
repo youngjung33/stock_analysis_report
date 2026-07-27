@@ -16,6 +16,34 @@ export interface SeoRouteMatch {
   params?: Record<string, string>;
 }
 
+/** Canonical pathname for a SEO page key (used in metadata + sitemap) */
+export function seoPathForPageKey(pageKey: SeoPageKey, params?: Record<string, string>): string {
+  switch (pageKey) {
+    case 'home':
+      return '/';
+    case 'login':
+      return '/login';
+    case 'forgotPassword':
+      return '/forgot-password';
+    case 'resetPassword':
+      return '/reset-password';
+    case 'settings':
+      return '/settings';
+    case 'myInfo':
+      return '/my-info';
+    case 'transactions':
+      return '/transactions';
+    case 'market':
+      return '/market/analysis';
+    case 'tax':
+      return '/tax';
+    case 'stock':
+      return `/stocks/${encodeURIComponent(params?.symbol ?? '')}`;
+    default:
+      return '/';
+  }
+}
+
 export function pathnameToSeoRoute(pathname: string): SeoRouteMatch {
   const path = pathname.split('?')[0] ?? '/';
 

@@ -296,7 +296,7 @@ export function TaxProfileForm({ profile, onChange }: Props) {
           value={formatKrwInputValue(profile.pensionContributionKrw)}
           onValueChange={(v) => onChange({ pensionContributionKrw: parseAmountInput(v) ?? 0 })}
           formatOptions={{ maxFractionDigits: 0 }}
-          placeholder="0"
+          placeholder={t('common.amountZeroPlaceholder')}
         />
       </fieldset>
 
@@ -310,7 +310,7 @@ export function TaxProfileForm({ profile, onChange }: Props) {
           value={formatKrwInputValue(profile.otherFinancialIncomeKrw)}
           onValueChange={(v) => onChange({ otherFinancialIncomeKrw: parseAmountInput(v) ?? 0 })}
           formatOptions={{ maxFractionDigits: 0 }}
-          placeholder="0"
+          placeholder={t('common.amountZeroPlaceholder')}
         />
       </fieldset>
 

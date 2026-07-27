@@ -129,7 +129,7 @@ export function LoginPage() {
               value={screen.email}
               onChange={(e) => screen.setEmail(e.target.value)}
               autoComplete="email"
-              placeholder="name@example.com"
+              placeholder={t('auth.emailPlaceholder')}
             />
             <AuthFieldHint message={registerFieldError(screen.fieldErrors.email, t)} tone="error" />
           </label>

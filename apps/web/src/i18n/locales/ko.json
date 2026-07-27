@@ -89,6 +89,7 @@
     "fxConversionNote": "원화 환산",
     "welcomeRegistered": "회원가입을 환영합니다! 투자 내역을 시작해 보세요.",
     "amountRequired": "금액을 입력해 주세요.",
+    "amountZeroPlaceholder": "0",
     "selectStockRequired": "종목을 검색해서 선택해 주세요.",
     "requestFailed": "요청을 처리하지 못했습니다."
   },
@@ -96,8 +97,12 @@
     "title": "주식 투자 현황",
     "description": "개인용 주식 매매·배당·세금 관리",
     "siteName": "SAR Portfolio",
+    "tagline": "주식 분석 리포트",
     "keywords": "주식, 포트폴리오, 매매, 배당, 세금, 투자",
-    "ogImageAlt": "SAR Portfolio — 주식 투자·분석 대시보드 미리보기"
+    "ogImageAlt": "SAR Portfolio — 주식 투자·분석 대시보드 미리보기",
+    "ogImageTagline": "주식 분석 리포트",
+    "ogImageFeatures": "포트폴리오 · 매매 · 배당 · 세금 추정",
+    "ogImageBadge": "sar.portfolio"
   },
   "seo": {
     "pages": {
@@ -164,6 +169,7 @@
     "password": "비밀번호",
     "passwordConfirm": "비밀번호 확인",
     "emailOptional": "이메일 (선택)",
+    "emailPlaceholder": "name@example.com",
     "login": "로그인",
     "loggingIn": "로그인 중...",
     "register": "회원가입",
@@ -210,6 +216,11 @@
   },
   "settings": {
     "title": "계정 설정",
+    "appearance": "화면 모드",
+    "theme": "테마",
+    "themeDesc": "라이트·다크 모드를 선택합니다. 변경 즉시 앱 전체에 적용됩니다.",
+    "themeLight": "라이트",
+    "themeDark": "다크",
     "language": "언어",
     "languageDesc": "변경 즉시 앱 전체에 적용됩니다.",
     "email": "이메일",
@@ -218,6 +229,7 @@
     "requestVerificationCode": "인증 코드 받기",
     "saveAndIssueCode": "저장 · 코드 발급",
     "verificationCode": "인증 코드 (6자리)",
+    "verificationCodePlaceholder": "000000",
     "verify": "인증하기",
     "changePassword": "비밀번호 변경",
     "currentPassword": "현재 비밀번호",
@@ -572,6 +584,12 @@
       "oneDay": "1일",
       "bollinger": "볼린저",
       "trend": "추세",
+      "sma": "SMA20/50",
+      "rsi": "RSI",
+      "macd": "MACD",
+      "stoch": "Stoch",
+      "yahooLink": "Yahoo ↗",
+      "tradingViewLink": "TradingView ↗",
       "sectorTitle": "업종 ETF 상대강도",
       "sectorSubtitle": "1주·1달 수익률 — SPY / KODEX 200 대비 자금 이동 관찰",
       "todayChange": "당일 {{percent}}",

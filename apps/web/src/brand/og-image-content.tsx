@@ -1,4 +1,5 @@
 import { BRAND_VISUAL } from './visual-theme';
+import type { OgImageCopy } from '@/i18n/server-metadata';
 
 /** JSX for next/og ImageResponse — shared by opengraph-image and apple-icon */
 export function BrandMark({ size }: { size: 'icon' | 'og' }) {
@@ -45,7 +46,7 @@ export function BrandMark({ size }: { size: 'icon' | 'og' }) {
   );
 }
 
-export function OgImageLayout() {
+export function OgImageLayout({ copy }: { copy: OgImageCopy }) {
   return (
     <div
       style={{
@@ -71,15 +72,15 @@ export function OgImageLayout() {
               lineHeight: 1.05,
             }}
           >
-            {BRAND_VISUAL.siteName}
+            {copy.siteName}
           </div>
-          <div style={{ fontSize: 28, color: BRAND_VISUAL.muted }}>{BRAND_VISUAL.tagline}</div>
+          <div style={{ fontSize: 28, color: BRAND_VISUAL.muted }}>{copy.tagline}</div>
         </div>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div style={{ fontSize: 24, color: BRAND_VISUAL.muted, maxWidth: 720, lineHeight: 1.45 }}>
-          Portfolio · Trades · Dividends · Tax estimates
+          {copy.features}
         </div>
         <div
           style={{
@@ -92,7 +93,7 @@ export function OgImageLayout() {
             border: `1px solid rgba(99,102,241,0.35)`,
           }}
         >
-          sar.portfolio
+          {copy.badge}
         </div>
       </div>
     </div>

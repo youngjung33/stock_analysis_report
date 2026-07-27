@@ -3,6 +3,7 @@
 import { LOCALE_LABELS, type SupportedLocale } from '@sar/shared';
 import { useTranslation } from 'react-i18next';
 import { useLocale } from '@/i18n';
+import { ThemeToggle } from './ThemeToggle';
 import { cn } from '../lib/cn';
 
 interface Props {
@@ -48,7 +49,8 @@ export function LanguageSelector({ className, variant = 'default' }: Props) {
 export function FixedLanguageSelector() {
   return (
     <div className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-end p-4 sm:p-5">
-      <div className="pointer-events-auto rounded-lg border border-border/80 bg-card/95 p-1 shadow-sm backdrop-blur-sm">
+      <div className="pointer-events-auto flex items-center gap-1 rounded-lg border border-border/80 bg-card/95 p-1 shadow-sm backdrop-blur-sm">
+        <ThemeToggle />
         <LanguageSelector variant="compact" />
       </div>
     </div>

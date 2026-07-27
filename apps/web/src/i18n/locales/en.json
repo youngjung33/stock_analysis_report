@@ -89,6 +89,7 @@
     "fxConversionNote": "KRW conversion",
     "welcomeRegistered": "Welcome! Start building your portfolio.",
     "amountRequired": "Please enter an amount.",
+    "amountZeroPlaceholder": "0",
     "selectStockRequired": "Search and select a stock.",
     "requestFailed": "Could not process the request."
   },
@@ -96,8 +97,12 @@
     "title": "Stock Portfolio",
     "description": "Personal stock trading, dividends, and tax management",
     "siteName": "SAR Portfolio",
+    "tagline": "Stock Analysis Report",
     "keywords": "stock portfolio, trading, dividends, tax, investment tracker",
-    "ogImageAlt": "SAR Portfolio — stock portfolio and analysis dashboard preview"
+    "ogImageAlt": "SAR Portfolio — stock portfolio and analysis dashboard preview",
+    "ogImageTagline": "Stock Analysis Report",
+    "ogImageFeatures": "Portfolio · Trades · Dividends · Tax estimates",
+    "ogImageBadge": "sar.portfolio"
   },
   "seo": {
     "pages": {
@@ -164,6 +169,7 @@
     "password": "Password",
     "passwordConfirm": "Confirm password",
     "emailOptional": "Email (optional)",
+    "emailPlaceholder": "name@example.com",
     "login": "Log in",
     "loggingIn": "Logging in...",
     "register": "Sign up",
@@ -210,6 +216,11 @@
   },
   "settings": {
     "title": "Account settings",
+    "appearance": "Appearance",
+    "theme": "Theme",
+    "themeDesc": "Choose light or dark mode. Changes apply immediately across the app.",
+    "themeLight": "Light",
+    "themeDark": "Dark",
     "language": "Language",
     "languageDesc": "Changes apply immediately across the app.",
     "email": "Email",
@@ -218,6 +229,7 @@
     "requestVerificationCode": "Send verification code",
     "saveAndIssueCode": "Save · Send code",
     "verificationCode": "Verification code (6 digits)",
+    "verificationCodePlaceholder": "000000",
     "verify": "Verify",
     "changePassword": "Change password",
     "currentPassword": "Current password",
@@ -572,6 +584,12 @@
       "oneDay": "1D",
       "bollinger": "Bollinger",
       "trend": "Trend",
+      "sma": "SMA20/50",
+      "rsi": "RSI",
+      "macd": "MACD",
+      "stoch": "Stoch",
+      "yahooLink": "Yahoo ↗",
+      "tradingViewLink": "TradingView ↗",
       "sectorTitle": "Sector ETF relative strength",
       "sectorSubtitle": "1W · 1M returns vs SPY / KODEX 200",
       "todayChange": "Today {{percent}}",

@@ -1,0 +1,168 @@
+/**
+ * Light theme overrides — loaded separately from globals.css.
+ * Dark theme (default) is defined only in globals.css and is not modified here.
+ * Apply by setting class="light" on <html> (server cookie or client toggle).
+ */
+
+.light {
+  color-scheme: light;
+
+  --color-background: #fafafa;
+  --color-foreground: #09090b;
+  --color-card: #ffffff;
+  --color-card-foreground: #09090b;
+  --color-muted: #f4f4f5;
+  --color-muted-foreground: #71717a;
+  --color-border: rgb(0 0 0 / 0.08);
+  --color-border-strong: rgb(0 0 0 / 0.12);
+  --color-accent: #f4f4f5;
+  --color-accent-foreground: #09090b;
+  --color-sidebar: #fafafa;
+  --color-sidebar-foreground: #71717a;
+  --color-sidebar-active: rgb(99 102 241 / 0.12);
+}
+
+/* Hardcoded slate panels — remapped only under .light; dark mode classes stay untouched. */
+@layer utilities {
+  .light :where(.bg-slate-950) {
+    background-color: #ffffff;
+  }
+
+  .light :where(.bg-slate-950\/30) {
+    background-color: rgb(255 255 255 / 0.85);
+  }
+
+  .light :where(.bg-slate-950\/40) {
+    background-color: rgb(255 255 255 / 0.9);
+  }
+
+  .light :where(.bg-slate-950\/50) {
+    background-color: rgb(255 255 255 / 0.92);
+  }
+
+  .light :where(.bg-slate-950\/90) {
+    background-color: rgb(255 255 255 / 0.96);
+  }
+
+  .light :where(.bg-slate-900) {
+    background-color: #f4f4f5;
+  }
+
+  .light :where(.bg-slate-900\/30) {
+    background-color: rgb(244 244 245 / 0.7);
+  }
+
+  .light :where(.bg-slate-900\/40) {
+    background-color: rgb(244 244 245 / 0.8);
+  }
+
+  .light :where(.bg-slate-900\/50) {
+    background-color: rgb(244 244 245 / 0.85);
+  }
+
+  .light :where(.bg-slate-900\/60) {
+    background-color: rgb(244 244 245 / 0.9);
+  }
+
+  .light :where(.bg-slate-900\/80) {
+    background-color: rgb(244 244 245 / 0.95);
+  }
+
+  .light :where(.bg-slate-900\/90) {
+    background-color: #f4f4f5;
+  }
+
+  .light :where(.bg-slate-800) {
+    background-color: #e4e4e7;
+  }
+
+  .light :where(.bg-slate-700) {
+    background-color: #d4d4d8;
+  }
+
+  .light :where(.border-slate-800) {
+    border-color: #e4e4e7;
+  }
+
+  .light :where(.border-slate-800\/80) {
+    border-color: rgb(228 228 231 / 0.85);
+  }
+
+  .light :where(.border-slate-700) {
+    border-color: #d4d4d8;
+  }
+
+  .light :where(.border-slate-600) {
+    border-color: #a1a1aa;
+  }
+
+  .light :where(.text-white) {
+    color: #09090b;
+  }
+
+  .light :where(.text-slate-200) {
+    color: #18181b;
+  }
+
+  .light :where(.text-slate-300) {
+    color: #3f3f46;
+  }
+
+  .light :where(.text-slate-400) {
+    color: #52525b;
+  }
+
+  .light :where(.text-slate-500) {
+    color: #71717a;
+  }
+
+  .light :where(.text-slate-600) {
+    color: #a1a1aa;
+  }
+
+  .light :where(.text-indigo-300) {
+    color: #4f46e5;
+  }
+
+  .light :where(.hover\:bg-slate-900\/50:hover) {
+    background-color: rgb(244 244 245 / 0.85);
+  }
+
+  .light :where(.hover\:bg-slate-900\/40:hover) {
+    background-color: rgb(244 244 245 / 0.8);
+  }
+
+  .light :where(.hover\:bg-slate-800:hover) {
+    background-color: #e4e4e7;
+  }
+
+  .light :where(.hover\:bg-slate-800\/80:hover) {
+    background-color: rgb(228 228 231 / 0.85);
+  }
+
+  .light :where(.hover\:bg-slate-700:hover) {
+    background-color: #d4d4d8;
+  }
+
+  .light :where(.hover\:text-indigo-300:hover) {
+    color: #4f46e5;
+  }
+
+  .light :where(.group-hover\:text-slate-400) {
+    color: inherit;
+  }
+
+  .light :where(.group:hover .group-hover\:text-slate-400) {
+    color: #52525b;
+  }
+
+  .light :where(.group:hover .group-hover\:text-indigo-300) {
+    color: #4f46e5;
+  }
+
+  /* Primary buttons keep white label on indigo background */
+  .light :where(.bg-indigo-600.text-white),
+  .light :where(.bg-indigo-600.hover\:bg-indigo-500.text-white) {
+    color: #ffffff;
+  }
+}

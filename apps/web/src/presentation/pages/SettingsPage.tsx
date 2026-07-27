@@ -4,6 +4,8 @@ import { OAUTH_PROVIDER_META } from '@sar/shared';
 import { useTranslation } from 'react-i18next';
 import { AppShell } from '../layout';
 import { PageStack, Surface } from '../design-system';
+import { LanguageSelector } from '../components/LanguageSelector';
+import { ThemeToggle } from '../components/ThemeToggle';
 import { useSettingsScreen } from '../hooks/screens/useSettingsScreen';
 
 export function SettingsPage() {
@@ -13,6 +15,22 @@ export function SettingsPage() {
   return (
     <AppShell title={t('settings.title')} subtitle={screen.profile?.username ?? ''}>
       <PageStack>
+        <Surface variant="section" className="space-y-3">
+          <div>
+            <h2 className="text-base font-semibold">{t('settings.appearance')}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t('settings.themeDesc')}</p>
+          </div>
+          <ThemeToggle variant="segmented" />
+        </Surface>
+
+        <Surface variant="section" className="space-y-3">
+          <div>
+            <h2 className="text-base font-semibold">{t('settings.language')}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t('settings.languageDesc')}</p>
+          </div>
+          <LanguageSelector />
+        </Surface>
+
         {screen.loading && <p className="text-sm text-muted-foreground">{t('common.loading')}</p>}
 
         {screen.profile && (
@@ -65,7 +83,7 @@ export function SettingsPage() {
                       className="mt-1 w-full rounded-lg border border-border-strong bg-muted px-3 py-2 text-sm tracking-widest"
                       value={screen.verificationCode}
                       onChange={(e) => screen.setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                      placeholder="000000"
+                      placeholder={t('settings.verificationCodePlaceholder')}
                     />
                   </label>
                   <button

@@ -29,7 +29,7 @@ export function AppSidebar({ className }: Props) {
       <div className="border-b border-border px-6 py-6">
         <Link href="/" className="block">
           <span className="text-base font-semibold tracking-tight text-foreground">{APP_BRAND.name}</span>
-          <span className="mt-0.5 block text-xs text-muted-foreground">{APP_BRAND.tagline}</span>
+          <span className="mt-0.5 block text-xs text-muted-foreground">{t('meta.tagline')}</span>
         </Link>
       </div>
 
