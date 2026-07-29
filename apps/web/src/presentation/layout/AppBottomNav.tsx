@@ -23,7 +23,7 @@ export function AppBottomNav({ className }: Props) {
       )}
       aria-label={t('nav.bottomMenu')}
     >
-      <div className="grid h-(--height-bottom-nav) grid-cols-5">
+      <div className="grid h-(--height-bottom-nav) grid-cols-6">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = active === item.id;

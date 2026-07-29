@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
-import { ArrowLeftRight, LayoutDashboard, LineChart, Receipt, UserCircle } from 'lucide-react';
+import { ArrowLeftRight, BookOpen, LayoutDashboard, LineChart, Receipt, UserCircle } from 'lucide-react';
 
-export type NavSectionId = 'dashboard' | 'my-info' | 'transactions' | 'market' | 'tax';
+export type NavSectionId = 'dashboard' | 'my-info' | 'transactions' | 'market' | 'tax' | 'guide';
 
 export interface AppNavItemDef {
   id: NavSectionId;
@@ -53,6 +53,14 @@ export const APP_NAV_ITEM_DEFS: AppNavItemDef[] = [
     shortLabelKey: 'nav.taxShort',
     icon: Receipt,
     match: (pathname) => pathname.startsWith('/tax'),
+  },
+  {
+    id: 'guide',
+    href: '/guide',
+    labelKey: 'nav.guide',
+    shortLabelKey: 'nav.guideShort',
+    icon: BookOpen,
+    match: (pathname) => pathname.startsWith('/guide'),
   },
 ];
 

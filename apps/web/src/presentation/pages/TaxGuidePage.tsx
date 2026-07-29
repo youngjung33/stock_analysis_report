@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import {
   FOREIGN_DIVIDEND_WITHHOLDING,
@@ -28,6 +29,9 @@ export function TaxGuidePage() {
       <Surface variant="section" className="space-y-2 border-indigo-900/30 bg-indigo-950/20">
         <h2 className="text-lg font-semibold md:text-xl">{t('tax.guideTitle')}</h2>
         <p className="text-sm text-muted-foreground">{t('tax.guideIntro')}</p>
+        <Link href="/guide" className="inline-block text-sm text-primary hover:underline">
+          {t('tax.guideLinkToQna')}
+        </Link>
         <ul className="list-inside list-disc text-xs text-muted-foreground md:text-sm">
           <li>{t('tax.guide.bulletFinancialTax')}</li>
           <li>{t('tax.guide.bulletForeignGain')}</li>

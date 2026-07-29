@@ -5,13 +5,10 @@ import {
   normalizeLocale,
   type SupportedLocale,
 } from '@sar/shared';
-import en from './locales/en.json';
-import ko from './locales/ko.json';
+import { localeBundles, type LocaleBundle } from './locale-bundles';
 import { seoPathForPageKey, type SeoPageKey } from './seo-routes';
 
-type LocaleBundle = typeof en;
-
-const BUNDLES: Record<SupportedLocale, LocaleBundle> = { en, ko };
+const BUNDLES: Record<SupportedLocale, LocaleBundle> = localeBundles;
 
 type CookieStore = {
   get: (name: string) => { value: string } | undefined;

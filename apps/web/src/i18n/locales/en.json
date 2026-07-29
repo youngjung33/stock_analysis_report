@@ -142,6 +142,10 @@
         "title": "Tax Guide",
         "description": "Korean tax rules reference and estimated tax from your portfolio."
       },
+      "guide": {
+        "title": "Stock Tips",
+        "description": "Practical tips on ISA, tax, charts, trading, and more — organized by category."
+      },
       "stock": {
         "title": "{{symbol}}",
         "description": "Stock quotes, charts, and details for {{symbol}}."
@@ -161,6 +165,8 @@
     "marketShort": "Market",
     "tax": "Tax Guide",
     "taxShort": "Tax",
+    "guide": "Stock Tips",
+    "guideShort": "Tips",
     "accountSettings": "Account settings",
     "logout": "Log out"
   },
@@ -465,6 +471,7 @@
   },
   "tax": {
     "guideTitle": "Tax guide for Korean residents",
+    "guideLinkToQna": "See ISA & tax tips →",
     "guideIntro": "Summary based on 2026 NTS and income tax law. Confirm actual filing with a tax professional.",
     "profileTitle": "My tax conditions",
     "profileDesc": "Select your situation to see applicable taxes and estimated amounts from holdings and trades.",
@@ -747,6 +754,9 @@
     },
     "tax": {
       "title": "Tax guide"
+    },
+    "guide": {
+      "title": "Stock Tips"
     },
     "globalError": {
       "title": "Something went wrong",

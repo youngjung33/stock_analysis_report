@@ -1,0 +1,384 @@
+{
+  "title": "Stock Tips",
+  "subtitle": "ISA, tax, charts & trading how-tos",
+  "intro": "Practical stock investing tips by category. Tap a title for details.",
+  "disclaimer": "General information for 2026 only — not tax or investment advice. Confirm your situation with your broker or a tax professional.",
+  "searchPlaceholder": "Search titles or keywords",
+  "allCategories": "All",
+  "noResults": "No results found.",
+  "itemCount": "{{count}} items",
+  "openItem": "Expand tip",
+  "closeItem": "Collapse tip",
+  "relatedLinks": "Related pages",
+  "categories": {
+    "isa": {
+      "label": "ISA",
+      "desc": "Annual limits, maturity & early withdrawal"
+    },
+    "tax": {
+      "label": "Tax",
+      "desc": "Dividends, gains, foreign stocks & filing"
+    },
+    "charts": {
+      "label": "Charts",
+      "desc": "Trend lines, RSI, MACD & more"
+    },
+    "trading": {
+      "label": "Trading basics",
+      "desc": "Cost basis, P/L, orders & dividends"
+    },
+    "accounts": {
+      "label": "Account types",
+      "desc": "Brokerage, ISA, pension & CMA"
+    },
+    "portfolio": {
+      "label": "Portfolio",
+      "desc": "Diversification, rebalancing & cash"
+    }
+  },
+  "links": {
+    "taxGuide": "View tax guide tables",
+    "marketAnalysis": "Open market analysis",
+    "transactions": "Trades & dividends",
+    "guideQna": "Stock Tips"
+  },
+  "items": {
+    "isa-what-is": {
+      "title": "What is an ISA (Individual Savings Account)?",
+      "paragraphs": [
+        "An ISA lets you hold deposits, funds, stocks, and bonds in one account with tax benefits on net income (interest, dividends, and trading gains combined).",
+        "Unlike a regular brokerage account, gains and losses are netted, with tax-free limits and a 9.9% flat rate on excess.",
+        "You typically must keep the account for a 3-year term to keep full benefits."
+      ],
+      "tips": ["Open a dedicated ISA at your bank or broker."]
+    },
+    "isa-yearly-limit": {
+      "title": "What are the ISA annual tax-free limits?",
+      "paragraphs": [
+        "Limits apply to net income (profits minus losses in the account).",
+        "General: up to KRW 2M tax-free per year. Worker/farmer/senior types: up to KRW 4M if eligible.",
+        "Excess is taxed at 9.9% (separate taxation)."
+      ],
+      "tips": ["See the ISA table on the tax guide page."]
+    },
+    "isa-early-withdrawal": {
+      "title": "What if I withdraw before the 3-year maturity?",
+      "paragraphs": [
+        "Early withdrawal or closure may cancel tax benefits or require repayment of prior benefits.",
+        "You can usually withdraw before maturity, but tax treatment becomes unfavorable.",
+        "Use early withdrawal only when necessary; staying until maturity is often better."
+      ],
+      "tips": ["Check NTS and broker notices for your tax year."]
+    },
+    "isa-vs-regular": {
+      "title": "ISA vs regular brokerage account?",
+      "paragraphs": [
+        "Regular account: domestic listed stock gains are generally tax-free (non-major shareholder); dividends withheld at 15.4%.",
+        "ISA: nets all product gains in the account; tax-free limit + 9.9% on excess.",
+        "Foreign stocks, bonds, and funds inside ISA can be netted together."
+      ],
+      "tips": ["Domestic stocks only may be fine in a regular account."]
+    },
+    "isa-overflow-tax": {
+      "title": "Tax rate above the ISA tax-free limit?",
+      "paragraphs": [
+        "Excess net income is taxed at 9.9% (9% income + 0.9% local).",
+        "ISA income is excluded from comprehensive financial income tax — a key benefit."
+      ],
+      "tips": ["Often lower than comprehensive rates up to 45%."]
+    },
+    "isa-comprehensive-tax-exclusion": {
+      "title": "Is ISA income included in comprehensive financial tax?",
+      "paragraphs": [
+        "ISA net income (tax-free and 9.9% portions) is excluded from the KRW 20M financial income threshold.",
+        "Useful if regular account interest/dividends approach the limit."
+      ],
+      "tips": ["Track regular and ISA income separately."]
+    },
+    "isa-eligibility-types": {
+      "title": "General, worker, and senior ISA types?",
+      "paragraphs": [
+        "General: no income test, KRW 2M tax-free.",
+        "Worker/farmer: income requirements, KRW 4M tax-free.",
+        "Senior: age 65+, KRW 4M tax-free."
+      ],
+      "tips": ["Your broker confirms eligibility at signup."]
+    },
+    "isa-contribution-limit": {
+      "title": "Annual ISA contribution limit?",
+      "paragraphs": [
+        "Contribution limits are separate from tax-free income limits.",
+        "Per-person annual cap is set by regulation (often around KRW 20M), all ISAs combined.",
+        "Over-contribution is not allowed."
+      ],
+      "tips": ["Limits may change with tax law updates."]
+    },
+    "isa-maturity-options": {
+      "title": "Options after 3-year ISA maturity?",
+      "paragraphs": [
+        "Convert to pension: possible extra tax benefits on pension withdrawals.",
+        "Close and withdraw: keep prior benefits and cash out.",
+        "Extension: may be available under product rules."
+      ],
+      "tips": ["Compare pension conversion vs cash-out terms."]
+    },
+    "isa-loss-offset": {
+      "title": "How are ISA gains and losses netted?",
+      "paragraphs": [
+        "All products in the same ISA are netted together.",
+        "Example: +KRW 1M on A and -KRW 300k on B → KRW 700k net for the tax-free limit.",
+        "If losses exceed gains, net income may be zero or negative for that year."
+      ],
+      "tips": ["Losses offset only within the same ISA and year."]
+    },
+    "tax-domestic-capital-gains": {
+      "title": "Tax on domestic stock trading profits?",
+      "paragraphs": [
+        "Non-major shareholders: gains on KOSPI/KOSDAQ listed shares are generally tax-free.",
+        "Major shareholders face separate capital gains tax (roughly 22–27.5%)."
+      ],
+      "tips": ["Unlisted/KONEX may have different rules."]
+    },
+    "tax-dividend-154": {
+      "title": "Why 15.4% withholding on dividends?",
+      "paragraphs": [
+        "Domestic dividends: 14% income + 1.4% local = 15.4% withheld at source.",
+        "If total financial income exceeds KRW 20M/year, comprehensive filing may apply."
+      ],
+      "tips": ["Ex-dates and pay dates vary by company."]
+    },
+    "tax-foreign-gains": {
+      "title": "Tax on foreign stock gains (e.g. US)?",
+      "paragraphs": [
+        "Foreign stock gains are taxable in Korea (around 22% plus local surcharges).",
+        "KRW 2.5M basic deduction; typically report in May comprehensive income tax."
+      ],
+      "tips": ["Consider foreign tax credit for US withholding."]
+    },
+    "tax-foreign-dividend": {
+      "title": "Tax on foreign dividends?",
+      "paragraphs": [
+        "Withheld locally (e.g. US 15–30%); additional tax may apply in Korea.",
+        "Report as financial income in May filing."
+      ],
+      "tips": ["See foreign dividend table on tax guide."]
+    },
+    "tax-financial-comprehensive": {
+      "title": "Comprehensive financial income tax (KRW 20M)?",
+      "paragraphs": [
+        "If interest + dividends (excluding some items) exceed KRW 20M/year, excess is taxed at progressive rates (6–45%).",
+        "ISA net income is excluded from this total."
+      ],
+      "tips": ["Important for high-dividend portfolios."]
+    },
+    "tax-filing-schedule": {
+      "title": "When do I file taxes?",
+      "paragraphs": [
+        "Foreign gains/dividends and comprehensive financial income: usually May comprehensive filing.",
+        "Tax-free domestic listed gains: no separate filing."
+      ],
+      "tips": ["Use HomeTax or a tax preparer."]
+    },
+    "tax-securities-transaction": {
+      "title": "What is securities transaction tax?",
+      "paragraphs": [
+        "On domestic stock sales, roughly 0.18–0.23% of sale amount is deducted.",
+        "Applies on sell, not buy."
+      ],
+      "tips": ["Include fees and tax for realistic P/L."]
+    },
+    "charts-trendline": {
+      "title": "How to draw trend lines?",
+      "paragraphs": [
+        "Uptrend: line connecting higher lows. Downtrend: line connecting lower highs.",
+        "Use at least 2–3 touch points. Break may signal trend change — not a sole signal."
+      ],
+      "tips": ["Check index charts on market analysis."]
+    },
+    "charts-support-resistance": {
+      "title": "Support and resistance?",
+      "paragraphs": [
+        "Support: price level where declines often pause or bounce.",
+        "Resistance: level where rallies often stall.",
+        "Confirm breaks with volume when possible."
+      ],
+      "tips": ["Round numbers and past highs/lows matter psychologically."]
+    },
+    "charts-rsi": {
+      "title": "How to read RSI?",
+      "paragraphs": [
+        "RSI 0–100; often 70+ overbought, 30- oversold.",
+        "Compare with market-wide RSI in app analysis.",
+        "Strong trends can stay overbought/oversold for long periods."
+      ],
+      "tips": ["RSI divergence is an advanced signal."]
+    },
+    "charts-macd": {
+      "title": "What does MACD show?",
+      "paragraphs": [
+        "MACD shows momentum from short vs long moving averages.",
+        "Signal crossovers and zero-line crosses are references — it lags price."
+      ],
+      "tips": ["Compare with market analysis MACD text."]
+    },
+    "charts-moving-average": {
+      "title": "Moving averages (MA)?",
+      "paragraphs": [
+        "20/60/120-day lines show short to medium trend.",
+        "Golden/death crosses are references; many false signals in sideways markets."
+      ],
+      "tips": ["Longer periods = slower but smoother."]
+    },
+    "charts-volume": {
+      "title": "Why volume matters?",
+      "paragraphs": [
+        "Rising price + rising volume: stronger participation. Price up, volume down: weaker follow-through.",
+        "Check volume on breakouts."
+      ],
+      "tips": ["Volume drop after spike may mean short-term exhaustion."]
+    },
+    "charts-vix": {
+      "title": "What is VIX?",
+      "paragraphs": [
+        "VIX estimates expected volatility from S&P 500 options — a fear gauge.",
+        "Higher VIX = more market anxiety.",
+        "Useful global sentiment reference for KR investors too."
+      ],
+      "tips": ["See VIX section in market analysis."]
+    },
+    "charts-caution": {
+      "title": "Trade on charts alone?",
+      "paragraphs": [
+        "Charts show past price patterns, not guaranteed future.",
+        "Combine with fundamentals, news, position sizing, and diversification.",
+        "Define stop-loss and sizing rules in advance."
+      ],
+      "tips": ["Use technical + fundamental + risk management together."]
+    },
+    "trading-average-cost": {
+      "title": "Average cost (cost basis)?",
+      "paragraphs": [
+        "Average purchase price across multiple buys.",
+        "App recalculates from trades and corporate actions.",
+        "Additional buys change your average."
+      ],
+      "tips": ["Align fee/tax treatment with your broker display."]
+    },
+    "trading-pnl": {
+      "title": "Unrealized vs realized P/L?",
+      "paragraphs": [
+        "Unrealized: (current price − cost) × shares for holdings still owned.",
+        "Realized: locked in when you sell.",
+        "Dashboard totals depend on definitions used."
+      ],
+      "tips": ["Tax generally applies to realized gains (with domestic listed exceptions)."]
+    },
+    "trading-market-vs-limit": {
+      "title": "Market vs limit orders?",
+      "paragraphs": [
+        "Market: fill quickly at current prices; slippage possible.",
+        "Limit: only at your price or better; may not fill.",
+        "Limits often help in volatile or thin markets."
+      ],
+      "tips": ["App records trades; place orders in your broker app."]
+    },
+    "trading-dividend-ex-date": {
+      "title": "Ex-dividend and record dates?",
+      "paragraphs": [
+        "Ex-date: day dividend rights separate from price; must hold day before.",
+        "Rights adjustments for splits/bonus issues.",
+        "Buying just before ex-date rarely nets free money after price drop and tax."
+      ],
+      "tips": ["Record dividends in Trades & Dividends."]
+    },
+    "trading-corporate-actions": {
+      "title": "Splits, mergers & corporate actions?",
+      "paragraphs": [
+        "Split: more shares, lower price per share.",
+        "Mergers/spin-offs adjust quantity and cost basis.",
+        "Log actions in the app to keep holdings correct."
+      ],
+      "tips": ["Reconcile broker notices with app records."]
+    },
+    "trading-quantity": {
+      "title": "How is share quantity calculated?",
+      "paragraphs": [
+        "Buys − sells + corporate action adjustments = current quantity.",
+        "Fractional shares depend on broker support (common for US)."
+      ],
+      "tips": ["Zero shares removes from portfolio but keeps history."]
+    },
+    "accounts-brokerage": {
+      "title": "Regular brokerage account?",
+      "paragraphs": [
+        "Standard account for stocks, ETFs, bonds.",
+        "Domestic gains often tax-free; dividends 15.4% withheld.",
+        "Often used alongside ISA/pension."
+      ],
+      "tips": ["You can hold ISA + regular at one broker."]
+    },
+    "accounts-isa-role": {
+      "title": "Role of an ISA account?",
+      "paragraphs": [
+        "Tax benefits: netting, tax-free limit, 9.9% excess.",
+        "3-year term, contribution caps, early exit penalties.",
+        "Consider for long-term diversified investing with tax savings."
+      ],
+      "tips": ["See Stock Tips ISA category and tax guide together."]
+    },
+    "accounts-pension": {
+      "title": "Pension savings vs stock account?",
+      "paragraphs": [
+        "Pension/IRP focus on retirement and contribution credits (up to ~13.2% on contributions).",
+        "Often fund/deposit heavy; direct stock rules vary by product.",
+        "May link to ISA maturity pension conversion."
+      ],
+      "tips": ["Check annual limits on tax guide."]
+    },
+    "accounts-cma": {
+      "title": "What is a CMA?",
+      "paragraphs": [
+        "Cash management account linked to brokerage for idle cash and short-term products.",
+        "Used for parking funds before investing.",
+        "Separate from stock trading mechanics."
+      ],
+      "tips": ["Match app cash balance with broker CMA."]
+    },
+    "portfolio-diversification": {
+      "title": "Why diversify?",
+      "paragraphs": [
+        "Concentration in one stock/sector increases specific risk.",
+        "Spread across names, sectors, countries (KR/US), and asset types.",
+        "Use allocation and simulation in the app."
+      ],
+      "tips": ["No perfect diversification — match your risk tolerance."]
+    },
+    "portfolio-rebalancing": {
+      "title": "What is rebalancing?",
+      "paragraphs": [
+        "Adjust holdings back to target weights (e.g. 70% stocks / 30% cash).",
+        "Sell overweight, add underweight on a schedule.",
+        "Too frequent rebalancing increases costs."
+      ],
+      "tips": ["Quarterly or semi-annual reviews are common."]
+    },
+    "portfolio-cash-ratio": {
+      "title": "How much cash to hold?",
+      "paragraphs": [
+        "Some cash buffers downturns and enables future buys.",
+        "100% invested vs cash is personal — situation and comfort differ.",
+        "Check cash vs total assets on dashboard."
+      ],
+      "tips": ["Keep emergency living funds outside brokerage."]
+    },
+    "portfolio-long-term": {
+      "title": "Long-term vs short-term trading?",
+      "paragraphs": [
+        "Long-term: growth, dividends, compounding; lower turnover and stress.",
+        "Short-term: more fees, tax, and time; needs discipline.",
+        "Beginners often start small, long-term, diversified."
+      ],
+      "tips": ["Define horizon and goal (retirement, lump sum, etc.) first."]
+    }
+  }
+}

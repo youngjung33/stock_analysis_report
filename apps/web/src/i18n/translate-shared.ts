@@ -408,3 +408,30 @@ export function translateAnalysisInsight(
   }));
   return { categoryLabel, title, summary, reasoning, evidence, links };
 }
+
+export interface TranslatedGuideFaqItem {
+  title: string;
+  paragraphs: string[];
+  tips: string[];
+}
+
+export function translateGuideCategory(
+  categoryId: string,
+  t: TFunction,
+): { label: string; desc: string } {
+  return {
+    label: t(`guide.categories.${categoryId}.label`),
+    desc: t(`guide.categories.${categoryId}.desc`),
+  };
+}
+
+export function translateGuideFaqItem(itemId: string, t: TFunction): TranslatedGuideFaqItem {
+  const base = `guide.items.${itemId}`;
+  const paragraphs = t(`${base}.paragraphs`, { returnObjects: true, defaultValue: [] });
+  const tips = t(`${base}.tips`, { returnObjects: true, defaultValue: [] });
+  return {
+    title: t(`${base}.title`),
+    paragraphs: Array.isArray(paragraphs) ? (paragraphs as string[]) : [],
+    tips: Array.isArray(tips) ? (tips as string[]) : [],
+  };
+}

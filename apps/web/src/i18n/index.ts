@@ -21,4 +21,7 @@ export {
   translateTaxDisclaimer,
   translateTaxLineItem,
   translateTaxRule,
+  translateGuideCategory,
+  translateGuideFaqItem,
 } from './translate-shared';
+export type { TranslatedGuideFaqItem } from './translate-shared';

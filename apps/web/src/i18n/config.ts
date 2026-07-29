@@ -9,15 +9,14 @@ import {
   normalizeLocale,
   type SupportedLocale,
 } from '@sar/shared';
-import en from './locales/en.json';
-import ko from './locales/ko.json';
+import { localeBundles } from './locale-bundles';
 
 const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 void i18n.use(initReactI18next).init({
   resources: {
-    en: { translation: en },
-    ko: { translation: ko },
+    en: { translation: localeBundles.en },
+    ko: { translation: localeBundles.ko },
   },
   lng: DEFAULT_LOCALE,
   fallbackLng: 'en',

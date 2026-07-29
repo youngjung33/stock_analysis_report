@@ -272,3 +272,10 @@ export type {
   NewsAnalysisInput,
   StochasticSnapshot,
 } from './market-analysis';
+
+export {
+  GUIDE_CATEGORIES,
+  GUIDE_FAQ_CATALOG,
+  isGuideCategoryId,
+} from './guide';
+export type { GuideCategoryId, GuideFaqItemDef, GuideRelatedLink } from './guide';

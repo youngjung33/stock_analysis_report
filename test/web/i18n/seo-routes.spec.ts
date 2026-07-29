@@ -19,7 +19,7 @@ describe('seo-routes', () => {
   });
 
   it('round-trips static routes', () => {
-    const paths = ['/login', '/tax', '/my-info', '/transactions'] as const;
+    const paths = ['/login', '/tax', '/guide', '/my-info', '/transactions'] as const;
     for (const path of paths) {
       const { pageKey } = pathnameToSeoRoute(path);
       expect(seoPathForPageKey(pageKey)).toBe(path);
