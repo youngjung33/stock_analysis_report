@@ -413,6 +413,7 @@ export interface TranslatedGuideFaqItem {
   title: string;
   paragraphs: string[];
   tips: string[];
+  figureCaption?: string;
 }
 
 export function translateGuideCategory(
@@ -433,5 +434,6 @@ export function translateGuideFaqItem(itemId: string, t: TFunction): TranslatedG
     title: t(`${base}.title`),
     paragraphs: Array.isArray(paragraphs) ? (paragraphs as string[]) : [],
     tips: Array.isArray(tips) ? (tips as string[]) : [],
+    figureCaption: t(`${base}.figureCaption`, { defaultValue: '' }) || undefined,
   };
 }

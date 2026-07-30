@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import type { GuideFaqItemDef } from '@sar/shared';
 import { translateGuideFaqItem } from '@/i18n';
+import { GuideFigure } from './figures/GuideFigure';
+import { hasGuideFigure } from './figures/registry';
 import { cn } from '../../lib/cn';
 
 interface Props {
@@ -51,6 +53,9 @@ export function GuideFaqAccordion({ item, categoryLabel, open, onToggle, id }: P
               <p key={index}>{paragraph}</p>
             ))}
           </div>
+          {hasGuideFigure(item.id) && (
+            <GuideFigure itemId={item.id} caption={content.figureCaption} t={t} />
+          )}
           {content.tips.length > 0 && (
             <ul className="mt-3 list-inside list-disc space-y-1 text-xs text-muted-foreground md:text-sm">
               {content.tips.map((tip, index) => (
