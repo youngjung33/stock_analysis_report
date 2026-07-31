@@ -114,7 +114,7 @@ export function GuideFaqList() {
 
   return (
     <div className="space-y-6">
-      <Surface variant="section" className="space-y-4 border-indigo-900/30 bg-indigo-950/20">
+      <Surface variant="section" className="space-y-4 border-primary/25 bg-primary/5">
         <div>
           <h2 className="text-lg font-semibold md:text-xl">{t('guide.title')}</h2>
           <p className="mt-1 text-sm text-muted-foreground">{t('guide.intro')}</p>

@@ -34,13 +34,19 @@
     "portfolio": {
       "label": "Portfolio",
       "desc": "Diversification, rebalancing & cash"
+    },
+    "type-analysis": {
+      "label": "My type analysis",
+      "desc": "Investor style, risk, horizon & allocation quizzes"
     }
   },
   "links": {
     "taxGuide": "View tax guide tables",
     "marketAnalysis": "Open market analysis",
     "transactions": "Trades & dividends",
-    "guideQna": "Stock Tips"
+    "guideQna": "Stock Tips",
+    "investorSurvey": "Investor type quiz",
+    "startTest": "Start quiz"
   },
   "items": {
     "isa-what-is": {
@@ -693,6 +699,42 @@
         "invest": "Investing",
         "save": "Savings"
       }
+    },
+    "analysis-investor-type": {
+      "title": "Full investor type quiz (10 steps)",
+      "paragraphs": [
+        "Ten questions on horizon, loss tolerance, experience, income, emergency fund, knowledge, crisis behavior, return expectations, diversification, and goals.",
+        "Classifies you into one of 10 types from ultra conservative to ultra aggressive, with asset mix, KR/US weights, and stock style suggestions.",
+        "You can apply results directly to portfolio target weights."
+      ],
+      "tips": ["About 3–5 minutes", "Tap “Apply to portfolio targets” after finishing."]
+    },
+    "analysis-risk-check": {
+      "title": "Quick risk tolerance quiz (5 questions)",
+      "paragraphs": [
+        "Five questions on loss tolerance, crisis response, return expectations, emergency fund, and diversification preference.",
+        "Useful to gauge how much volatility you can handle when markets fall.",
+        "Best as a light check before or alongside the full quiz."
+      ],
+      "tips": ["About 1–2 minutes", "Use together with the full investor type quiz."]
+    },
+    "analysis-horizon-goal": {
+      "title": "Horizon & goal check (5 questions)",
+      "paragraphs": [
+        "Five questions on time horizon, purpose, experience, income stability, and knowledge.",
+        "Helps clarify whether your money is short-term or long-term and what you are investing for.",
+        "If horizon and goals do not match stocks, lowering equity weight is OK."
+      ],
+      "tips": ["About 1–2 minutes", "Keep living expenses and emergency cash outside brokerage."]
+    },
+    "analysis-allocation-style": {
+      "title": "Allocation style quiz (5 questions)",
+      "paragraphs": [
+        "Five questions on diversification, return expectations, loss tolerance, purpose, and horizon.",
+        "Points toward cash, bonds, ETFs, or individual stocks in your mix.",
+        "Compare with the full quiz and adjust simulation targets in the app."
+      ],
+      "tips": ["About 1–2 minutes", "Review alongside app simulation target weights."]
     }
   }
 }

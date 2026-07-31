@@ -10,6 +10,7 @@ export type SeoPageKey =
   | 'market'
   | 'tax'
   | 'guide'
+  | 'investorSurvey'
   | 'stock';
 
 export interface SeoRouteMatch {
@@ -40,6 +41,8 @@ export function seoPathForPageKey(pageKey: SeoPageKey, params?: Record<string, s
       return '/tax';
     case 'guide':
       return '/guide';
+    case 'investorSurvey':
+      return '/guide/investor-type';
     case 'stock':
       return `/stocks/${encodeURIComponent(params?.symbol ?? '')}`;
     default:
@@ -60,6 +63,7 @@ export function pathnameToSeoRoute(pathname: string): SeoRouteMatch {
   if (path === '/market/analysis') return { pageKey: 'market' };
   if (path === '/tax') return { pageKey: 'tax' };
   if (path === '/guide') return { pageKey: 'guide' };
+  if (path === '/guide/investor-type') return { pageKey: 'investorSurvey' };
 
   const stockMatch = path.match(/^\/stocks\/([^/]+)$/);
   if (stockMatch?.[1]) {
@@ -80,4 +84,5 @@ export const SITEMAP_PATHS = [
   '/market/analysis',
   '/tax',
   '/guide',
+  '/guide/investor-type',
 ] as const;

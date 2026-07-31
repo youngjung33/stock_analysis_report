@@ -146,6 +146,10 @@
         "title": "주식이용 Tip",
         "description": "ISA·세금·차트·매매 등 주식 투자에 필요한 팁을 카테고리별로 확인합니다."
       },
+      "investorSurvey": {
+        "title": "투자 유형 진단",
+        "description": "10단계 설문으로 투자 성향을 분류하고 자산 배분·종목 스타일을 추천합니다."
+      },
       "stock": {
         "title": "{{symbol}}",
         "description": "{{symbol}} 종목 시세, 차트 및 상세 정보."
@@ -757,6 +761,9 @@
     },
     "guide": {
       "title": "주식이용 Tip"
+    },
+    "investorSurvey": {
+      "title": "투자 유형 진단"
     },
     "globalError": {
       "title": "문제가 발생했습니다",

@@ -146,6 +146,10 @@
         "title": "Stock Tips",
         "description": "Practical tips on ISA, tax, charts, trading, and more — organized by category."
       },
+      "investorSurvey": {
+        "title": "Investor Type Quiz",
+        "description": "10-step survey to classify your investing style and get allocation suggestions."
+      },
       "stock": {
         "title": "{{symbol}}",
         "description": "Stock quotes, charts, and details for {{symbol}}."
@@ -757,6 +761,9 @@
     },
     "guide": {
       "title": "Stock Tips"
+    },
+    "investorSurvey": {
+      "title": "Investor Type Quiz"
     },
     "globalError": {
       "title": "Something went wrong",

@@ -25,13 +25,16 @@ describe('guide translations', () => {
         const entry = guideItems(bundle)[item.id];
         expect(entry?.title, `${item.id} title`).toBeTruthy();
         expect(entry?.paragraphs?.length, `${item.id} paragraphs`).toBeGreaterThan(0);
-        expect(entry?.figureCaption, `${item.id} figureCaption`).toBeTruthy();
+        if (!item.id.startsWith('analysis-')) {
+          expect(entry?.figureCaption, `${item.id} figureCaption`).toBeTruthy();
+        }
       }
     }
   });
 
   it('has figure labels for every catalog item in ko and en', () => {
     for (const item of GUIDE_FAQ_CATALOG) {
+      if (item.id.startsWith('analysis-')) continue;
       for (const bundle of [localeBundles.ko, localeBundles.en]) {
         const figure = guideItems(bundle)[item.id]?.figure;
         expect(figure && Object.keys(figure).length > 0, `${item.id} figure keys`).toBeTruthy();

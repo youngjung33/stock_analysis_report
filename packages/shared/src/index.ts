@@ -279,3 +279,38 @@ export {
   isGuideCategoryId,
 } from './guide';
 export type { GuideCategoryId, GuideFaqItemDef, GuideRelatedLink } from './guide';
+
+export {
+  INVESTOR_SURVEY_STEP_COUNT,
+  INVESTOR_SURVEY_STEP_IDS,
+  INVESTOR_SURVEY_OPTION_IDS,
+  INVESTOR_TYPE_IDS,
+  INVESTOR_TYPE_PROFILES,
+  GUIDE_ANALYSIS_TEST_LINKS,
+  MINI_ANALYSIS_TEST_IDS,
+  MINI_ANALYSIS_TESTS,
+  computeInvestorSurveyResult,
+  computeMiniAnalysisResult,
+  computeSurveyTotalScore,
+  getAnalysisTestLink,
+  getInvestorTypeProfile,
+  isAnalysisTestId,
+  isInvestorSurveyStepId,
+  isInvestorTypeId,
+  isMiniAnalysisTestId,
+  resolveInvestorTypeFromScore,
+} from './investor-survey';
+export type {
+  AnalysisTestId,
+  AnalysisTestLinkDef,
+  InvestorAssetMix,
+  InvestorSurveyAnswers,
+  InvestorSurveyOptionId,
+  InvestorSurveyResult,
+  InvestorSurveyStepId,
+  InvestorTypeId,
+  InvestorTypeProfile,
+  MiniAnalysisResult,
+  MiniAnalysisTestDef,
+  MiniAnalysisTestId,
+} from './investor-survey';

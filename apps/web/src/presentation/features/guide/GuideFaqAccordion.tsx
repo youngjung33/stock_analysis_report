@@ -36,10 +36,10 @@ export function GuideFaqAccordion({ item, categoryLabel, open, onToggle, id }: P
         className="flex w-full items-start justify-between gap-3 px-4 py-3 text-left"
       >
         <div className="min-w-0 flex-1">
-          <span className="rounded bg-slate-800 px-2 py-0.5 text-[10px] text-slate-300">
+          <span className="rounded bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
             {categoryLabel}
           </span>
-          <h3 className="mt-1.5 text-sm font-semibold text-white sm:text-base">{content.title}</h3>
+          <h3 className="mt-1.5 text-sm font-semibold text-foreground sm:text-base">{content.title}</h3>
         </div>
         <span className="shrink-0 pt-1 text-xs text-muted-foreground">
           {open ? t('guide.closeItem') : t('guide.openItem')}

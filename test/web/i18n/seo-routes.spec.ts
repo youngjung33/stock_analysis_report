@@ -19,10 +19,15 @@ describe('seo-routes', () => {
   });
 
   it('round-trips static routes', () => {
-    const paths = ['/login', '/tax', '/guide', '/my-info', '/transactions'] as const;
+    const paths = ['/login', '/tax', '/guide', '/guide/investor-type', '/my-info', '/transactions'] as const;
     for (const path of paths) {
       const { pageKey } = pathnameToSeoRoute(path);
       expect(seoPathForPageKey(pageKey)).toBe(path);
     }
+  });
+
+  it('maps investor survey path', () => {
+    expect(pathnameToSeoRoute('/guide/investor-type')).toEqual({ pageKey: 'investorSurvey' });
+    expect(seoPathForPageKey('investorSurvey')).toBe('/guide/investor-type');
   });
 });

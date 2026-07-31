@@ -1,0 +1,256 @@
+{
+  "title": "Investor Type Quiz",
+  "subtitle": "10-step survey to find your investing style",
+  "intro": "Answer 10 questions on horizon, loss tolerance, experience, and goals. We classify you into one of 10 investor types and suggest asset mix, market weights, and stock styles.",
+  "disclaimer": "For education only — not investment advice. You can apply results to portfolio target weights in the app.",
+  "start": "Start quiz",
+  "retake": "Retake quiz",
+  "next": "Next",
+  "prev": "Back",
+  "seeResult": "See results",
+  "stepOf": "Step {{current}} / {{total}}",
+  "resultTitle": "Your investor type",
+  "typeLevel": "Level {{level}}",
+  "scoreLabel": "Risk score",
+  "scoreOf": "{{score}} / {{max}} pts",
+  "assetMixTitle": "Suggested asset mix",
+  "strategyTitle": "Strategy tips",
+  "warningsTitle": "Cautions",
+  "tagsTitle": "Suggested stock styles",
+  "allocationTitle": "Market & position targets",
+  "horizonLabel": "Suggested horizon",
+  "horizonRange": "{{min}}–{{max}} years",
+  "applyPrefs": "Apply to portfolio targets",
+  "applyPrefsDone": "Applied to portfolio targets",
+  "applyPrefsHint": "Review under My Info → Capital & simulation",
+  "goCapital": "Open capital & simulation",
+  "backToGuide": "Back to Stock Tips",
+  "ctaBanner": "Find your investor type with our 10-step quiz",
+  "ctaLink": "Start investor type quiz",
+  "assetLabels": {
+    "stocks": "Individual stocks",
+    "etf": "ETFs & funds",
+    "bonds": "Bonds & deposits",
+    "cash": "Cash & CMA"
+  },
+  "allocationLabels": {
+    "kr": "Korea weight",
+    "us": "US weight",
+    "maxSingle": "Max single position"
+  },
+  "steps": {
+    "horizon": {
+      "title": "Time horizon",
+      "question": "How long can you keep money invested in stocks?",
+      "options": {
+        "a": { "label": "Under 1 year", "desc": "Short-term — avoid volatility" },
+        "b": { "label": "1–3 years", "desc": "Medium-term goals" },
+        "c": { "label": "3–10 years", "desc": "Long-term savings" },
+        "d": { "label": "10+ years", "desc": "Retirement / very long term" }
+      }
+    },
+    "loss-tolerance": {
+      "title": "Loss tolerance",
+      "question": "If your portfolio fell 20%, what would you do?",
+      "options": {
+        "a": { "label": "Sell everything", "desc": "Capital preservation first" },
+        "b": { "label": "Reduce exposure", "desc": "Limit further losses" },
+        "c": { "label": "Hold or buy slowly", "desc": "Can wait for recovery" },
+        "d": { "label": "Buy more", "desc": "Treat as a dip opportunity" }
+      }
+    },
+    "experience": {
+      "title": "Experience",
+      "question": "How much stock/ETF investing experience do you have?",
+      "options": {
+        "a": { "label": "None", "desc": "Deposits/savings only" },
+        "b": { "label": "Under 1 year", "desc": "Just started small" },
+        "c": { "label": "1–5 years", "desc": "Trades and dividends" },
+        "d": { "label": "5+ years", "desc": "Multiple market cycles" }
+      }
+    },
+    "income-stability": {
+      "title": "Income stability",
+      "question": "How stable is your main income?",
+      "options": {
+        "a": { "label": "Unstable", "desc": "Freelance / short contracts" },
+        "b": { "label": "Somewhat unstable", "desc": "May fluctuate" },
+        "c": { "label": "Stable", "desc": "Regular salary or business" },
+        "d": { "label": "Very stable", "desc": "Multiple streams + buffer" }
+      }
+    },
+    "emergency-fund": {
+      "title": "Emergency fund",
+      "question": "Do you have 6+ months of living expenses saved separately?",
+      "options": {
+        "a": { "label": "No", "desc": "Investing overlaps with living cash" },
+        "b": { "label": "Under 3 months", "desc": "Limited buffer" },
+        "c": { "label": "3–6 months", "desc": "Basic emergency fund" },
+        "d": { "label": "6+ months", "desc": "Separate from brokerage" }
+      }
+    },
+    "knowledge": {
+      "title": "Knowledge",
+      "question": "How well do you understand P/E, dividends, ETFs, diversification?",
+      "options": {
+        "a": { "label": "Very little", "desc": "Terms are unfamiliar" },
+        "b": { "label": "Basic", "desc": "Look things up as needed" },
+        "c": { "label": "Intermediate", "desc": "Statements & charts OK" },
+        "d": { "label": "Advanced", "desc": "Tax and rebalancing too" }
+      }
+    },
+    "crisis-reaction": {
+      "title": "Crisis behavior",
+      "question": "In sharp drawdowns (e.g. 2020, 2022), you typically:",
+      "options": {
+        "a": { "label": "Sold or quit", "desc": "Losses felt too large" },
+        "b": { "label": "Did nothing", "desc": "Just watched" },
+        "c": { "label": "Bought in tranches", "desc": "Followed a plan" },
+        "d": { "label": "Bought aggressively", "desc": "Used cash to buy dips" }
+      }
+    },
+    "return-expectation": {
+      "title": "Return expectation",
+      "question": "Expected annual return (with volatility)?",
+      "options": {
+        "a": { "label": "Deposit-like (2–3%)", "desc": "Preserve principal" },
+        "b": { "label": "Around 5%", "desc": "Bonds + dividends mix" },
+        "c": { "label": "7–10%", "desc": "Stock-heavy long term" },
+        "d": { "label": "10%+", "desc": "Accept high growth risk" }
+      }
+    },
+    "diversification": {
+      "title": "Diversification style",
+      "question": "Preferred portfolio style?",
+      "options": {
+        "a": { "label": "Cash / MMF heavy", "desc": "Minimal stocks" },
+        "b": { "label": "ETF & bonds core", "desc": "Few broad ETFs" },
+        "c": { "label": "10–20 names", "desc": "Sector & country spread" },
+        "d": { "label": "Focused names", "desc": "Higher conviction weights" }
+      }
+    },
+    "purpose": {
+      "title": "Primary goal",
+      "question": "Main purpose of stock investing?",
+      "options": {
+        "a": { "label": "Preserve capital", "desc": "Beat inflation slightly" },
+        "b": { "label": "Stable dividends", "desc": "Income flow" },
+        "c": { "label": "Wealth building", "desc": "Retirement / lump sum" },
+        "d": { "label": "Aggressive growth", "desc": "Growth & themes" }
+      }
+    }
+  },
+  "types": {
+    "ultra-safe": {
+      "name": "Ultra conservative",
+      "summary": "Capital preservation first. Minimize stocks; favor cash and bonds.",
+      "traits": ["Very volatility-averse", "Short-term money", "Loss avoidance"],
+      "strategies": ["Park in CMA/MMF/short bonds", "Tiny dividend ETF only", "Build 6mo emergency fund first"],
+      "warnings": ["Do not force high stock weights", "Avoid hot stocks & leverage"]
+    },
+    "safe": {
+      "name": "Conservative",
+      "summary": "Balance safety and modest return. Defensive ETFs and quality dividends.",
+      "traits": ["Low volatility preference", "Dividend/bond interest", "Learning stage"],
+      "strategies": ["Core dividend ETFs KR/US", "Under 5–10 names", "Review quarterly"],
+      "warnings": ["Avoid chasing short-term spikes"]
+    },
+    "conservative": {
+      "name": "Moderately conservative",
+      "summary": "Keep bond/ETF weight while slowly adding stocks.",
+      "traits": ["Medium-long horizon", "Planned drawdown response", "Accepts diversification"],
+      "strategies": ["Near 60/40 stocks/bonds", "Large caps & sector ETFs", "Consider ISA/pension tax perks"],
+      "warnings": ["Keep single-name risk under ~25%"]
+    },
+    "mod-conservative": {
+      "name": "Balanced conservative",
+      "summary": "Growth with stability. Diversified ETFs plus quality stocks.",
+      "traits": ["Multi-year horizon", "Cash/bond buffer", "Open to rebalancing"],
+      "strategies": ["Target KR/US 75:25", "Sector ETFs + 5–15 names", "Monthly DCA"],
+      "warnings": ["Watch emotional trading in crashes"]
+    },
+    "balanced": {
+      "name": "Balanced",
+      "summary": "Even mix of KR/US stocks and ETFs. Market-level risk/return.",
+      "traits": ["~10 year horizon", "Diversification discipline", "Chart + fundamentals"],
+      "strategies": ["KR/US 70:30 (near app default)", "Sector & country spread", "Buy dips in tranches"],
+      "warnings": ["Leveraged ETFs need caution"]
+    },
+    "mod-growth": {
+      "name": "Balanced growth",
+      "summary": "Slightly more growth and US exposure. Accept mid-term swings.",
+      "traits": ["Growth/ETF focus", "Cash for opportunities", "Rebalancing rules"],
+      "strategies": ["More US growth/tech ETFs", "Use momentum & pullback tags", "Check targets quarterly"],
+      "warnings": ["Avoid FOMO on short spikes"]
+    },
+    "growth": {
+      "name": "Growth",
+      "summary": "Higher stock allocation. Long-term compounding with broad diversification.",
+      "traits": ["10+ year view", "Tolerates volatility", "Uses market analysis"],
+      "strategies": ["KR/US 60:40", "15–25 growth + dividend names", "Follow recommendation tags"],
+      "warnings": ["Keep emergency funds separate"]
+    },
+    "agg-growth": {
+      "name": "Aggressive growth",
+      "summary": "More US and growth. Higher return target with larger swings.",
+      "traits": ["Experienced investor", "Dip buying discipline", "Position limits"],
+      "strategies": ["US 45%+, momentum names", "Sector rotation", "Strict stop/size rules"],
+      "warnings": ["Single name over 50% is excessive risk"]
+    },
+    "aggressive": {
+      "name": "Aggressive",
+      "summary": "Growth, themes, US-heavy. Accept volatility for return.",
+      "traits": ["High risk tolerance", "Active sector views", "Frequent rebalancing"],
+      "strategies": ["KR/US 50:50", "Growth stocks + ETFs", "Pre-define order rules"],
+      "warnings": ["No living expenses or debt investing", "Leverage with care"]
+    },
+    "ultra-aggressive": {
+      "name": "Ultra aggressive",
+      "summary": "Maximum equity/US tilt. Long-term high return; large drawdowns OK.",
+      "traits": ["Very long & volatile OK", "Conviction + diversification", "Tax/weight aware"],
+      "strategies": ["US 55%+, few high-conviction names", "Momentum/growth themes", "Regular profit-taking"],
+      "warnings": ["Never invest entire net worth", "Mindset & cash flow matter most"]
+    }
+  },
+  "miniTests": {
+    "risk-check": {
+      "title": "Quick risk tolerance quiz",
+      "subtitle": "5 questions on volatility and loss tolerance",
+      "intro": "Answer five questions on losses, crises, return expectations, emergency fund, and diversification.",
+      "resultTitle": "Risk tolerance level",
+      "results": {
+        "tier-1": { "name": "Very low", "summary": "Capital preservation first. Favor cash and bonds; keep stocks minimal.", "tips": ["Avoid hot stocks & leverage", "Use CMA/short bonds", "Take the full quiz too"] },
+        "tier-2": { "name": "Low", "summary": "Small dips may feel stressful. Dividend ETFs and quality names in small size fit well.", "tips": ["Avoid lump-sum all-in", "Review quarterly", "Build emergency fund first"] },
+        "tier-3": { "name": "Moderate", "summary": "You can accept some volatility. ETF + diversified stocks work well.", "tips": ["Hold through ~10% dips", "Keep target weights", "Watch emotional trades"] },
+        "tier-4": { "name": "High", "summary": "You can ride mid-term drawdowns and buy in tranches. Growth/balance mix is OK.", "tips": ["Define stop/size rules", "Keep some cash", "Respect position limits"] },
+        "tier-5": { "name": "Very high", "summary": "Large swings are OK, but avoid betting living expenses; strict risk rules still matter.", "tips": ["Leverage with care", "Take profits periodically", "Validate with full quiz"] }
+      }
+    },
+    "horizon-goal": {
+      "title": "Horizon & goal check",
+      "subtitle": "5 questions on timeline, purpose, and readiness",
+      "intro": "Five questions on horizon, goals, experience, income, and knowledge.",
+      "resultTitle": "Horizon & goal fit",
+      "results": {
+        "tier-1": { "name": "Short-term / preserve", "summary": "Under 1 year or capital preservation — prefer deposits, CMA, short bonds over stocks.", "tips": ["Stocks only small/ETF", "Plan cash-out before need", "See full quiz"] },
+        "tier-2": { "name": "Medium / stable", "summary": "1–3 year goals — raise bonds and dividend ETF weight for safety.", "tips": ["Work backward from date", "Lower-vol products", "Stay diversified"] },
+        "tier-3": { "name": "Mid-long / accumulate", "summary": "3–10 year savings fit regular stock/ETF DCA.", "tips": ["Monthly DCA", "KR/US spread", "Rebalance review"] },
+        "tier-4": { "name": "Long / grow", "summary": "10+ year wealth building — can gradually raise equity weight.", "tips": ["Reinvest dividends", "Sector spread", "Use tax-advantaged accounts"] },
+        "tier-5": { "name": "Very long / clear goal", "summary": "Retirement-grade horizon — long diversification plus ISA/pension worth reviewing.", "tips": ["Write target amount & date", "Annual review", "Confirm with full quiz"] }
+      }
+    },
+    "allocation-style": {
+      "title": "Allocation style quiz",
+      "subtitle": "5 questions on preferred asset mix",
+      "intro": "Five questions on diversification, return, loss tolerance, purpose, and horizon.",
+      "resultTitle": "Allocation style",
+      "results": {
+        "tier-1": { "name": "Cash & bonds core", "summary": "Heavy cash, deposits, MMF, short bonds; minimal stocks.", "tips": ["Use CMA", "Stocks ~10% or less", "Stability first"] },
+        "tier-2": { "name": "Bond & ETF mix", "summary": "Bonds and dividend ETFs as core; stocks secondary.", "tips": ["2–4 ETFs", "Quarterly rebalance", "Reinvest dividends"] },
+        "tier-3": { "name": "Balanced", "summary": "Even mix of stocks, ETFs, cash — near 60/40 or 70/30.", "tips": ["KR/US targets", "10–15 names", "Check simulation"] },
+        "tier-4": { "name": "Equity & ETF growth", "summary": "Higher stock/growth ETF weight while staying diversified.", "tips": ["Sector spread", "Per-name cap", "Buy dips in tranches"] },
+        "tier-5": { "name": "Concentrated equity", "summary": "Higher single-stock/growth tilt — position limits and rules are essential.", "tips": ["Separate emergency cash", "Stop-loss rules", "Cross-check full quiz"] }
+      }
+    }
+  }
+}

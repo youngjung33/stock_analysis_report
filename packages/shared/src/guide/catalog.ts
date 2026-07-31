@@ -1,4 +1,11 @@
-export type GuideCategoryId = 'isa' | 'tax' | 'charts' | 'trading' | 'accounts' | 'portfolio';
+export type GuideCategoryId =
+  | 'isa'
+  | 'tax'
+  | 'charts'
+  | 'trading'
+  | 'accounts'
+  | 'portfolio'
+  | 'type-analysis';
 
 export interface GuideRelatedLink {
   href: string;
@@ -19,6 +26,7 @@ export const GUIDE_CATEGORIES: { id: GuideCategoryId; labelKey: string }[] = [
   { id: 'trading', labelKey: 'guide.categories.trading.label' },
   { id: 'accounts', labelKey: 'guide.categories.accounts.label' },
   { id: 'portfolio', labelKey: 'guide.categories.portfolio.label' },
+  { id: 'type-analysis', labelKey: 'guide.categories.typeAnalysis.label' },
 ];
 
 export const GUIDE_FAQ_CATALOG: GuideFaqItemDef[] = [
@@ -229,11 +237,13 @@ export const GUIDE_FAQ_CATALOG: GuideFaqItemDef[] = [
     id: 'portfolio-diversification',
     categoryId: 'portfolio',
     tags: ['portfolio', 'diversification'],
+    relatedLinks: [{ href: '/guide/investor-type', labelKey: 'guide.links.investorSurvey' }],
   },
   {
     id: 'portfolio-rebalancing',
     categoryId: 'portfolio',
     tags: ['portfolio', 'rebalance'],
+    relatedLinks: [{ href: '/guide/investor-type', labelKey: 'guide.links.investorSurvey' }],
   },
   {
     id: 'portfolio-cash-ratio',
@@ -244,6 +254,31 @@ export const GUIDE_FAQ_CATALOG: GuideFaqItemDef[] = [
     id: 'portfolio-long-term',
     categoryId: 'portfolio',
     tags: ['portfolio', 'long-term'],
+  },
+  // Type analysis (tests)
+  {
+    id: 'analysis-investor-type',
+    categoryId: 'type-analysis',
+    tags: ['analysis', 'investor-type', 'survey', '10step'],
+    relatedLinks: [{ href: '/guide/investor-type', labelKey: 'guide.links.startTest' }],
+  },
+  {
+    id: 'analysis-risk-check',
+    categoryId: 'type-analysis',
+    tags: ['analysis', 'risk', 'survey', '5step'],
+    relatedLinks: [{ href: '/guide/analysis/risk-check', labelKey: 'guide.links.startTest' }],
+  },
+  {
+    id: 'analysis-horizon-goal',
+    categoryId: 'type-analysis',
+    tags: ['analysis', 'horizon', 'goal', 'survey', '5step'],
+    relatedLinks: [{ href: '/guide/analysis/horizon-goal', labelKey: 'guide.links.startTest' }],
+  },
+  {
+    id: 'analysis-allocation-style',
+    categoryId: 'type-analysis',
+    tags: ['analysis', 'allocation', 'survey', '5step'],
+    relatedLinks: [{ href: '/guide/analysis/allocation-style', labelKey: 'guide.links.startTest' }],
   },
 ];
 
