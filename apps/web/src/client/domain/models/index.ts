@@ -231,6 +231,7 @@ export interface PortfolioPreferences {
   targetKrPercent: number;
   targetUsPercent: number;
   maxSingleWeightPercent: number;
+  investorProfile?: import('@sar/shared').StoredInvestorProfile | null;
 }
 
 export interface PortfolioSimulationResponse {
@@ -238,4 +239,5 @@ export interface PortfolioSimulationResponse {
   simulation: import('@sar/shared').PortfolioSimulationResult;
   ledgerEntryCount: number;
   asOf: string;
+  investorProfile?: import('@sar/shared').BuiltInvestorProfile;
 }

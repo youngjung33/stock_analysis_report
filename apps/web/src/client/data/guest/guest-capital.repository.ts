@@ -1,6 +1,9 @@
 import {
   buildMarketInsights,
   buildPortfolioSimulation,
+  rankRecommendationsByTags,
+  buildInvestorProfile,
+  createDefaultStoredProfile,
   CashLedgerType,
 } from '@sar/shared';
 import {
@@ -13,6 +16,7 @@ import { ICashRepository, IPortfolioCapitalRepository } from '../../domain/repos
 import { IMarketRepository, IPortfolioRepository } from '../../domain/repositories';
 import {
   getGuestCashBalances,
+  getGuestInvestorProfile,
   getGuestPortfolioPreference,
   listGuestCashLedger,
   saveGuestCashEntry,
@@ -62,12 +66,25 @@ export class GuestPortfolioCapitalRepository implements IPortfolioCapitalReposit
   ) {}
 
   async getPreferences(): Promise<PortfolioPreferences> {
-    return getGuestPortfolioPreference();
+    const prefs = getGuestPortfolioPreference();
+    return {
+      ...prefs,
+      investorProfile: getGuestInvestorProfile(),
+    };
   }
 
   async updatePreferences(prefs: Omit<PortfolioPreferences, 'userId'>): Promise<PortfolioPreferences> {
-    saveGuestPortfolioPreference(prefs);
-    return prefs;
+    saveGuestPortfolioPreference({
+      targetKrPercent: prefs.targetKrPercent,
+      targetUsPercent: prefs.targetUsPercent,
+      maxSingleWeightPercent: prefs.maxSingleWeightPercent,
+    });
+    return {
+      targetKrPercent: prefs.targetKrPercent,
+      targetUsPercent: prefs.targetUsPercent,
+      maxSingleWeightPercent: prefs.maxSingleWeightPercent,
+      investorProfile: prefs.investorProfile ?? getGuestInvestorProfile(),
+    };
   }
 
   async getSimulation(): Promise<PortfolioSimulationResponse> {
@@ -97,6 +114,13 @@ export class GuestPortfolioCapitalRepository implements IPortfolioCapitalReposit
       6,
     );
 
+    const storedProfile = getGuestInvestorProfile() ?? createDefaultStoredProfile();
+    const builtProfile = buildInvestorProfile(storedProfile);
+    const rankedRecommendations = rankRecommendationsByTags(
+      insights.recommendations.filter((r) => r.currentPrice > 0),
+      builtProfile.preferredTags,
+    );
+
     const simulation = buildPortfolioSimulation({
       cash: { krw: dashboard.summary.cashKrw, usd: dashboard.summary.cashUsd },
       holdings: dashboard.holdings.map((h) => ({
@@ -110,15 +134,16 @@ export class GuestPortfolioCapitalRepository implements IPortfolioCapitalReposit
         weightPercent: h.weightPercent,
       })),
       preferences,
-      recommendations: insights.recommendations.filter((r) => r.currentPrice > 0),
+      recommendations: rankedRecommendations,
       usdKrwRate: dashboard.summary.usdKrwRate,
     });
 
     return {
-      preferences,
+      preferences: { ...preferences, investorProfile: storedProfile },
       simulation,
       ledgerEntryCount: listGuestCashLedger().length,
       asOf: featured.fetchedAt,
+      investorProfile: builtProfile,
     };
   }
 }

@@ -1,9 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { MiniAnalysisResult, MiniAnalysisTestId } from '@sar/shared';
+import type { InvestorSurveyAnswers, MiniAnalysisResult, MiniAnalysisTestId } from '@sar/shared';
+import { scoreEntryFromMiniTest } from '@sar/shared';
+import { useToast } from '../../components/Toast';
 import { Surface } from '../../design-system';
+import { useInvestorProfile } from '../../hooks/useInvestorProfile';
 import { useMiniAnalysisSurvey } from '../../hooks/useMiniAnalysisSurvey';
 import { InvestorSurveyStepView } from '../investor-survey/InvestorSurveyStepView';
 
@@ -14,15 +18,31 @@ interface Props {
 function MiniResultView({
   testId,
   result,
+  answers,
   onRetake,
 }: {
   testId: MiniAnalysisTestId;
   result: MiniAnalysisResult;
+  answers: InvestorSurveyAnswers;
   onRetake: () => void;
 }) {
   const { t } = useTranslation();
+  const { showSuccess } = useToast();
+  const { profile, upsertTestScoreEntry, stored } = useInvestorProfile();
+  const appliedRef = useRef(false);
   const base = `investorSurvey.miniTests.${testId}.results.${result.tierId}`;
   const tips = t(`${base}.tips`, { returnObjects: true, defaultValue: [] }) as string[];
+
+  useEffect(() => {
+    if (appliedRef.current) return;
+    const entry = scoreEntryFromMiniTest(testId, answers);
+    if (!entry) return;
+    appliedRef.current = true;
+    const hadBefore = Boolean(stored.ledger.entries[testId]);
+    void upsertTestScoreEntry(entry).then(() => {
+      showSuccess(t(hadBefore ? 'investorSurvey.ledgerUpdated' : 'investorSurvey.ledgerAccumulated'));
+    });
+  }, [answers, showSuccess, stored.ledger.entries, t, testId, upsertTestScoreEntry]);
 
   return (
     <div className="space-y-6">
@@ -33,6 +53,14 @@ function MiniResultView({
           {t('investorSurvey.scoreOf', { score: result.totalScore, max: result.maxScore })}
         </p>
         <p className="text-sm leading-relaxed text-muted-foreground">{t(`${base}.summary`)}</p>
+        {profile.compositePercent !== null && (
+          <p className="text-xs text-primary">
+            {t('investorSurvey.profilePreview', {
+              composite: profile.compositePercent.toFixed(1),
+              effective: profile.effectivePercent.toFixed(1),
+            })}
+          </p>
+        )}
       </Surface>
 
       {Array.isArray(tips) && tips.length > 0 && (
@@ -48,8 +76,14 @@ function MiniResultView({
 
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <Link
-          href="/guide/investor-type"
+          href="/my-info#investor-profile"
           className="rounded-lg bg-primary px-4 py-2.5 text-center text-sm font-medium text-primary-foreground"
+        >
+          {t('investorSurvey.goProfile')}
+        </Link>
+        <Link
+          href="/guide/investor-type"
+          className="rounded-lg border border-border px-4 py-2.5 text-center text-sm text-muted-foreground hover:bg-muted/50"
         >
           {t('investorSurvey.ctaLink')}
         </Link>
@@ -79,7 +113,14 @@ export function AnalysisMiniSurveyFlow({ testId }: Props) {
   const testBase = `investorSurvey.miniTests.${testId}`;
 
   if (survey.phase === 'result' && survey.result) {
-    return <MiniResultView testId={testId} result={survey.result} onRetake={survey.retake} />;
+    return (
+      <MiniResultView
+        testId={testId}
+        result={survey.result}
+        answers={survey.answers}
+        onRetake={survey.retake}
+      />
+    );
   }
 
   if (survey.phase === 'intro') {

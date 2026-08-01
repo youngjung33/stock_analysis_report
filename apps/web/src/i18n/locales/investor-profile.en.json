@@ -1,0 +1,36 @@
+{
+  "title": "Investor profile",
+  "desc": "Test scores are combined with weights; use the slider to fine-tune.",
+  "guestNotice": "Guest profile scores live in this tab's sessionStorage only and reset when you close the tab. Survey drafts may remain in browser localStorage but are not auto-applied to your profile.",
+  "testsReflected": "{{count}}/4 tests reflected",
+  "compositeLabel": "Composite score",
+  "adjustmentLabel": "Adjustment",
+  "adjustmentHint": "Multiplier on composite (70–130%)",
+  "effectiveLabel": "Effective score",
+  "typeLabel": "Investor type",
+  "levelLabel": "Level {{level}}",
+  "tagsLabel": "Preferred tags first",
+  "notCompleted": "Not done",
+  "completedAt": "Done {{date}}",
+  "percentScore": "{{value}}%",
+  "save": "Save profile",
+  "saved": "Profile saved",
+  "saveFailed": "Failed to save profile",
+  "takeTest": "Take test",
+  "retakeTest": "Review test",
+  "adjustmentDisabled": "Complete at least one test to use the adjustment slider.",
+  "allocationTitle": "Portfolio targets (fine-tune)",
+  "slots": {
+    "investor-type": "Full type survey",
+    "risk-check": "Risk check",
+    "horizon-goal": "Horizon & goals",
+    "allocation-style": "Allocation style"
+  },
+  "weights": {
+    "investor-type": "40%",
+    "risk-check": "20%",
+    "horizon-goal": "20%",
+    "allocation-style": "20%"
+  },
+  "simulationHint": "Simulation picks are ranked by your preferred tags."
+}

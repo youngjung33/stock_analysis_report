@@ -170,6 +170,15 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
         <Surface variant="section" className="space-y-4">
           <div>
             <h2 className="text-base font-semibold md:text-lg">{t('capital.simulationStatsTitle')}</h2>
+            {screen.simulation?.investorProfile?.compositePercent != null && (
+              <p className="mt-1 text-xs text-primary">
+                {t('investorSurvey.profilePreview', {
+                  composite: screen.simulation.investorProfile.compositePercent.toFixed(1),
+                  effective: screen.simulation.investorProfile.effectivePercent.toFixed(1),
+                })}{' '}
+                · {t(`investorSurvey.types.${screen.simulation.investorProfile.typeId}.name`)}
+              </p>
+            )}
             <p className="mt-1 text-sm font-medium text-foreground">
               {translateSimulationHeadline(sim, t)}
             </p>

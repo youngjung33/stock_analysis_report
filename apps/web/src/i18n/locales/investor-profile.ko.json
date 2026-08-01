@@ -1,0 +1,36 @@
+{
+  "title": "투자 성향 프로필",
+  "desc": "테스트 점수가 가중 합산되며, 슬라이더로 미세 조절할 수 있습니다.",
+  "guestNotice": "비회원 프로필(점수·조절값)은 이 탭의 sessionStorage에만 저장됩니다. 탭을 닫으면 초기화됩니다. 설문 답변 초안은 브라우저 localStorage에 남을 수 있으나, 프로필 점수에는 자동 반영되지 않습니다.",
+  "testsReflected": "{{count}}/4 테스트 반영",
+  "compositeLabel": "합산 점수",
+  "adjustmentLabel": "조절",
+  "adjustmentHint": "테스트 합산 점수에 곱하는 비율 (70~130%)",
+  "effectiveLabel": "실효 점수",
+  "typeLabel": "투자 유형",
+  "levelLabel": "레벨 {{level}}",
+  "tagsLabel": "추천 태그 우선",
+  "notCompleted": "미완료",
+  "completedAt": "완료 {{date}}",
+  "percentScore": "{{value}}%",
+  "save": "프로필 저장",
+  "saved": "프로필을 저장했습니다",
+  "saveFailed": "프로필 저장에 실패했습니다",
+  "takeTest": "테스트 하러 가기",
+  "retakeTest": "다시 보기",
+  "adjustmentDisabled": "테스트를 1개 이상 완료하면 조절 슬라이더를 사용할 수 있습니다.",
+  "allocationTitle": "포트폴리오 목표 (미세 조정)",
+  "slots": {
+    "investor-type": "종합 유형 진단",
+    "risk-check": "리스크 점검",
+    "horizon-goal": "기간·목표",
+    "allocation-style": "배분 스타일"
+  },
+  "weights": {
+    "investor-type": "40%",
+    "risk-check": "20%",
+    "horizon-goal": "20%",
+    "allocation-style": "20%"
+  },
+  "simulationHint": "시뮬레이션 추천 종목은 선호 태그 순으로 정렬됩니다."
+}

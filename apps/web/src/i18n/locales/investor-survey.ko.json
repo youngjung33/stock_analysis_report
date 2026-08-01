@@ -24,7 +24,11 @@
   "applyPrefsDone": "목표 비중에 반영했습니다",
   "applyPrefsHint": "내 정보 → 자본금·시뮬레이션에서 확인할 수 있습니다",
   "goCapital": "자본금·시뮬레이션 보기",
+  "goProfile": "투자 성향 프로필 보기",
   "backToGuide": "주식이용 Tip으로",
+  "ledgerUpdated": "점수가 내 정보에 갱신되었습니다",
+  "ledgerAccumulated": "점수가 내 정보에 누적되었습니다",
+  "profilePreview": "합산 {{composite}}% · 실효 {{effective}}%",
   "ctaBanner": "나에게 맞는 투자 유형을 10단계 설문으로 진단해 보세요",
   "ctaLink": "투자 유형 진단 시작",
   "assetLabels": {

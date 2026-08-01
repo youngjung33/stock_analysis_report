@@ -1,4 +1,4 @@
-import { Market, TransactionType, CorporateActionType, CashLedgerType, computeCashBalances, DEFAULT_PORTFOLIO_PREFERENCES, formatDividendLedgerMemo, type CashCurrency } from '@sar/shared';
+import { Market, TransactionType, CorporateActionType, CashLedgerType, computeCashBalances, DEFAULT_PORTFOLIO_PREFERENCES, formatDividendLedgerMemo, type CashCurrency, type StoredInvestorProfile } from '@sar/shared';
 import { Stock, Transaction, WatchlistItem } from '../../domain/models';
 
 const STORAGE_KEY = 'sar_guest_data';
@@ -31,6 +31,7 @@ interface GuestStore {
     targetUsPercent: number;
     maxSingleWeightPercent: number;
   } | null;
+  investorProfile: StoredInvestorProfile | null;
 }
 
 function emptyStore(): GuestStore {
@@ -41,6 +42,7 @@ function emptyStore(): GuestStore {
     corporateActions: [],
     cashLedger: [],
     portfolioPreference: null,
+    investorProfile: null,
   };
 }
 
@@ -57,6 +59,7 @@ function readStore(): GuestStore {
       corporateActions: parsed.corporateActions ?? [],
       cashLedger: parsed.cashLedger ?? [],
       portfolioPreference: parsed.portfolioPreference ?? null,
+      investorProfile: parsed.investorProfile ?? null,
     };
   } catch {
     return emptyStore();
@@ -281,4 +284,18 @@ export function saveGuestPortfolioPreference(prefs: {
   const store = readStore();
   store.portfolioPreference = prefs;
   writeStore(store);
+}
+
+export function getGuestInvestorProfile(): StoredInvestorProfile | null {
+  return readStore().investorProfile ?? null;
+}
+
+export function saveGuestInvestorProfile(profile: StoredInvestorProfile): void {
+  const store = readStore();
+  store.investorProfile = profile;
+  writeStore(store);
+}
+
+export function snapshotGuestInvestorProfile(): StoredInvestorProfile | null {
+  return getGuestInvestorProfile();
 }

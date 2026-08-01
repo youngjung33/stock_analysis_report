@@ -37,6 +37,7 @@ export class UpdatePortfolioPreferencesUseCase {
     targetKrPercent: number;
     targetUsPercent: number;
     maxSingleWeightPercent: number;
+    investorProfile?: import('@sar/shared').StoredInvestorProfile | null;
   }) {
     return this.repo.updatePreferences(prefs);
   }

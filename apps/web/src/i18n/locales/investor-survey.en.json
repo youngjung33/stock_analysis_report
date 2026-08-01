@@ -24,7 +24,11 @@
   "applyPrefsDone": "Applied to portfolio targets",
   "applyPrefsHint": "Review under My Info → Capital & simulation",
   "goCapital": "Open capital & simulation",
+  "goProfile": "View investor profile",
   "backToGuide": "Back to Stock Tips",
+  "ledgerUpdated": "Score updated in My Info",
+  "ledgerAccumulated": "Score added to My Info",
+  "profilePreview": "Composite {{composite}}% · effective {{effective}}%",
   "ctaBanner": "Find your investor type with our 10-step quiz",
   "ctaLink": "Start investor type quiz",
   "assetLabels": {

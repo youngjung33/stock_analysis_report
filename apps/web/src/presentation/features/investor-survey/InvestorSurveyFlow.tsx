@@ -11,7 +11,7 @@ export function InvestorSurveyFlow() {
   const survey = useInvestorSurvey();
 
   if (survey.phase === 'result' && survey.result) {
-    return <InvestorSurveyResultView result={survey.result} onRetake={survey.retake} />;
+    return <InvestorSurveyResultView result={survey.result} answers={survey.answers} onRetake={survey.retake} />;
   }
 
   if (survey.phase === 'intro') {

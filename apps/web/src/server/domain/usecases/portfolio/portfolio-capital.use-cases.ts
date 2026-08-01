@@ -2,6 +2,9 @@ import {
   DEFAULT_PORTFOLIO_PREFERENCES,
   buildMarketInsights,
   buildPortfolioSimulation,
+  rankRecommendationsByTags,
+  buildInvestorProfile,
+  createDefaultStoredProfile,
 } from '@sar/shared';
 import { PortfolioPreferenceEntity } from '../../entities';
 import {
@@ -16,7 +19,7 @@ export class GetPortfolioPreferencesUseCase {
 
   async execute(userId: string) {
     const pref = await this.prefRepo.findByUser(userId);
-    return pref ?? { userId, ...DEFAULT_PORTFOLIO_PREFERENCES };
+    return pref ?? { userId, ...DEFAULT_PORTFOLIO_PREFERENCES, investorProfile: null };
   }
 }
 
@@ -32,6 +35,7 @@ export class UpdatePortfolioPreferencesUseCase {
       targetKrPercent: kr,
       targetUsPercent: us,
       maxSingleWeightPercent: maxW,
+      investorProfile: input.investorProfile,
     });
   }
 }
@@ -52,7 +56,7 @@ export class GetPortfolioSimulationUseCase {
       this.prefRepo.findByUser(userId),
     ]);
 
-    const preferences = prefRow ?? { userId, ...DEFAULT_PORTFOLIO_PREFERENCES };
+    const preferences = prefRow ?? { userId, ...DEFAULT_PORTFOLIO_PREFERENCES, investorProfile: null };
     const cash = {
       krw: dashboard.summary.cashKrw,
       usd: dashboard.summary.cashUsd,
@@ -78,6 +82,13 @@ export class GetPortfolioSimulationUseCase {
       6,
     );
 
+    const storedProfile = preferences.investorProfile ?? createDefaultStoredProfile();
+    const builtProfile = buildInvestorProfile(storedProfile);
+    const rankedRecommendations = rankRecommendationsByTags(
+      insights.recommendations.filter((r) => r.currentPrice > 0),
+      builtProfile.preferredTags,
+    );
+
     const simulation = buildPortfolioSimulation({
       cash,
       holdings: dashboard.holdings.map((h) => ({
@@ -95,7 +106,7 @@ export class GetPortfolioSimulationUseCase {
         targetUsPercent: preferences.targetUsPercent,
         maxSingleWeightPercent: preferences.maxSingleWeightPercent,
       },
-      recommendations: insights.recommendations.filter((r) => r.currentPrice > 0),
+      recommendations: rankedRecommendations,
       usdKrwRate: dashboard.summary.usdKrwRate,
     });
 
@@ -104,6 +115,7 @@ export class GetPortfolioSimulationUseCase {
       simulation,
       ledgerEntryCount: cashEntries.length,
       asOf: featured.fetchedAt,
+      investorProfile: builtProfile,
     };
   }
 }

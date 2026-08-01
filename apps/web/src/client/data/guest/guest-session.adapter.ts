@@ -1,5 +1,6 @@
 import { IGuestSessionPort, IGuestStorePort } from '../../domain/repositories';
-import { clearGuestStore } from './guest-storage';
+import { clearGuestStore, snapshotGuestInvestorProfile } from './guest-storage';
+import { savePendingInvestorProfile } from './pending-investor-profile';
 import { guestSession } from './guest-session';
 
 export class GuestSessionAdapter implements IGuestSessionPort {
@@ -18,6 +19,8 @@ export class GuestSessionAdapter implements IGuestSessionPort {
 
 export class GuestStoreAdapter implements IGuestStorePort {
   clear() {
+    const profile = snapshotGuestInvestorProfile();
+    if (profile) savePendingInvestorProfile(profile);
     clearGuestStore();
   }
 }

@@ -379,11 +379,20 @@ export class PrismaPortfolioPreferenceRepository implements IPortfolioPreference
   async upsert(data: PortfolioPreferenceEntity) {
     return this.prisma.portfolioPreference.upsert({
       where: { userId: data.userId },
-      create: data,
+      create: {
+        userId: data.userId,
+        targetKrPercent: data.targetKrPercent,
+        targetUsPercent: data.targetUsPercent,
+        maxSingleWeightPercent: data.maxSingleWeightPercent,
+        investorProfile: data.investorProfile ?? undefined,
+      },
       update: {
         targetKrPercent: data.targetKrPercent,
         targetUsPercent: data.targetUsPercent,
         maxSingleWeightPercent: data.maxSingleWeightPercent,
+        ...(data.investorProfile !== undefined
+          ? { investorProfile: data.investorProfile ?? undefined }
+          : {}),
       },
     });
   }

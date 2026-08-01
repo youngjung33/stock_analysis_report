@@ -1,25 +1,46 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { InvestorSurveyResult } from '@sar/shared';
+import {
+  scoreEntryFromInvestorSurvey,
+  type InvestorSurveyAnswers,
+  type InvestorSurveyResult,
+} from '@sar/shared';
 import { translateTag } from '@/i18n';
+import { useToast } from '../../components/Toast';
 import { MiniBars } from '../guide/figures/FigureShell';
 import { Surface } from '../../design-system';
-import { useInvestorSurveyApply } from '../../hooks/useInvestorSurveyApply';
+import { useInvestorProfile } from '../../hooks/useInvestorProfile';
 
 interface Props {
   result: InvestorSurveyResult;
+  answers: InvestorSurveyAnswers;
   onRetake: () => void;
 }
 
 const ASSET_KEYS = ['stocks', 'etf', 'bonds', 'cash'] as const;
 
-export function InvestorSurveyResultView({ result, onRetake }: Props) {
+export function InvestorSurveyResultView({ result, answers, onRetake }: Props) {
   const { t } = useTranslation();
-  const { profile, totalScore, maxScore, typeId, typeLevel } = result;
+  const { showSuccess } = useToast();
+  const { profile, upsertTestScoreEntry, stored } = useInvestorProfile();
+  const appliedRef = useRef(false);
+
+  const { profile: typeProfile, totalScore, maxScore, typeId, typeLevel } = result;
   const typeBase = `investorSurvey.types.${typeId}`;
-  const { applyPreferences, applied, saving } = useInvestorSurveyApply();
+
+  useEffect(() => {
+    if (appliedRef.current) return;
+    const entry = scoreEntryFromInvestorSurvey(answers);
+    if (!entry) return;
+    appliedRef.current = true;
+    const hadBefore = Boolean(stored.ledger.entries['investor-type']);
+    void upsertTestScoreEntry(entry).then(() => {
+      showSuccess(t(hadBefore ? 'investorSurvey.ledgerUpdated' : 'investorSurvey.ledgerAccumulated'));
+    });
+  }, [answers, showSuccess, stored.ledger.entries, t, upsertTestScoreEntry]);
 
   const traits = t(`${typeBase}.traits`, { returnObjects: true, defaultValue: [] }) as string[];
   const strategies = t(`${typeBase}.strategies`, { returnObjects: true, defaultValue: [] }) as string[];
@@ -27,9 +48,9 @@ export function InvestorSurveyResultView({ result, onRetake }: Props) {
 
   const assetBars = ASSET_KEYS.map((key) => ({
     label: t(`investorSurvey.assetLabels.${key}`),
-    value: profile.assetMix[key],
+    value: typeProfile.assetMix[key],
     max: 100,
-    suffix: `${profile.assetMix[key]}%`,
+    suffix: `${typeProfile.assetMix[key]}%`,
     color: key === 'stocks' ? '#6366f1' : key === 'etf' ? '#10b981' : key === 'bonds' ? '#f59e0b' : '#71717a',
   }));
 
@@ -50,6 +71,14 @@ export function InvestorSurveyResultView({ result, onRetake }: Props) {
           </div>
         </div>
         <p className="text-sm leading-relaxed text-muted-foreground">{t(`${typeBase}.summary`)}</p>
+        {profile.compositePercent !== null && (
+          <p className="text-xs text-primary">
+            {t('investorSurvey.profilePreview', {
+              composite: profile.compositePercent.toFixed(1),
+              effective: profile.effectivePercent.toFixed(1),
+            })}
+          </p>
+        )}
         {Array.isArray(traits) && traits.length > 0 && (
           <ul className="flex flex-wrap gap-2">
             {traits.map((trait) => (
@@ -70,8 +99,8 @@ export function InvestorSurveyResultView({ result, onRetake }: Props) {
         <p className="text-xs text-muted-foreground">
           {t('investorSurvey.horizonLabel')}:{' '}
           {t('investorSurvey.horizonRange', {
-            min: profile.horizonYearsMin,
-            max: profile.horizonYearsMax,
+            min: typeProfile.horizonYearsMin,
+            max: typeProfile.horizonYearsMax,
           })}
         </p>
       </Surface>
@@ -81,15 +110,15 @@ export function InvestorSurveyResultView({ result, onRetake }: Props) {
         <dl className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
           <div className="rounded-lg border border-border bg-muted/20 px-3 py-2">
             <dt className="text-xs text-muted-foreground">{t('investorSurvey.allocationLabels.kr')}</dt>
-            <dd className="font-semibold tabular-nums">{profile.preferences.targetKrPercent}%</dd>
+            <dd className="font-semibold tabular-nums">{typeProfile.preferences.targetKrPercent}%</dd>
           </div>
           <div className="rounded-lg border border-border bg-muted/20 px-3 py-2">
             <dt className="text-xs text-muted-foreground">{t('investorSurvey.allocationLabels.us')}</dt>
-            <dd className="font-semibold tabular-nums">{profile.preferences.targetUsPercent}%</dd>
+            <dd className="font-semibold tabular-nums">{typeProfile.preferences.targetUsPercent}%</dd>
           </div>
           <div className="rounded-lg border border-border bg-muted/20 px-3 py-2">
             <dt className="text-xs text-muted-foreground">{t('investorSurvey.allocationLabels.maxSingle')}</dt>
-            <dd className="font-semibold tabular-nums">{profile.preferences.maxSingleWeightPercent}%</dd>
+            <dd className="font-semibold tabular-nums">{typeProfile.preferences.maxSingleWeightPercent}%</dd>
           </div>
         </dl>
       </Surface>
@@ -97,7 +126,7 @@ export function InvestorSurveyResultView({ result, onRetake }: Props) {
       <Surface variant="section" className="space-y-3">
         <h3 className="text-sm font-semibold">{t('investorSurvey.tagsTitle')}</h3>
         <div className="flex flex-wrap gap-2">
-          {profile.preferredTags.map((tag) => (
+          {typeProfile.preferredTags.map((tag) => (
             <span
               key={tag}
               className="rounded-md border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs text-primary"
@@ -131,14 +160,12 @@ export function InvestorSurveyResultView({ result, onRetake }: Props) {
       )}
 
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-        <button
-          type="button"
-          disabled={saving || applied}
-          onClick={() => applyPreferences(profile.preferences)}
-          className="rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground disabled:opacity-60"
+        <Link
+          href="/my-info#investor-profile"
+          className="rounded-lg bg-primary px-4 py-2.5 text-center text-sm font-medium text-primary-foreground"
         >
-          {applied ? t('investorSurvey.applyPrefsDone') : t('investorSurvey.applyPrefs')}
-        </button>
+          {t('investorSurvey.goProfile')}
+        </Link>
         <button
           type="button"
           onClick={onRetake}
@@ -147,21 +174,12 @@ export function InvestorSurveyResultView({ result, onRetake }: Props) {
           {t('investorSurvey.retake')}
         </button>
         <Link
-          href="/my-info#capital"
-          className="rounded-lg border border-border px-4 py-2.5 text-center text-sm text-primary hover:bg-accent"
-        >
-          {t('investorSurvey.goCapital')}
-        </Link>
-        <Link
           href="/guide?category=type-analysis"
           className="rounded-lg border border-border px-4 py-2.5 text-center text-sm text-muted-foreground hover:bg-muted/50"
         >
           {t('investorSurvey.backToGuide')}
         </Link>
       </div>
-      {applied && (
-        <p className="text-xs text-muted-foreground">{t('investorSurvey.applyPrefsHint')}</p>
-      )}
 
       <p className="text-xs leading-relaxed text-muted-foreground">{t('investorSurvey.disclaimer')}</p>
     </div>

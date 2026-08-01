@@ -247,6 +247,7 @@ export interface PortfolioPreferenceEntity {
   targetKrPercent: number;
   targetUsPercent: number;
   maxSingleWeightPercent: number;
+  investorProfile?: import('@sar/shared').StoredInvestorProfile | null;
 }
 
 export interface PortfolioAnalysisResult {

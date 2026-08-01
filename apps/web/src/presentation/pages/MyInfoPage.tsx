@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { CapitalAndSimulationSection } from '../components/CapitalAndSimulationSection';
+import { InvestorProfileSection } from '../features/investor-profile/InvestorProfileSection';
 import { TransactionForm } from '../features/transactions/TransactionForm';
 import { TransactionList } from '../features/transactions/TransactionList';
 import { MyTaxSection } from '../features/tax/MyTaxSection';
@@ -34,6 +35,10 @@ export function MyInfoPage() {
         {screen.data && (
           <>
             <SummaryCards summary={screen.data.summary} />
+
+            <section id="investor-profile" className="scroll-mt-6">
+              <InvestorProfileSection />
+            </section>
 
             <section id="capital" className="scroll-mt-6">
               <Surface variant="section" className="mb-4 space-y-1">

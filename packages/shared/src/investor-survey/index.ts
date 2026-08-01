@@ -22,6 +22,26 @@ export {
   isAnalysisTestId,
   isMiniAnalysisTestId,
 } from './analysis-tests';
+export {
+  ANALYSIS_TEST_IDS,
+  DEFAULT_ADJUSTMENT_PERCENT,
+  MAX_ADJUSTMENT_PERCENT,
+  MIN_ADJUSTMENT_PERCENT,
+  TEST_SCORE_WEIGHTS,
+  buildInvestorProfile,
+  clampAdjustmentPercent,
+  computeCompositePercent,
+  createDefaultStoredProfile,
+  createEmptyLedger,
+  effectivePercentFromComposite,
+  getDefaultTypeProfile,
+  normalizePercentScore,
+  rankRecommendationsByTags,
+  scoreEntryFromInvestorSurvey,
+  scoreEntryFromMiniTest,
+  totalScoreFromEffectivePercent,
+  upsertTestScore,
+} from './profile';
 export type {
   AnalysisTestId,
   AnalysisTestLinkDef,
@@ -38,3 +58,9 @@ export type {
   InvestorTypeId,
   InvestorTypeProfile,
 } from './catalog';
+export type {
+  BuiltInvestorProfile,
+  InvestorScoreLedger,
+  StoredInvestorProfile,
+  TestScoreEntry,
+} from './profile';
