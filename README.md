@@ -25,7 +25,9 @@ packages/shared/      # 공통 도메인·포맷·시뮬레이션
 
 - **자본금·현금** — 초기 자본, 입출금, 매수/매도·배당 연동
 - **포트폴리오 시뮬레이션** — 목표 비중 대비 유지/축소/매수 검토
-- **내 정보** (`/my-info`) — 자본금·주식 거래 등록·수정 (비회원 포함)
+- **내 정보** (`/my-info`) — **투자 성향 프로필** · 자본금·주식 거래 (비회원 포함)
+- **주식이용 Tip** (`/guide`) — FAQ·Figure·**나의 유형분석** (종합 + 미니 3종)
+- **투자 성향 추천** — 테스트 ledger → tag 우선 simulation pick
 - **온보딩** — 자본·종목 미등록 시 대시보드 시작 안내
 - **시세 캐시** — React Query staleTime, 갱신 버튼으로만 외부 API 재호출
 
@@ -71,7 +73,7 @@ http://localhost:3000
 ## 테스트
 
 ```bash
-npm run test           # Vitest (226+ tests)
+npm run test           # Vitest (294 tests)
 npm run lint           # ESLint (flat config)
 npm run test:e2e       # Playwright smoke
 npm run build          # 프로덕션 빌드
@@ -83,6 +85,7 @@ npm run build          # 프로덕션 빌드
 |------|------|
 | [docs/PLAN.md](docs/PLAN.md) | 아키텍처·API·구현 상태 |
 | [docs/USECASES.md](docs/USECASES.md) | Use Case·테스트 매핑 |
+| [docs/investor-profile.md](docs/investor-profile.md) | 투자 성향 프로필·ledger·추천·저장 정책 |
 | [docs/stock-catalog-import.md](docs/stock-catalog-import.md) | 종목 마스터 import |
 
 ## 클린 아키텍처

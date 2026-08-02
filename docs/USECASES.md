@@ -32,6 +32,7 @@ apps/web/src/
 │       ├── auth/          # login, register, oauth, forgot/reset-password, …
 │       ├── account/       # profile, password, email, verify, delete, oauth
 │       ├── transactions/, portfolio/, watchlist/, corporate-actions/
+│       ├── guide/             # Tip, investor-type, analysis/[testId]
 │       └── market/
 ├── server/
 │   ├── container.ts
@@ -46,7 +47,8 @@ apps/web/src/
 └── presentation/
     ├── pages/             # responsive 단일 페이지
     ├── views/             # 일부 app route 래퍼
-    ├── hooks/screens/     # ViewModel
+    ├── hooks/             # screens/, useInvestorProfile, useInvestorSurvey, …
+    ├── features/          # investor-profile, investor-survey, guide, …
     └── desktop/, mobile/  # feature 컴포넌트
 ```
 
@@ -71,7 +73,7 @@ test/
 ```
 
 ```bash
-npm run test         # 192 tests, 45 files (Vitest)
+npm run test         # 294 tests, 65 files (Vitest)
 npm run test:e2e     # Playwright smoke (dev server 필요)
 ```
 
@@ -124,6 +126,9 @@ npm run test:e2e     # Playwright smoke (dev server 필요)
 | `DeleteTransactionUseCase` | DELETE `/api/transactions/[id]` | 동일 |
 | `GetDashboardUseCase` | GET `/api/portfolio/dashboard` | `portfolio.use-cases.spec.ts` |
 | `GetPortfolioAnalysisUseCase` | GET `/api/portfolio/analysis` | `get-portfolio-analysis.use-case.spec.ts` |
+| `GetPortfolioPreferencesUseCase` | GET `/api/portfolio/preferences` | `portfolio.use-cases.spec.ts` |
+| `UpdatePortfolioPreferencesUseCase` | PUT `/api/portfolio/preferences` (incl. `investorProfile`) | — |
+| `GetPortfolioSimulationUseCase` | GET `/api/portfolio/simulation` (tag rank) | — |
 | `GetHoldingBySymbolUseCase` | GET `/api/portfolio/holding` | `get-holding.use-case.spec.ts` |
 | `RefreshQuotesUseCase` | POST `/api/market/refresh` | `market.use-cases.spec.ts` (KR 병렬 포함) |
 | `GetFeaturedQuotesUseCase` | GET `/api/market/featured` | `get-featured-quotes.use-case.spec.ts` |
@@ -148,6 +153,7 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | Account (settings, delete, verify) | `client/domain/usecases/account/` | — |
 | Transactions | `client/domain/usecases/transactions/` | `transactions.use-cases.spec.ts` |
 | Portfolio | `client/domain/usecases/portfolio/` | `portfolio.use-cases.spec.ts` |
+| **Investor profile** | `presentation/hooks/useInvestorProfile.ts`, `client/data/investor-profile-hydrate.ts` | `investor-profile.spec.ts` (shared) |
 | Watchlist | `client/domain/usecases/watchlist/` | `watchlist.use-cases.spec.ts` |
 | Corporate actions | `client/domain/usecases/corporate-actions/` | `corporate-actions.use-cases.spec.ts` |
 | Market | `client/domain/usecases/market/` | — |
@@ -163,7 +169,11 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | `auth`, `auth-tokens` | 가입 검증, 토큰 타입 |
 | `featured-stocks`, `chart-range` | 주요 종목, 기간 |
 | `portfolio-*`, `market-analysis` | 포트폴리오·시장 분석 순수 로직 |
+| `investor-survey/` | 투자 유형 catalog, 미니 테스트, **profile** (ledger·composite·rank) |
+| `guide/` | Tip FAQ catalog |
 | `corporate-actions`, `stock-search` | 기업행위·검색 |
+
+투자 프로필 상세: [investor-profile.md](investor-profile.md)
 
 테스트: `test/shared/`
 

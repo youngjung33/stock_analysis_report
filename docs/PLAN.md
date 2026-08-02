@@ -60,7 +60,10 @@ stock-analysis-report/
 | 경로 | 역할 |
 |------|------|
 | `/` | 대시보드 (protected) — 온보딩·요약·시뮬레이션 |
-| `/my-info` | 내 정보 — 자본금·주식 거래 (protected, 비회원 포함) |
+| `/my-info` | 내 정보 — **투자 성향 프로필** · 자본금·주식 거래 (protected, 비회원 포함) |
+| `/guide` | 주식이용 Tip (FAQ·Figure) |
+| `/guide/investor-type` | 10단계 투자 유형 진단 |
+| `/guide/analysis/[testId]` | 미니 분석 (risk-check, horizon-goal, allocation-style) |
 | `/login` | 로그인 · 회원가입 · SSO · 비회원 |
 | `/transactions` | 거래 · 기업행위 (protected) |
 | `/stocks/[symbol]` | 종목 상세 (`?market=KR\|US`) |
@@ -118,8 +121,8 @@ Handler → `getServerServices()` → Domain Use Case
 | GET | `/api/portfolio/dashboard` | ✅ |
 | GET | `/api/portfolio/analysis` | ✅ |
 | GET | `/api/portfolio/holding` | ✅ |
-| GET/PUT | `/api/portfolio/preferences` | ✅ |
-| GET | `/api/portfolio/simulation` | ✅ |
+| GET/PUT | `/api/portfolio/preferences` | ✅ (`investorProfile` JSON 포함) |
+| GET | `/api/portfolio/simulation` | ✅ (tag rank + `investorProfile` 응답) |
 | GET/POST | `/api/cash` | ✅ |
 | GET/POST | `/api/watchlist` | ✅ |
 | DELETE | `/api/watchlist/[id]` | ✅ |
@@ -180,9 +183,13 @@ Use Case 상세: [USECASES.md](USECASES.md)
 
 ## 비회원(게스트) 모드
 
-- JWT·DB 없음. 거래·시세는 **sessionStorage**.
+- JWT·DB 없음. 거래·시세·**투자 프로필 점수**는 **sessionStorage** (`sar_guest_data`).
+- 설문 **답변 초안**은 **localStorage** (브라우저 공용) — 프로필 ledger에는 비회원 시 **자동 반영하지 않음**.
 - 시세 갱신: `POST /api/market/quotes`
 - 주요 종목·기간 조회는 회원과 동일 API
+- 게스트 → 회원 전환 시 `investorProfile` 1회 승계 (`sar_pending_investor_profile`)
+
+상세: [investor-profile.md](investor-profile.md)
 
 ---
 
@@ -244,9 +251,21 @@ npm run test:e2e              # Playwright (선택)
 | 10 | Rate limit + 보안 헤더 | ✅ |
 | 11 | Toast · 에러 마스킹 | ✅ |
 | 12 | 계정 설정·탈퇴·비밀번호 재설정 | ✅ |
-| 13 | Vitest **192 tests** (45 files) | ✅ |
+| 13 | Vitest **294 tests** (65 files) | ✅ |
 | 14 | Playwright smoke E2E | ✅ |
 | 15 | Sentry·structured log (골격) | ✅ |
+| 16 | 투자 성향 프로필 · ledger · simulation tag 추천 | ✅ |
+| 17 | 주식이용 Tip · 투자 유형/미니 진단 · 다크/라이트 | ✅ |
+
+---
+
+## 투자 성향 · 추천 (요약)
+
+- 4종 테스트 → ledger → 가중 composite → adjustment → 10유형 + `preferredTags`
+- **비회원**: 프로필 `sessionStorage` / **회원**: `PortfolioPreference.investorProfile`
+- 시뮬레이션 추천 종목 tag 우선 정렬
+
+→ [docs/investor-profile.md](investor-profile.md)
 
 ---
 
