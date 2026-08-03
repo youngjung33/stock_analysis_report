@@ -41,6 +41,7 @@ export function useMiniAnalysisSurvey(testId: MiniAnalysisTestId) {
   const [phase, setPhase] = useState<'intro' | 'survey' | 'result'>(() => {
     return computeMiniAnalysisResult(testId, readStored(testId)) ? 'result' : 'intro';
   });
+  const [sessionCompleted, setSessionCompleted] = useState(false);
 
   useEffect(() => {
     const stored = readStored(testId);
@@ -68,7 +69,10 @@ export function useMiniAnalysisSurvey(testId: MiniAnalysisTestId) {
       setStepIndex((i) => i + 1);
       return;
     }
-    if (computeMiniAnalysisResult(testId, answers)) setPhase('result');
+    if (computeMiniAnalysisResult(testId, answers)) {
+      setSessionCompleted(true);
+      setPhase('result');
+    }
   }, [answers, stepCount, stepIndex, testId]);
 
   const goPrev = useCallback(() => {
@@ -77,6 +81,7 @@ export function useMiniAnalysisSurvey(testId: MiniAnalysisTestId) {
 
   const startSurvey = useCallback(() => {
     setStepIndex(0);
+    setSessionCompleted(false);
     setPhase('survey');
   }, []);
 
@@ -84,6 +89,7 @@ export function useMiniAnalysisSurvey(testId: MiniAnalysisTestId) {
     const empty: InvestorSurveyAnswers = {};
     setAnswers(empty);
     setStepIndex(0);
+    setSessionCompleted(false);
     setPhase('intro');
     writeStored(testId, empty);
   }, [testId]);
@@ -103,6 +109,7 @@ export function useMiniAnalysisSurvey(testId: MiniAnalysisTestId) {
     startSurvey,
     retake,
     canGoNext: Boolean(currentAnswer),
+    sessionCompleted,
     isFirstStep: stepIndex === 0,
     isLastStep: stepIndex === stepCount - 1,
   };

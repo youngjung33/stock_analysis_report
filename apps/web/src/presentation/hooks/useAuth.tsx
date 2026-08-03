@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, createContext, useContext } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { GUEST_DISPLAY_NAME, isGuestUsername, OAuthProviderId, RegisterInput } from '@sar/shared';
+import { clearPendingInvestorProfile } from '@/client/data/guest/pending-investor-profile';
 import { useServices } from './useServices';
 
 interface AuthContextValue {
@@ -36,6 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     if (guestSession.isActive()) {
+      clearPendingInvestorProfile();
       guestSession.clear();
       guestStore.clear();
       setUsername(null);
@@ -73,8 +75,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(
     async (user: string, password: string) => {
+      if (guestSession.isActive()) {
+        guestStore.transferProfileAndClear();
+      } else {
+        guestStore.clear();
+      }
       guestSession.clear();
-      guestStore.clear();
       const result = await loginUseCase.execute(user, password);
       setUsername(result.username);
       await queryClient.clear();
@@ -84,8 +90,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = useCallback(
     async (input: RegisterInput) => {
+      if (guestSession.isActive()) {
+        guestStore.transferProfileAndClear();
+      } else {
+        guestStore.clear();
+      }
       guestSession.clear();
-      guestStore.clear();
       const result = await registerUseCase.execute(input);
       setUsername(result.username);
       await queryClient.clear();
@@ -95,8 +105,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const startOAuthLogin = useCallback(
     async (provider: OAuthProviderId, redirectUri: string) => {
+      if (guestSession.isActive()) {
+        guestStore.transferProfileAndClear();
+      } else {
+        guestStore.clear();
+      }
       guestSession.clear();
-      guestStore.clear();
       const result = await startOAuthLoginUseCase.execute(provider, redirectUri);
       window.location.assign(result.authorizationUrl);
     },
@@ -109,6 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // ignore — 비회원 전환 시 기존 세션 정리
     }
+    clearPendingInvestorProfile();
     guestStore.clear();
     guestSession.activate();
     setUsername(GUEST_DISPLAY_NAME);

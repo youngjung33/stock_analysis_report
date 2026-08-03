@@ -17,12 +17,13 @@ import { useInvestorProfile } from '../../hooks/useInvestorProfile';
 interface Props {
   result: InvestorSurveyResult;
   answers: InvestorSurveyAnswers;
+  sessionCompleted: boolean;
   onRetake: () => void;
 }
 
 const ASSET_KEYS = ['stocks', 'etf', 'bonds', 'cash'] as const;
 
-export function InvestorSurveyResultView({ result, answers, onRetake }: Props) {
+export function InvestorSurveyResultView({ result, answers, sessionCompleted, onRetake }: Props) {
   const { t } = useTranslation();
   const { showSuccess } = useToast();
   const { profile, upsertTestScoreEntry, stored } = useInvestorProfile();
@@ -32,7 +33,7 @@ export function InvestorSurveyResultView({ result, answers, onRetake }: Props) {
   const typeBase = `investorSurvey.types.${typeId}`;
 
   useEffect(() => {
-    if (appliedRef.current) return;
+    if (!sessionCompleted || appliedRef.current) return;
     const entry = scoreEntryFromInvestorSurvey(answers);
     if (!entry) return;
     appliedRef.current = true;
@@ -40,7 +41,7 @@ export function InvestorSurveyResultView({ result, answers, onRetake }: Props) {
     void upsertTestScoreEntry(entry).then(() => {
       showSuccess(t(hadBefore ? 'investorSurvey.ledgerUpdated' : 'investorSurvey.ledgerAccumulated'));
     });
-  }, [answers, showSuccess, stored.ledger.entries, t, upsertTestScoreEntry]);
+  }, [answers, sessionCompleted, showSuccess, stored.ledger.entries, t, upsertTestScoreEntry]);
 
   const traits = t(`${typeBase}.traits`, { returnObjects: true, defaultValue: [] }) as string[];
   const strategies = t(`${typeBase}.strategies`, { returnObjects: true, defaultValue: [] }) as string[];

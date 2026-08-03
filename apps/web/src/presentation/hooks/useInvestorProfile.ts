@@ -73,16 +73,23 @@ export function useInvestorProfile() {
 
       const pending = peekPendingInvestorProfile();
       if (pending && !data.investorProfile && !pendingTransferDone.current) {
-        pendingTransferDone.current = true;
-        nextStored = hydrateStoredProfile(normalizeStoredProfile(pending), { fromLocalAnswers: true });
-        takePendingInvestorProfile();
-        await updatePortfolioPreferencesUseCase.execute({
-          targetKrPercent: data.targetKrPercent,
-          targetUsPercent: data.targetUsPercent,
-          maxSingleWeightPercent: data.maxSingleWeightPercent,
-          investorProfile: nextStored,
+        const merged = hydrateStoredProfile(normalizeStoredProfile(pending), {
+          fromLocalAnswers: true,
         });
-        await invalidatePortfolioLocal(queryClient);
+        try {
+          await updatePortfolioPreferencesUseCase.execute({
+            targetKrPercent: data.targetKrPercent,
+            targetUsPercent: data.targetUsPercent,
+            maxSingleWeightPercent: data.maxSingleWeightPercent,
+            investorProfile: merged,
+          });
+          takePendingInvestorProfile();
+          pendingTransferDone.current = true;
+          nextStored = merged;
+          await invalidatePortfolioLocal(queryClient);
+        } catch {
+          // pending 유지 — 다음 refresh에서 재시도
+        }
       }
 
       setStored(nextStored);
@@ -130,15 +137,8 @@ export function useInvestorProfile() {
         ledger: nextLedger,
         updatedAt: new Date().toISOString(),
       };
-      const built = buildInvestorProfile(nextStored);
-      const nextPrefs = {
-        targetKrPercent: built.preferences.targetKrPercent,
-        targetUsPercent: built.preferences.targetUsPercent,
-        maxSingleWeightPercent: built.preferences.maxSingleWeightPercent,
-      };
-      setPrefs(nextPrefs);
-      await persistStored(nextStored, nextPrefs);
-      return built;
+      await persistStored(nextStored);
+      return buildInvestorProfile(nextStored);
     },
     [persistStored, stored],
   );

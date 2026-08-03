@@ -2,6 +2,11 @@ import type { StoredInvestorProfile } from '@sar/shared';
 
 const PENDING_KEY = 'sar_pending_investor_profile';
 
+export function clearPendingInvestorProfile(): void {
+  if (typeof sessionStorage === 'undefined') return;
+  sessionStorage.removeItem(PENDING_KEY);
+}
+
 export function savePendingInvestorProfile(profile: StoredInvestorProfile): void {
   if (typeof sessionStorage === 'undefined') return;
   sessionStorage.setItem(PENDING_KEY, JSON.stringify(profile));

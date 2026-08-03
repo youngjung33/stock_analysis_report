@@ -19,6 +19,10 @@ export class GuestSessionAdapter implements IGuestSessionPort {
 
 export class GuestStoreAdapter implements IGuestStorePort {
   clear() {
+    clearGuestStore();
+  }
+
+  transferProfileAndClear() {
     const profile = snapshotGuestInvestorProfile();
     if (profile) savePendingInvestorProfile(profile);
     clearGuestStore();

@@ -125,6 +125,8 @@ export interface IGuestSessionPort {
 
 export interface IGuestStorePort {
   clear(): void;
+  /** Snapshot investor profile for member transfer, then clear guest store. */
+  transferProfileAndClear(): void;
 }
 
 export interface IAuthSessionPort {

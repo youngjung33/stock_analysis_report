@@ -44,6 +44,7 @@ export function useInvestorSurvey() {
     const result = computeInvestorSurveyResult(stored.answers);
     return result ? 'result' : 'intro';
   });
+  const [sessionCompleted, setSessionCompleted] = useState(false);
 
   useEffect(() => {
     const stored = readStored();
@@ -80,6 +81,7 @@ export function useInvestorSurvey() {
         completedAt: new Date().toISOString(),
         typeId: computed.typeId,
       });
+      setSessionCompleted(true);
       setPhase('result');
     }
   }, [answers, stepIndex]);
@@ -90,6 +92,7 @@ export function useInvestorSurvey() {
 
   const startSurvey = useCallback(() => {
     setStepIndex(0);
+    setSessionCompleted(false);
     setPhase('survey');
   }, []);
 
@@ -97,6 +100,7 @@ export function useInvestorSurvey() {
     const empty: InvestorSurveyAnswers = {};
     setAnswers(empty);
     setStepIndex(0);
+    setSessionCompleted(false);
     setPhase('intro');
     writeStored({ answers: empty });
   }, []);
@@ -118,6 +122,7 @@ export function useInvestorSurvey() {
     startSurvey,
     retake,
     canGoNext,
+    sessionCompleted,
     isFirstStep: stepIndex === 0,
     isLastStep: stepIndex === INVESTOR_SURVEY_STEP_COUNT - 1,
   };

@@ -19,11 +19,13 @@ function MiniResultView({
   testId,
   result,
   answers,
+  sessionCompleted,
   onRetake,
 }: {
   testId: MiniAnalysisTestId;
   result: MiniAnalysisResult;
   answers: InvestorSurveyAnswers;
+  sessionCompleted: boolean;
   onRetake: () => void;
 }) {
   const { t } = useTranslation();
@@ -34,7 +36,7 @@ function MiniResultView({
   const tips = t(`${base}.tips`, { returnObjects: true, defaultValue: [] }) as string[];
 
   useEffect(() => {
-    if (appliedRef.current) return;
+    if (!sessionCompleted || appliedRef.current) return;
     const entry = scoreEntryFromMiniTest(testId, answers);
     if (!entry) return;
     appliedRef.current = true;
@@ -42,7 +44,7 @@ function MiniResultView({
     void upsertTestScoreEntry(entry).then(() => {
       showSuccess(t(hadBefore ? 'investorSurvey.ledgerUpdated' : 'investorSurvey.ledgerAccumulated'));
     });
-  }, [answers, showSuccess, stored.ledger.entries, t, testId, upsertTestScoreEntry]);
+  }, [answers, sessionCompleted, showSuccess, stored.ledger.entries, t, testId, upsertTestScoreEntry]);
 
   return (
     <div className="space-y-6">
@@ -118,6 +120,7 @@ export function AnalysisMiniSurveyFlow({ testId }: Props) {
         testId={testId}
         result={survey.result}
         answers={survey.answers}
+        sessionCompleted={survey.sessionCompleted}
         onRetake={survey.retake}
       />
     );
