@@ -1,9 +1,5 @@
 import {
-  buildMarketInsights,
-  buildPortfolioSimulation,
-  rankRecommendationsByTags,
-  buildInvestorProfile,
-  createDefaultStoredProfile,
+  buildRankedPortfolioSimulation,
   CashLedgerType,
 } from '@sar/shared';
 import {
@@ -94,34 +90,7 @@ export class GuestPortfolioCapitalRepository implements IPortfolioCapitalReposit
       this.getPreferences(),
     ]);
 
-    const insights = buildMarketInsights(
-      featured.kr.map((q) => ({
-        symbol: q.symbol,
-        name: q.name,
-        market: q.market,
-        currency: q.currency,
-        currentPrice: q.currentPrice,
-        changePercent: q.changePercent,
-      })),
-      featured.us.map((q) => ({
-        symbol: q.symbol,
-        name: q.name,
-        market: q.market,
-        currency: q.currency,
-        currentPrice: q.currentPrice,
-        changePercent: q.changePercent,
-      })),
-      6,
-    );
-
-    const storedProfile = getGuestInvestorProfile() ?? createDefaultStoredProfile();
-    const builtProfile = buildInvestorProfile(storedProfile);
-    const rankedRecommendations = rankRecommendationsByTags(
-      insights.recommendations.filter((r) => r.currentPrice > 0),
-      builtProfile.preferredTags,
-    );
-
-    const simulation = buildPortfolioSimulation({
+    const { simulation, builtProfile, storedProfile } = buildRankedPortfolioSimulation({
       cash: { krw: dashboard.summary.cashKrw, usd: dashboard.summary.cashUsd },
       holdings: dashboard.holdings.map((h) => ({
         symbol: h.symbol,
@@ -134,7 +103,23 @@ export class GuestPortfolioCapitalRepository implements IPortfolioCapitalReposit
         weightPercent: h.weightPercent,
       })),
       preferences,
-      recommendations: rankedRecommendations,
+      featuredKr: featured.kr.map((q) => ({
+        symbol: q.symbol,
+        name: q.name,
+        market: q.market,
+        currency: q.currency,
+        currentPrice: q.currentPrice,
+        changePercent: q.changePercent,
+      })),
+      featuredUs: featured.us.map((q) => ({
+        symbol: q.symbol,
+        name: q.name,
+        market: q.market,
+        currency: q.currency,
+        currentPrice: q.currentPrice,
+        changePercent: q.changePercent,
+      })),
+      storedProfile: getGuestInvestorProfile(),
       usdKrwRate: dashboard.summary.usdKrwRate,
     });
 

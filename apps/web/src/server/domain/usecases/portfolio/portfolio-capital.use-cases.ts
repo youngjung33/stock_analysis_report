@@ -1,10 +1,6 @@
 import {
   DEFAULT_PORTFOLIO_PREFERENCES,
-  buildMarketInsights,
-  buildPortfolioSimulation,
-  rankRecommendationsByTags,
-  buildInvestorProfile,
-  createDefaultStoredProfile,
+  buildRankedPortfolioSimulation,
 } from '@sar/shared';
 import { PortfolioPreferenceEntity } from '../../entities';
 import {
@@ -62,34 +58,7 @@ export class GetPortfolioSimulationUseCase {
       usd: dashboard.summary.cashUsd,
     };
 
-    const insights = buildMarketInsights(
-      featured.kr.map((q) => ({
-        symbol: q.symbol,
-        name: q.name,
-        market: q.market,
-        currency: q.currency,
-        currentPrice: q.currentPrice,
-        changePercent: q.changePercent,
-      })),
-      featured.us.map((q) => ({
-        symbol: q.symbol,
-        name: q.name,
-        market: q.market,
-        currency: q.currency,
-        currentPrice: q.currentPrice,
-        changePercent: q.changePercent,
-      })),
-      6,
-    );
-
-    const storedProfile = preferences.investorProfile ?? createDefaultStoredProfile();
-    const builtProfile = buildInvestorProfile(storedProfile);
-    const rankedRecommendations = rankRecommendationsByTags(
-      insights.recommendations.filter((r) => r.currentPrice > 0),
-      builtProfile.preferredTags,
-    );
-
-    const simulation = buildPortfolioSimulation({
+    const { simulation, builtProfile } = buildRankedPortfolioSimulation({
       cash,
       holdings: dashboard.holdings.map((h) => ({
         symbol: h.symbol,
@@ -106,7 +75,23 @@ export class GetPortfolioSimulationUseCase {
         targetUsPercent: preferences.targetUsPercent,
         maxSingleWeightPercent: preferences.maxSingleWeightPercent,
       },
-      recommendations: rankedRecommendations,
+      featuredKr: featured.kr.map((q) => ({
+        symbol: q.symbol,
+        name: q.name,
+        market: q.market,
+        currency: q.currency,
+        currentPrice: q.currentPrice,
+        changePercent: q.changePercent,
+      })),
+      featuredUs: featured.us.map((q) => ({
+        symbol: q.symbol,
+        name: q.name,
+        market: q.market,
+        currency: q.currency,
+        currentPrice: q.currentPrice,
+        changePercent: q.changePercent,
+      })),
+      storedProfile: preferences.investorProfile,
       usdKrwRate: dashboard.summary.usdKrwRate,
     });
 

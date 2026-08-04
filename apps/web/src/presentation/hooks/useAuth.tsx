@@ -118,17 +118,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const loginAsGuest = useCallback(async () => {
-    try {
-      await logoutUseCase.execute();
-    } catch {
-      // ignore — 비회원 전환 시 기존 세션 정리
+    if (username && !isGuestUsername(username)) {
+      try {
+        await logoutUseCase.execute();
+      } catch {
+        // ignore — 비회원 전환 시 기존 회원 세션 정리
+      }
     }
     clearPendingInvestorProfile();
     guestStore.clear();
     guestSession.activate();
     setUsername(GUEST_DISPLAY_NAME);
     await queryClient.clear();
-  }, [logoutUseCase, queryClient, guestSession, guestStore]);
+  }, [logoutUseCase, queryClient, guestSession, guestStore, username]);
 
   const value = useMemo(
     () => ({

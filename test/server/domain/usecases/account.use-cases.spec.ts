@@ -76,7 +76,11 @@ describe('GetAccountUseCase', () => {
 
 describe('ChangeEmailUseCase', () => {
   it('rejects invalid email', async () => {
-    const useCase = new ChangeEmailUseCase(createMockUserRepo(), createMockAuthTokenRepo());
+    const useCase = new ChangeEmailUseCase(
+      createMockUserRepo(),
+      createMockAuthTokenRepo(),
+      createMockEmailSender(),
+    );
     await expect(
       useCase.execute({ userId: 'user-1', email: 'not-an-email' }),
     ).rejects.toThrow(ValidationError);
@@ -86,7 +90,7 @@ describe('ChangeEmailUseCase', () => {
     const userRepo = createMockUserRepo();
     userRepo.findByEmail.mockResolvedValue(createMockUser({ id: 'other-user' }));
 
-    const useCase = new ChangeEmailUseCase(userRepo, createMockAuthTokenRepo());
+    const useCase = new ChangeEmailUseCase(userRepo, createMockAuthTokenRepo(), createMockEmailSender());
     await expect(
       useCase.execute({ userId: 'user-1', email: 'taken@example.com' }),
     ).rejects.toBeInstanceOf(ConflictError);
@@ -97,12 +101,14 @@ describe('ChangeEmailUseCase', () => {
     userRepo.findByEmail.mockResolvedValue(null);
     const authTokenRepo = createMockAuthTokenRepo();
 
-    const useCase = new ChangeEmailUseCase(userRepo, authTokenRepo);
+    const emailSender = createMockEmailSender();
+    const useCase = new ChangeEmailUseCase(userRepo, authTokenRepo, emailSender);
     const result = await useCase.execute({ userId: 'user-1', email: 'New@Example.com' });
 
     expect(userRepo.updateEmail).toHaveBeenCalledWith('user-1', 'new@example.com');
     expect(result.verificationCode).toMatch(/^\d{6}$/);
     expect(authTokenRepo.create).toHaveBeenCalled();
+    expect(emailSender.send).toHaveBeenCalled();
   });
 });
 
@@ -313,11 +319,13 @@ describe('RequestEmailVerificationUseCase', () => {
     );
     const authTokenRepo = createMockAuthTokenRepo();
 
-    const useCase = new RequestEmailVerificationUseCase(userRepo, authTokenRepo);
+    const emailSender = createMockEmailSender();
+    const useCase = new RequestEmailVerificationUseCase(userRepo, authTokenRepo, emailSender);
     const result = await useCase.execute('user-1');
 
     expect(result?.verificationCode).toMatch(/^\d{6}$/);
     expect(authTokenRepo.create).toHaveBeenCalled();
+    expect(emailSender.send).toHaveBeenCalled();
   });
 
   it('returns null when already verified', async () => {
@@ -326,7 +334,11 @@ describe('RequestEmailVerificationUseCase', () => {
       createMockUser({ email: 'user@example.com', emailVerifiedAt: new Date() }),
     );
 
-    const useCase = new RequestEmailVerificationUseCase(userRepo, createMockAuthTokenRepo());
+    const useCase = new RequestEmailVerificationUseCase(
+      userRepo,
+      createMockAuthTokenRepo(),
+      createMockEmailSender(),
+    );
     const result = await useCase.execute('user-1');
 
     expect(result).toBeNull();

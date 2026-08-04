@@ -6,8 +6,8 @@
 
 # Test info
 
-- Name: smoke.spec.ts >> smoke >> guest is redirected from settings to dashboard
-- Location: ..\..\test\e2e\smoke.spec.ts:41:7
+- Name: smoke.spec.ts >> smoke >> guest sees onboarding on empty dashboard
+- Location: ..\..\test\e2e\smoke.spec.ts:55:7
 
 # Error details
 

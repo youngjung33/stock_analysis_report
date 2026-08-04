@@ -6,8 +6,8 @@
 
 # Test info
 
-- Name: smoke.spec.ts >> smoke >> guest is redirected from settings to dashboard
-- Location: ..\..\test\e2e\smoke.spec.ts:41:7
+- Name: smoke.spec.ts >> smoke >> guest can open my-info page
+- Location: ..\..\test\e2e\smoke.spec.ts:47:7
 
 # Error details
 

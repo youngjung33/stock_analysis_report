@@ -712,6 +712,10 @@
     "passwordReset": {
       "subject": "[SAR Portfolio] Reset your password",
       "body": "Use the link below to reset your password.\n\n{{link}}\n\nThis link expires in 1 hour."
+    },
+    "emailVerification": {
+      "subject": "[SAR Portfolio] Verify your email",
+      "body": "Your verification code: {{code}}\n\nClick the link below or enter the code in Settings.\n\n{{link}}\n\nThis code expires in 24 hours."
     }
   },
   "portfolio": {

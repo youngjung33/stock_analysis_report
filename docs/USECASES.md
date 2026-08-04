@@ -25,7 +25,7 @@ client/domain  ←  client/data  (axios → /api)
 ```
 apps/web/src/
 ├── app/
-│   ├── page.tsx, login/, transactions/, settings/
+│   ├── page.tsx, login/, transactions/, settings/, tax/
 │   ├── forgot-password/, reset-password/
 │   ├── market/analysis/, stocks/[symbol]/
 │   └── api/
@@ -73,7 +73,7 @@ test/
 ```
 
 ```bash
-npm run test         # 294 tests, 65 files (Vitest)
+npm run test         # 310 tests, 70 files (Vitest)
 npm run test:e2e     # Playwright smoke (dev server 필요)
 ```
 

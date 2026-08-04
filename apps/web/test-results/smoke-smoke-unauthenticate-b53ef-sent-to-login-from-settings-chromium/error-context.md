@@ -6,8 +6,8 @@
 
 # Test info
 
-- Name: smoke.spec.ts >> smoke >> guest is redirected from settings to dashboard
-- Location: ..\..\test\e2e\smoke.spec.ts:41:7
+- Name: smoke.spec.ts >> smoke >> unauthenticated user is sent to login from settings
+- Location: ..\..\test\e2e\smoke.spec.ts:69:7
 
 # Error details
 

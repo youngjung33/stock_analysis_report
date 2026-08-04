@@ -131,6 +131,13 @@ export {
   DEFAULT_PORTFOLIO_PREFERENCES,
   buildPortfolioSimulation,
 } from './portfolio-simulation';
+export {
+  buildRankedPortfolioSimulation,
+} from './portfolio-capital-simulation';
+export type {
+  FeaturedQuoteInput,
+  RankedPortfolioSimulationResult,
+} from './portfolio-capital-simulation';
 export type {
   PortfolioPreferences,
   PortfolioSimulationResult,

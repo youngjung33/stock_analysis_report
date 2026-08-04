@@ -18,6 +18,7 @@ import {
 } from '@/client/data/investor-profile-hydrate';
 import {
   getGuestInvestorProfile,
+  getGuestPortfolioPreference,
   saveGuestInvestorProfile,
   saveGuestPortfolioPreference,
 } from '@/client/data/guest/guest-storage';
@@ -25,7 +26,7 @@ import {
   peekPendingInvestorProfile,
   takePendingInvestorProfile,
 } from '@/client/data/guest/pending-investor-profile';
-import { invalidatePortfolioLocal, MARKET_QUERY_KEYS } from '../lib/query-config';
+import { invalidatePortfolioLocal } from '../lib/query-config';
 import { useAuth } from './useAuth';
 import { useServices } from './useServices';
 
@@ -54,6 +55,12 @@ export function useInvestorProfile() {
 
   const refresh = useCallback(async () => {
     if (isGuest) {
+      const guestPrefs = getGuestPortfolioPreference();
+      setPrefs({
+        targetKrPercent: guestPrefs.targetKrPercent,
+        targetUsPercent: guestPrefs.targetUsPercent,
+        maxSingleWeightPercent: guestPrefs.maxSingleWeightPercent,
+      });
       // Guest ledger lives in sessionStorage only — do not pull from shared localStorage.
       setStored(loadGuestStoredProfile());
       return;
@@ -68,8 +75,10 @@ export function useInvestorProfile() {
         maxSingleWeightPercent: data.maxSingleWeightPercent,
       });
 
-      let nextStored = normalizeStoredProfile(data.investorProfile);
-      nextStored = hydrateStoredProfile(nextStored, { fromLocalAnswers: true });
+      const dbStored = normalizeStoredProfile(data.investorProfile);
+      let nextStored = hydrateStoredProfile(dbStored, { fromLocalAnswers: true });
+      const hydrateChanged =
+        JSON.stringify(nextStored.ledger.entries) !== JSON.stringify(dbStored.ledger.entries);
 
       const pending = peekPendingInvestorProfile();
       if (pending && !data.investorProfile && !pendingTransferDone.current) {
@@ -89,6 +98,18 @@ export function useInvestorProfile() {
           await invalidatePortfolioLocal(queryClient);
         } catch {
           // pending 유지 — 다음 refresh에서 재시도
+        }
+      } else if (hydrateChanged) {
+        try {
+          await updatePortfolioPreferencesUseCase.execute({
+            targetKrPercent: data.targetKrPercent,
+            targetUsPercent: data.targetUsPercent,
+            maxSingleWeightPercent: data.maxSingleWeightPercent,
+            investorProfile: nextStored,
+          });
+          await invalidatePortfolioLocal(queryClient);
+        } catch {
+          // 로컬 hydrate 상태는 UI에 반영 — DB 동기화는 다음 persist 시 재시도
         }
       }
 

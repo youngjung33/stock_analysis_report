@@ -6,8 +6,8 @@
 
 # Test info
 
-- Name: smoke.spec.ts >> smoke >> guest is redirected from settings to dashboard
-- Location: ..\..\test\e2e\smoke.spec.ts:41:7
+- Name: smoke.spec.ts >> smoke >> guest can register initial capital on my-info
+- Location: ..\..\test\e2e\smoke.spec.ts:61:7
 
 # Error details
 

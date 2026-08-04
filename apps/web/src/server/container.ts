@@ -52,7 +52,7 @@ import {
   PrismaPortfolioPreferenceRepository,
 } from './data/persistence/prisma.repositories';
 import { PrismaAuthTokenRepository } from './data/auth/auth-token.repository';
-import { ConsoleEmailSender } from './data/auth/console-email.sender';
+import { createEmailSender } from './data/auth/create-email-sender';
 import {
   ChangeEmailUseCase,
   ChangePasswordUseCase,
@@ -143,7 +143,7 @@ export function getServerServices(): ServerServices {
   const oauthAccountRepo = new PrismaUserOAuthAccountRepository();
   const oauthStateRepo = new PrismaOAuthStateRepository();
   const authTokenRepo = new PrismaAuthTokenRepository();
-  const emailSender = new ConsoleEmailSender();
+  const emailSender = createEmailSender();
   const authSession = new AuthSessionService(refreshRepo, tokenService);
   const marketData = new MarketDataProvider();
 
@@ -208,8 +208,12 @@ export function getServerServices(): ServerServices {
     deleteWatchlistUseCase: new DeleteWatchlistUseCase(watchlistRepo),
     getAccountUseCase: new GetAccountUseCase(userRepo, oauthAccountRepo),
     changePasswordUseCase: new ChangePasswordUseCase(userRepo, passwordHasher),
-    changeEmailUseCase: new ChangeEmailUseCase(userRepo, authTokenRepo),
-    requestEmailVerificationUseCase: new RequestEmailVerificationUseCase(userRepo, authTokenRepo),
+    changeEmailUseCase: new ChangeEmailUseCase(userRepo, authTokenRepo, emailSender),
+    requestEmailVerificationUseCase: new RequestEmailVerificationUseCase(
+      userRepo,
+      authTokenRepo,
+      emailSender,
+    ),
     verifyEmailUseCase: new VerifyEmailUseCase(userRepo, authTokenRepo),
     requestPasswordResetUseCase: new RequestPasswordResetUseCase(
       userRepo,

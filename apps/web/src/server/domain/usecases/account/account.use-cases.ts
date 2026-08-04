@@ -97,9 +97,14 @@ export class ChangeEmailUseCase {
   constructor(
     private readonly userRepo: IUserRepository,
     private readonly authTokenRepo: IAuthTokenRepository,
+    private readonly emailSender: IEmailSenderPort,
   ) {}
 
-  async execute(input: { userId: string; email: string }): Promise<EmailVerificationIssued> {
+  async execute(input: {
+    userId: string;
+    email: string;
+    locale?: SupportedLocale;
+  }): Promise<EmailVerificationIssued> {
     const email = input.email.trim().toLowerCase();
     if (!email || !email.includes('@')) {
       throw new ValidationError(AppErrorCode.AUTH_EMAIL_INVALID);
@@ -111,7 +116,10 @@ export class ChangeEmailUseCase {
     }
 
     await this.userRepo.updateEmail(input.userId, email);
-    return issueEmailVerificationCode(this.authTokenRepo, input.userId, email);
+    return issueEmailVerificationCode(this.authTokenRepo, input.userId, email, {
+      emailSender: this.emailSender,
+      locale: input.locale,
+    });
   }
 }
 
@@ -119,14 +127,18 @@ export class RequestEmailVerificationUseCase {
   constructor(
     private readonly userRepo: IUserRepository,
     private readonly authTokenRepo: IAuthTokenRepository,
+    private readonly emailSender: IEmailSenderPort,
   ) {}
 
-  async execute(userId: string): Promise<EmailVerificationIssued | null> {
+  async execute(userId: string, locale: SupportedLocale = 'ko'): Promise<EmailVerificationIssued | null> {
     const user = await this.userRepo.findById(userId);
     if (!user?.email) throw new ValidationError(AppErrorCode.AUTH_EMAIL_REQUIRED);
     if (user.emailVerifiedAt) return null;
 
-    return issueEmailVerificationCode(this.authTokenRepo, userId, user.email);
+    return issueEmailVerificationCode(this.authTokenRepo, userId, user.email, {
+      emailSender: this.emailSender,
+      locale,
+    });
   }
 }
 

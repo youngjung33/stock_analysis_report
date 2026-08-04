@@ -1,14 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerServices } from '@/server/container';
 import { handleRouteError } from '@/server/http/route-utils';
 
-/**
- * TODO: EmailSender 연동 후 링크 기반 인증 복구.
- * 현재는 6자리 인증 코드 + POST /api/account/confirm-email 사용.
- */
+/** 링크 기반 이메일 인증 — 6자리 code 쿼리 또는 설정 화면 POST confirm-email */
 export async function GET(req: NextRequest) {
   try {
-    return NextResponse.redirect(new URL('/settings?verifyError=1', req.url));
+    const code = req.nextUrl.searchParams.get('code')?.trim();
+    if (!code) {
+      return NextResponse.redirect(new URL('/settings?verifyError=1', req.url));
+    }
+
+    const { verifyEmailUseCase } = getServerServices();
+    await verifyEmailUseCase.execute(code);
+    return NextResponse.redirect(new URL('/settings?verified=1', req.url));
   } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.redirect(new URL('/settings?verifyError=1', req.url));
+    }
     return handleRouteError(error);
   }
 }

@@ -654,7 +654,7 @@
       "marketUsOption": "미국 (US)",
       "searchLabel": "종목 검색",
       "placeholderKr": "종목명 또는 코드 (예: 삼성전자, 005930)",
-      "placeholderUs": "Ticker or name (e.g. AAPL)",
+      "placeholderUs": "티커 또는 종목명 (예: AAPL)",
       "searching": "검색 중...",
       "noResults": "검색 결과가 없습니다.",
       "selectHint": "검색 결과에서 종목을 선택해야 거래를 등록할 수 있습니다.",
@@ -712,6 +712,10 @@
     "passwordReset": {
       "subject": "[SAR Portfolio] 비밀번호 재설정",
       "body": "비밀번호 재설정 링크입니다.\n\n{{link}}\n\n1시간 내에 유효합니다."
+    },
+    "emailVerification": {
+      "subject": "[SAR Portfolio] 이메일 인증",
+      "body": "이메일 인증 코드: {{code}}\n\n아래 링크를 클릭하거나 설정 화면에서 코드를 입력하세요.\n\n{{link}}\n\n24시간 내에 유효합니다."
     }
   },
   "portfolio": {

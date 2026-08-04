@@ -68,6 +68,7 @@ stock-analysis-report/
 | `/transactions` | 거래 · 기업행위 (protected) |
 | `/stocks/[symbol]` | 종목 상세 (`?market=KR\|US`) |
 | `/market/analysis` | 시장 분석 (protected) |
+| `/tax` | 세금 추정 · 적용 규칙 참고 (protected) |
 | `/settings` | 계정 설정 (protected) |
 | `/forgot-password` | 비밀번호 찾기 |
 | `/reset-password` | 비밀번호 재설정 |
@@ -75,8 +76,8 @@ stock-analysis-report/
 ### UI 레이아웃
 
 - **`AppShell`**: sidebar(데스크톱) + header + bottom nav(모바일)
-- **데스크톱**: 사이드바 — 대시보드 · **내 정보** · 거래 · 시장 / 하단 계정 설정
-- **모바일**: 하단 nav 4탭 (홈 · 내 정보 · 거래 · 시장)
+- **데스크톱**: 사이드바 — 대시보드 · **내 정보** · 거래 · 시장 · **세금** · Tip / 하단 계정 설정
+- **모바일**: 하단 nav **6탭** (홈 · 내 정보 · 거래 · 시장 · **세금** · Tip)
 - **`pages/`**: Dashboard, Transactions, Login 등 responsive 단일 페이지
 - **Toast**: PC 우상단 / 모바일 하단
 
@@ -199,7 +200,8 @@ Use Case 상세: [USECASES.md](USECASES.md)
 |------|------|
 | 아이디 회원가입 / 로그인 | ✅ |
 | SSO (Google, Naver, Kakao, Apple) | ✅ (env 설정 시) |
-| 비밀번호 재설정 | ✅ UI·API (메일 발송은 추후 EmailSender) |
+| 비밀번호 재설정 | ✅ UI·API (ConsoleEmailSender / Resend) |
+| 이메일 인증 | ✅ 6자리 코드 + GET `/api/auth/verify-email?code=` 링크 |
 | 이메일 인증 | ✅ 6자리 코드 → toast (실메일 발송 TODO) |
 | 계정 설정 / SSO 연동 해제 | ✅ |
 | 회원탈퇴 | ✅ User cascade 삭제 |
@@ -271,7 +273,7 @@ npm run test:e2e              # Playwright (선택)
 
 ## 확장 포인트
 
-- 프로덕션 **EmailSender** (비밀번호 재설정·이메일 인증 실메일)
+- 프로덕션 **EmailSender** — `RESEND_API_KEY` 설정 시 Resend, 미설정 시 콘솔 출력 (비밀번호 재설정·이메일 인증)
 - 가입 직후 이메일 인증 플로우 연동
 - `desktop/mobile` feature 컴포넌트 통합
 - `views/*` → `pages/*` 직접 import 정리

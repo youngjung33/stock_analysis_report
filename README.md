@@ -26,6 +26,7 @@ packages/shared/      # 공통 도메인·포맷·시뮬레이션
 - **자본금·현금** — 초기 자본, 입출금, 매수/매도·배당 연동
 - **포트폴리오 시뮬레이션** — 목표 비중 대비 유지/축소/매수 검토
 - **내 정보** (`/my-info`) — **투자 성향 프로필** · 자본금·주식 거래 (비회원 포함)
+- **세금** (`/tax`) — 실현·배당 기반 세금 추정 · 규칙 참고
 - **주식이용 Tip** (`/guide`) — FAQ·Figure·**나의 유형분석** (종합 + 미니 3종)
 - **투자 성향 추천** — 테스트 ledger → tag 우선 simulation pick
 - **온보딩** — 자본·종목 미등록 시 대시보드 시작 안내
@@ -73,7 +74,7 @@ http://localhost:3000
 ## 테스트
 
 ```bash
-npm run test           # Vitest (294 tests)
+npm run test           # Vitest (310 tests)
 npm run lint           # ESLint (flat config)
 npm run test:e2e       # Playwright smoke
 npm run build          # 프로덕션 빌드

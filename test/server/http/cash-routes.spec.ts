@@ -130,6 +130,49 @@ describe('cash & portfolio capital API routes', () => {
     expect(body.targetKrPercent).toBe(60);
   });
 
+  it('PUT /api/portfolio/preferences merges investorProfile', async () => {
+    const updateExecute = vi.fn().mockResolvedValue({
+      targetKrPercent: 70,
+      targetUsPercent: 30,
+      maxSingleWeightPercent: 40,
+      investorProfile: {
+        ledger: { entries: {}, version: 1 },
+        adjustmentPercent: 100,
+        updatedAt: '2026-01-01T00:00:00.000Z',
+      },
+    });
+    mockServices({
+      getPortfolioPreferencesUseCase: {
+        execute: vi.fn().mockResolvedValue({
+          targetKrPercent: 70,
+          targetUsPercent: 30,
+          maxSingleWeightPercent: 40,
+          investorProfile: null,
+        }),
+      },
+      updatePortfolioPreferencesUseCase: { execute: updateExecute },
+    });
+
+    const profile = {
+      ledger: { entries: {}, version: 1 },
+      adjustmentPercent: 110,
+      updatedAt: '2026-01-02T00:00:00.000Z',
+    };
+    const req = authedRequest('http://localhost/api/portfolio/preferences', {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json', authorization: 'Bearer test-token' },
+      body: JSON.stringify({ investorProfile: profile }),
+    });
+    const res = await putPreferences(req);
+    expect(res.status).toBe(200);
+    expect(updateExecute).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: authUser.userId,
+        investorProfile: profile,
+      }),
+    );
+  });
+
   it('GET /api/portfolio/simulation returns simulation', async () => {
     const res = await getSimulation(authedRequest('http://localhost/api/portfolio/simulation'));
     expect(res.status).toBe(200);
