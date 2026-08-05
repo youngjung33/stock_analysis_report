@@ -150,6 +150,10 @@
         "title": "Investor Type Quiz",
         "description": "10-step survey to classify your investing style and get allocation suggestions."
       },
+      "miniAnalysis": {
+        "title": "Mini investment analysis",
+        "description": "Short surveys to check risk, horizon, and allocation style."
+      },
       "stock": {
         "title": "{{symbol}}",
         "description": "Stock quotes, charts, and details for {{symbol}}."

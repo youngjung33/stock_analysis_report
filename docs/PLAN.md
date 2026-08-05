@@ -61,7 +61,7 @@ stock-analysis-report/
 |------|------|
 | `/` | 대시보드 (protected) — 온보딩·요약·시뮬레이션 |
 | `/my-info` | 내 정보 — **투자 성향 프로필** · 자본금·주식 거래 (protected, 비회원 포함) |
-| `/guide` | 주식이용 Tip (FAQ·Figure) |
+| `/guide` | 주식이용 Tip (protected — **비회원 입장 또는 로그인** 필요) |
 | `/guide/investor-type` | 10단계 투자 유형 진단 |
 | `/guide/analysis/[testId]` | 미니 분석 (risk-check, horizon-goal, allocation-style) |
 | `/login` | 로그인 · 회원가입 · SSO · 비회원 |
@@ -201,8 +201,7 @@ Use Case 상세: [USECASES.md](USECASES.md)
 | 아이디 회원가입 / 로그인 | ✅ |
 | SSO (Google, Naver, Kakao, Apple) | ✅ (env 설정 시) |
 | 비밀번호 재설정 | ✅ UI·API (ConsoleEmailSender / Resend) |
-| 이메일 인증 | ✅ 6자리 코드 + GET `/api/auth/verify-email?code=` 링크 |
-| 이메일 인증 | ✅ 6자리 코드 → toast (실메일 발송 TODO) |
+| 이메일 인증 | ✅ 6자리 코드 + GET `/api/auth/verify-email?code=` + Resend/Console 발송 |
 | 계정 설정 / SSO 연동 해제 | ✅ |
 | 회원탈퇴 | ✅ User cascade 삭제 |
 
@@ -253,8 +252,8 @@ npm run test:e2e              # Playwright (선택)
 | 10 | Rate limit + 보안 헤더 | ✅ |
 | 11 | Toast · 에러 마스킹 | ✅ |
 | 12 | 계정 설정·탈퇴·비밀번호 재설정 | ✅ |
-| 13 | Vitest **294 tests** (65 files) | ✅ |
-| 14 | Playwright smoke E2E | ✅ |
+| 13 | Vitest **333 tests** (77 files) | ✅ |
+| 14 | Playwright smoke E2E (13 scenarios) | ✅ |
 | 15 | Sentry·structured log (골격) | ✅ |
 | 16 | 투자 성향 프로필 · ledger · simulation tag 추천 | ✅ |
 | 17 | 주식이용 Tip · 투자 유형/미니 진단 · 다크/라이트 | ✅ |
@@ -273,11 +272,8 @@ npm run test:e2e              # Playwright (선택)
 
 ## 확장 포인트
 
-- 프로덕션 **EmailSender** — `RESEND_API_KEY` 설정 시 Resend, 미설정 시 콘솔 출력 (비밀번호 재설정·이메일 인증)
-- 가입 직후 이메일 인증 플로우 연동
-- `desktop/mobile` feature 컴포넌트 통합
-- `views/*` → `pages/*` 직접 import 정리
-- Account API·E2E 테스트 보강
+- `middleware.ts` — locale cookie + **protected route session** (refreshToken 또는 guest cookie)
+- Account API·E2E 테스트 보강 (진행 중 — HTTP route·회원 E2E env)
 - logger ↔ route-error ↔ Sentry 연동
 
 종목 마스터: [stock-catalog-import.md](stock-catalog-import.md)

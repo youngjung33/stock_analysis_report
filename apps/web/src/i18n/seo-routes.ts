@@ -1,3 +1,5 @@
+import { MINI_ANALYSIS_TEST_IDS } from '@sar/shared';
+
 /** pathname → SEO page key (matches seo.pages.* in locale files) */
 export type SeoPageKey =
   | 'home'
@@ -11,6 +13,7 @@ export type SeoPageKey =
   | 'tax'
   | 'guide'
   | 'investorSurvey'
+  | 'miniAnalysis'
   | 'stock';
 
 export interface SeoRouteMatch {
@@ -43,6 +46,8 @@ export function seoPathForPageKey(pageKey: SeoPageKey, params?: Record<string, s
       return '/guide';
     case 'investorSurvey':
       return '/guide/investor-type';
+    case 'miniAnalysis':
+      return `/guide/analysis/${encodeURIComponent(params?.testId ?? MINI_ANALYSIS_TEST_IDS[0])}`;
     case 'stock':
       return `/stocks/${encodeURIComponent(params?.symbol ?? '')}`;
     default:
@@ -65,6 +70,11 @@ export function pathnameToSeoRoute(pathname: string): SeoRouteMatch {
   if (path === '/guide') return { pageKey: 'guide' };
   if (path === '/guide/investor-type') return { pageKey: 'investorSurvey' };
 
+  const miniMatch = path.match(/^\/guide\/analysis\/([^/]+)$/);
+  if (miniMatch?.[1] && (MINI_ANALYSIS_TEST_IDS as readonly string[]).includes(miniMatch[1])) {
+    return { pageKey: 'miniAnalysis', params: { testId: miniMatch[1] } };
+  }
+
   const stockMatch = path.match(/^\/stocks\/([^/]+)$/);
   if (stockMatch?.[1]) {
     return { pageKey: 'stock', params: { symbol: decodeURIComponent(stockMatch[1]) } };
@@ -85,4 +95,5 @@ export const SITEMAP_PATHS = [
   '/tax',
   '/guide',
   '/guide/investor-type',
+  ...MINI_ANALYSIS_TEST_IDS.map((testId) => `/guide/analysis/${testId}`),
 ] as const;

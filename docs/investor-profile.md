@@ -191,9 +191,9 @@ Body (기존 3필드 + optional):
 
 | 파일 | 역할 |
 |------|------|
-| `client/data/investor-profile-hydrate.ts` | localStorage → ledger hydrate (회원 전용) |
+| `client/domain/services/investor-profile-hydrate.ts` | localStorage → ledger hydrate (회원 전용) |
 | `client/data/guest/guest-storage.ts` | `investorProfile` sessionStorage |
-| `client/data/guest/pending-investor-profile.ts` | 게스트→회원 1회 승계 |
+| `client/domain/services/pending-investor-profile.ts` | 게스트→회원 1회 승계 |
 | `presentation/hooks/useInvestorProfile.ts` | 통합 훅 (load/save/upsert/adjustment) |
 | `presentation/features/investor-profile/InvestorProfileSection.tsx` | my-info UI |
 | `presentation/features/investor-survey/*` | 설문·결과 (완료 시 ledger auto-upsert) |

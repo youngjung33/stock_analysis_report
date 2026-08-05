@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { pathnameToSeoRoute, seoPathForPageKey } from '@/i18n/seo-routes';
+import { MINI_ANALYSIS_TEST_IDS } from '@sar/shared';
+import { pathnameToSeoRoute, seoPathForPageKey, SITEMAP_PATHS } from '@/i18n/seo-routes';
 
 describe('seo-routes', () => {
   it('maps pathnames to page keys', () => {
@@ -29,5 +30,21 @@ describe('seo-routes', () => {
   it('maps investor survey path', () => {
     expect(pathnameToSeoRoute('/guide/investor-type')).toEqual({ pageKey: 'investorSurvey' });
     expect(seoPathForPageKey('investorSurvey')).toBe('/guide/investor-type');
+  });
+
+  it('maps mini analysis paths', () => {
+    for (const testId of MINI_ANALYSIS_TEST_IDS) {
+      expect(pathnameToSeoRoute(`/guide/analysis/${testId}`)).toEqual({
+        pageKey: 'miniAnalysis',
+        params: { testId },
+      });
+      expect(seoPathForPageKey('miniAnalysis', { testId })).toBe(`/guide/analysis/${testId}`);
+    }
+  });
+
+  it('includes mini analysis routes in sitemap', () => {
+    for (const testId of MINI_ANALYSIS_TEST_IDS) {
+      expect(SITEMAP_PATHS).toContain(`/guide/analysis/${testId}`);
+    }
   });
 });

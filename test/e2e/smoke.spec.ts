@@ -70,4 +70,28 @@ test.describe('smoke', () => {
     await page.goto('/settings');
     await expect(page).toHaveURL('/login');
   });
+
+  test('unauthenticated user is sent to login from dashboard', async ({ page }) => {
+    await page.goto('/');
+    await expect(page).toHaveURL('/login');
+  });
+
+  test('guest can open tax page', async ({ page }) => {
+    await enterAsGuest(page);
+    await page.goto('/tax');
+    await expect(page.getByRole('heading', { name: '세금 정보' })).toBeVisible();
+  });
+
+  test('member can login with seeded credentials', async ({ page }) => {
+    const username = process.env.E2E_USERNAME;
+    const password = process.env.E2E_PASSWORD;
+    test.skip(!username || !password, 'Set E2E_USERNAME and E2E_PASSWORD to run member login E2E');
+
+    await page.goto('/login');
+    await page.getByPlaceholder('아이디').fill(username!);
+    await page.getByPlaceholder('비밀번호').fill(password!);
+    await page.getByRole('button', { name: '로그인' }).click();
+    await expect(page).toHaveURL('/', { timeout: 15_000 });
+    await expect(page.getByText('투자 현황')).toBeVisible();
+  });
 });

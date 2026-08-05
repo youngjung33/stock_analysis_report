@@ -15,7 +15,11 @@ const eslintConfig = [
   },
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
-    files: ['src/presentation/features/**/*.{ts,tsx}', 'src/presentation/pages/**/*.{ts,tsx}'],
+    files: [
+      'src/presentation/features/**/*.{ts,tsx}',
+      'src/presentation/pages/**/*.{ts,tsx}',
+      'src/presentation/hooks/**/*.{ts,tsx}',
+    ],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -24,7 +28,7 @@ const eslintConfig = [
             {
               group: ['@/client/data/*', '@/server/*', '@/server/**'],
               message:
-                'Presentation features/pages must use hooks or client/domain — not data layers directly.',
+                'Presentation must use client/domain or useServices — not data/server layers directly.',
             },
           ],
         },

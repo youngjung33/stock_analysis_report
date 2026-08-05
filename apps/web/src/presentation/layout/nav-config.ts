@@ -64,9 +64,6 @@ export const APP_NAV_ITEM_DEFS: AppNavItemDef[] = [
   },
 ];
 
-/** @deprecated use useAppNavItems() for translated labels */
-export const APP_NAV_ITEMS = APP_NAV_ITEM_DEFS;
-
 export const APP_BRAND = {
   name: 'SAR Portfolio',
   tagline: 'Stock Analysis Report',

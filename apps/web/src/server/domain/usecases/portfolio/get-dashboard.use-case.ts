@@ -1,4 +1,4 @@
-import { Market, aggregatePortfolioTodayPnl, aggregateKrwSummary, applyCorporateActions, computeAllocation, enrichHoldingKrw, computeCashBalances, cashToKrw } from '@sar/shared';
+import { Market, applyCorporateActions, buildDashboardFromRawHoldings, computeCashBalances, cashToKrw, type RawDashboardHolding } from '@sar/shared';
 import { DashboardResult } from '../../entities';
 import {
   ICashLedgerRepository,
@@ -27,11 +27,7 @@ export class GetDashboardUseCase {
     const quotes = await this.quoteRepo.findByStockIds(stockIds);
     const quoteMap = new Map(quotes.map((q) => [q.stockId, q]));
 
-    const rawHoldings = [];
-    let totalCostBasis = 0;
-    let totalMarketValue = 0;
-    let totalUnrealizedPnl = 0;
-    let totalRealizedPnl = 0;
+    const rawHoldings: RawDashboardHolding[] = [];
     let hasAllQuotes = true;
     let lastRefreshedAt: Date | null = null;
 
@@ -77,11 +73,6 @@ export class GetDashboardUseCase {
           ? ((currentPrice - position.averageCost) / position.averageCost) * 100
           : null;
 
-      totalCostBasis += position.costBasis;
-      totalRealizedPnl += position.realizedPnl;
-      if (marketValue !== null) totalMarketValue += marketValue;
-      if (unrealizedPnl !== null) totalUnrealizedPnl += unrealizedPnl;
-
       rawHoldings.push({
         stockId: stock.id,
         symbol: stock.symbol,
@@ -100,80 +91,26 @@ export class GetDashboardUseCase {
       });
     }
 
-    const hasHoldings = rawHoldings.length > 0;
-    const today =
-      hasHoldings && hasAllQuotes
-        ? aggregatePortfolioTodayPnl(rawHoldings)
-        : { todayPnl: null, todayPnlPercent: null };
-
     const hasUsdHoldings = rawHoldings.some((h) => h.currency === 'USD');
-    const usdKrwRate = hasUsdHoldings ? await this.marketData.fetchUsdKrwRate() : null;
-
-    const krwSummary = aggregateKrwSummary(rawHoldings, usdKrwRate, hasAllQuotes);
-    const allocation = computeAllocation(
-      rawHoldings.map((h) => ({
-        symbol: h.symbol,
-        name: h.name,
-        market: h.market,
-        marketValueKrw: enrichHoldingKrw(h, usdKrwRate).marketValueKrw,
-      })),
-    );
-    const weightMap = new Map(allocation.items.map((i) => [`${i.symbol}:${i.market}`, i.weightPercent]));
-
-    const holdings = rawHoldings.map((h) => ({
-      ...h,
-      ...enrichHoldingKrw(h, usdKrwRate),
-      weightPercent: weightMap.get(`${h.symbol}:${h.market}`) ?? null,
-    }));
+    let usdKrwRate = hasUsdHoldings ? await this.marketData.fetchUsdKrwRate() : null;
 
     const cashEntries = await this.cashRepo.findByUser(userId);
     const cashBalances = computeCashBalances(cashEntries);
-    let fxRate = usdKrwRate;
-    if (fxRate === null && (hasUsdHoldings || cashBalances.usd > 0)) {
-      fxRate = await this.marketData.fetchUsdKrwRate();
+    if (usdKrwRate === null && (hasUsdHoldings || cashBalances.usd > 0)) {
+      usdKrwRate = await this.marketData.fetchUsdKrwRate();
     }
-    const cashTotalKrwFinal = cashToKrw(cashBalances, fxRate);
-    const totalAssetsKrw =
-      krwSummary.totalMarketValueKrw !== null
-        ? krwSummary.totalMarketValueKrw + cashTotalKrwFinal
-        : cashTotalKrwFinal > 0
-          ? cashTotalKrwFinal
-          : null;
+
+    const built = buildDashboardFromRawHoldings({
+      rawHoldings,
+      cashBalances,
+      usdKrwRate,
+      hasAllQuotes,
+      lastRefreshedAt,
+    });
 
     return {
-      summary: {
-        totalCostBasis,
-        totalMarketValue: hasAllQuotes ? totalMarketValue : null,
-        totalUnrealizedPnl: hasAllQuotes ? totalUnrealizedPnl : null,
-        totalRealizedPnl,
-        holdingsCount: holdings.length,
-        todayPnl: today.todayPnl,
-        todayPnlPercent: today.todayPnlPercent,
-        totalCostBasisKrw: krwSummary.totalCostBasisKrw,
-        totalMarketValueKrw: krwSummary.totalMarketValueKrw,
-        totalUnrealizedPnlKrw: krwSummary.totalUnrealizedPnlKrw,
-        totalRealizedPnlKrw: krwSummary.totalRealizedPnlKrw,
-        todayPnlKrw: krwSummary.todayPnlKrw,
-        todayPnlPercentKrw: krwSummary.todayPnlPercentKrw,
-        usdKrwRate: krwSummary.usdKrwRate ?? fxRate,
-        hasUsdHoldings: krwSummary.hasUsdHoldings || cashBalances.usd > 0,
-        allocationByMarket: allocation.allocationByMarket,
-        cashKrw: cashBalances.krw,
-        cashUsd: cashBalances.usd,
-        cashTotalKrw: cashTotalKrwFinal,
-        totalAssetsKrw,
-        cashPercent:
-          totalAssetsKrw && totalAssetsKrw > 0
-            ? (cashTotalKrwFinal / totalAssetsKrw) * 100
-            : cashTotalKrwFinal > 0
-              ? 100
-              : null,
-        investedPercent:
-          totalAssetsKrw && totalAssetsKrw > 0 && krwSummary.totalMarketValueKrw !== null
-            ? (krwSummary.totalMarketValueKrw / totalAssetsKrw) * 100
-            : null,
-      },
-      holdings,
+      summary: built.summary,
+      holdings: built.holdings,
       lastRefreshedAt,
     };
   }

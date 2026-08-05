@@ -15,24 +15,14 @@ import {
 import {
   hydrateStoredProfile,
   normalizeStoredProfile,
-} from '@/client/data/investor-profile-hydrate';
-import {
-  getGuestInvestorProfile,
-  getGuestPortfolioPreference,
-  saveGuestInvestorProfile,
-  saveGuestPortfolioPreference,
-} from '@/client/data/guest/guest-storage';
+} from '@/client/domain/services/investor-profile-hydrate';
 import {
   peekPendingInvestorProfile,
   takePendingInvestorProfile,
-} from '@/client/data/guest/pending-investor-profile';
+} from '@/client/domain/services/pending-investor-profile';
 import { invalidatePortfolioLocal } from '../lib/query-config';
 import { useAuth } from './useAuth';
 import { useServices } from './useServices';
-
-function loadGuestStoredProfile(): StoredInvestorProfile {
-  return normalizeStoredProfile(getGuestInvestorProfile());
-}
 
 export function useInvestorProfile() {
   const { isGuest } = useAuth();
@@ -40,10 +30,8 @@ export function useInvestorProfile() {
   const queryClient = useQueryClient();
   const pendingTransferDone = useRef(false);
 
-  const [stored, setStored] = useState<StoredInvestorProfile>(() =>
-    isGuest ? loadGuestStoredProfile() : createDefaultStoredProfile(),
-  );
-  const [loading, setLoading] = useState(!isGuest);
+  const [stored, setStored] = useState<StoredInvestorProfile>(() => createDefaultStoredProfile());
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [prefs, setPrefs] = useState({
     targetKrPercent: 70,
@@ -54,18 +42,6 @@ export function useInvestorProfile() {
   const profile: BuiltInvestorProfile = useMemo(() => buildInvestorProfile(stored), [stored]);
 
   const refresh = useCallback(async () => {
-    if (isGuest) {
-      const guestPrefs = getGuestPortfolioPreference();
-      setPrefs({
-        targetKrPercent: guestPrefs.targetKrPercent,
-        targetUsPercent: guestPrefs.targetUsPercent,
-        maxSingleWeightPercent: guestPrefs.maxSingleWeightPercent,
-      });
-      // Guest ledger lives in sessionStorage only — do not pull from shared localStorage.
-      setStored(loadGuestStoredProfile());
-      return;
-    }
-
     setLoading(true);
     try {
       const data = await getPortfolioPreferencesUseCase.execute();
@@ -74,6 +50,11 @@ export function useInvestorProfile() {
         targetUsPercent: data.targetUsPercent,
         maxSingleWeightPercent: data.maxSingleWeightPercent,
       });
+
+      if (isGuest) {
+        setStored(normalizeStoredProfile(data.investorProfile));
+        return;
+      }
 
       const dbStored = normalizeStoredProfile(data.investorProfile);
       let nextStored = hydrateStoredProfile(dbStored, { fromLocalAnswers: true });
@@ -127,22 +108,14 @@ export function useInvestorProfile() {
     async (nextStored: StoredInvestorProfile, nextPrefs = prefs) => {
       setSaving(true);
       try {
-        if (isGuest) {
-          saveGuestInvestorProfile(nextStored);
-          saveGuestPortfolioPreference({
-            targetKrPercent: nextPrefs.targetKrPercent,
-            targetUsPercent: nextPrefs.targetUsPercent,
-            maxSingleWeightPercent: nextPrefs.maxSingleWeightPercent,
-          });
-          setStored(nextStored);
-          return;
-        }
         await updatePortfolioPreferencesUseCase.execute({
           ...nextPrefs,
           investorProfile: nextStored,
         });
         setStored(nextStored);
-        await invalidatePortfolioLocal(queryClient);
+        if (!isGuest) {
+          await invalidatePortfolioLocal(queryClient);
+        }
       } finally {
         setSaving(false);
       }

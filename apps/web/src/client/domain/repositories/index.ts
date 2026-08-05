@@ -121,6 +121,7 @@ export interface IGuestSessionPort {
   isActive(): boolean;
   activate(): void;
   clear(): void;
+  syncCookie(): void;
 }
 
 export interface IGuestStorePort {

@@ -150,6 +150,10 @@
         "title": "투자 유형 진단",
         "description": "10단계 설문으로 투자 성향을 분류하고 자산 배분·종목 스타일을 추천합니다."
       },
+      "miniAnalysis": {
+        "title": "미니 투자 분석",
+        "description": "짧은 설문으로 리스크·기간·배분 성향을 점검합니다."
+      },
       "stock": {
         "title": "{{symbol}}",
         "description": "{{symbol}} 종목 시세, 차트 및 상세 정보."

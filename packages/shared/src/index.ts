@@ -25,6 +25,14 @@ export { Market, TransactionType } from './enums';
 export const REFRESH_TOKEN_COOKIE = 'refreshToken';
 export const ACCESS_TOKEN_COOKIE = 'accessToken';
 
+export {
+  GUEST_SESSION_COOKIE,
+  PUBLIC_PAGE_PATHS,
+  normalizePagePath,
+  isPublicPagePath,
+  hasAppSessionCookie,
+} from './route-access';
+
 export const GUEST_DISPLAY_NAME = '비회원';
 
 export function isGuestUsername(username: string | null | undefined): boolean {
@@ -138,6 +146,15 @@ export type {
   FeaturedQuoteInput,
   RankedPortfolioSimulationResult,
 } from './portfolio-capital-simulation';
+export {
+  buildDashboardFromRawHoldings,
+} from './portfolio-dashboard';
+export type {
+  RawDashboardHolding,
+  BuiltDashboardHolding,
+  DashboardSummaryResult,
+  BuildDashboardFromHoldingsInput,
+} from './portfolio-dashboard';
 export type {
   PortfolioPreferences,
   PortfolioSimulationResult,

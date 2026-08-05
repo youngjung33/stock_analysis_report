@@ -8,7 +8,7 @@ import {
   peekPendingInvestorProfile,
   savePendingInvestorProfile,
   takePendingInvestorProfile,
-} from '@/client/data/guest/pending-investor-profile';
+} from '@/client/domain/services/pending-investor-profile';
 
 describe('pending-investor-profile', () => {
   beforeEach(() => {

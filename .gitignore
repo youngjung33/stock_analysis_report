@@ -28,6 +28,7 @@ apps/web/.env.example
 
 # Test / coverage
 coverage/
+apps/web/test-results/
 
 # Logs
 *.log

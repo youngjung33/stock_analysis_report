@@ -12,7 +12,7 @@ import {
   hydrateLedgerFromLocalAnswers,
   hydrateStoredProfile,
   normalizeStoredProfile,
-} from '@/client/data/investor-profile-hydrate';
+} from '@/client/domain/services/investor-profile-hydrate';
 
 const SURVEY_KEY = 'sar_investor_survey';
 

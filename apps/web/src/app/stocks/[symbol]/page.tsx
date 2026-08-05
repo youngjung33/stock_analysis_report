@@ -17,7 +17,7 @@ function StockDetailRouteInner() {
 
   if (!market) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-rose-400">
+      <div className="flex min-h-screen items-center justify-center bg-background text-destructive">
         {t('pages.stockDetail.marketQueryRequired')}
       </div>
     );
@@ -33,7 +33,7 @@ export default function StockDetailRoutePage() {
     <ProtectedRoute>
       <Suspense
         fallback={
-          <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-300">
+          <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
             {t('common.loading')}
           </div>
         }

@@ -16,6 +16,7 @@ import {
   getGuestPortfolioPreference,
   listGuestCashLedger,
   saveGuestCashEntry,
+  saveGuestInvestorProfile,
   saveGuestPortfolioPreference,
 } from './guest-storage';
 
@@ -75,6 +76,9 @@ export class GuestPortfolioCapitalRepository implements IPortfolioCapitalReposit
       targetUsPercent: prefs.targetUsPercent,
       maxSingleWeightPercent: prefs.maxSingleWeightPercent,
     });
+    if (prefs.investorProfile) {
+      saveGuestInvestorProfile(prefs.investorProfile);
+    }
     return {
       targetKrPercent: prefs.targetKrPercent,
       targetUsPercent: prefs.targetUsPercent,

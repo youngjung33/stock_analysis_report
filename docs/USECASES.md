@@ -18,6 +18,9 @@ client/domain  ←  client/data  (axios → /api)
 | **Domain** | `server/domain/` | `client/domain/` |
 | **Data** | `server/data/` | `client/data/` |
 
+**라우트 보호:** `middleware.ts` — `refreshToken` 또는 `sarGuestSession` 쿠키 없으면 protected 페이지 → `/login`  
+**클라이언트:** `ProtectedRoute` — 게스트·회원 UI 가드 (이중 보호)
+
 ---
 
 ## 소스 디렉터리
@@ -27,12 +30,11 @@ apps/web/src/
 ├── app/
 │   ├── page.tsx, login/, transactions/, settings/, tax/
 │   ├── forgot-password/, reset-password/
-│   ├── market/analysis/, stocks/[symbol]/
+│   ├── market/analysis/, stocks/[symbol]/, guide/
 │   └── api/
 │       ├── auth/          # login, register, oauth, forgot/reset-password, …
 │       ├── account/       # profile, password, email, verify, delete, oauth
 │       ├── transactions/, portfolio/, watchlist/, corporate-actions/
-│       ├── guide/             # Tip, investor-type, analysis/[testId]
 │       └── market/
 ├── server/
 │   ├── container.ts
@@ -43,21 +45,22 @@ apps/web/src/
 │   └── data/
 ├── client/
 │   ├── bootstrap.ts
-│   └── domain/usecases/
+│   ├── domain/usecases/
+│   └── domain/services/   # investor-profile-hydrate, pending-investor-profile
 └── presentation/
     ├── pages/             # responsive 단일 페이지
-    ├── views/             # 일부 app route 래퍼
-    ├── hooks/             # screens/, useInvestorProfile, useInvestorSurvey, …
-    ├── features/          # investor-profile, investor-survey, guide, …
-    └── desktop/, mobile/  # feature 컴포넌트
+    ├── hooks/             # screens/, useInvestorProfile, useAuth, …
+    └── features/          # investor-profile, investor-survey, guide, tax, …
 ```
+
+> Tip(`/guide`)·진단 설문은 **비회원 입장 또는 로그인 후** 이용 가능 (`ProtectedRoute`).
 
 ### MVVM
 
 | MVVM | 위치 |
 |------|------|
 | View | `presentation/pages/*`, `layout/AppShell`, feature 컴포넌트 |
-| ViewModel | `presentation/hooks/screens/*` |
+| ViewModel | `presentation/hooks/screens/*`, `useInvestorProfile`, … |
 | Model | `server/domain`, `client/domain` |
 
 ---
@@ -67,14 +70,14 @@ apps/web/src/
 ```
 test/
 ├── server/          # domain, http, data/market
-├── web/             # client use case, guest
+├── web/             # client use case, guest, middleware, i18n
 ├── shared/          # @sar/shared
-└── e2e/             # Playwright smoke
+└── e2e/             # Playwright smoke (13 scenarios)
 ```
 
 ```bash
-npm run test         # 310 tests, 70 files (Vitest)
-npm run test:e2e     # Playwright smoke (dev server 필요)
+npm run test         # Vitest — see README for current count
+npm run test:e2e     # Playwright (dev server + E2E_USERNAME/PASSWORD for member login)
 ```
 
 ---
@@ -85,7 +88,7 @@ npm run test:e2e     # Playwright smoke (dev server 필요)
 |---------|------|--------|
 | `PositionCalculator` | `position-calculator.ts` | `position-calculator.spec.ts` |
 | `StockSymbolResolver` | `stock-symbol.resolver.ts` | `stock-symbol.resolver.spec.ts` |
-| `EmailVerification` (코드 발급) | `email-verification.service.ts` | use case 경유 |
+| `EmailVerification` (코드 발급) | `email-verification.service.ts` | use case + route |
 
 ---
 
@@ -107,38 +110,39 @@ npm run test:e2e     # Playwright smoke (dev server 필요)
 
 | Use Case | Route | 테스트 |
 |----------|-------|--------|
-| `GetAccountUseCase` | GET `/api/account` | — |
-| `ChangePasswordUseCase` | POST `/api/account/password` | `account.use-cases.spec.ts` |
-| `ChangeEmailUseCase` | POST `/api/account/email` | — |
-| `RequestEmailVerificationUseCase` | POST `/api/account/verify-email` | `account.use-cases.spec.ts` |
-| `VerifyEmailUseCase` | POST `/api/account/confirm-email` | `account.use-cases.spec.ts` |
-| `RequestPasswordResetUseCase` | POST `/api/auth/forgot-password` | `account.use-cases.spec.ts` |
-| `ResetPasswordUseCase` | POST `/api/auth/reset-password` | `account.use-cases.spec.ts` |
-| `UnlinkOAuthAccountUseCase` | DELETE `/api/account/oauth/[provider]` | — |
-| `DeleteAccountUseCase` | DELETE `/api/account` | `account.use-cases.spec.ts` |
+| `GetAccountUseCase` | GET `/api/account` | `account.use-cases.spec.ts` |
+| `ChangePasswordUseCase` | POST `/api/account/password` | 동일 |
+| `ChangeEmailUseCase` | POST `/api/account/email` | 동일 |
+| `RequestEmailVerificationUseCase` | POST `/api/account/verify-email` | 동일 |
+| `VerifyEmailUseCase` | POST `/api/account/confirm-email` | 동일 |
+| `RequestPasswordResetUseCase` | POST `/api/auth/forgot-password` | 동일 |
+| `ResetPasswordUseCase` | POST `/api/auth/reset-password` | 동일 |
+| `UnlinkOAuthAccountUseCase` | DELETE `/api/account/oauth/[provider]` | 동일 |
+| `DeleteAccountUseCase` | DELETE `/api/account` | 동일 |
 
 ### Transactions · Portfolio · Market · Watchlist · Corporate Actions
 
 | Use Case | Route | 테스트 |
 |----------|-------|--------|
-| `CreateTransactionUseCase` | POST `/api/transactions` | `transactions.use-cases.spec.ts` |
-| `ListTransactionsUseCase` | GET `/api/transactions` | 동일 |
-| `DeleteTransactionUseCase` | DELETE `/api/transactions/[id]` | 동일 |
-| `GetDashboardUseCase` | GET `/api/portfolio/dashboard` | `portfolio.use-cases.spec.ts` |
+| `CreateTransactionUseCase` | POST `/api/transactions` | domain + `portfolio-api-routes.spec.ts` |
+| `ListTransactionsUseCase` | GET `/api/transactions` | domain + HTTP |
+| `DeleteTransactionUseCase` | DELETE `/api/transactions/[id]` | domain |
+| `GetDashboardUseCase` | GET `/api/portfolio/dashboard` | `portfolio.use-cases.spec.ts` + HTTP |
 | `GetPortfolioAnalysisUseCase` | GET `/api/portfolio/analysis` | `get-portfolio-analysis.use-case.spec.ts` |
-| `GetPortfolioPreferencesUseCase` | GET `/api/portfolio/preferences` | `portfolio.use-cases.spec.ts` |
-| `UpdatePortfolioPreferencesUseCase` | PUT `/api/portfolio/preferences` (incl. `investorProfile`) | — |
-| `GetPortfolioSimulationUseCase` | GET `/api/portfolio/simulation` (tag rank) | — |
+| `GetPortfolioPreferencesUseCase` | GET `/api/portfolio/preferences` | `portfolio.use-cases.spec.ts` + `cash-routes.spec.ts` |
+| `UpdatePortfolioPreferencesUseCase` | PUT `/api/portfolio/preferences` | `portfolio-capital.use-cases.spec.ts` + HTTP |
+| `GetPortfolioSimulationUseCase` | GET `/api/portfolio/simulation` | `cash-routes.spec.ts` |
 | `GetHoldingBySymbolUseCase` | GET `/api/portfolio/holding` | `get-holding.use-case.spec.ts` |
-| `RefreshQuotesUseCase` | POST `/api/market/refresh` | `market.use-cases.spec.ts` (KR 병렬 포함) |
+| `RecordCashEntryUseCase` | POST `/api/cash` | `cash.use-cases.spec.ts` + HTTP |
+| `RefreshQuotesUseCase` | POST `/api/market/refresh` | `market.use-cases.spec.ts` |
 | `GetFeaturedQuotesUseCase` | GET `/api/market/featured` | `get-featured-quotes.use-case.spec.ts` |
 | `GetStockQuoteUseCase` | GET `/api/market/quote` | provider/chart |
 | `FetchQuotesUseCase` | POST `/api/market/quotes` | `market.use-cases.spec.ts` |
 | `GetMarketStatusUseCase` | GET `/api/market/status` | `get-market-status.use-case.spec.ts` |
 | `SearchStocksUseCase` | GET `/api/market/search` | `search-stocks.use-case.spec.ts` |
-| `GetFxRateUseCase` | GET `/api/market/fx` | — |
+| `GetFxRateUseCase` | GET `/api/market/fx` | client `market.use-cases.spec.ts` |
 | `GetMarketAnalysisUseCase` | GET `/api/market/analysis` | `get-market-analysis.use-case.spec.ts` |
-| Watchlist use cases | `/api/watchlist` | `watchlist.use-cases.spec.ts` |
+| Watchlist use cases | `/api/watchlist` | domain + `portfolio-api-routes.spec.ts` |
 | Corporate action use cases | `/api/corporate-actions` | `corporate-actions.use-cases.spec.ts` |
 
 Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
@@ -150,13 +154,13 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | 영역 | 소스 | 테스트 |
 |------|------|--------|
 | Auth (login, register, oauth, session) | `client/domain/usecases/auth/` | `auth.use-cases.spec.ts`, `auth-register-oauth.use-cases.spec.ts` |
-| Account (settings, delete, verify) | `client/domain/usecases/account/` | — |
+| Account (settings, delete, verify) | `client/domain/usecases/account/` | `account.use-cases.spec.ts` |
 | Transactions | `client/domain/usecases/transactions/` | `transactions.use-cases.spec.ts` |
 | Portfolio | `client/domain/usecases/portfolio/` | `portfolio.use-cases.spec.ts` |
-| **Investor profile** | `presentation/hooks/useInvestorProfile.ts`, `client/data/investor-profile-hydrate.ts` | `investor-profile.spec.ts` (shared) |
+| **Investor profile** | `presentation/hooks/useInvestorProfile.ts`, `client/domain/services/` | shared + hydrate + pending specs |
 | Watchlist | `client/domain/usecases/watchlist/` | `watchlist.use-cases.spec.ts` |
 | Corporate actions | `client/domain/usecases/corporate-actions/` | `corporate-actions.use-cases.spec.ts` |
-| Market | `client/domain/usecases/market/` | — |
+| Market | `client/domain/usecases/market/` | `market.use-cases.spec.ts` |
 | Guest adapters | `client/data/guest/` | `guest-repositories.spec.ts` |
 
 ---
@@ -166,10 +170,10 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | 모듈 | 역할 |
 |------|------|
 | `app-error-codes` | 공통 에러 코드·사용자 메시지 |
-| `auth`, `auth-tokens` | 가입 검증, 토큰 타입 |
-| `featured-stocks`, `chart-range` | 주요 종목, 기간 |
-| `portfolio-*`, `market-analysis` | 포트폴리오·시장 분석 순수 로직 |
-| `investor-survey/` | 투자 유형 catalog, 미니 테스트, **profile** (ledger·composite·rank) |
+| `auth`, `auth-tokens`, `route-access` | 가입 검증, 토큰, middleware 경로 |
+| `portfolio-dashboard` | dashboard summary/holdings 집계 (guest/server 공유) |
+| `portfolio-capital-simulation` | simulation tag rank pipeline |
+| `investor-survey/` | 투자 유형 catalog, 미니 테스트, **profile** |
 | `guide/` | Tip FAQ catalog |
 | `corporate-actions`, `stock-search` | 기업행위·검색 |
 
@@ -184,9 +188,13 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | 영역 | 파일 | 내용 |
 |------|------|------|
 | Route utils | `route-utils.spec.ts` | 인증 헬퍼 |
+| Portfolio/transactions/watchlist | `portfolio-api-routes.spec.ts` | CRUD smoke |
+| Cash/preferences/simulation | `cash-routes.spec.ts` | capital API |
 | Market rate limit | `market-routes.spec.ts` | 429 |
 | Auth rate limit | `auth-routes.spec.ts` | login, check-username |
-| Route error | `route-error.spec.ts` | DB 에러 사용자 메시지 마스킹 |
+| Verify email | `verify-email-route.spec.ts` | 링크 인증 redirect |
+| Route error | `route-error.spec.ts` | DB 에러 마스킹 |
+| Middleware | `middleware.spec.ts` | protected route redirect |
 
 ---
 
@@ -194,31 +202,10 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 
 | 시나리오 | 파일 |
 |----------|------|
-| 로그인 화면 | `test/e2e/smoke.spec.ts` |
-| 비밀번호 찾기 | 동일 |
-| 비회원 대시보드 | 동일 |
-
----
-
-## 테스트 ID (주요)
-
-### Account — `account.use-cases.spec.ts`
-
-| ID | 시나리오 |
-|----|----------|
-| — | ChangePassword, Request/ResetPassword, VerifyEmail(6자리), RequestEmailVerification, DeleteAccount |
-
-### Market Refresh — `market.use-cases.spec.ts`
-
-| ID | 시나리오 |
-|----|----------|
-| RQ-01 ~ RQ-06 | 갱신 성공/실패, provider 미설정 |
-| RQ-07 | KR 병렬 갱신 |
-
-### Auth · Position · Guest
-
-기존 PC-01~05, AU-01~05, guest 6 tests 유지.  
-상세 시나리오는 각 `*.spec.ts` 참고.
+| 로그인·회원가입·비밀번호 찾기 | `test/e2e/smoke.spec.ts` |
+| 비회원 대시보드·거래·my-info·세금 | 동일 |
+| 미인증 → `/login` redirect (middleware) | 동일 |
+| 회원 로그인 | 동일 (`E2E_USERNAME` / `E2E_PASSWORD` env) |
 
 ---
 
@@ -228,4 +215,4 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 - **server/data** → server/domain
 - **app/api** → server/container
 - **client/** → client/domain
-- **presentation/** → client bootstrap, hooks
+- **presentation/** → client/domain, hooks (ESLint: `@/client/data`, `@/server` import 금지)

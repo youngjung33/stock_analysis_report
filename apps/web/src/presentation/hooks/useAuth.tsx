@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, createContext, useContext } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { GUEST_DISPLAY_NAME, isGuestUsername, OAuthProviderId, RegisterInput } from '@sar/shared';
-import { clearPendingInvestorProfile } from '@/client/data/guest/pending-investor-profile';
+import { clearPendingInvestorProfile } from '@/client/domain/services/pending-investor-profile';
 import { useServices } from './useServices';
 
 interface AuthContextValue {
@@ -61,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (guestSession.isActive()) {
+      guestSession.syncCookie();
       setUsername(GUEST_DISPLAY_NAME);
       setIsLoading(false);
       return;
