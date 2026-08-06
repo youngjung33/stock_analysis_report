@@ -82,6 +82,31 @@ test.describe('smoke', () => {
     await expect(page.getByRole('heading', { name: '세금 정보' })).toBeVisible();
   });
 
+  test('guest can open guide page', async ({ page }) => {
+    await enterAsGuest(page);
+    await page.goto('/guide');
+    await expect(page.getByRole('heading', { name: '주식이용 Tip' })).toBeVisible();
+  });
+
+  test('guest can open market analysis page', async ({ page }) => {
+    await enterAsGuest(page);
+    await page.goto('/market/analysis');
+    await expect(page.getByRole('heading', { name: '시장 심층 분석' })).toBeVisible();
+  });
+
+  test('guest can open investor type survey page', async ({ page }) => {
+    await enterAsGuest(page);
+    await page.goto('/guide/investor-type');
+    await expect(page.getByRole('heading', { name: '투자 유형 진단' })).toBeVisible();
+  });
+
+  test('guest login returns to next path from middleware redirect', async ({ page }) => {
+    await page.goto('/tax');
+    await expect(page).toHaveURL(/\/login\?next=%2Ftax/);
+    await page.getByRole('button', { name: '비회원으로 입장' }).click();
+    await expect(page).toHaveURL('/tax', { timeout: 15_000 });
+  });
+
   test('member can login with seeded credentials', async ({ page }) => {
     const username = process.env.E2E_USERNAME;
     const password = process.env.E2E_PASSWORD;

@@ -31,6 +31,7 @@ export {
   normalizePagePath,
   isPublicPagePath,
   hasAppSessionCookie,
+  sanitizePostAuthPath,
 } from './route-access';
 
 export const GUEST_DISPLAY_NAME = '비회원';
@@ -149,6 +150,15 @@ export type {
 export {
   buildDashboardFromRawHoldings,
 } from './portfolio-dashboard';
+export {
+  buildHoldingWithKrw,
+  buildRawDashboardHolding,
+  nextQuoteRefreshState,
+} from './portfolio-holding-build';
+export type {
+  HoldingQuoteSnapshot,
+  QuoteRefreshState,
+} from './portfolio-holding-build';
 export type {
   RawDashboardHolding,
   BuiltDashboardHolding,

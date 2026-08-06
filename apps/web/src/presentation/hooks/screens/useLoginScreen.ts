@@ -1,11 +1,13 @@
 'use client';
 
 import { FormEvent, useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import {
   OAuthProviderId,
   OAuthProviderMeta,
   RegisterFieldErrors,
+  sanitizePostAuthPath,
   validateRegisterFields,
   validateUsernameFormatCode,
   isAppErrorCode,
@@ -19,6 +21,8 @@ export type UsernameCheckStatus = 'idle' | 'checking' | 'available' | 'unavailab
 
 export function useLoginScreen() {
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const nextParam = searchParams.get('next');
   const { login, register, startOAuthLogin, loginAsGuest, isAuthenticated } = useAuth();
   const { listOAuthProvidersUseCase, checkUsernameAvailabilityUseCase } = useServices();
   const { showError, showSuccess } = useToast();
@@ -35,7 +39,11 @@ export function useLoginScreen() {
   const [providersLoading, setProvidersLoading] = useState(true);
   const [usernameCheckStatus, setUsernameCheckStatus] = useState<UsernameCheckStatus>('idle');
   const [usernameCheckMessage, setUsernameCheckMessage] = useState('');
-  const [postAuthPath, setPostAuthPath] = useState('/');
+  const [postAuthPath, setPostAuthPath] = useState(() => sanitizePostAuthPath(nextParam));
+
+  useEffect(() => {
+    setPostAuthPath(sanitizePostAuthPath(nextParam));
+  }, [nextParam]);
 
   useEffect(() => {
     listOAuthProvidersUseCase
@@ -132,7 +140,9 @@ export function useLoginScreen() {
     setLoading(true);
     try {
       if (mode === 'register') {
-        setPostAuthPath('/?welcome=1');
+        setPostAuthPath(
+          nextParam ? sanitizePostAuthPath(nextParam) : '/?welcome=1',
+        );
         await register({
           username: username.trim(),
           password,
@@ -140,7 +150,6 @@ export function useLoginScreen() {
           email: email.trim() || null,
         });
       } else {
-        setPostAuthPath('/');
         await login(username, password);
       }
     } catch (err) {
@@ -153,6 +162,7 @@ export function useLoginScreen() {
   async function handleGuestLogin() {
     setGuestLoading(true);
     try {
+      setPostAuthPath(sanitizePostAuthPath(nextParam));
       await loginAsGuest();
     } catch {
       showError(t('auth.guestLoginFailed'));

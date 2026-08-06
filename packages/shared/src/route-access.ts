@@ -19,3 +19,17 @@ export function hasAppSessionCookie(cookies: {
   if (cookies.get('refreshToken')?.value) return true;
   return cookies.get(GUEST_SESSION_COOKIE)?.value === '1';
 }
+
+const AUTH_ONLY_PATHS = new Set(['/login', '/forgot-password', '/reset-password']);
+
+/** Safe internal redirect target after login (blocks open redirects). */
+export function sanitizePostAuthPath(next: string | null | undefined, fallback = '/'): string {
+  if (!next) return fallback;
+  const trimmed = next.trim();
+  if (!trimmed.startsWith('/') || trimmed.startsWith('//')) return fallback;
+  if (trimmed.includes('://')) return fallback;
+
+  const pathname = trimmed.split('?')[0]?.split('#')[0] ?? '/';
+  if (AUTH_ONLY_PATHS.has(pathname)) return fallback;
+  return trimmed;
+}

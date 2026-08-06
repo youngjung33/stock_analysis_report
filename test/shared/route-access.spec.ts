@@ -5,6 +5,7 @@ import {
   hasAppSessionCookie,
   isPublicPagePath,
   normalizePagePath,
+  sanitizePostAuthPath,
 } from '@sar/shared';
 
 describe('route-access', () => {
@@ -35,5 +36,20 @@ describe('route-access', () => {
         get: () => undefined,
       }),
     ).toBe(false);
+  });
+
+  describe('sanitizePostAuthPath', () => {
+    it('returns fallback for missing or unsafe targets', () => {
+      expect(sanitizePostAuthPath(null)).toBe('/');
+      expect(sanitizePostAuthPath('')).toBe('/');
+      expect(sanitizePostAuthPath('https://evil.com')).toBe('/');
+      expect(sanitizePostAuthPath('//evil.com')).toBe('/');
+      expect(sanitizePostAuthPath('/login')).toBe('/');
+    });
+
+    it('allows safe internal paths', () => {
+      expect(sanitizePostAuthPath('/tax')).toBe('/tax');
+      expect(sanitizePostAuthPath('/guide?category=type-analysis')).toBe('/guide?category=type-analysis');
+    });
   });
 });

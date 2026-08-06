@@ -1,4 +1,4 @@
-import { Market, applyCorporateActions, enrichHoldingKrw } from '@sar/shared';
+import { Market, applyCorporateActions, buildHoldingWithKrw, buildRawDashboardHolding } from '@sar/shared';
 import { HoldingResult } from '../../entities';
 import {
   ICorporateActionRepository,
@@ -41,45 +41,24 @@ export class GetHoldingBySymbolUseCase {
         targetPrice: a.targetPrice,
       })),
     );
-    if (position.quantity <= 0) return null;
 
     const quotes = await this.quoteRepo.findByStockIds([stock.id]);
-    const quote = quotes[0];
-    const currentPrice = quote?.currentPrice ?? null;
-    const changePercent = quote?.changePercent ?? null;
+    const quote = quotes?.[0];
 
-    const marketValue = currentPrice !== null ? currentPrice * position.quantity : null;
-    const unrealizedPnl =
-      currentPrice !== null ? (currentPrice - position.averageCost) * position.quantity : null;
-    const unrealizedPnlPercent =
-      currentPrice !== null && position.averageCost > 0
-        ? ((currentPrice - position.averageCost) / position.averageCost) * 100
-        : null;
-
-    const usdKrwRate =
-      stock.currency === 'USD' ? await this.marketData.fetchUsdKrwRate() : null;
-    const base = {
+    const raw = buildRawDashboardHolding({
       stockId: stock.id,
       symbol: stock.symbol,
       name: stock.name,
       market: stock.market as Market,
       currency: stock.currency,
-      quantity: position.quantity,
-      averageCost: position.averageCost,
-      currentPrice,
-      changePercent,
-      marketValue,
-      unrealizedPnl,
-      unrealizedPnlPercent,
-      realizedPnl: position.realizedPnl,
-      costBasis: position.costBasis,
-    };
+      position,
+      quote,
+    });
+    if (!raw) return null;
 
-    return {
-      ...base,
-      ...enrichHoldingKrw(base, usdKrwRate),
-      weightPercent: null,
-      usdKrwRate,
-    };
+    const usdKrwRate =
+      stock.currency === 'USD' ? await this.marketData.fetchUsdKrwRate() : null;
+
+    return buildHoldingWithKrw(raw, usdKrwRate);
   }
 }

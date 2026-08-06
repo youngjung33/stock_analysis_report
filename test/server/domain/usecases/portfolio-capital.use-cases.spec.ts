@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
-import { UpdatePortfolioPreferencesUseCase } from '@server/domain/usecases/portfolio/portfolio-capital.use-cases';
+import { Market } from '@sar/shared';
+import {
+  GetPortfolioSimulationUseCase,
+  UpdatePortfolioPreferencesUseCase,
+} from '@server/domain/usecases/portfolio/portfolio-capital.use-cases';
 
 describe('UpdatePortfolioPreferencesUseCase', () => {
   it('clamps preference percents before upsert', async () => {
@@ -21,5 +25,52 @@ describe('UpdatePortfolioPreferencesUseCase', () => {
       maxSingleWeightPercent: 5,
       investorProfile: null,
     });
+  });
+});
+
+describe('GetPortfolioSimulationUseCase', () => {
+  it('combines dashboard, featured quotes, cash, and preferences', async () => {
+    const dashboardUseCase = {
+      execute: vi.fn().mockResolvedValue({
+        summary: { cashKrw: 1_000_000, cashUsd: 0, usdKrwRate: 1300, holdingsCount: 1 },
+        holdings: [
+          {
+            symbol: '005930',
+            name: '삼성전자',
+            market: Market.KR,
+            currency: 'KRW',
+            quantity: 10,
+            currentPrice: 80000,
+            marketValueKrw: 800_000,
+            weightPercent: 100,
+          },
+        ],
+        lastRefreshedAt: null,
+      }),
+    };
+    const featuredQuotesUseCase = {
+      execute: vi.fn().mockResolvedValue({
+        kr: [{ symbol: '000660', name: 'SK하이닉스', market: Market.KR, currency: 'KRW', currentPrice: 200000, changePercent: 1 }],
+        us: [],
+        fetchedAt: '2026-01-01T00:00:00.000Z',
+      }),
+    };
+    const cashRepo = { findByUser: vi.fn().mockResolvedValue([{ id: 'c1' }]) };
+    const prefRepo = { findByUser: vi.fn().mockResolvedValue(null) };
+
+    const useCase = new GetPortfolioSimulationUseCase(
+      dashboardUseCase as never,
+      featuredQuotesUseCase as never,
+      cashRepo as never,
+      prefRepo as never,
+    );
+
+    const result = await useCase.execute('user-1');
+
+    expect(result.ledgerEntryCount).toBe(1);
+    expect(result.asOf).toBe('2026-01-01T00:00:00.000Z');
+    expect(result.simulation).toBeDefined();
+    expect(result.preferences.targetKrPercent).toBe(70);
+    expect(dashboardUseCase.execute).toHaveBeenCalledWith('user-1');
   });
 });

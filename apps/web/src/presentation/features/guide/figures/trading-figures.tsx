@@ -196,7 +196,7 @@ export function getPortfolioFigureRenderers(t: TFunction): Record<string, Figure
             { start: 120, size: 90, color: '#10b981', label: '30%' },
             { start: 210, size: 75, color: '#f59e0b', label: '25%' },
             { start: 285, size: 35, color: '#71717a', label: '5%' },
-          ].map(({ start, size, color, label }) => (
+          ].map(({ start, size, color }) => (
             <g key={start}>
               <circle cx="160" cy="80" r="55" fill="none" stroke={color} strokeWidth={size / 10} strokeDasharray={`${size} 345`} strokeDashoffset={-start} transform="rotate(-90 160 80)" />
             </g>

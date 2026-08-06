@@ -1,4 +1,12 @@
-import { Market, applyCorporateActions, buildDashboardFromRawHoldings, enrichHoldingKrw, type RawDashboardHolding } from '@sar/shared';
+import {
+  Market,
+  applyCorporateActions,
+  buildDashboardFromRawHoldings,
+  buildHoldingWithKrw,
+  buildRawDashboardHolding,
+  nextQuoteRefreshState,
+  type RawDashboardHolding,
+} from '@sar/shared';
 import { Dashboard, PortfolioHolding, RefreshQuoteResult } from '../../domain/models';
 import { IMarketRepository, IPortfolioRepository } from '../../domain/repositories';
 import {
@@ -21,14 +29,14 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
       return null;
     }
   }
+
   async getDashboard(): Promise<Dashboard> {
     const txs = listGuestTransactions();
     const stockIds = [...new Set(txs.map((tx) => tx.stockId))];
     const quotes = getGuestQuotes();
 
     const rawHoldings: RawDashboardHolding[] = [];
-    let hasAllQuotes = true;
-    let lastRefreshedAt: string | null = null;
+    let quoteState = { lastRefreshedAt: null as string | null, hasAllQuotes: true };
 
     for (const stockId of stockIds) {
       const stockTxs = guestTransactionsForStock(stockId);
@@ -53,44 +61,19 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
         })),
       );
 
-      if (position.quantity <= 0) continue;
-
       const quote = quotes[stockId];
-      const currentPrice = quote?.currentPrice ?? null;
-      const changePercent = quote?.changePercent ?? null;
+      quoteState = nextQuoteRefreshState(quoteState, quote ?? null);
 
-      if (quote) {
-        if (!lastRefreshedAt || quote.fetchedAt > lastRefreshedAt) {
-          lastRefreshedAt = quote.fetchedAt;
-        }
-      } else {
-        hasAllQuotes = false;
-      }
-
-      const marketValue = currentPrice !== null ? currentPrice * position.quantity : null;
-      const unrealizedPnl =
-        currentPrice !== null ? (currentPrice - position.averageCost) * position.quantity : null;
-      const unrealizedPnlPercent =
-        currentPrice !== null && position.averageCost > 0
-          ? ((currentPrice - position.averageCost) / position.averageCost) * 100
-          : null;
-
-      rawHoldings.push({
+      const raw = buildRawDashboardHolding({
         stockId,
         symbol: sample.symbol,
         name: sample.name,
         market: sample.market as Market,
         currency: sample.currency,
-        quantity: position.quantity,
-        averageCost: position.averageCost,
-        currentPrice,
-        changePercent,
-        marketValue,
-        unrealizedPnl,
-        unrealizedPnlPercent,
-        realizedPnl: position.realizedPnl,
-        costBasis: position.costBasis,
+        position,
+        quote,
       });
+      if (raw) rawHoldings.push(raw);
     }
 
     const cashBalances = getGuestCashBalances();
@@ -104,8 +87,8 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
       rawHoldings,
       cashBalances,
       usdKrwRate,
-      hasAllQuotes,
-      lastRefreshedAt,
+      hasAllQuotes: quoteState.hasAllQuotes,
+      lastRefreshedAt: quoteState.lastRefreshedAt,
       zeroWhenEmpty: true,
     });
   }
@@ -117,8 +100,7 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
 
     const sample = stockTxs[0].stock!;
     const stockId = stockTxs[0].stockId;
-    const quotes = getGuestQuotes();
-    const quote = quotes[stockId];
+    const quote = getGuestQuotes()[stockId];
 
     const corpActions = listGuestCorporateActions().filter((a) => a.stockId === stockId);
     const position = applyCorporateActions(
@@ -137,42 +119,20 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
         targetPrice: a.targetPrice,
       })),
     );
-    if (position.quantity <= 0) return null;
 
-    const currentPrice = quote?.currentPrice ?? null;
-    const changePercent = quote?.changePercent ?? null;
-    const marketValue = currentPrice !== null ? currentPrice * position.quantity : null;
-    const unrealizedPnl =
-      currentPrice !== null ? (currentPrice - position.averageCost) * position.quantity : null;
-    const unrealizedPnlPercent =
-      currentPrice !== null && position.averageCost > 0
-        ? ((currentPrice - position.averageCost) / position.averageCost) * 100
-        : null;
-
-    const usdKrwRate = sample.currency === 'USD' ? await this.fetchUsdKrwRate() : null;
-    const base = {
+    const raw = buildRawDashboardHolding({
       stockId,
       symbol: sample.symbol,
       name: sample.name,
       market: sample.market as Market,
       currency: sample.currency,
-      quantity: position.quantity,
-      averageCost: position.averageCost,
-      currentPrice,
-      changePercent,
-      marketValue,
-      unrealizedPnl,
-      unrealizedPnlPercent,
-      realizedPnl: position.realizedPnl,
-      costBasis: position.costBasis,
-    };
+      position,
+      quote,
+    });
+    if (!raw) return null;
 
-    return {
-      ...base,
-      ...enrichHoldingKrw(base, usdKrwRate),
-      weightPercent: null,
-      usdKrwRate,
-    };
+    const usdKrwRate = sample.currency === 'USD' ? await this.fetchUsdKrwRate() : null;
+    return buildHoldingWithKrw(raw, usdKrwRate);
   }
 
   async refreshQuotes(): Promise<RefreshQuoteResult> {

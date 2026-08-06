@@ -49,6 +49,13 @@ describe('middleware route access', () => {
     expect(url.pathname).toBe('/login');
   });
 
+  it('preserves next path when redirecting from protected route', () => {
+    middleware(request('/tax'));
+    const url = vi.mocked(NextResponse.redirect).mock.calls[0]?.[0] as URL;
+    expect(url.pathname).toBe('/login');
+    expect(url.searchParams.get('next')).toBe('/tax');
+  });
+
   it('allows guest cookie on protected routes', () => {
     middleware(request('/my-info', { [GUEST_SESSION_COOKIE]: '1' }));
     expect(NextResponse.next).toHaveBeenCalled();

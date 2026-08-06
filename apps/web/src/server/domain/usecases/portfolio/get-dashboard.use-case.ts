@@ -1,4 +1,4 @@
-import { Market, applyCorporateActions, buildDashboardFromRawHoldings, computeCashBalances, cashToKrw, type RawDashboardHolding } from '@sar/shared';
+import { Market, applyCorporateActions, buildDashboardFromRawHoldings, buildRawDashboardHolding, computeCashBalances, nextQuoteRefreshState, type RawDashboardHolding } from '@sar/shared';
 import { DashboardResult } from '../../entities';
 import {
   ICashLedgerRepository,
@@ -28,8 +28,7 @@ export class GetDashboardUseCase {
     const quoteMap = new Map(quotes.map((q) => [q.stockId, q]));
 
     const rawHoldings: RawDashboardHolding[] = [];
-    let hasAllQuotes = true;
-    let lastRefreshedAt: Date | null = null;
+    let quoteState = { lastRefreshedAt: null as Date | null, hasAllQuotes: true };
 
     for (const stock of stocks) {
       const txs = await this.transactionRepo.findByUserAndStock(userId, stock.id);
@@ -51,44 +50,19 @@ export class GetDashboardUseCase {
         })),
       );
 
-      if (position.quantity <= 0) continue;
-
       const quote = quoteMap.get(stock.id);
-      const currentPrice = quote?.currentPrice ?? null;
-      const changePercent = quote?.changePercent ?? null;
+      quoteState = nextQuoteRefreshState(quoteState, quote ?? null);
 
-      if (quote) {
-        if (!lastRefreshedAt || quote.fetchedAt > lastRefreshedAt) {
-          lastRefreshedAt = quote.fetchedAt;
-        }
-      } else {
-        hasAllQuotes = false;
-      }
-
-      const marketValue = currentPrice !== null ? currentPrice * position.quantity : null;
-      const unrealizedPnl =
-        currentPrice !== null ? (currentPrice - position.averageCost) * position.quantity : null;
-      const unrealizedPnlPercent =
-        currentPrice !== null && position.averageCost > 0
-          ? ((currentPrice - position.averageCost) / position.averageCost) * 100
-          : null;
-
-      rawHoldings.push({
+      const raw = buildRawDashboardHolding({
         stockId: stock.id,
         symbol: stock.symbol,
         name: stock.name,
         market: stock.market as Market,
         currency: stock.currency,
-        quantity: position.quantity,
-        averageCost: position.averageCost,
-        currentPrice,
-        changePercent,
-        marketValue,
-        unrealizedPnl,
-        unrealizedPnlPercent,
-        realizedPnl: position.realizedPnl,
-        costBasis: position.costBasis,
+        position,
+        quote,
       });
+      if (raw) rawHoldings.push(raw);
     }
 
     const hasUsdHoldings = rawHoldings.some((h) => h.currency === 'USD');
@@ -104,14 +78,14 @@ export class GetDashboardUseCase {
       rawHoldings,
       cashBalances,
       usdKrwRate,
-      hasAllQuotes,
-      lastRefreshedAt,
+      hasAllQuotes: quoteState.hasAllQuotes,
+      lastRefreshedAt: quoteState.lastRefreshedAt,
     });
 
     return {
       summary: built.summary,
       holdings: built.holdings,
-      lastRefreshedAt,
+      lastRefreshedAt: quoteState.lastRefreshedAt,
     };
   }
 }

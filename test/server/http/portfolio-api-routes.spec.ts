@@ -11,6 +11,9 @@ import { getServerServices } from '@/server/container';
 import { GET as listTransactions, POST as createTransaction } from '@/app/api/transactions/route';
 import { GET as getDashboard } from '@/app/api/portfolio/dashboard/route';
 import { GET as listWatchlist, POST as addWatchlist } from '@/app/api/watchlist/route';
+import { GET as listCorporateActions, POST as createCorporateAction } from '@/app/api/corporate-actions/route';
+import { GET as getPortfolioAnalysis } from '@/app/api/portfolio/analysis/route';
+import { POST as refreshMarketQuotes } from '@/app/api/market/refresh/route';
 
 const authUser = { userId: 'user-1', username: 'admin' };
 
@@ -47,6 +50,18 @@ function mockServices(overrides: Record<string, unknown> = {}) {
     },
     addWatchlistUseCase: {
       execute: vi.fn().mockResolvedValue({ id: 'wl-new', symbol: 'AAPL' }),
+    },
+    listCorporateActionsUseCase: {
+      execute: vi.fn().mockResolvedValue([{ id: 'ca-1' }]),
+    },
+    createCorporateActionUseCase: {
+      execute: vi.fn().mockResolvedValue({ id: 'ca-new' }),
+    },
+    getPortfolioAnalysisUseCase: {
+      execute: vi.fn().mockResolvedValue({ periods: [], insights: null }),
+    },
+    refreshQuotesUseCase: {
+      execute: vi.fn().mockResolvedValue({ updated: 2, succeeded: ['005930'], failed: [] }),
     },
     ...overrides,
   } as never);
@@ -114,5 +129,54 @@ describe('portfolio & transactions API routes', () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.item.symbol).toBe('AAPL');
+  });
+
+  it('GET /api/corporate-actions returns 401 without auth', async () => {
+    const res = await listCorporateActions(new NextRequest('http://localhost/api/corporate-actions'));
+    expect(res.status).toBe(401);
+  });
+
+  it('GET /api/corporate-actions returns list for authed user', async () => {
+    const res = await listCorporateActions(authedRequest('http://localhost/api/corporate-actions'));
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.items).toHaveLength(1);
+  });
+
+  it('POST /api/corporate-actions creates action', async () => {
+    const req = authedRequest('http://localhost/api/corporate-actions', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: 'Bearer test-token' },
+      body: JSON.stringify({
+        stockSymbol: '005930',
+        market: Market.KR,
+        name: '삼성전자',
+        type: 'DIVIDEND',
+        effectiveAt: new Date().toISOString(),
+        cashAmount: 10000,
+      }),
+    });
+    const res = await createCorporateAction(req);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.item.id).toBe('ca-new');
+  });
+
+  it('GET /api/portfolio/analysis returns analysis', async () => {
+    const res = await getPortfolioAnalysis(
+      authedRequest('http://localhost/api/portfolio/analysis?periods=1mo,ytd'),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.periods).toEqual([]);
+  });
+
+  it('POST /api/market/refresh refreshes quotes', async () => {
+    const res = await refreshMarketQuotes(
+      authedRequest('http://localhost/api/market/refresh', { method: 'POST' }),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.updated).toBe(2);
   });
 });
