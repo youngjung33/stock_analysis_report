@@ -2,13 +2,19 @@ import { GUEST_SESSION_COOKIE } from '@sar/shared';
 
 const SESSION_KEY = 'sar_guest_session';
 
-function setGuestCookie(active: boolean): void {
-  if (typeof document === 'undefined') return;
-  if (active) {
-    document.cookie = `${GUEST_SESSION_COOKIE}=1; path=/; SameSite=Lax`;
-  } else {
-    document.cookie = `${GUEST_SESSION_COOKIE}=; path=/; Max-Age=0; SameSite=Lax`;
-  }
+async function postGuestSession(): Promise<void> {
+  const res = await fetch('/api/auth/guest/session', {
+    method: 'POST',
+    credentials: 'include',
+  });
+  if (!res.ok) throw new Error('Guest session request failed');
+}
+
+async function deleteGuestSession(): Promise<void> {
+  await fetch('/api/auth/guest/session', {
+    method: 'DELETE',
+    credentials: 'include',
+  });
 }
 
 export const guestSession = {
@@ -17,22 +23,29 @@ export const guestSession = {
     return sessionStorage.getItem(SESSION_KEY) === '1';
   },
 
-  activate(): void {
+  async activate(): Promise<void> {
+    await postGuestSession();
     sessionStorage.setItem(SESSION_KEY, '1');
-    setGuestCookie(true);
   },
 
   clear(): void {
     sessionStorage.removeItem(SESSION_KEY);
-    setGuestCookie(false);
+    void deleteGuestSession();
   },
 
-  /** Restore cookie after refresh when sessionStorage is still active */
-  syncCookie(): void {
-    if (this.isActive()) setGuestCookie(true);
+  /** Restore server cookie after refresh when sessionStorage is still active */
+  async syncCookie(): Promise<void> {
+    if (!this.isActive()) return;
+    try {
+      await postGuestSession();
+    } catch {
+      // sessionStorage remains; user may retry navigation
+    }
   },
 };
 
 export function clearGuestSessionCookie(): void {
-  setGuestCookie(false);
+  void deleteGuestSession();
 }
+
+export { GUEST_SESSION_COOKIE };

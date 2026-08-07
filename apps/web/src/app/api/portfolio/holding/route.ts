@@ -2,10 +2,12 @@ import { NextRequest } from 'next/server';
 import { AppErrorCode, Market } from '@sar/shared';
 import { getServerServices } from '@/server/container';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
+import { enforceRateLimit } from '@/server/http/rate-limit';
 import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
 
 export async function GET(req: NextRequest) {
   try {
+    await enforceRateLimit(req, 'api:portfolio-holding', 'apiRead');
     const user = requireAuth(req);
     const symbol = req.nextUrl.searchParams.get('symbol');
     const marketParam = req.nextUrl.searchParams.get('market');

@@ -11,7 +11,7 @@ import {
 
 export async function POST(req: NextRequest) {
   try {
-    enforceRateLimit(req, 'auth:refresh', 'authRefresh');
+    await enforceRateLimit(req, 'auth:refresh', 'authRefresh');
     const refreshToken = getRefreshToken(req);
     if (!refreshToken) {
       return jsonData({ username: null });

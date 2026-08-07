@@ -5,7 +5,7 @@ import { handleRouteError, jsonData } from '@/server/http/route-utils';
 
 export async function GET(req: NextRequest) {
   try {
-    enforceRateLimit(req, 'market:status', 'light');
+    await enforceRateLimit(req, 'market:status', 'light');
     const { getMarketStatusUseCase } = getServerServices();
     return jsonData(getMarketStatusUseCase.execute());
   } catch (error) {

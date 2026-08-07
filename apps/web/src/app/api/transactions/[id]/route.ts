@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
+import { enforceRateLimit } from '@/server/http/rate-limit';
 import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
 
 export async function DELETE(
@@ -7,6 +8,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    await enforceRateLimit(req, 'api:transactions-delete', 'apiWrite');
     const user = requireAuth(req);
     const { id } = await params;
     const { deleteTransactionUseCase } = getServerServices();

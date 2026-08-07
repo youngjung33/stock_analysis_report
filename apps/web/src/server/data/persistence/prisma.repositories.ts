@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client';
-import { Market, TransactionType } from '@sar/shared';
+import { Prisma, PrismaClient } from '@prisma/client';
+import { Market, TransactionType, type StoredInvestorProfile } from '@sar/shared';
 import {
   StockEntity,
   StockQuoteEntity,
@@ -371,29 +371,43 @@ export class PrismaCashLedgerRepository implements ICashLedgerRepository {
 export class PrismaPortfolioPreferenceRepository implements IPortfolioPreferenceRepository {
   constructor(private readonly prisma: PrismaClient = defaultPrisma) {}
 
-  async findByUser(userId: string) {
+  async findByUser(userId: string): Promise<PortfolioPreferenceEntity | null> {
     const row = await this.prisma.portfolioPreference.findUnique({ where: { userId } });
-    return row;
+    if (!row) return null;
+    return {
+      userId: row.userId,
+      targetKrPercent: row.targetKrPercent,
+      targetUsPercent: row.targetUsPercent,
+      maxSingleWeightPercent: row.maxSingleWeightPercent,
+      investorProfile: (row.investorProfile as StoredInvestorProfile | null) ?? null,
+    };
   }
 
-  async upsert(data: PortfolioPreferenceEntity) {
-    return this.prisma.portfolioPreference.upsert({
+  async upsert(data: PortfolioPreferenceEntity): Promise<PortfolioPreferenceEntity> {
+    const row = await this.prisma.portfolioPreference.upsert({
       where: { userId: data.userId },
       create: {
         userId: data.userId,
         targetKrPercent: data.targetKrPercent,
         targetUsPercent: data.targetUsPercent,
         maxSingleWeightPercent: data.maxSingleWeightPercent,
-        investorProfile: data.investorProfile ?? undefined,
+        investorProfile: (data.investorProfile ?? undefined) as Prisma.InputJsonValue | undefined,
       },
       update: {
         targetKrPercent: data.targetKrPercent,
         targetUsPercent: data.targetUsPercent,
         maxSingleWeightPercent: data.maxSingleWeightPercent,
         ...(data.investorProfile !== undefined
-          ? { investorProfile: data.investorProfile ?? undefined }
+          ? { investorProfile: (data.investorProfile ?? undefined) as Prisma.InputJsonValue | undefined }
           : {}),
       },
     });
+    return {
+      userId: row.userId,
+      targetKrPercent: row.targetKrPercent,
+      targetUsPercent: row.targetUsPercent,
+      maxSingleWeightPercent: row.maxSingleWeightPercent,
+      investorProfile: (row.investorProfile as StoredInvestorProfile | null) ?? null,
+    };
   }
 }

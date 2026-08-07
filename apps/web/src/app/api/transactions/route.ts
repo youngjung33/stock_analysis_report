@@ -1,10 +1,12 @@
 import { NextRequest } from 'next/server';
 import { Market, TransactionType } from '@sar/shared';
 import { getServerServices } from '@/server/container';
+import { enforceRateLimit } from '@/server/http/rate-limit';
 import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
 
 export async function POST(req: NextRequest) {
   try {
+    await enforceRateLimit(req, 'api:transactions-write', 'apiWrite');
     const user = requireAuth(req);
     const body = await req.json();
 
@@ -30,6 +32,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
+    await enforceRateLimit(req, 'api:transactions-read', 'apiRead');
     const user = requireAuth(req);
     const stockId = req.nextUrl.searchParams.get('stockId') ?? undefined;
     const type = (req.nextUrl.searchParams.get('type') as TransactionType | null) ?? undefined;

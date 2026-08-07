@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
+  ACCESS_TOKEN_COOKIE,
   DEFAULT_LOCALE,
   GUEST_SESSION_COOKIE,
   LOCALE_COOKIE_KEY,
   REFRESH_TOKEN_COOKIE,
+  isJwtNotExpired,
+  isPlausibleRefreshToken,
   isPublicPagePath,
+  verifyGuestSessionToken,
   type SupportedLocale,
 } from '@sar/shared';
 
@@ -16,15 +20,32 @@ function localeFromAcceptLanguage(header: string | null): SupportedLocale {
   return DEFAULT_LOCALE;
 }
 
-function hasAppSession(request: NextRequest): boolean {
-  if (request.cookies.get(REFRESH_TOKEN_COOKIE)?.value) return true;
-  return request.cookies.get(GUEST_SESSION_COOKIE)?.value === '1';
+function guestSessionSecret(): string | null {
+  const dedicated = process.env.GUEST_SESSION_SECRET?.trim();
+  if (dedicated) return dedicated;
+  return process.env.JWT_ACCESS_SECRET?.trim() ?? null;
 }
 
-export function middleware(request: NextRequest) {
+async function hasAppSession(request: NextRequest): Promise<boolean> {
+  const refresh = request.cookies.get(REFRESH_TOKEN_COOKIE)?.value;
+  if (isPlausibleRefreshToken(refresh)) return true;
+
+  const access = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
+  if (isJwtNotExpired(access)) return true;
+
+  const guestToken = request.cookies.get(GUEST_SESSION_COOKIE)?.value;
+  const secret = guestSessionSecret();
+  if (guestToken && secret) {
+    return verifyGuestSessionToken(guestToken, secret);
+  }
+
+  return false;
+}
+
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (!isPublicPagePath(pathname) && !hasAppSession(request)) {
+  if (!isPublicPagePath(pathname) && !(await hasAppSession(request))) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = '/login';
     loginUrl.search = '';

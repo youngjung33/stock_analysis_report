@@ -1,6 +1,7 @@
 import { AppErrorCode, createDefaultStoredProfile, type StoredInvestorProfile } from '@sar/shared';
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
+import { enforceRateLimit } from '@/server/http/rate-limit';
 import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 
@@ -20,6 +21,7 @@ function parseInvestorProfile(value: unknown): StoredInvestorProfile | null | un
 
 export async function GET(req: NextRequest) {
   try {
+    await enforceRateLimit(req, 'api:portfolio-preferences-read', 'apiRead');
     const user = requireAuth(req);
     const { getPortfolioPreferencesUseCase } = getServerServices();
     const prefs = await getPortfolioPreferencesUseCase.execute(user.userId);
@@ -31,6 +33,7 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    await enforceRateLimit(req, 'api:portfolio-preferences-write', 'apiWrite');
     const user = requireAuth(req);
     const body = (await req.json()) as {
       targetKrPercent?: number;

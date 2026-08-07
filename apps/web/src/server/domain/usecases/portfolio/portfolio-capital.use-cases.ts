@@ -1,6 +1,7 @@
 import {
   DEFAULT_PORTFOLIO_PREFERENCES,
   buildRankedPortfolioSimulation,
+  toFeaturedQuoteInputs,
 } from '@sar/shared';
 import { PortfolioPreferenceEntity } from '../../entities';
 import {
@@ -75,22 +76,8 @@ export class GetPortfolioSimulationUseCase {
         targetUsPercent: preferences.targetUsPercent,
         maxSingleWeightPercent: preferences.maxSingleWeightPercent,
       },
-      featuredKr: featured.kr.map((q) => ({
-        symbol: q.symbol,
-        name: q.name,
-        market: q.market,
-        currency: q.currency,
-        currentPrice: q.currentPrice,
-        changePercent: q.changePercent,
-      })),
-      featuredUs: featured.us.map((q) => ({
-        symbol: q.symbol,
-        name: q.name,
-        market: q.market,
-        currency: q.currency,
-        currentPrice: q.currentPrice,
-        changePercent: q.changePercent,
-      })),
+      featuredKr: toFeaturedQuoteInputs(featured.kr),
+      featuredUs: toFeaturedQuoteInputs(featured.us),
       storedProfile: preferences.investorProfile,
       usdKrwRate: dashboard.summary.usdKrwRate,
     });

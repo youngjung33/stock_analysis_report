@@ -7,7 +7,7 @@ export const maxDuration = 15;
 
 export async function GET(req: NextRequest) {
   try {
-    enforceRateLimit(req, 'market:featured', 'standard');
+    await enforceRateLimit(req, 'market:featured', 'standard');
     const { getFeaturedQuotesUseCase } = getServerServices();
     const result = await getFeaturedQuotesUseCase.execute();
     return jsonData(result);

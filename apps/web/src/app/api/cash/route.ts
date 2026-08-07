@@ -1,11 +1,13 @@
 import { NextRequest } from 'next/server';
 import { AppErrorCode, CashLedgerType } from '@sar/shared';
 import { getServerServices } from '@/server/container';
+import { enforceRateLimit } from '@/server/http/rate-limit';
 import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 
 export async function GET(req: NextRequest) {
   try {
+    await enforceRateLimit(req, 'api:cash-read', 'apiRead');
     const user = requireAuth(req);
     const { getCashSummaryUseCase } = getServerServices();
     const summary = await getCashSummaryUseCase.execute(user.userId);
@@ -17,6 +19,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    await enforceRateLimit(req, 'api:cash-write', 'apiWrite');
     const user = requireAuth(req);
     const body = (await req.json()) as {
       currency?: string;

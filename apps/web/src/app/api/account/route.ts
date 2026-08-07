@@ -13,6 +13,7 @@ import {
 
 export async function GET(req: NextRequest) {
   try {
+    await enforceRateLimit(req, 'api:account-read', 'apiRead');
     const user = requireAuth(req);
     const { getAccountUseCase } = getServerServices();
     const profile = await getAccountUseCase.execute(user.userId);
@@ -22,10 +23,10 @@ export async function GET(req: NextRequest) {
   }
 }
 
-/** 회원탈퇴 — User 및 cascade 연관 데이터 삭제 */
+/** Delete account and related user data (cascade). */
 export async function DELETE(req: NextRequest) {
   try {
-    enforceRateLimit(req, 'auth:delete-account', 'authLogin');
+    await enforceRateLimit(req, 'auth:delete-account', 'authLogin');
     const user = requireAuth(req);
     const body = (await req.json().catch(() => ({}))) as { password?: string };
 

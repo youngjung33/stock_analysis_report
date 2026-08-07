@@ -7,9 +7,9 @@ function f(t: TFunction, id: string, key: string, fallback: string): string {
   return t(`guide.items.${id}.figure.${key}`, { defaultValue: fallback });
 }
 
-function SvgChart({ children }: { children: React.ReactNode }) {
+function SvgChart({ children, viewBox = '0 0 320 160' }: { children: React.ReactNode; viewBox?: string }) {
   return (
-    <svg viewBox="0 0 320 160" className="mx-auto h-auto w-full max-w-md text-foreground" role="img">
+    <svg viewBox={viewBox} className="mx-auto h-auto w-full max-w-md text-foreground" role="img">
       {children}
     </svg>
   );

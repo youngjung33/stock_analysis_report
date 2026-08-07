@@ -24,13 +24,13 @@ describe('market API rate limit', () => {
     const req = new NextRequest('http://localhost/api/market/featured', {
       headers: { 'x-forwarded-for': '1.2.3.4' },
     });
-    expect(() => enforceRateLimit(req, 'market:featured', 'standard')).not.toThrow();
+    await expect(enforceRateLimit(req, 'market:featured', 'standard')).resolves.toBeUndefined();
   });
 
   it('returns 429 when limit exceeded', async () => {
     const ip = '9.9.9.9';
     for (let i = 0; i < 60; i++) {
-      enforceRateLimit(
+      await enforceRateLimit(
         new NextRequest('http://localhost/api/market/featured', {
           headers: { 'x-forwarded-for': ip },
         }),
@@ -39,7 +39,7 @@ describe('market API rate limit', () => {
       );
     }
 
-    expect(() =>
+    await expect(
       enforceRateLimit(
         new NextRequest('http://localhost/api/market/featured', {
           headers: { 'x-forwarded-for': ip },
@@ -47,7 +47,7 @@ describe('market API rate limit', () => {
         'market:featured',
         'standard',
       ),
-    ).toThrow(HttpError);
+    ).rejects.toThrow(HttpError);
 
     const req = new NextRequest('http://localhost/api/market/featured', {
       headers: { 'x-forwarded-for': ip },

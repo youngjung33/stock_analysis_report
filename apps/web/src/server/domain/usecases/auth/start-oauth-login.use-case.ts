@@ -1,5 +1,5 @@
 import { randomBytes } from 'crypto';
-import { AppErrorCode, OAuthProviderId, isOAuthProvider } from '@sar/shared';
+import { AppErrorCode, OAuthProviderId, isAllowedOAuthRedirectUri, isOAuthProvider } from '@sar/shared';
 import { ValidationError } from '../../errors/domain.errors';
 import { IOAuthProviderPort } from '../../ports/oauth-provider.port';
 import { IOAuthStateRepository } from '../../repositories';
@@ -7,6 +7,7 @@ import { IOAuthStateRepository } from '../../repositories';
 export interface StartOAuthLoginInput {
   provider: string;
   redirectUri: string;
+  allowedOrigin: string;
 }
 
 export interface StartOAuthLoginResult {
@@ -36,6 +37,9 @@ export class StartOAuthLoginUseCase {
     const redirectUri = input.redirectUri.trim();
     if (!redirectUri) {
       throw new ValidationError(AppErrorCode.AUTH_OAUTH_REDIRECT_URI_REQUIRED);
+    }
+    if (!isAllowedOAuthRedirectUri(redirectUri, input.allowedOrigin)) {
+      throw new ValidationError(AppErrorCode.AUTH_OAUTH_REDIRECT_URI_INVALID);
     }
 
     const state = randomBytes(32).toString('hex');

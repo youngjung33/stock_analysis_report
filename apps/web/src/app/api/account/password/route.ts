@@ -7,7 +7,7 @@ import { ValidationError } from '@/server/domain/errors/domain.errors';
 
 export async function POST(req: NextRequest) {
   try {
-    enforceRateLimit(req, 'auth:change-password', 'authLogin');
+    await enforceRateLimit(req, 'auth:change-password', 'authLogin');
     const user = requireAuth(req);
     const body = (await req.json()) as {
       currentPassword?: string;

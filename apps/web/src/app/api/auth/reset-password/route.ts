@@ -7,7 +7,7 @@ import { ValidationError } from '@/server/domain/errors/domain.errors';
 
 export async function POST(req: NextRequest) {
   try {
-    enforceRateLimit(req, 'auth:reset-password', 'authRegister');
+    await enforceRateLimit(req, 'auth:reset-password', 'authRegister');
     const body = (await req.json()) as {
       token?: string;
       password?: string;

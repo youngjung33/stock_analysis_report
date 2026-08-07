@@ -1,4 +1,4 @@
-import { Market, applyCorporateActions, buildDashboardFromRawHoldings, buildRawDashboardHolding, computeCashBalances, nextQuoteRefreshState, type RawDashboardHolding } from '@sar/shared';
+import { Market, applyCorporateActions, buildDashboardFromRawHoldings, buildRawDashboardHolding, computeCashBalances, nextQuoteRefreshState, normalizeDashboardSummary, type QuoteRefreshState, type RawDashboardHolding } from '@sar/shared';
 import { DashboardResult } from '../../entities';
 import {
   ICashLedgerRepository,
@@ -28,7 +28,7 @@ export class GetDashboardUseCase {
     const quoteMap = new Map(quotes.map((q) => [q.stockId, q]));
 
     const rawHoldings: RawDashboardHolding[] = [];
-    let quoteState = { lastRefreshedAt: null as Date | null, hasAllQuotes: true };
+    let quoteState: QuoteRefreshState = { lastRefreshedAt: null, hasAllQuotes: true };
 
     for (const stock of stocks) {
       const txs = await this.transactionRepo.findByUserAndStock(userId, stock.id);
@@ -82,10 +82,17 @@ export class GetDashboardUseCase {
       lastRefreshedAt: quoteState.lastRefreshedAt,
     });
 
+    const lastRefreshedAt =
+      quoteState.lastRefreshedAt instanceof Date
+        ? quoteState.lastRefreshedAt
+        : quoteState.lastRefreshedAt
+          ? new Date(quoteState.lastRefreshedAt)
+          : null;
+
     return {
-      summary: built.summary,
+      summary: normalizeDashboardSummary(built.summary),
       holdings: built.holdings,
-      lastRefreshedAt: quoteState.lastRefreshedAt,
+      lastRefreshedAt,
     };
   }
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ACCESS_TOKEN_COOKIE, AppErrorCode, REFRESH_TOKEN_COOKIE } from '@sar/shared';
+import { ACCESS_TOKEN_COOKIE, AppErrorCode, GUEST_SESSION_COOKIE, REFRESH_TOKEN_COOKIE } from '@sar/shared';
 import { getServerServices } from '../container';
 import { AuthenticationError } from '../domain/errors/domain.errors';
 
@@ -64,6 +64,19 @@ export function setAccessCookie(res: NextResponse, token: string) {
 
 export function clearAccessCookie(res: NextResponse) {
   res.cookies.set(ACCESS_TOKEN_COOKIE, '', { ...cookieBaseOptions(), maxAge: 0 });
+}
+
+const GUEST_COOKIE_MAX_AGE = 7 * 24 * 60 * 60;
+
+export function setGuestSessionCookie(res: NextResponse, token: string) {
+  res.cookies.set(GUEST_SESSION_COOKIE, token, {
+    ...cookieBaseOptions(),
+    maxAge: GUEST_COOKIE_MAX_AGE,
+  });
+}
+
+export function clearGuestSessionCookie(res: NextResponse) {
+  res.cookies.set(GUEST_SESSION_COOKIE, '', { ...cookieBaseOptions(), maxAge: 0 });
 }
 
 /** httpOnly cookie 우선, 없으면 Authorization Bearer (API 클라이언트·테스트용) */

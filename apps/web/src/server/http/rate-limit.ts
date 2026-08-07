@@ -4,12 +4,7 @@ import { HttpError } from './errors';
 
 type Bucket = { count: number; resetAt: number };
 
-/**
- * 프로세스 메모리 기반 rate limit.
- * Vercel serverless는 인스턴스마다 카운터가 분리됩니다.
- * 트래픽이 늘면 Upstash Redis 등 외부 store로 교체하세요.
- */
-const buckets = new Map<string, Bucket>();
+const memoryBuckets = new Map<string, Bucket>();
 
 export type MarketRateLimitTier = 'light' | 'standard' | 'heavy';
 
@@ -18,11 +13,17 @@ export type AuthRateLimitTier =
   | 'authRegister'
   | 'authCheckUsername'
   | 'authOAuthStart'
-  | 'authRefresh';
+  | 'authOAuthCallback'
+  | 'authOAuthProviders'
+  | 'authRefresh'
+  | 'authLogout'
+  | 'authVerifyEmail';
 
-export type RateLimitTier = MarketRateLimitTier | AuthRateLimitTier;
+export type ApiRateLimitTier = 'apiRead' | 'apiWrite' | 'apiHeavy';
 
-const TIER_LIMITS: Record<RateLimitTier, { limit: number; windowMs: number }> = {
+export type RateLimitTier = MarketRateLimitTier | AuthRateLimitTier | ApiRateLimitTier;
+
+export const TIER_LIMITS: Record<RateLimitTier, { limit: number; windowMs: number }> = {
   light: { limit: 120, windowMs: 60_000 },
   standard: { limit: 60, windowMs: 60_000 },
   heavy: { limit: 12, windowMs: 60_000 },
@@ -30,8 +31,21 @@ const TIER_LIMITS: Record<RateLimitTier, { limit: number; windowMs: number }> = 
   authRegister: { limit: 10, windowMs: 60_000 },
   authCheckUsername: { limit: 30, windowMs: 60_000 },
   authOAuthStart: { limit: 20, windowMs: 60_000 },
+  authOAuthCallback: { limit: 30, windowMs: 60_000 },
+  authOAuthProviders: { limit: 60, windowMs: 60_000 },
   authRefresh: { limit: 60, windowMs: 60_000 },
+  authLogout: { limit: 30, windowMs: 60_000 },
+  authVerifyEmail: { limit: 10, windowMs: 60_000 },
+  apiRead: { limit: 120, windowMs: 60_000 },
+  apiWrite: { limit: 40, windowMs: 60_000 },
+  apiHeavy: { limit: 15, windowMs: 60_000 },
 };
+
+type UpstashModule = typeof import('@upstash/ratelimit');
+type RedisModule = typeof import('@upstash/redis');
+
+let upstashWarned = false;
+const upstashLimiters = new Map<RateLimitTier, InstanceType<UpstashModule['Ratelimit']>>();
 
 function clientIp(req: NextRequest): string {
   const forwarded = req.headers.get('x-forwarded-for');
@@ -39,19 +53,37 @@ function clientIp(req: NextRequest): string {
   return req.headers.get('x-real-ip') ?? 'unknown';
 }
 
-/** IP 기준 슬라이딩 윈도 rate limit — 초과 시 429 */
-export function enforceRateLimit(
-  req: NextRequest,
-  scope: string,
-  tier: RateLimitTier = 'standard',
-): void {
+function upstashConfigured(): boolean {
+  return Boolean(
+    process.env.UPSTASH_REDIS_REST_URL?.trim() && process.env.UPSTASH_REDIS_REST_TOKEN?.trim(),
+  );
+}
+
+async function getUpstashLimiter(tier: RateLimitTier) {
+  const cached = upstashLimiters.get(tier);
+  if (cached) return cached;
+
+  const [{ Ratelimit }, { Redis }] = await Promise.all([
+    import('@upstash/ratelimit') as Promise<UpstashModule>,
+    import('@upstash/redis') as Promise<RedisModule>,
+  ]);
+
   const { limit, windowMs } = TIER_LIMITS[tier];
-  const key = `${scope}:${clientIp(req)}`;
+  const limiter = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.slidingWindow(limit, `${windowMs} ms`),
+    prefix: `sar:rl:${tier}`,
+  });
+  upstashLimiters.set(tier, limiter);
+  return limiter;
+}
+
+function enforceMemoryRateLimit(key: string, limit: number, windowMs: number): void {
   const now = Date.now();
-  const bucket = buckets.get(key);
+  const bucket = memoryBuckets.get(key);
 
   if (!bucket || now >= bucket.resetAt) {
-    buckets.set(key, { count: 1, resetAt: now + windowMs });
+    memoryBuckets.set(key, { count: 1, resetAt: now + windowMs });
     return;
   }
 
@@ -61,7 +93,45 @@ export function enforceRateLimit(
   }
 }
 
+async function enforceUpstashRateLimit(key: string, tier: RateLimitTier): Promise<void> {
+  const limiter = await getUpstashLimiter(tier);
+  const result = await limiter.limit(key);
+  if (!result.success) {
+    throw new HttpError(resolveAppErrorMessage(AppErrorCode.RATE_LIMIT), 429, AppErrorCode.RATE_LIMIT);
+  }
+}
+
+/** IP 기준 rate limit — Upstash Redis(선택) 또는 프로세스 메모리 fallback */
+export async function enforceRateLimit(
+  req: NextRequest,
+  scope: string,
+  tier: RateLimitTier = 'standard',
+): Promise<void> {
+  const { limit, windowMs } = TIER_LIMITS[tier];
+  const key = `${scope}:${clientIp(req)}`;
+
+  if (upstashConfigured()) {
+    await enforceUpstashRateLimit(key, tier);
+    return;
+  }
+
+  if (process.env.NODE_ENV === 'production' && !upstashWarned) {
+    upstashWarned = true;
+    console.warn(
+      JSON.stringify({
+        level: 'warn',
+        msg: 'rate limit using in-memory store; set UPSTASH_REDIS_REST_URL/TOKEN for production',
+        ts: new Date().toISOString(),
+      }),
+    );
+  }
+
+  enforceMemoryRateLimit(key, limit, windowMs);
+}
+
 /** vitest 전용 — rate limit 상태 초기화 */
 export function resetRateLimitStoreForTests(): void {
-  buckets.clear();
+  memoryBuckets.clear();
+  upstashLimiters.clear();
+  upstashWarned = false;
 }

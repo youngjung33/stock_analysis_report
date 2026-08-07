@@ -1,4 +1,9 @@
 export async function register() {
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    const { validateServerEnv } = await import('@/server/config/env');
+    validateServerEnv();
+  }
+
   const dsn = process.env.SENTRY_DSN?.trim();
   if (!dsn) return;
 

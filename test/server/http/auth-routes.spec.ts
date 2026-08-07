@@ -28,18 +28,18 @@ describe('auth API rate limit', () => {
     } as never);
   });
 
-  it('allows login requests under limit', () => {
+  it('allows login requests under limit', async () => {
     const req = new NextRequest('http://localhost/api/auth/login', {
       method: 'POST',
       headers: { 'x-forwarded-for': '1.2.3.4' },
     });
-    expect(() => enforceRateLimit(req, 'auth:login', 'authLogin')).not.toThrow();
+    await expect(enforceRateLimit(req, 'auth:login', 'authLogin')).resolves.toBeUndefined();
   });
 
   it('returns 429 when login limit exceeded', async () => {
     const ip = '9.9.9.9';
     for (let i = 0; i < 20; i++) {
-      enforceRateLimit(
+      await enforceRateLimit(
         new NextRequest('http://localhost/api/auth/login', {
           method: 'POST',
           headers: { 'x-forwarded-for': ip },
@@ -49,7 +49,7 @@ describe('auth API rate limit', () => {
       );
     }
 
-    expect(() =>
+    await expect(
       enforceRateLimit(
         new NextRequest('http://localhost/api/auth/login', {
           method: 'POST',
@@ -58,7 +58,7 @@ describe('auth API rate limit', () => {
         'auth:login',
         'authLogin',
       ),
-    ).toThrow(HttpError);
+    ).rejects.toThrow(HttpError);
 
     const req = new NextRequest('http://localhost/api/auth/login', {
       method: 'POST',
@@ -72,7 +72,7 @@ describe('auth API rate limit', () => {
   it('returns 429 when check-username limit exceeded', async () => {
     const ip = '8.8.8.8';
     for (let i = 0; i < 30; i++) {
-      enforceRateLimit(
+      await enforceRateLimit(
         new NextRequest('http://localhost/api/auth/check-username?username=a', {
           headers: { 'x-forwarded-for': ip },
         }),

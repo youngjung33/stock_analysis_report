@@ -6,7 +6,7 @@ import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-uti
 
 export async function POST(req: NextRequest) {
   try {
-    enforceRateLimit(req, 'auth:verify-email-request', 'authRegister');
+    await enforceRateLimit(req, 'auth:verify-email-request', 'authRegister');
     const user = requireAuth(req);
     const { requestEmailVerificationUseCase } = getServerServices();
     const result = await requestEmailVerificationUseCase.execute(user.userId);

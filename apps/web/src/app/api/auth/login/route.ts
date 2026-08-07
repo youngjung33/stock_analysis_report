@@ -12,7 +12,7 @@ import {
 
 export async function POST(req: NextRequest) {
   try {
-    enforceRateLimit(req, 'auth:login', 'authLogin');
+    await enforceRateLimit(req, 'auth:login', 'authLogin');
     const body = (await req.json()) as { username?: string; password?: string };
     if (!body.username || !body.password) {
       throw new ValidationError(AppErrorCode.AUTH_LOGIN_REQUIRED);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Market } from '@sar/shared';
-import { buildDashboardFromRawHoldings } from '@sar/shared';
+import { buildDashboardFromRawHoldings, normalizeDashboardSummary } from '@sar/shared';
 
 describe('buildDashboardFromRawHoldings', () => {
   it('builds empty guest dashboard with zero defaults', () => {
@@ -46,5 +46,35 @@ describe('buildDashboardFromRawHoldings', () => {
     expect(result.holdings).toHaveLength(1);
     expect(result.holdings[0]?.weightPercent).toBe(100);
     expect(result.summary.totalMarketValue).toBe(800_000);
+  });
+
+  it('normalizeDashboardSummary coalesces null KRW totals to zero', () => {
+    const normalized = normalizeDashboardSummary({
+      totalCostBasis: 0,
+      totalMarketValue: null,
+      totalUnrealizedPnl: null,
+      totalRealizedPnl: 0,
+      holdingsCount: 0,
+      todayPnl: null,
+      todayPnlPercent: null,
+      totalCostBasisKrw: null,
+      totalMarketValueKrw: null,
+      totalUnrealizedPnlKrw: null,
+      totalRealizedPnlKrw: null,
+      todayPnlKrw: null,
+      todayPnlPercentKrw: null,
+      usdKrwRate: null,
+      hasUsdHoldings: false,
+      allocationByMarket: { krPercent: 0, usPercent: 0 },
+      cashKrw: 0,
+      cashUsd: 0,
+      cashTotalKrw: 0,
+      totalAssetsKrw: null,
+      cashPercent: null,
+      investedPercent: null,
+    });
+
+    expect(normalized.totalCostBasisKrw).toBe(0);
+    expect(normalized.totalRealizedPnlKrw).toBe(0);
   });
 });

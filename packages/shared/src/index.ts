@@ -33,6 +33,12 @@ export {
   hasAppSessionCookie,
   sanitizePostAuthPath,
 } from './route-access';
+export { isAllowedOAuthRedirectUri } from './oauth-redirect';
+export {
+  issueGuestSessionToken,
+  verifyGuestSessionToken,
+} from './guest-session-token';
+export { isPlausibleRefreshToken, isJwtNotExpired } from './session-cookie';
 
 export const GUEST_DISPLAY_NAME = '비회원';
 
@@ -142,6 +148,7 @@ export {
 } from './portfolio-simulation';
 export {
   buildRankedPortfolioSimulation,
+  toFeaturedQuoteInputs,
 } from './portfolio-capital-simulation';
 export type {
   FeaturedQuoteInput,
@@ -149,6 +156,7 @@ export type {
 } from './portfolio-capital-simulation';
 export {
   buildDashboardFromRawHoldings,
+  normalizeDashboardSummary,
 } from './portfolio-dashboard';
 export {
   buildHoldingWithKrw,
@@ -160,6 +168,7 @@ export type {
   QuoteRefreshState,
 } from './portfolio-holding-build';
 export type {
+  DashboardSummaryNormalized,
   RawDashboardHolding,
   BuiltDashboardHolding,
   DashboardSummaryResult,

@@ -9,7 +9,7 @@ export const maxDuration = 10;
 
 export async function POST(req: NextRequest) {
   try {
-    enforceRateLimit(req, 'market:quotes', 'standard');
+    await enforceRateLimit(req, 'market:quotes', 'standard');
     const body = (await req.json()) as {
       stocks?: { stockId?: string; symbol?: string; market?: Market }[];
     };

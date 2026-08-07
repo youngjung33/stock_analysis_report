@@ -17,7 +17,7 @@ export function hasAppSessionCookie(cookies: {
   get(name: string): { value: string } | undefined;
 }): boolean {
   if (cookies.get('refreshToken')?.value) return true;
-  return cookies.get(GUEST_SESSION_COOKIE)?.value === '1';
+  return false;
 }
 
 const AUTH_ONLY_PATHS = new Set(['/login', '/forgot-password', '/reset-password']);

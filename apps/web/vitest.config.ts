@@ -10,6 +10,10 @@ export default defineConfig({
     include: ['../../test/**/*.spec.ts', '../../test/**/*.spec.tsx'],
     exclude: ['../../test/e2e/**'],
     globals: true,
+    env: {
+      JWT_ACCESS_SECRET: 'vitest-jwt-access-secret-32-chars-min',
+      DATABASE_URL: 'postgresql://test:test@localhost:5432/test',
+    },
   },
   resolve: {
     alias: {

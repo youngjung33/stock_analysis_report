@@ -31,6 +31,28 @@ export interface RankedPortfolioSimulationResult {
   storedProfile: StoredInvestorProfile;
 }
 
+export function toFeaturedQuoteInputs(
+  quotes: {
+    symbol: string;
+    name: string;
+    market: Market;
+    currency: string;
+    currentPrice: number | null;
+    changePercent: number | null;
+  }[],
+): FeaturedQuoteInput[] {
+  return quotes
+    .filter((q): q is typeof q & { currentPrice: number } => q.currentPrice != null)
+    .map((q) => ({
+      symbol: q.symbol,
+      name: q.name,
+      market: q.market,
+      currency: q.currency,
+      currentPrice: q.currentPrice,
+      changePercent: q.changePercent,
+    }));
+}
+
 /** Featured quotes + investor profile → ranked recommendations → portfolio simulation */
 export function buildRankedPortfolioSimulation(input: {
   cash: CashBalances;

@@ -5,6 +5,8 @@ import {
   buildHoldingWithKrw,
   buildRawDashboardHolding,
   nextQuoteRefreshState,
+  normalizeDashboardSummary,
+  type QuoteRefreshState,
   type RawDashboardHolding,
 } from '@sar/shared';
 import { Dashboard, PortfolioHolding, RefreshQuoteResult } from '../../domain/models';
@@ -36,7 +38,7 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
     const quotes = getGuestQuotes();
 
     const rawHoldings: RawDashboardHolding[] = [];
-    let quoteState = { lastRefreshedAt: null as string | null, hasAllQuotes: true };
+    let quoteState: QuoteRefreshState = { lastRefreshedAt: null, hasAllQuotes: true };
 
     for (const stockId of stockIds) {
       const stockTxs = guestTransactionsForStock(stockId);
@@ -83,7 +85,7 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
       usdKrwRate = await this.fetchUsdKrwRate();
     }
 
-    return buildDashboardFromRawHoldings({
+    const built = buildDashboardFromRawHoldings({
       rawHoldings,
       cashBalances,
       usdKrwRate,
@@ -91,6 +93,15 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
       lastRefreshedAt: quoteState.lastRefreshedAt,
       zeroWhenEmpty: true,
     });
+
+    return {
+      summary: normalizeDashboardSummary(built.summary),
+      holdings: built.holdings,
+      lastRefreshedAt:
+        built.lastRefreshedAt instanceof Date
+          ? built.lastRefreshedAt.toISOString()
+          : built.lastRefreshedAt,
+    };
   }
 
   async getHolding(symbol: string, market: Market): Promise<PortfolioHolding | null> {

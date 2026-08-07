@@ -2,10 +2,12 @@ import { AppErrorCode, Market } from '@sar/shared';
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
+import { enforceRateLimit } from '@/server/http/rate-limit';
 import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
 
 export async function GET(req: NextRequest) {
   try {
+    await enforceRateLimit(req, 'api:corporate-actions-read', 'apiRead');
     const user = requireAuth(req);
     const { listCorporateActionsUseCase } = getServerServices();
     const items = await listCorporateActionsUseCase.execute(user.userId);
@@ -17,6 +19,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    await enforceRateLimit(req, 'api:corporate-actions-write', 'apiWrite');
     const user = requireAuth(req);
     const body = await req.json();
     const market = body.market as Market;

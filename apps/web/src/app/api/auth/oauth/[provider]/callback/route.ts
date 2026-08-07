@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AppErrorCode, isOAuthProvider } from '@sar/shared';
 import { getServerServices } from '@/server/container';
+import { enforceRateLimit } from '@/server/http/rate-limit';
 import { logApiError } from '@/server/http/route-error';
 import {
   clearAccessCookie,
@@ -17,6 +18,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
   let provider = 'unknown';
 
   try {
+    await enforceRateLimit(req, 'auth:oauth-callback', 'authOAuthCallback');
     const params = await context.params;
     provider = params.provider;
 

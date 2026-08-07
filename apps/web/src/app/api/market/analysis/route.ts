@@ -7,7 +7,7 @@ export const maxDuration = 25;
 
 export async function GET(req: NextRequest) {
   try {
-    enforceRateLimit(req, 'market:analysis', 'heavy');
+    await enforceRateLimit(req, 'market:analysis', 'heavy');
     const { getMarketAnalysisUseCase } = getServerServices();
     const result = await getMarketAnalysisUseCase.execute();
     return jsonData(result);

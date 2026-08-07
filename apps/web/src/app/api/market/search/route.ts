@@ -8,7 +8,7 @@ export const maxDuration = 10;
 
 export async function GET(req: NextRequest) {
   try {
-    enforceRateLimit(req, 'market:search', 'standard');
+    await enforceRateLimit(req, 'market:search', 'standard');
     const q = req.nextUrl.searchParams.get('q') ?? '';
     const marketParam = req.nextUrl.searchParams.get('market');
     const market = marketParam === Market.US ? Market.US : Market.KR;

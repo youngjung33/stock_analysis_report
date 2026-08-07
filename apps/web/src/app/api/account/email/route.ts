@@ -7,7 +7,7 @@ import { ValidationError } from '@/server/domain/errors/domain.errors';
 
 export async function POST(req: NextRequest) {
   try {
-    enforceRateLimit(req, 'auth:change-email', 'authRegister');
+    await enforceRateLimit(req, 'auth:change-email', 'authRegister');
     const user = requireAuth(req);
     const body = (await req.json()) as { email?: string };
     if (!body.email?.trim()) throw new ValidationError(AppErrorCode.AUTH_EMAIL_REQUIRED);

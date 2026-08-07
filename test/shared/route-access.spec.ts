@@ -20,7 +20,7 @@ describe('route-access', () => {
     expect(isPublicPagePath('/')).toBe(false);
   });
 
-  it('detects refresh or guest session cookies', () => {
+  it('detects refresh session cookie', () => {
     expect(
       hasAppSessionCookie({
         get: (name) => (name === 'refreshToken' ? { value: 'x' } : undefined),
@@ -30,7 +30,7 @@ describe('route-access', () => {
       hasAppSessionCookie({
         get: (name) => (name === GUEST_SESSION_COOKIE ? { value: '1' } : undefined),
       }),
-    ).toBe(true);
+    ).toBe(false);
     expect(
       hasAppSessionCookie({
         get: () => undefined,

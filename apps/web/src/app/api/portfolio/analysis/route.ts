@@ -1,11 +1,13 @@
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
+import { enforceRateLimit } from '@/server/http/rate-limit';
 import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
 
 export const maxDuration = 25;
 
 export async function GET(req: NextRequest) {
   try {
+    await enforceRateLimit(req, 'api:portfolio-analysis', 'apiHeavy');
     const user = requireAuth(req);
     const periodsParam = req.nextUrl.searchParams.get('periods') ?? '1mo,3mo,ytd,max';
     const includeInsights = req.nextUrl.searchParams.get('insights') !== '0';

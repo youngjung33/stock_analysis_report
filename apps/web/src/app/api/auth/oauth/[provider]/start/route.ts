@@ -10,7 +10,7 @@ type RouteContext = { params: Promise<{ provider: string }> };
 /** OAuth authorize URL 발급 */
 export async function GET(req: NextRequest, context: RouteContext) {
   try {
-    enforceRateLimit(req, 'auth:oauth-start', 'authOAuthStart');
+    await enforceRateLimit(req, 'auth:oauth-start', 'authOAuthStart');
     const { provider } = await context.params;
     if (!isOAuthProvider(provider)) {
       throw new ValidationError(AppErrorCode.AUTH_OAUTH_PROVIDER_INVALID);
@@ -21,7 +21,11 @@ export async function GET(req: NextRequest, context: RouteContext) {
       `${req.nextUrl.origin}/api/auth/oauth/${provider}/callback`;
 
     const { startOAuthLoginUseCase } = getServerServices();
-    const result = await startOAuthLoginUseCase.execute({ provider, redirectUri });
+    const result = await startOAuthLoginUseCase.execute({
+      provider,
+      redirectUri,
+      allowedOrigin: req.nextUrl.origin,
+    });
     return jsonData(result);
   } catch (error) {
     return handleRouteError(error);

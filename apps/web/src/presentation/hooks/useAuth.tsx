@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (guestSession.isActive()) {
-      guestSession.syncCookie();
+      void guestSession.syncCookie();
       setUsername(GUEST_DISPLAY_NAME);
       setIsLoading(false);
       return;
@@ -128,7 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     clearPendingInvestorProfile();
     guestStore.clear();
-    guestSession.activate();
+    await guestSession.activate();
     setUsername(GUEST_DISPLAY_NAME);
     await queryClient.clear();
   }, [logoutUseCase, queryClient, guestSession, guestStore, username]);

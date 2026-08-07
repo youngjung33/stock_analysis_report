@@ -46,6 +46,23 @@ export interface DashboardSummaryResult {
   investedPercent: number | null;
 }
 
+/** Server/client summary shape — KRW totals never null (missing quotes → 0). */
+export interface DashboardSummaryNormalized
+  extends Omit<DashboardSummaryResult, 'totalCostBasisKrw' | 'totalRealizedPnlKrw'> {
+  totalCostBasisKrw: number;
+  totalRealizedPnlKrw: number;
+}
+
+export function normalizeDashboardSummary(
+  summary: DashboardSummaryResult,
+): DashboardSummaryNormalized {
+  return {
+    ...summary,
+    totalCostBasisKrw: summary.totalCostBasisKrw ?? 0,
+    totalRealizedPnlKrw: summary.totalRealizedPnlKrw ?? 0,
+  };
+}
+
 export interface BuiltDashboardHolding extends RawDashboardHolding {
   marketValueKrw: number | null;
   costBasisKrw: number;

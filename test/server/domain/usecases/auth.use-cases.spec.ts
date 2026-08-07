@@ -160,11 +160,27 @@ describe('StartOAuthLoginUseCase', () => {
     const useCase = new StartOAuthLoginUseCase(oauthProvider, oauthStateRepo);
     const result = await useCase.execute({
       provider: OAuthProvider.GOOGLE,
-      redirectUri: 'http://localhost/callback',
+      redirectUri: 'http://localhost/api/auth/oauth/google/callback',
+      allowedOrigin: 'http://localhost',
     });
 
     expect(result.authorizationUrl).toContain('oauth.example');
     expect(oauthStateRepo.create).toHaveBeenCalled();
+  });
+
+  it('rejects redirect URI outside allowed origin', async () => {
+    const useCase = new StartOAuthLoginUseCase(
+      createMockOAuthProvider(),
+      createMockOAuthStateRepo(),
+    );
+
+    await expect(
+      useCase.execute({
+        provider: OAuthProvider.GOOGLE,
+        redirectUri: 'https://evil.com/api/auth/oauth/google/callback',
+        allowedOrigin: 'http://localhost',
+      }),
+    ).rejects.toThrow(ValidationError);
   });
 
   it('throws when provider is not configured', async () => {
@@ -175,7 +191,11 @@ describe('StartOAuthLoginUseCase', () => {
     const useCase = new StartOAuthLoginUseCase(oauthProvider, createMockOAuthStateRepo());
 
     await expect(
-      useCase.execute({ provider: OAuthProvider.KAKAO, redirectUri: 'http://localhost/callback' }),
+      useCase.execute({
+        provider: OAuthProvider.KAKAO,
+        redirectUri: 'http://localhost/api/auth/oauth/kakao/callback',
+        allowedOrigin: 'http://localhost',
+      }),
     ).rejects.toThrow(ValidationError);
   });
 });

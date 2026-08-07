@@ -1,6 +1,7 @@
 import {
   buildRankedPortfolioSimulation,
   CashLedgerType,
+  toFeaturedQuoteInputs,
 } from '@sar/shared';
 import {
   CashLedgerEntry,
@@ -107,22 +108,8 @@ export class GuestPortfolioCapitalRepository implements IPortfolioCapitalReposit
         weightPercent: h.weightPercent,
       })),
       preferences,
-      featuredKr: featured.kr.map((q) => ({
-        symbol: q.symbol,
-        name: q.name,
-        market: q.market,
-        currency: q.currency,
-        currentPrice: q.currentPrice,
-        changePercent: q.changePercent,
-      })),
-      featuredUs: featured.us.map((q) => ({
-        symbol: q.symbol,
-        name: q.name,
-        market: q.market,
-        currency: q.currency,
-        currentPrice: q.currentPrice,
-        changePercent: q.changePercent,
-      })),
+      featuredKr: toFeaturedQuoteInputs(featured.kr),
+      featuredUs: toFeaturedQuoteInputs(featured.us),
       storedProfile: getGuestInvestorProfile(),
       usdKrwRate: dashboard.summary.usdKrwRate,
     });

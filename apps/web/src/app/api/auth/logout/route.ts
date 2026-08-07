@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
+import { enforceRateLimit } from '@/server/http/rate-limit';
 import {
   clearAccessCookie,
   clearRefreshCookie,
@@ -10,6 +11,7 @@ import {
 
 export async function POST(req: NextRequest) {
   try {
+    await enforceRateLimit(req, 'auth:logout', 'authLogout');
     const refreshToken = getRefreshToken(req);
     const { logoutUseCase } = getServerServices();
     await logoutUseCase.execute(refreshToken);

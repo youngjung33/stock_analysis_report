@@ -9,7 +9,7 @@ export const maxDuration = 10;
 
 export async function GET(req: NextRequest) {
   try {
-    enforceRateLimit(req, 'market:quote', 'standard');
+    await enforceRateLimit(req, 'market:quote', 'standard');
     const symbol = req.nextUrl.searchParams.get('symbol')?.trim();
     const market = req.nextUrl.searchParams.get('market') as Market | null;
     const rangeParam = req.nextUrl.searchParams.get('range') ?? '1d';
