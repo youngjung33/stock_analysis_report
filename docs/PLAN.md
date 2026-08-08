@@ -252,8 +252,8 @@ npm run test:e2e              # Playwright (선택)
 | 10 | Rate limit + 보안 헤더 | ✅ |
 | 11 | Toast · 에러 마스킹 | ✅ |
 | 12 | 계정 설정·탈퇴·비밀번호 재설정 | ✅ |
-| 13 | Vitest **333 tests** (77 files) | ✅ |
-| 14 | Playwright smoke E2E (13 scenarios) | ✅ |
+| 13 | Vitest **354 tests** (80 files) | ✅ |
+| 14 | Playwright smoke E2E (17 scenarios) | ✅ |
 | 15 | Sentry·structured log (골격) | ✅ |
 | 16 | 투자 성향 프로필 · ledger · simulation tag 추천 | ✅ |
 | 17 | 주식이용 Tip · 투자 유형/미니 진단 · 다크/라이트 | ✅ |
@@ -273,7 +273,7 @@ npm run test:e2e              # Playwright (선택)
 ## 확장 포인트
 
 - `middleware.ts` — locale cookie + **protected route session** (refreshToken 또는 guest cookie)
-- Account API·E2E 테스트 보강 (진행 중 — HTTP route·회원 E2E env)
+- Account API·E2E 테스트 보강 (회원 E2E env)
 - logger ↔ route-error ↔ Sentry 연동
 
 종목 마스터: [stock-catalog-import.md](stock-catalog-import.md)

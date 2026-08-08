@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id               String            @id @default(uuid())
+  username         String            @unique
+  email            String?           @unique
+  emailVerifiedAt  DateTime?
+  passwordHash     String?
+  createdAt        DateTime          @default(now())
+  refreshTokens    RefreshToken[]
+  transactions     Transaction[]
+  corporateActions CorporateAction[]
+  watchlistItems   WatchlistItem[]
+  oauthAccounts    UserOAuthAccount[]
+  authTokens       AuthToken[]
+  cashLedgerEntries CashLedgerEntry[]
+  portfolioPreference PortfolioPreference?
+}
+
+model AuthToken {
+  id        String    @id @default(uuid())
+  userId    String
+  type      String
+  tokenHash String    @unique
+  email     String?
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@index([expiresAt])
+}
+
+model UserOAuthAccount {
+  id             String   @id @default(uuid())
+  userId         String
+  provider       String
+  providerUserId String
+  email          String?
+  createdAt      DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+}
+
+model OAuthState {
+  id          String   @id @default(uuid())
+  state       String   @unique
+  provider    String
+  redirectUri String
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([expiresAt])
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Stock {
+  id               String            @id @default(uuid())
+  symbol           String
+  name             String
+  market           String
+  currency         String
+  yahooSymbol      String?
+  createdAt        DateTime          @default(now())
+  transactions     Transaction[]
+  quote            StockQuote?
+  corporateActions CorporateAction[] @relation("ActionStock")
+  mergerTargets    CorporateAction[] @relation("MergerTarget")
+
+  @@unique([symbol, market])
+}
+
+model Transaction {
+  id        String   @id @default(uuid())
+  userId    String
+  stockId   String
+  type      String
+  quantity  Float
+  price     Float
+  tradedAt  DateTime
+  memo      String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stock     Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([stockId])
+}
+
+model StockQuote {
+  stockId       String   @id
+  currentPrice  Float
+  changePercent Float?
+  fetchedAt     DateTime
+  stock         Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+}
+
+/// 종목 검색용 마스터 (fetch:stocks → JSON → Supabase 임포트)
+model StockCatalog {
+  id          String   @id @default(uuid())
+  symbol      String
+  name        String
+  market      String
+  board       String
+  yahooSymbol String
+  isActive    Boolean  @default(true)
+  syncedAt    DateTime @default(now())
+
+  @@unique([symbol, market])
+  @@index([market, isActive])
+}
+
+model CorporateAction {
+  id             String   @id @default(uuid())
+  userId         String
+  stockId        String
+  type           String
+  effectiveAt    DateTime
+  cashAmount     Float?
+  splitRatio     Float?
+  targetStockId  String?
+  targetQuantity Float?
+  targetPrice    Float?
+  memo           String?
+  createdAt      DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stock          Stock    @relation("ActionStock", fields: [stockId], references: [id], onDelete: Cascade)
+  targetStock    Stock?   @relation("MergerTarget", fields: [targetStockId], references: [id])
+
+  @@index([userId])
+  @@index([stockId])
+}
+
+model WatchlistItem {
+  id        String   @id @default(uuid())
+  userId    String
+  symbol    String
+  name      String
+  market    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, symbol, market])
+}
+
+/// 현금 원장 — 입출금·거래결제·배당
+model CashLedgerEntry {
+  id         String   @id @default(uuid())
+  userId     String
+  currency   String
+  type       String
+  amount     Float
+  occurredAt DateTime
+  memo       String?
+  refId      String?
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, occurredAt])
+}
+
+/// 포트폴리오 목표 비중·집중도 한도
+model PortfolioPreference {
+  userId                 String @id
+  targetKrPercent        Float  @default(70)
+  targetUsPercent        Float  @default(30)
+  maxSingleWeightPercent Float  @default(40)
+  investorProfile        Json?
+  user                   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

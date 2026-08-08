@@ -19,12 +19,7 @@ import {
   ResetPasswordUseCase,
   UnlinkOAuthUseCase,
 } from './usecases/account/account.use-cases';
-import {
-  IAuthSessionPort,
-  IGuestSessionPort,
-  IGuestStorePort,
-  ITokenStoragePort,
-} from './repositories';
+import { IAuthSessionPort, IGuestSessionPort, IGuestStorePort } from './repositories';
 import {
   AddWatchlistUseCase,
   ListWatchlistUseCase,
@@ -97,5 +92,4 @@ export interface AppServices {
   authSession: IAuthSessionPort;
   guestSession: IGuestSessionPort;
   guestStore: IGuestStorePort;
-  tokenStorage: ITokenStoragePort;
 }

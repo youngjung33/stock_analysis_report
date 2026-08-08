@@ -76,7 +76,7 @@ http://localhost:3000
 ```bash
 npm run test           # Vitest (see USECASES.md for count)
 npm run lint           # ESLint (flat config)
-npm run test:e2e       # Playwright smoke (13 scenarios)
+npm run test:e2e       # Playwright smoke (17 scenarios)
 npm run build          # 프로덕션 빌드
 ```
 

@@ -72,7 +72,7 @@ test/
 ├── server/          # domain, http, data/market
 ├── web/             # client use case, guest, middleware, i18n
 ├── shared/          # @sar/shared
-└── e2e/             # Playwright smoke (13 scenarios)
+└── e2e/             # Playwright smoke (17 scenarios)
 ```
 
 ```bash

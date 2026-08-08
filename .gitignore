@@ -16,12 +16,6 @@ out/
 .env.*
 !.env*.example
 
-# Prisma / DB (스키마·마이그레이션 — git에 올리지 않음)
-apps/web/prisma/migrations/
-apps/web/prisma/schema.prisma
-apps/web/prisma/seed.ts
-apps/web/.env.example
-
 # SQLite 잔여물
 *.db
 *.db-journal

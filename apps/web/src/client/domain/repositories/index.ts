@@ -134,10 +134,6 @@ export interface IAuthSessionPort {
   onUnauthorized(callback: () => void): void;
 }
 
-export interface ITokenStoragePort {
-  getAccessToken(): string | null;
-}
-
 export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;

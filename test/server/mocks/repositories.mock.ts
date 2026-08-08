@@ -237,10 +237,6 @@ export function createMockMarketData(
   };
 }
 
-/** @deprecated createMockMarketData 사용 */
-export const createMockFxRateProvider = (rate = 1300) =>
-  createMockMarketData({}, rate);
-
 export function createMockMarketProvider(
   market: Market,
   quote = { currentPrice: 150, changePercent: 2.5 },

@@ -41,7 +41,6 @@ import {
   ResetPasswordUseCase,
   UnlinkOAuthUseCase,
 } from './domain/usecases/account/account.use-cases';
-import { tokenStorageAdapter } from './data/auth/token-storage.adapter';
 import { authSessionAdapter } from './data/auth/auth-session.adapter';
 import { guestSessionAdapter, guestStoreAdapter } from './data/guest/guest-session.adapter';
 import {
@@ -107,6 +106,5 @@ export function wireAppServices(): AppServices {
     authSession: authSessionAdapter,
     guestSession: guestSessionAdapter,
     guestStore: guestStoreAdapter,
-    tokenStorage: tokenStorageAdapter,
   };
 }
