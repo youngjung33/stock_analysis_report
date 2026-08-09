@@ -240,4 +240,6 @@ export interface PortfolioSimulationResponse {
   ledgerEntryCount: number;
   asOf: string;
   investorProfile?: import('@sar/shared').BuiltInvestorProfile;
+  recommendations?: import('@sar/shared').StockRecommendation[];
+  regimes?: import('@sar/shared').MarketRegime[];
 }

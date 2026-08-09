@@ -77,6 +77,7 @@ export interface IMarketRepository {
   getStockQuote(symbol: string, market: Market, range: QuoteChartRange): Promise<StockQuoteSnapshot>;
   getMarketStatus(): Promise<MarketProviderStatus[]>;
   getMarketAnalysis(): Promise<MarketAnalysisReport>;
+  getRecommendationContext(): Promise<import('@sar/shared').RecommendationContextResponse>;
   searchStocks(query: string, market: Market): Promise<StockSearchResult[]>;
   getFxRate(): Promise<{ usdKrwRate: number | null; fetchedAt: string }>;
   fetchBatchQuotes(

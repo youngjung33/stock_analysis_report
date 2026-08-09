@@ -13,21 +13,32 @@ describe('GetMarketAnalysisUseCase', () => {
       }),
     };
 
-    const marketData = createMockMarketData();
-    marketData.fetchChartSeries.mockResolvedValue({
-      closes: [100, 101, 102, 103],
-      volumes: [1, 2, 3, 4],
-      highs: [101, 102, 103, 104],
-      lows: [99, 100, 101, 102],
-      changePercent1d: 1,
-    });
+    const buildMarketContextUseCase = {
+      execute: vi.fn().mockResolvedValue({
+        macro: [],
+        sectors: [],
+        indices: [],
+        usdKrwRate: null,
+        usdKrwChange1d: null,
+        indexInputs: [],
+        macroInputs: [],
+        sectorInputs: [],
+      }),
+    };
 
-    const useCase = new GetMarketAnalysisUseCase(getFeaturedQuotesUseCase as never, marketData);
+    const marketData = createMockMarketData();
+
+    const useCase = new GetMarketAnalysisUseCase(
+      getFeaturedQuotesUseCase as never,
+      buildMarketContextUseCase as never,
+      marketData,
+    );
     const report = await useCase.execute();
 
     expect(report.krQuotes.length).toBeGreaterThan(0);
     expect(report.usQuotes.length).toBeGreaterThan(0);
     expect(report.fetchedAt).toBeTruthy();
     expect(getFeaturedQuotesUseCase.execute).toHaveBeenCalled();
+    expect(buildMarketContextUseCase.execute).toHaveBeenCalled();
   });
 });

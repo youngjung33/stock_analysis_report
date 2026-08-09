@@ -131,7 +131,9 @@ npm run test:e2e     # Playwright (dev server + E2E_USERNAME/PASSWORD for member
 | `GetPortfolioAnalysisUseCase` | GET `/api/portfolio/analysis` | `get-portfolio-analysis.use-case.spec.ts` |
 | `GetPortfolioPreferencesUseCase` | GET `/api/portfolio/preferences` | `portfolio.use-cases.spec.ts` + `cash-routes.spec.ts` |
 | `UpdatePortfolioPreferencesUseCase` | PUT `/api/portfolio/preferences` | `portfolio-capital.use-cases.spec.ts` + HTTP |
-| `GetPortfolioSimulationUseCase` | GET `/api/portfolio/simulation` | `cash-routes.spec.ts` |
+| `GetPortfolioSimulationUseCase` | GET `/api/portfolio/simulation` (+ `regimes`, `recommendations`) | `portfolio-capital.use-cases.spec.ts`, `cash-routes.spec.ts` |
+| `BuildMarketContextUseCase` | (내부) macro/sector/index for recommendation | `get-market-analysis.use-case.spec.ts` |
+| `FetchRecommendationQuotesUseCase` | (내부) candidate pool quotes + 15m cache | `portfolio-capital.use-cases.spec.ts` |
 | `GetHoldingBySymbolUseCase` | GET `/api/portfolio/holding` | `get-holding.use-case.spec.ts` |
 | `RecordCashEntryUseCase` | POST `/api/cash` | `cash.use-cases.spec.ts` + HTTP |
 | `RefreshQuotesUseCase` | POST `/api/market/refresh` | `market.use-cases.spec.ts` |
@@ -142,6 +144,7 @@ npm run test:e2e     # Playwright (dev server + E2E_USERNAME/PASSWORD for member
 | `SearchStocksUseCase` | GET `/api/market/search` | `search-stocks.use-case.spec.ts` |
 | `GetFxRateUseCase` | GET `/api/market/fx` | client `market.use-cases.spec.ts` |
 | `GetMarketAnalysisUseCase` | GET `/api/market/analysis` | `get-market-analysis.use-case.spec.ts` |
+| `BuildMarketContextUseCase` | GET `/api/market/recommendation-context` | shared with analysis/simulation |
 | Watchlist use cases | `/api/watchlist` | domain + `portfolio-api-routes.spec.ts` |
 | Corporate action use cases | `/api/corporate-actions` | `corporate-actions.use-cases.spec.ts` |
 

@@ -7,6 +7,8 @@ import {
   translateSimulationHeadline,
   translateSimulationReason,
   translateTag,
+  translateRecommendationEvidence,
+  translateRegime,
 } from '@/i18n';
 import { Surface } from '../design-system';
 import { AmountInput } from '../shared/AmountInput';
@@ -185,6 +187,19 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
             <p className="mt-1 text-xs text-muted-foreground md:text-sm">
               {translateSimulationDescription(sim, t)}
             </p>
+            {screen.simulation?.regimes && screen.simulation.regimes.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                <span className="text-xs text-muted-foreground">{t('market.regimeTitle')}:</span>
+                {screen.simulation.regimes.map((regime) => (
+                  <span
+                    key={regime.id}
+                    className="rounded-full border border-indigo-500/30 bg-indigo-950/30 px-2 py-0.5 text-[10px] text-indigo-200"
+                  >
+                    {translateRegime(regime.id, t)}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           <dl className="grid grid-cols-2 gap-3 text-xs md:grid-cols-4 md:text-sm">
@@ -212,7 +227,11 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
           </dl>
 
           <ul className="space-y-3">
-            {sim.actions.map((action: SimulationAction, index: number) => (
+            {sim.actions.map((action: SimulationAction, index: number) => {
+              const rec = screen.simulation?.recommendations?.find(
+                (r) => r.symbol === action.symbol && r.market === action.market,
+              );
+              return (
               <li
                 key={`${action.type}-${action.symbol}-${index}`}
                 className={`rounded-xl border p-4 ${ACTION_CLASS[action.type]}`}
@@ -233,6 +252,13 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
                 <p className="mt-2 text-xs text-muted-foreground md:text-sm">
                   {translateSimulationReason(action, t)}
                 </p>
+                {action.type === 'add' && rec?.evidenceItems && rec.evidenceItems.length > 0 && (
+                  <ul className="mt-2 list-inside list-disc space-y-0.5 text-xs text-muted-foreground">
+                    {rec.evidenceItems.map((evidence) => (
+                      <li key={evidence.key}>{translateRecommendationEvidence(evidence, t)}</li>
+                    ))}
+                  </ul>
+                )}
                 {action.suggestedAmountKrw !== null && action.type !== 'keep' && (
                   <p className="mt-2 text-sm font-medium text-foreground">
                     {action.suggestedQuantity
@@ -246,7 +272,8 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
                   </p>
                 )}
               </li>
-            ))}
+              );
+            })}
           </ul>
         </Surface>
       )}

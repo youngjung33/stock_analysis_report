@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { buildMarketInsights, sentimentBadgeClass } from '@sar/shared';
-import { translateRegionSentiment, translateSentiment, translateTag } from '@/i18n/translate-shared';
+import { translateRegionSentiment, translateSentiment, translateTag, translateRegime } from '@/i18n/translate-shared';
 import { useFeaturedQuotes } from '../hooks/useFeaturedQuotes';
 import { formatPercent, pnlClass } from '../shared/formatters';
 import { marketAnalysisHref } from '../shared/stock-routes';
@@ -40,6 +40,20 @@ export function MarketSentimentSummarySection({ compact }: Props) {
       </div>
 
       {isLoading && <p className="mt-4 text-sm text-slate-400">{t('market.loadingQuotes')}</p>}
+
+      {insights && insights.regimes && insights.regimes.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          <span className="text-xs text-slate-500">{t('market.regimeTitle')}:</span>
+          {insights.regimes.map((regime) => (
+            <span
+              key={regime.id}
+              className="rounded-full border border-indigo-500/40 bg-indigo-950/40 px-2 py-0.5 text-[10px] font-medium text-indigo-200"
+            >
+              {translateRegime(regime.id, t)}
+            </span>
+          ))}
+        </div>
+      )}
 
       {insights && (
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">

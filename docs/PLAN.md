@@ -264,7 +264,10 @@ npm run test:e2e              # Playwright (선택)
 
 - 4종 테스트 → ledger → 가중 composite → adjustment → 10유형 + `preferredTags`
 - **비회원**: 프로필 `sessionStorage` / **회원**: `PortfolioPreference.investorProfile`
-- 시뮬레이션 추천 종목 tag 우선 정렬
+- **`buildStockRecommendations`**: VIX·환율·섹터 RS·한·미 레짐 반영 KR/US 분리 스코oring
+- 후보 풀: Featured + 섹터 대표주 + 관심종목 + 보유 + Catalog (`findBySymbols`)
+- 시뮬레이션: score 상위 add, `globalRiskOff` 시 deploy 15% cap, 보유 종목 add 제외
+- API: `GET /api/market/recommendation-context` (게스트 macro 컨텍스트), simulation 응답에 `regimes`·`recommendations`
 
 → [docs/investor-profile.md](investor-profile.md)
 

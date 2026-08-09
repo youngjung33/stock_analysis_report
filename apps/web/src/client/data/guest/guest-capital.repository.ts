@@ -15,6 +15,7 @@ import {
   getGuestCashBalances,
   getGuestInvestorProfile,
   getGuestPortfolioPreference,
+  getGuestWatchlist,
   listGuestCashLedger,
   saveGuestCashEntry,
   saveGuestInvestorProfile,
@@ -89,30 +90,54 @@ export class GuestPortfolioCapitalRepository implements IPortfolioCapitalReposit
   }
 
   async getSimulation(): Promise<PortfolioSimulationResponse> {
-    const [dashboard, featured, preferences] = await Promise.all([
+    const [dashboard, featured, preferences, marketContext] = await Promise.all([
       this.portfolioRepo.getDashboard(),
       this.marketRepo.getFeaturedQuotes(),
       this.getPreferences(),
+      this.marketRepo.getRecommendationContext().catch(() => null),
     ]);
 
-    const { simulation, builtProfile, storedProfile } = buildRankedPortfolioSimulation({
-      cash: { krw: dashboard.summary.cashKrw, usd: dashboard.summary.cashUsd },
-      holdings: dashboard.holdings.map((h) => ({
-        symbol: h.symbol,
-        name: h.name,
-        market: h.market,
-        currency: h.currency,
-        quantity: h.quantity,
-        currentPrice: h.currentPrice,
-        marketValueKrw: h.marketValueKrw,
-        weightPercent: h.weightPercent,
-      })),
-      preferences,
-      featuredKr: toFeaturedQuoteInputs(featured.kr),
-      featuredUs: toFeaturedQuoteInputs(featured.us),
-      storedProfile: getGuestInvestorProfile(),
-      usdKrwRate: dashboard.summary.usdKrwRate,
-    });
+    const userHoldings = dashboard.holdings.map((h) => ({
+      symbol: h.symbol,
+      market: h.market,
+      name: h.name,
+    }));
+    const userWatchlist = getGuestWatchlist().map((w) => ({
+      symbol: w.symbol,
+      market: w.market,
+      name: w.name,
+    }));
+
+    const { simulation, builtProfile, storedProfile, recommendations, regimes } =
+      buildRankedPortfolioSimulation({
+        cash: { krw: dashboard.summary.cashKrw, usd: dashboard.summary.cashUsd },
+        holdings: dashboard.holdings.map((h) => ({
+          symbol: h.symbol,
+          name: h.name,
+          market: h.market,
+          currency: h.currency,
+          quantity: h.quantity,
+          currentPrice: h.currentPrice,
+          marketValueKrw: h.marketValueKrw,
+          weightPercent: h.weightPercent,
+        })),
+        preferences,
+        featuredKr: toFeaturedQuoteInputs(featured.kr),
+        featuredUs: toFeaturedQuoteInputs(featured.us),
+        storedProfile: getGuestInvestorProfile(),
+        usdKrwRate: dashboard.summary.usdKrwRate ?? marketContext?.usdKrwRate ?? null,
+        marketContext: marketContext
+          ? {
+              macro: marketContext.macro,
+              sectors: marketContext.sectors,
+              indices: marketContext.indices,
+              usdKrwRate: marketContext.usdKrwRate,
+              usdKrwChange1d: marketContext.usdKrwChange1d,
+              userHoldings,
+              userWatchlist,
+            }
+          : { userHoldings, userWatchlist },
+      });
 
     return {
       preferences: { ...preferences, investorProfile: storedProfile },
@@ -120,6 +145,8 @@ export class GuestPortfolioCapitalRepository implements IPortfolioCapitalReposit
       ledgerEntryCount: listGuestCashLedger().length,
       asOf: featured.fetchedAt,
       investorProfile: builtProfile,
+      recommendations,
+      regimes,
     };
   }
 }

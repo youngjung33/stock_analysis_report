@@ -570,6 +570,8 @@
     "detailTitle": "시장 심층 분석",
     "detailSubtitle": "변동성 · 경기 · 업종 · 차트 지표",
     "sentimentTitle": "시장 정세 요약",
+    "regimeTitle": "시장 레짐",
+    "scoreBreakdownTitle": "추천 근거",
     "sentimentDesc": "대표 종목 오늘 시세 기준 · 변동성·업종·차트 지표는 상세 페이지",
     "detailAnalysisLink": "상세 분석 →",
     "loadingQuotes": "시세 불러오는 중...",
@@ -1134,7 +1136,30 @@
         "bearPullback": "대표주 조정폭 큼. 과매도·반등 신호 여부 관찰.",
         "bearDefensive": "약세장에서 상대적으로 견조한 {{name}} — 방어적 관심.",
         "neutralMomentum": "혼조장 속 {{name}} 상대 강세 — 방향성 확인.",
-        "neutralWatchlist": "혼조장에서 조정 받는 {{name}} — 지지선·반등 관찰."
+        "neutralWatchlist": "혼조장에서 조정 받는 {{name}} — 지지선·반등 관찰.",
+        "evidence": {
+          "change1d": "당일 등락 {{change}}%",
+          "globalRiskOff": "VIX·리스크오프 — 모멘텀 축소·방어 가중",
+          "globalRiskOn": "VIX 안정 + 미국 강세 — 모멘텀 우호",
+          "fxKrwWeakExport": "원화 약세 — 수출·반도체 태그 가중",
+          "fxKrwStrongDomestic": "원화 강세 — 내수·방어 태그 가중",
+          "usLeadingKr": "미장 선행(미국 {{usAvg}}%) — 한국 추격 불확실, 관심 위주",
+          "vixElevated": "VIX {{vix}} — 성장·모멘텀 축소",
+          "yieldRising": "10Y 금리 상승 — 성장주 부담",
+          "sectorAlignment": "주도 섹터 {{sector}} 정렬",
+          "investorTag": "투자 성향 태그 {{tag}} 일치",
+          "userWatchlist": "관심종목 가산"
+        }
+      },
+      "regime": {
+        "globalRiskOff": "글로벌 리스크오프",
+        "globalRiskOn": "글로벌 리스크온",
+        "fxKrwWeak": "원화 약세",
+        "fxKrwStrong": "원화 강세",
+        "usLeadingKr": "미장 선행",
+        "syncBull": "한·미 동반 강세",
+        "syncBear": "한·미 동반 약세",
+        "diverged": "한·미 온도차"
       },
       "insights": {
         "regions": {

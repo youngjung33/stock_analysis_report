@@ -38,5 +38,7 @@ describe('buildMarketInsights', () => {
     expect(insights.recommendations.some((r) => r.market === Market.US)).toBe(true);
     expect(insights.kr.label).toBe('bull');
     expect(insights.us.label).toBe('bear');
+    expect(insights.regimes).toBeDefined();
+    expect(insights.recommendations[0]?.scoreBreakdown?.length).toBeGreaterThan(0);
   });
 });

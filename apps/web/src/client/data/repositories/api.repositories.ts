@@ -156,6 +156,13 @@ export class ApiMarketRepository implements IMarketRepository {
     return data;
   }
 
+  async getRecommendationContext() {
+    const { data } = await apiClient.get<import('@sar/shared').RecommendationContextResponse>(
+      '/market/recommendation-context',
+    );
+    return data;
+  }
+
   async searchStocks(query: string, market: Market) {
     const { data } = await apiClient.get<import('@sar/shared').StockSearchResult[]>('/market/search', {
       params: { q: query, market },

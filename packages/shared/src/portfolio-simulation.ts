@@ -1,7 +1,8 @@
 import { Market } from './enums';
 import { CashBalances, cashToKrw, formatCashAmount } from './cash-ledger';
 import { AllocationByMarket } from './portfolio-allocation';
-import { StockRecommendation } from './market-insights';
+import { StockRecommendation } from './market-insights.types';
+import type { MarketRegimeId } from './market-recommendation/types';
 
 export interface PortfolioPreferences {
   targetKrPercent: number;
@@ -109,8 +110,9 @@ export function buildPortfolioSimulation(input: {
   preferences: PortfolioPreferences;
   recommendations: StockRecommendation[];
   usdKrwRate: number | null;
+  regimes?: MarketRegimeId[];
 }): PortfolioSimulationResult {
-  const { cash, holdings, preferences, recommendations, usdKrwRate } = input;
+  const { cash, holdings, preferences, recommendations, usdKrwRate, regimes = [] } = input;
   const prefs = {
     targetKrPercent: clampPercent(preferences.targetKrPercent),
     targetUsPercent: clampPercent(preferences.targetUsPercent),
@@ -211,17 +213,36 @@ export function buildPortfolioSimulation(input: {
     }
   }
 
+  const heldKeys = new Set(holdings.map((h) => `${h.market}:${h.symbol.toUpperCase()}`));
+  const riskOff = regimes.includes('globalRiskOff');
+  const fxWeak = regimes.includes('fxKrwWeak');
+
   // 2) 시장별 부족분 → add (추천 종목)
   const underweightMarket =
     allocationGapPercent.kr >= allocationGapPercent.us ? Market.KR : Market.US;
   const gapPercent = Math.max(allocationGapPercent.kr, allocationGapPercent.us);
+
+  let cashDeployRatio = gapPercent > 2 ? 0.6 : 0.3;
+  if (riskOff) cashDeployRatio = Math.min(cashDeployRatio, 0.15);
+
   const deployKrw =
     totalAssetsKrw > 0 && gapPercent > 2
-      ? Math.min(cashTotalKrw * 0.6, (gapPercent / 100) * totalAssetsKrw)
-      : Math.min(cashTotalKrw * 0.3, cashTotalKrw);
+      ? Math.min(cashTotalKrw * cashDeployRatio, (gapPercent / 100) * totalAssetsKrw)
+      : Math.min(cashTotalKrw * (riskOff ? 0.15 : 0.3), cashTotalKrw);
 
-  const marketRecs = recommendations.filter((r) => r.market === underweightMarket);
-  const picks = marketRecs.length > 0 ? marketRecs : recommendations;
+  const sortedRecs = [...recommendations]
+    .filter((r) => !heldKeys.has(`${r.market}:${r.symbol.toUpperCase()}`))
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+
+  const marketRecs = sortedRecs.filter((r) => r.market === underweightMarket);
+  let picks = marketRecs.length > 0 ? marketRecs : sortedRecs;
+
+  if (fxWeak && underweightMarket === Market.US) {
+    picks = sortedRecs.filter((r) => r.market === Market.KR).concat(
+      sortedRecs.filter((r) => r.market === Market.US),
+    );
+  }
+
   const perPickKrw = picks.length > 0 ? deployKrw / Math.min(picks.length, 2) : 0;
 
   for (const rec of picks.slice(0, 2)) {
@@ -248,7 +269,12 @@ export function buildPortfolioSimulation(input: {
       currency: rec.currency,
       reason: `${rec.tagLabel} — ${rec.reason}`,
       reasonKey: rec.reasonKey ?? 'shared.simulation.reason.addRecommendation',
-      reasonParams: rec.reasonParams,
+      reasonParams: {
+        ...rec.reasonParams,
+        ...(rec.evidenceItems?.[0]
+          ? { evidenceKey: rec.evidenceItems[0].key }
+          : {}),
+      },
       tag: rec.tag,
       currentWeightPercent: null,
       targetWeightPercent: null,

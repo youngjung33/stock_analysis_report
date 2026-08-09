@@ -37,4 +37,26 @@ export class PrismaStockCatalogRepository implements IStockCatalogRepository {
       exchange: row.board,
     }));
   }
+
+  async findBySymbols(symbols: string[], market: Market): Promise<StockSearchResult[]> {
+    const normalized = [...new Set(symbols.map((s) => s.trim().toUpperCase()).filter(Boolean))];
+    if (normalized.length === 0) return [];
+
+    const rows = await this.prisma.stockCatalog.findMany({
+      where: {
+        market,
+        isActive: true,
+        symbol: { in: normalized },
+      },
+      orderBy: [{ symbol: 'asc' }],
+    });
+
+    return rows.map((row) => ({
+      symbol: row.symbol,
+      name: row.name,
+      market: row.market as Market,
+      yahooSymbol: row.yahooSymbol,
+      exchange: row.board,
+    }));
+  }
 }

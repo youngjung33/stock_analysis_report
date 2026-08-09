@@ -385,6 +385,21 @@ function translateEvidenceItem(item: EvidenceItem, fallback: string, t: TFunctio
   return t(item.key, { ...params, defaultValue: fallback });
 }
 
+export function translateRegime(regimeId: string, t: TFunction): string {
+  return t(`shared.market.regime.${regimeId}`, { defaultValue: regimeId });
+}
+
+export function translateRecommendationEvidence(
+  item: EvidenceItem,
+  t: TFunction,
+): string {
+  const params = { ...(item.params ?? {}) };
+  if (params.tag !== undefined) {
+    params.tag = translateTag(String(params.tag) as RecommendationTag, t);
+  }
+  return t(item.key, { ...params, defaultValue: item.key });
+}
+
 export function translateAnalysisInsight(
   insight: AnalysisInsight,
   t: TFunction,

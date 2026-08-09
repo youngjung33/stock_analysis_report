@@ -18,6 +18,8 @@ export {
   translateSimulationHeadline,
   translateSimulationReason,
   translateTag,
+  translateRegime,
+  translateRecommendationEvidence,
   translateTaxDisclaimer,
   translateTaxLineItem,
   translateTaxRule,

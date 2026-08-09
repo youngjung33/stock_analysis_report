@@ -15,6 +15,8 @@ import {
   translateRegionSentiment,
   translateSentiment,
   translateTag,
+  translateRegime,
+  translateRecommendationEvidence,
 } from '@/i18n/translate-shared';
 import { useMarketAnalysis } from '../hooks/useMarketAnalysis';
 import { useErrorToast } from '../hooks/useErrorToast';
@@ -81,6 +83,60 @@ function SentimentSummary({
         </div>
         );
       })}
+    </div>
+  );
+}
+
+function RegimeBadges({ report }: { report: MarketAnalysisReport }) {
+  const { t } = useTranslation();
+  if (!report.regimes?.length) return null;
+  return (
+    <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+      <span className="text-xs font-medium text-slate-400">{t('market.regimeTitle')}</span>
+      {report.regimes.map((regime) => (
+        <span
+          key={regime.id}
+          className="rounded-full border border-indigo-500/40 bg-indigo-950/40 px-2 py-0.5 text-[10px] font-medium text-indigo-200"
+        >
+          {translateRegime(regime.id, t)}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function RecommendationBreakdown({ report }: { report: MarketAnalysisReport }) {
+  const { t } = useTranslation();
+  if (!report.recommendations?.length) return null;
+  return (
+    <div className="space-y-3 rounded-xl border border-slate-800 bg-slate-950/30 p-4">
+      <h3 className="text-sm font-semibold text-white">{t('market.scoreBreakdownTitle')}</h3>
+      <ul className="space-y-3">
+        {report.recommendations.slice(0, 6).map((rec) => (
+          <li key={`${rec.market}-${rec.symbol}`} className="text-xs text-slate-300">
+            <span className="font-medium text-white">
+              {rec.name} ({rec.symbol})
+            </span>
+            {rec.score != null && (
+              <span className="ml-2 text-slate-500">score {rec.score.toFixed(2)}</span>
+            )}
+            {rec.scoreBreakdown && rec.scoreBreakdown.length > 0 && (
+              <ul className="mt-1 list-inside list-disc text-slate-400">
+                {rec.scoreBreakdown.slice(0, 3).map((item) => (
+                  <li key={`${rec.symbol}-${item.factor}`}>
+                    {translateRecommendationEvidence(
+                      { key: item.evidenceKey, params: item.evidenceParams },
+                      t,
+                    )}{' '}
+                    ({item.delta >= 0 ? '+' : ''}
+                    {item.delta.toFixed(2)})
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -206,6 +262,8 @@ export function MarketAnalysisDetailSection({ compact }: Props) {
       {data && (
         <>
           <SentimentSummary report={data} compact={compact} />
+          <RegimeBadges report={data} />
+          <RecommendationBreakdown report={data} />
           <MacroPanel macro={data.macro} compact={compact} />
           <IndexTechnicalPanel indices={data.indices} compact={compact} />
           <SectorStrengthPanel sectors={data.sectors} compact={compact} />

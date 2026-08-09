@@ -1,6 +1,8 @@
 import { GetFeaturedQuotesUseCase } from './domain/usecases/market/get-featured-quotes.use-case';
 import { GetFxRateUseCase } from './domain/usecases/market/get-fx-rate.use-case';
 import { GetMarketAnalysisUseCase } from './domain/usecases/market/get-market-analysis.use-case';
+import { BuildMarketContextUseCase } from './domain/usecases/market/build-market-context.use-case';
+import { FetchRecommendationQuotesUseCase } from './domain/usecases/market/fetch-recommendation-quotes.use-case';
 import { GetStockQuoteUseCase } from './domain/usecases/market/get-stock-quote.use-case';
 import { FetchQuotesUseCase } from './domain/usecases/market/fetch-quotes.use-case';
 import { GetMarketStatusUseCase } from './domain/usecases/market/get-market-status.use-case';
@@ -97,6 +99,8 @@ export interface ServerServices {
   getStockQuoteUseCase: GetStockQuoteUseCase;
   getMarketStatusUseCase: GetMarketStatusUseCase;
   getMarketAnalysisUseCase: GetMarketAnalysisUseCase;
+  buildMarketContextUseCase: BuildMarketContextUseCase;
+  fetchRecommendationQuotesUseCase: FetchRecommendationQuotesUseCase;
   searchStocksUseCase: SearchStocksUseCase;
   getFxRateUseCase: GetFxRateUseCase;
   listCorporateActionsUseCase: ListCorporateActionsUseCase;
@@ -149,6 +153,8 @@ export function getServerServices(): ServerServices {
 
   const fetchQuotesUseCase = new FetchQuotesUseCase(marketData);
   const getFeaturedQuotesUseCase = new GetFeaturedQuotesUseCase(fetchQuotesUseCase);
+  const buildMarketContextUseCase = new BuildMarketContextUseCase(marketData);
+  const fetchRecommendationQuotesUseCase = new FetchRecommendationQuotesUseCase(marketData);
   const getDashboardUseCase = new GetDashboardUseCase(
     stockRepo,
     txRepo,
@@ -197,7 +203,13 @@ export function getServerServices(): ServerServices {
     ),
     refreshQuotesUseCase: new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, marketData),
     getMarketStatusUseCase: new GetMarketStatusUseCase(marketData),
-    getMarketAnalysisUseCase: new GetMarketAnalysisUseCase(getFeaturedQuotesUseCase, marketData),
+    getMarketAnalysisUseCase: new GetMarketAnalysisUseCase(
+      getFeaturedQuotesUseCase,
+      buildMarketContextUseCase,
+      marketData,
+    ),
+    buildMarketContextUseCase,
+    fetchRecommendationQuotesUseCase,
     searchStocksUseCase: new SearchStocksUseCase(catalogRepo, marketData),
     getFxRateUseCase: new GetFxRateUseCase(marketData),
     listCorporateActionsUseCase: new ListCorporateActionsUseCase(corpActionRepo),
@@ -233,6 +245,10 @@ export function getServerServices(): ServerServices {
       getFeaturedQuotesUseCase,
       cashRepo,
       prefRepo,
+      watchlistRepo,
+      catalogRepo,
+      buildMarketContextUseCase,
+      fetchRecommendationQuotesUseCase,
     ),
   };
 

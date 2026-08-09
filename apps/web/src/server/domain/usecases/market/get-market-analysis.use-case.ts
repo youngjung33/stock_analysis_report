@@ -1,119 +1,33 @@
 import {
-  INDEX_BENCHMARKS,
-  KR_SECTOR_BENCHMARK,
-  MACRO_INDICATORS,
-  SECTOR_ETFS,
-  US_SECTOR_BENCHMARK,
-  IndexTechnicalInput,
-  MacroSeriesInput,
   Market,
   MarketAnalysisReport,
   NewsAnalysisInput,
-  SectorSeriesInput,
   buildMarketAnalysisReport,
 } from '@sar/shared';
-import { ChartSeriesData, IMarketDataProvider } from '../../ports/market-data.port';
 import { GetFeaturedQuotesUseCase } from './get-featured-quotes.use-case';
+import { BuildMarketContextUseCase } from './build-market-context.use-case';
+import { IMarketDataProvider } from '../../ports/market-data.port';
 
 /** 시장 심층 분석 리포트 생성 use case */
 export class GetMarketAnalysisUseCase {
   constructor(
     private readonly getFeaturedQuotesUseCase: GetFeaturedQuotesUseCase,
+    private readonly buildMarketContextUseCase: BuildMarketContextUseCase,
     private readonly marketData: IMarketDataProvider,
   ) {}
 
   /** 지수·매크로·섹터·뉴스 집계 후 MarketAnalysisReport 반환 */
-  async execute(): Promise<MarketAnalysisReport> {
-    const featured = await this.getFeaturedQuotesUseCase.execute();
-
-    const sectorBenchmarks = [US_SECTOR_BENCHMARK.yahooSymbol, KR_SECTOR_BENCHMARK.yahooSymbol];
-    const allSymbols = [
-      ...new Set([
-        ...INDEX_BENCHMARKS.map((b) => b.yahooSymbol),
-        ...MACRO_INDICATORS.map((m) => m.yahooSymbol),
-        ...SECTOR_ETFS.map((s) => s.yahooSymbol),
-        ...sectorBenchmarks,
-      ]),
-    ];
-
-    const [seriesResults, krNews, usNewsGoogle, finnhubNews] = await Promise.all([
-      Promise.allSettled(allSymbols.map((sym) => this.marketData.fetchChartSeries(sym))),
+  async execute(options?: {
+    userHoldings?: Array<{ symbol: string; market: Market }>;
+    userWatchlist?: Array<{ symbol: string; market: Market }>;
+  }): Promise<MarketAnalysisReport> {
+    const [featured, marketContext, krNews, usNewsGoogle, finnhubNews] = await Promise.all([
+      this.getFeaturedQuotesUseCase.execute(),
+      this.buildMarketContextUseCase.execute(),
       this.marketData.fetchGoogleNews('코스피+증시+주식', Market.KR, 'ko', 'KR', 6).catch(() => []),
       this.marketData.fetchGoogleNews('US+stock+market+S&P', Market.US, 'en-US', 'US', 6).catch(() => []),
       this.marketData.fetchFinnhubMarketNews('general', 6).catch(() => []),
     ]);
-
-    const seriesMap = new Map<string, ChartSeriesData>();
-    allSymbols.forEach((sym, i) => {
-      const result = seriesResults[i];
-      if (result.status === 'fulfilled') {
-        seriesMap.set(sym, result.value);
-      }
-    });
-
-    const indexInputs: IndexTechnicalInput[] = INDEX_BENCHMARKS.flatMap((bench) => {
-      const series = seriesMap.get(bench.yahooSymbol);
-      if (!series) return [];
-      return [
-        {
-          yahooSymbol: bench.yahooSymbol,
-          name: bench.name,
-          market: bench.market,
-          closes: series.closes,
-          volumes: series.volumes,
-          highs: series.highs,
-          lows: series.lows,
-          changePercent1d: series.changePercent1d,
-          chartUrl: bench.chartUrl,
-          tradingViewUrl: bench.tradingViewUrl ?? bench.chartUrl,
-        },
-      ];
-    });
-
-    const macroInputs: MacroSeriesInput[] = MACRO_INDICATORS.flatMap((m) => {
-      const series = seriesMap.get(m.yahooSymbol);
-      if (!series) return [];
-      return [
-        {
-          yahooSymbol: m.yahooSymbol,
-          name: m.name,
-          kind: m.kind,
-          unit: m.unit,
-          closes: series.closes,
-          changePercent1d: series.changePercent1d,
-          chartUrl: m.chartUrl,
-          tradingViewUrl: m.tradingViewUrl,
-        },
-      ];
-    });
-
-    const spyCloses = seriesMap.get(US_SECTOR_BENCHMARK.yahooSymbol)?.closes ?? [];
-    const krBenchCloses = seriesMap.get(KR_SECTOR_BENCHMARK.yahooSymbol)?.closes ?? [];
-
-    const sectorInputs: SectorSeriesInput[] = SECTOR_ETFS.flatMap((etf) => {
-      const series = seriesMap.get(etf.yahooSymbol);
-      if (!series) return [];
-      const benchmarkCloses =
-        etf.market === Market.US
-          ? spyCloses.length > 0
-            ? spyCloses
-            : series.closes
-          : krBenchCloses.length > 0
-            ? krBenchCloses
-            : series.closes;
-      return [
-        {
-          yahooSymbol: etf.yahooSymbol,
-          name: etf.name,
-          sectorLabel: etf.sectorLabel,
-          market: etf.market,
-          closes: series.closes,
-          changePercent1d: series.changePercent1d,
-          chartUrl: etf.chartUrl,
-          benchmarkCloses,
-        },
-      ];
-    });
 
     const news: NewsAnalysisInput[] = [
       ...krNews.map((n) => ({ ...n, market: Market.KR as Market | 'global' })),
@@ -124,11 +38,13 @@ export class GetMarketAnalysisUseCase {
     return buildMarketAnalysisReport({
       krQuotes: featured.kr,
       usQuotes: featured.us,
-      indexInputs,
-      macroInputs,
-      sectorInputs,
+      indexInputs: marketContext.indexInputs,
+      macroInputs: marketContext.macroInputs,
+      sectorInputs: marketContext.sectorInputs,
       news,
       fetchedAt: new Date().toISOString(),
+      userHoldings: options?.userHoldings,
+      userWatchlist: options?.userWatchlist,
     });
   }
 }

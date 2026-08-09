@@ -885,8 +885,19 @@ function macroInsight(kr: RegionSentiment, us: RegionSentiment): AnalysisInsight
 }
 
 function recommendationInsights(recommendations: StockRecommendation[]): AnalysisInsight[] {
-  return recommendations.map((rec) =>
-    insight({
+  return recommendations.map((rec) => {
+    const evidenceFromRec =
+      rec.evidenceItems?.map((e) => ev(e.key, e.params)) ??
+      [
+        ev('shared.market.insights.evidence.recPrice', {
+          price: rec.currentPrice.toLocaleString(),
+          currency: rec.currency,
+        }),
+        ev('shared.market.insights.evidence.recChange', { change: formatPct(rec.changePercent) }),
+        ev('shared.market.insights.evidence.recTag', { tagKey: rec.tag }),
+      ];
+
+    return insight({
       id: `rec-${rec.market}-${rec.symbol}`,
       category: 'recommendation',
       title: `[${rec.tagLabel}] ${rec.name}`,
@@ -908,15 +919,9 @@ function recommendationInsights(recommendations: StockRecommendation[]): Analysi
         `현재가 ${rec.currentPrice.toLocaleString()} ${rec.currency}`,
         `당일 등락 ${formatPct(rec.changePercent)}`,
         `태그: ${rec.tagLabel}`,
+        ...(rec.score != null ? [`점수 ${rec.score.toFixed(2)}`] : []),
       ],
-      evidenceItems: [
-        ev('shared.market.insights.evidence.recPrice', {
-          price: rec.currentPrice.toLocaleString(),
-          currency: rec.currency,
-        }),
-        ev('shared.market.insights.evidence.recChange', { change: formatPct(rec.changePercent) }),
-        ev('shared.market.insights.evidence.recTag', { tagKey: rec.tag }),
-      ],
+      evidenceItems: evidenceFromRec,
       links: [
         {
           label: rec.market === Market.KR ? '네이버 금융' : 'Yahoo Finance',
@@ -938,8 +943,8 @@ function recommendationInsights(recommendations: StockRecommendation[]): Analysi
       tone:
         rec.changePercent > 0.5 ? 'bullish' : rec.changePercent < -0.5 ? 'bearish' : 'neutral',
       market: rec.market,
-    }),
-  );
+    });
+  });
 }
 
 function formatPct(v: number | null | undefined): string {
@@ -959,8 +964,9 @@ export function buildMarketAnalysisReport(input: {
   sectorInputs: SectorSeriesInput[];
   news: NewsAnalysisInput[];
   fetchedAt?: string;
+  userHoldings?: Array<{ symbol: string; market: Market }>;
+  userWatchlist?: Array<{ symbol: string; market: Market }>;
 }): MarketAnalysisReport {
-  const base = buildMarketInsights(input.krQuotes, input.usQuotes);
   const indices = input.indexInputs
     .map(buildIndexSnapshot)
     .filter((s): s is IndexTechnicalSnapshot => s !== null);
@@ -972,6 +978,22 @@ export function buildMarketAnalysisReport(input: {
       .map(buildSectorSnapshot)
       .filter((s): s is SectorEtfSnapshot => s !== null),
   );
+
+  const fxMacro = macro.find((m) => m.kind === 'fx');
+  const base = buildMarketInsights(input.krQuotes, input.usQuotes, 6, {
+    macro,
+    sectors,
+    indices: indices.map((i) => ({
+      yahooSymbol: i.yahooSymbol,
+      name: i.name,
+      market: i.market,
+      changePercent1d: i.changePercent1d,
+    })),
+    usdKrwRate: fxMacro?.value ?? null,
+    usdKrwChange1d: fxMacro?.changePercent1d ?? null,
+    userHoldings: input.userHoldings,
+    userWatchlist: input.userWatchlist,
+  });
 
   const insights: AnalysisInsight[] = [
     ...macroPanelInsights(macro),

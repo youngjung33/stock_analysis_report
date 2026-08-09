@@ -3,11 +3,12 @@ import { Market } from './enums';
 import {
   buildInvestorProfile,
   createDefaultStoredProfile,
-  rankRecommendationsByTags,
   type BuiltInvestorProfile,
   type StoredInvestorProfile,
 } from './investor-survey/profile';
-import { buildMarketInsights, type MarketInsightsResult } from './market-insights';
+import { buildStockRecommendations } from './market-recommendation/engine';
+import type { MarketContextInput } from './market-recommendation/types';
+import type { MarketInsightsResult } from './market-insights.types';
 import {
   buildPortfolioSimulation,
   type PortfolioPreferences,
@@ -29,6 +30,8 @@ export interface RankedPortfolioSimulationResult {
   builtProfile: BuiltInvestorProfile;
   insights: MarketInsightsResult;
   storedProfile: StoredInvestorProfile;
+  recommendations: MarketInsightsResult['recommendations'];
+  regimes: MarketInsightsResult['regimes'];
 }
 
 export function toFeaturedQuoteInputs(
@@ -53,7 +56,7 @@ export function toFeaturedQuoteInputs(
     }));
 }
 
-/** Featured quotes + investor profile → ranked recommendations → portfolio simulation */
+/** Market context + holdings → ranked recommendations → portfolio simulation */
 export function buildRankedPortfolioSimulation(input: {
   cash: CashBalances;
   holdings: SimulationHoldingInput[];
@@ -63,25 +66,46 @@ export function buildRankedPortfolioSimulation(input: {
   storedProfile?: StoredInvestorProfile | null;
   usdKrwRate: number | null;
   insightCount?: number;
+  marketContext?: Omit<MarketContextInput, 'krQuotes' | 'usQuotes' | 'investorProfile' | 'preferredTags'>;
+  candidateQuotes?: MarketContextInput['candidateQuotes'];
 }): RankedPortfolioSimulationResult {
   const storedProfile = input.storedProfile ?? createDefaultStoredProfile();
   const builtProfile = buildInvestorProfile(storedProfile);
-  const insights = buildMarketInsights(
-    input.featuredKr,
-    input.featuredUs,
-    input.insightCount ?? 6,
-  );
-  const rankedRecommendations = rankRecommendationsByTags(
-    insights.recommendations.filter((r) => r.currentPrice > 0),
-    builtProfile.preferredTags,
-  );
+
+  const contextInput: MarketContextInput = {
+    krQuotes: input.featuredKr,
+    usQuotes: input.featuredUs,
+    candidateQuotes: input.candidateQuotes,
+    usdKrwRate: input.usdKrwRate,
+    investorProfile: builtProfile,
+    preferredTags: builtProfile.preferredTags,
+    userHoldings: input.holdings.map((h) => ({ symbol: h.symbol, market: h.market })),
+    ...input.marketContext,
+  };
+
+  const recResult = buildStockRecommendations(contextInput, input.insightCount ?? 6);
+  const insights: MarketInsightsResult = {
+    kr: recResult.kr,
+    us: recResult.us,
+    recommendations: recResult.recommendations as MarketInsightsResult['recommendations'],
+    regimes: recResult.regimes,
+  };
+
   const simulation = buildPortfolioSimulation({
     cash: input.cash,
     holdings: input.holdings,
     preferences: input.preferences,
-    recommendations: rankedRecommendations,
+    recommendations: recResult.recommendations,
     usdKrwRate: input.usdKrwRate,
+    regimes: recResult.regimes.map((r) => r.id),
   });
 
-  return { simulation, builtProfile, insights, storedProfile };
+  return {
+    simulation,
+    builtProfile,
+    insights,
+    storedProfile,
+    recommendations: recResult.recommendations,
+    regimes: recResult.regimes,
+  };
 }

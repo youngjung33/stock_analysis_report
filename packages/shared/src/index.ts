@@ -276,6 +276,25 @@ export type {
   StockRecommendation,
 } from './market-insights';
 export {
+  buildStockRecommendations,
+  buildMarketContext,
+  detectMarketRegimes,
+  buildCandidatePool,
+  scoreCandidates,
+  resolveUsdKrwChange1d,
+  resolveUsdKrwRate,
+} from './market-recommendation';
+export type {
+  MarketContext,
+  MarketContextInput,
+  MarketRegime,
+  MarketRegimeId,
+  EnrichedStockRecommendation,
+  StockRecommendationsResult,
+  RecommendationContextResponse,
+  IndexContextSnapshot,
+} from './market-recommendation';
+export {
   QUOTE_CHART_RANGES,
   QUOTE_RANGE_LABELS,
   QUOTE_CHART_RANGE_HINT,

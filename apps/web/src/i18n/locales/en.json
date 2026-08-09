@@ -570,6 +570,8 @@
     "detailTitle": "In-depth market analysis",
     "detailSubtitle": "Volatility · Economy · Sectors · Chart indicators",
     "sentimentTitle": "Market sentiment summary",
+    "regimeTitle": "Market regime",
+    "scoreBreakdownTitle": "Recommendation rationale",
     "sentimentDesc": "Featured stocks today · See volatility, sectors, and chart indicators on the detail page",
     "detailAnalysisLink": "Detailed analysis →",
     "loadingQuotes": "Loading quotes...",
@@ -1134,7 +1136,30 @@
         "bearPullback": "Large pullback among {{market}} featured stocks — watch oversold signals.",
         "bearDefensive": "Relatively resilient {{name}} in bear market — defensive interest.",
         "neutralMomentum": "Relative strength for {{name}} in mixed market — confirm direction.",
-        "neutralWatchlist": "{{name}} pulling back in mixed market — watch support."
+        "neutralWatchlist": "{{name}} pulling back in mixed market — watch support.",
+        "evidence": {
+          "change1d": "1D change {{change}}%",
+          "globalRiskOff": "VIX risk-off — momentum cut, defensive tilt",
+          "globalRiskOn": "Low VIX + US strength — momentum friendly",
+          "fxKrwWeakExport": "KRW weakness — export/semiconductor boost",
+          "fxKrwStrongDomestic": "KRW strength — domestic/defensive boost",
+          "usLeadingKr": "US leading (US {{usAvg}}%) — KR catch-up uncertain, watchlist tilt",
+          "vixElevated": "VIX {{vix}} — growth/momentum trimmed",
+          "yieldRising": "10Y yield rising — pressure on growth",
+          "sectorAlignment": "Leading sector {{sector}} alignment",
+          "investorTag": "Investor profile tag {{tag}} match",
+          "userWatchlist": "Watchlist bonus"
+        }
+      },
+      "regime": {
+        "globalRiskOff": "Global risk-off",
+        "globalRiskOn": "Global risk-on",
+        "fxKrwWeak": "KRW weakness",
+        "fxKrwStrong": "KRW strength",
+        "usLeadingKr": "US leading Korea",
+        "syncBull": "KR–US sync bull",
+        "syncBear": "KR–US sync bear",
+        "diverged": "KR–US divergence"
       },
       "insights": {
         "regions": {

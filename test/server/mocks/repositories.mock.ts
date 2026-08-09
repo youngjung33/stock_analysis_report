@@ -119,6 +119,7 @@ export function createMockCatalogRepo(
   return {
     countByMarket: vi.fn().mockResolvedValue(0),
     search: vi.fn().mockResolvedValue([]),
+    findBySymbols: vi.fn().mockResolvedValue([]),
     ...overrides,
   };
 }

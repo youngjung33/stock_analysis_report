@@ -121,6 +121,7 @@ export interface IPortfolioPreferenceRepository {
 export interface IStockCatalogRepository {
   countByMarket(market: Market): Promise<number>;
   search(query: string, market: Market, limit?: number): Promise<import('@sar/shared').StockSearchResult[]>;
+  findBySymbols(symbols: string[], market: Market): Promise<import('@sar/shared').StockSearchResult[]>;
 }
 
 export interface IPasswordHasher {

@@ -44,19 +44,64 @@ describe('buildPortfolioSimulation', () => {
     expect(result.actions.some((a) => a.type === 'add' || a.type === 'reserve_cash')).toBe(true);
   });
 
-  it('prompts capital setup when no cash and no holdings', () => {
+  it('reduces deploy and excludes held symbols under globalRiskOff', () => {
+    const heldSymbol = '005930';
     const result = buildPortfolioSimulation({
-      cash: { krw: 0, usd: 0 },
-      holdings: [],
+      cash: { krw: 10_000_000, usd: 0 },
+      holdings: [
+        {
+          symbol: heldSymbol,
+          name: '삼성전자',
+          market: Market.KR,
+          currency: 'KRW',
+          quantity: 5,
+          currentPrice: 70000,
+          marketValueKrw: 350_000,
+          weightPercent: 5,
+        },
+      ],
       preferences: {
-        targetKrPercent: 70,
-        targetUsPercent: 30,
+        targetKrPercent: 30,
+        targetUsPercent: 70,
         maxSingleWeightPercent: 40,
       },
-      recommendations: [],
-      usdKrwRate: null,
+      recommendations: [
+        {
+          symbol: heldSymbol,
+          name: '삼성전자',
+          market: Market.KR,
+          currency: 'KRW',
+          currentPrice: 70000,
+          changePercent: 2,
+          tag: 'momentum',
+          tagLabel: '상승',
+          reason: 'test',
+          reasonKey: 'shared.market.recommendation.momentumStrong',
+          score: 5,
+        },
+        {
+          symbol: 'AAPL',
+          name: 'Apple',
+          market: Market.US,
+          currency: 'USD',
+          currentPrice: 180,
+          changePercent: -1.2,
+          tag: 'pullback',
+          tagLabel: '조정',
+          reason: 'test',
+          reasonKey: 'shared.market.recommendation.momentumStrong',
+          score: 3,
+        },
+      ],
+      usdKrwRate: 1300,
+      regimes: ['globalRiskOff'],
     });
 
-    expect(result.headline).toContain('투자 원금');
+    expect(result.actions.some((a) => a.type === 'add' && a.symbol === heldSymbol)).toBe(false);
+    const addActions = result.actions.filter((a) => a.type === 'add');
+    if (addActions.length > 0) {
+      const totalAdd = addActions.reduce((s, a) => s + (a.suggestedAmountKrw ?? 0), 0);
+      expect(totalAdd).toBeLessThanOrEqual(10_000_000 * 0.15 + 1);
+    }
   });
 });

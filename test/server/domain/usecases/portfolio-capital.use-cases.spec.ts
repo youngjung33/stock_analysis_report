@@ -57,12 +57,31 @@ describe('GetPortfolioSimulationUseCase', () => {
     };
     const cashRepo = { findByUser: vi.fn().mockResolvedValue([{ id: 'c1' }]) };
     const prefRepo = { findByUser: vi.fn().mockResolvedValue(null) };
+    const watchlistRepo = { findByUser: vi.fn().mockResolvedValue([]) };
+    const catalogRepo = { findBySymbols: vi.fn().mockResolvedValue([]) };
+    const buildMarketContextUseCase = {
+      execute: vi.fn().mockResolvedValue({
+        macro: [],
+        sectors: [],
+        indices: [],
+        usdKrwRate: 1300,
+        usdKrwChange1d: null,
+        indexInputs: [],
+        macroInputs: [],
+        sectorInputs: [],
+      }),
+    };
+    const fetchRecommendationQuotesUseCase = { execute: vi.fn().mockResolvedValue([]) };
 
     const useCase = new GetPortfolioSimulationUseCase(
       dashboardUseCase as never,
       featuredQuotesUseCase as never,
       cashRepo as never,
       prefRepo as never,
+      watchlistRepo as never,
+      catalogRepo as never,
+      buildMarketContextUseCase as never,
+      fetchRecommendationQuotesUseCase as never,
     );
 
     const result = await useCase.execute('user-1');
