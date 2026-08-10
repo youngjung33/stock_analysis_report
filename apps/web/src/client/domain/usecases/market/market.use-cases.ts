@@ -41,6 +41,15 @@ export class GetMarketAnalysisUseCase {
   }
 }
 
+/** 일별 추천 기록(ledger) 조회 use case */
+export class GetRecommendationHistoryUseCase {
+  constructor(private readonly marketRepo: IMarketRepository) {}
+
+  execute(limit?: number) {
+    return this.marketRepo.getRecommendationHistory(limit);
+  }
+}
+
 /** 종목 검색 use case */
 export class SearchStocksUseCase {
   constructor(private readonly marketRepo: IMarketRepository) {}

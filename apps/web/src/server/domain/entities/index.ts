@@ -282,3 +282,11 @@ export interface PortfolioAnalysisResult {
   asOf: string;
   allocationByMarket: import('@sar/shared').AllocationByMarket;
 }
+
+export type {
+  RecommendationBatchEntity,
+  RecommendationItemEntity,
+  RecommendationOutcomeEntity,
+  CreateRecommendationBatchInput,
+  UpsertRecommendationOutcomeInput,
+} from './recommendation-ledger.entities';

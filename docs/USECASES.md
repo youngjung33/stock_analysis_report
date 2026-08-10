@@ -144,6 +144,10 @@ npm run test:e2e     # Playwright (dev server + E2E_USERNAME/PASSWORD for member
 | `SearchStocksUseCase` | GET `/api/market/search` | `search-stocks.use-case.spec.ts` |
 | `GetFxRateUseCase` | GET `/api/market/fx` | client `market.use-cases.spec.ts` |
 | `GetMarketAnalysisUseCase` | GET `/api/market/analysis` | `get-market-analysis.use-case.spec.ts` |
+| `RunGlobalRecommendationBatchUseCase` | POST `/api/cron/recommendation-batch` | `recommendation-ledger.use-cases` + cron route |
+| `EvaluateRecommendationOutcomesUseCase` | POST `/api/cron/recommendation-outcomes` | outcome evaluation + cron route |
+| `ListRecommendationHistoryUseCase` | GET `/api/market/recommendation-history` | `recommendation-ledger.spec.ts` |
+| `GetRecommendationBatchUseCase` | GET `/api/market/recommendation-history/[batchId]` | ledger repository |
 | `BuildMarketContextUseCase` | GET `/api/market/recommendation-context` | shared with analysis/simulation |
 | Watchlist use cases | `/api/watchlist` | domain + `portfolio-api-routes.spec.ts` |
 | Corporate action use cases | `/api/corporate-actions` | `corporate-actions.use-cases.spec.ts` |
@@ -163,7 +167,7 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | **Investor profile** | `presentation/hooks/useInvestorProfile.ts`, `client/domain/services/` | shared + hydrate + pending specs |
 | Watchlist | `client/domain/usecases/watchlist/` | `watchlist.use-cases.spec.ts` |
 | Corporate actions | `client/domain/usecases/corporate-actions/` | `corporate-actions.use-cases.spec.ts` |
-| Market | `client/domain/usecases/market/` | `market.use-cases.spec.ts` |
+| Market | `client/domain/usecases/market/` (+ `GetRecommendationHistoryUseCase`) | `market.use-cases.spec.ts`, `score-pipeline.spec.ts` |
 | Guest adapters | `client/data/guest/` | `guest-repositories.spec.ts` |
 
 ---
@@ -178,7 +182,9 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | `portfolio-capital-simulation` | simulation tag rank pipeline |
 | `investor-survey/` | 투자 유형 catalog, 미니 테스트, **profile** |
 | `guide/` | Tip FAQ catalog |
-| `corporate-actions`, `stock-search` | 기업행위·검색 |
+| `market-recommendation/` | scoring, **G0** score-caps/pipeline, engine |
+| `recommendation-ledger.ts` | engine version, horizons, batch view types |
+| `build-global-baseline-recommendations.ts` | global profile baseline picks |
 
 투자 프로필 상세: [investor-profile.md](investor-profile.md)
 

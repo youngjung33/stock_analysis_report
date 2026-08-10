@@ -101,3 +101,15 @@ export function requireAuth(req: NextRequest): AuthUser {
   const payload = tokenService.verifyAccessToken(token);
   return { userId: payload.sub, username: payload.username };
 }
+
+/** Cron job auth — `Authorization: Bearer $CRON_SECRET` (not user JWT) */
+export function requireCronSecret(req: NextRequest): void {
+  const secret = process.env.CRON_SECRET;
+  if (!secret) {
+    throw new AuthenticationError(AppErrorCode.AUTH_UNAUTHORIZED);
+  }
+  const header = req.headers.get('authorization');
+  if (header !== `Bearer ${secret}`) {
+    throw new AuthenticationError(AppErrorCode.AUTH_UNAUTHORIZED);
+  }
+}

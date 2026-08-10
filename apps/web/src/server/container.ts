@@ -76,6 +76,13 @@ import {
   GetPortfolioSimulationUseCase,
   UpdatePortfolioPreferencesUseCase,
 } from './domain/usecases/portfolio/portfolio-capital.use-cases';
+import {
+  EvaluateRecommendationOutcomesUseCase,
+  GetRecommendationBatchUseCase,
+  ListRecommendationHistoryUseCase,
+  RunGlobalRecommendationBatchUseCase,
+} from './domain/usecases/market/recommendation-ledger.use-cases';
+import { PrismaRecommendationLedgerRepository } from './data/persistence/recommendation-ledger.repository';
 
 export interface ServerServices {
   tokenService: ITokenService;
@@ -124,6 +131,10 @@ export interface ServerServices {
   getPortfolioPreferencesUseCase: GetPortfolioPreferencesUseCase;
   updatePortfolioPreferencesUseCase: UpdatePortfolioPreferencesUseCase;
   getPortfolioSimulationUseCase: GetPortfolioSimulationUseCase;
+  runGlobalRecommendationBatchUseCase: RunGlobalRecommendationBatchUseCase;
+  evaluateRecommendationOutcomesUseCase: EvaluateRecommendationOutcomesUseCase;
+  listRecommendationHistoryUseCase: ListRecommendationHistoryUseCase;
+  getRecommendationBatchUseCase: GetRecommendationBatchUseCase;
 }
 
 let cached: ServerServices | null = null;
@@ -155,6 +166,7 @@ export function getServerServices(): ServerServices {
   const getFeaturedQuotesUseCase = new GetFeaturedQuotesUseCase(fetchQuotesUseCase);
   const buildMarketContextUseCase = new BuildMarketContextUseCase(marketData);
   const fetchRecommendationQuotesUseCase = new FetchRecommendationQuotesUseCase(marketData);
+  const recommendationLedgerRepo = new PrismaRecommendationLedgerRepository();
   const getDashboardUseCase = new GetDashboardUseCase(
     stockRepo,
     txRepo,
@@ -250,6 +262,20 @@ export function getServerServices(): ServerServices {
       buildMarketContextUseCase,
       fetchRecommendationQuotesUseCase,
     ),
+    runGlobalRecommendationBatchUseCase: new RunGlobalRecommendationBatchUseCase(
+      recommendationLedgerRepo,
+      getFeaturedQuotesUseCase,
+      buildMarketContextUseCase,
+      fetchRecommendationQuotesUseCase,
+      catalogRepo,
+      marketData,
+    ),
+    evaluateRecommendationOutcomesUseCase: new EvaluateRecommendationOutcomesUseCase(
+      recommendationLedgerRepo,
+      marketData,
+    ),
+    listRecommendationHistoryUseCase: new ListRecommendationHistoryUseCase(recommendationLedgerRepo),
+    getRecommendationBatchUseCase: new GetRecommendationBatchUseCase(recommendationLedgerRepo),
   };
 
   return cached;

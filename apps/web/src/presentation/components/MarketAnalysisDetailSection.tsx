@@ -27,6 +27,7 @@ import {
   MacroPanel,
   SectorStrengthPanel,
 } from './market-analysis/MarketAnalysisPanels';
+import { RecommendationHistorySection } from './market-analysis/RecommendationHistorySection';
 
 interface Props {
   compact?: boolean;
@@ -294,6 +295,8 @@ export function MarketAnalysisDetailSection({ compact }: Props) {
           </div>
 
           <NewsList news={data.news} />
+
+          <RecommendationHistorySection />
 
           {data.recommendations.length > 0 && (
             <div className="space-y-2">

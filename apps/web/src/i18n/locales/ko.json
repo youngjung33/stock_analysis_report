@@ -316,6 +316,7 @@
     "HOLDING_PARAMS_REQUIRED": "symbol과 market이 필요합니다.",
     "dashboardLoadFailed": "투자 현황을 불러오지 못했습니다.",
     "marketAnalysisLoadFailed": "시장 분석을 불러오지 못했습니다.",
+    "recommendationHistoryLoadFailed": "추천 기록을 불러오지 못했습니다.",
     "stockQuoteLoadFailed": "종목 시세를 불러오지 못했습니다.",
     "quoteRefreshFailed": "시세 갱신에 실패했습니다."
   },
@@ -591,6 +592,27 @@
     "latestHeadlines": "최신 헤드라인",
     "indicatorDetails": "지표별 상세 해석",
     "stockQuickLinks": "종목 바로가기",
+    "recommendationHistory": {
+      "title": "일별 추천 기록",
+      "desc": "엔진이 매 거래일 생성한 글로벌 baseline 추천과 1일·1주·1개월 사후 수익률(벤치마크 대비 α)입니다.",
+      "loading": "추천 기록 불러오는 중…",
+      "empty": "아직 저장된 추천 배치가 없습니다. cron이 실행되면 여기에 표시됩니다.",
+      "emptyItems": "이 배치에 저장된 종목이 없습니다.",
+      "batchTitle": "{{date}} 추천",
+      "runMeta": "실행 {{runAt}} · 엔진 v{{version}}",
+      "itemCount": "{{count}}종목",
+      "colSymbol": "종목",
+      "colTag": "태그",
+      "colScore": "점수",
+      "showMore": "나머지 {{count}}종목 더 보기",
+      "showLess": "접기",
+      "horizon": {
+        "1d": "1일",
+        "1w": "1주",
+        "1m": "1개월"
+      },
+      "disclaimer": "과거 추천 성과는 미래 수익을 보장하지 않으며, 참고용 기록입니다."
+    },
     "panels": {
       "macroTitle": "경기 · 변동성 · 환율 · 금리",
       "macroSubtitle": "VIX · USD/KRW · 미국 국채 수익률",
@@ -1148,7 +1170,9 @@
           "yieldRising": "10Y 금리 상승 — 성장주 부담",
           "sectorAlignment": "주도 섹터 {{sector}} 정렬",
           "investorTag": "투자 성향 태그 {{tag}} 일치",
-          "userWatchlist": "관심종목 가산"
+          "userWatchlist": "관심종목 가산",
+          "capTier3": "T3(뉴스·서사) 채널 합산 cap 적용",
+          "capEnrichment": "enrichment 채널 합산 cap 적용"
         }
       },
       "regime": {

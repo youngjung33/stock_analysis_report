@@ -8,6 +8,7 @@ import type {
   RecommendationEvidenceItem,
   ScoreBreakdownItem,
 } from './types';
+import { applyScorePipeline } from './score-pipeline';
 
 type ValidQuote = QuoteInsightInput & { changePercent: number; currentPrice: number };
 
@@ -206,7 +207,7 @@ export function scoreKrCandidate(quote: ValidQuote, ctx: MarketContext): Enriche
     params: f.evidenceParams,
   }));
 
-  return {
+  return applyScorePipeline({
     symbol: quote.symbol,
     name: quote.name,
     market: quote.market,
@@ -223,7 +224,7 @@ export function scoreKrCandidate(quote: ValidQuote, ctx: MarketContext): Enriche
     evidenceItems,
     regimeContext: ctx.regimes.map((r) => r.id),
     sectorAlignment: sectorBonus.sector,
-  };
+  });
 }
 
 export function scoreUsCandidate(quote: ValidQuote, ctx: MarketContext): EnrichedStockRecommendation | null {
@@ -278,7 +279,7 @@ export function scoreUsCandidate(quote: ValidQuote, ctx: MarketContext): Enriche
   const topFactors = [...breakdown].sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, 3);
   const reasonKey = topFactors[0]?.evidenceKey ?? 'shared.market.recommendation.momentumStrong';
 
-  return {
+  return applyScorePipeline({
     symbol: quote.symbol,
     name: quote.name,
     market: quote.market,
@@ -295,7 +296,7 @@ export function scoreUsCandidate(quote: ValidQuote, ctx: MarketContext): Enriche
     evidenceItems: topFactors.map((f) => ({ key: f.evidenceKey, params: f.evidenceParams })),
     regimeContext: ctx.regimes.map((r) => r.id),
     sectorAlignment: sectorBonus.sector,
-  };
+  });
 }
 
 export function scoreCandidates(

@@ -156,6 +156,14 @@ export class ApiMarketRepository implements IMarketRepository {
     return data;
   }
 
+  async getRecommendationHistory(limit = 30) {
+    const { data } = await apiClient.get<import('@sar/shared').RecommendationHistoryResponse>(
+      '/market/recommendation-history',
+      { params: { limit } },
+    );
+    return data;
+  }
+
   async getRecommendationContext() {
     const { data } = await apiClient.get<import('@sar/shared').RecommendationContextResponse>(
       '/market/recommendation-context',

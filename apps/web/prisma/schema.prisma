@@ -191,3 +191,53 @@ model PortfolioPreference {
   investorProfile        Json?
   user                   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+/// Daily (or per-run) recommendation snapshot — global baseline or per-user (2nd)
+model RecommendationBatch {
+  id            String   @id @default(uuid())
+  runAt         DateTime @default(now())
+  tradingDate   String
+  engineVersion String
+  profileKey    String   @default("global")
+  regimes       Json
+  macroSnapshot Json?
+  candidatePool Json?
+  items         RecommendationItem[]
+  createdAt     DateTime @default(now())
+
+  @@unique([tradingDate, engineVersion, profileKey])
+  @@index([runAt])
+  @@index([tradingDate])
+}
+
+model RecommendationItem {
+  id              String                  @id @default(uuid())
+  batchId         String
+  rank            Int
+  symbol          String
+  market          String
+  tag             String
+  score           Float
+  priceAtRun      Float
+  changePercent1d Float?
+  evidence        Json
+  outcomes        RecommendationOutcome[]
+  batch           RecommendationBatch     @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  @@index([batchId])
+  @@index([symbol, market])
+}
+
+model RecommendationOutcome {
+  id               String             @id @default(uuid())
+  itemId           String
+  horizon          String
+  evaluatedAt      DateTime
+  priceAtHorizon   Float
+  returnPercent    Float
+  benchmarkReturn  Float?
+  alphaVsBenchmark Float?
+  item             RecommendationItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([itemId, horizon])
+}

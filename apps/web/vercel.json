@@ -1,5 +1,15 @@
 {
   "installCommand": "cd ../.. && npm install",
   "buildCommand": "cd ../.. && npm run build -w @sar/shared && npm run build -w @sar/web",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "crons": [
+    {
+      "path": "/api/cron/recommendation-batch",
+      "schedule": "0 0 * * 1-5"
+    },
+    {
+      "path": "/api/cron/recommendation-outcomes",
+      "schedule": "30 1 * * *"
+    }
+  ]
 }

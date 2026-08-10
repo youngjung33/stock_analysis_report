@@ -316,6 +316,7 @@
     "HOLDING_PARAMS_REQUIRED": "symbol and market are required.",
     "dashboardLoadFailed": "Failed to load portfolio.",
     "marketAnalysisLoadFailed": "Failed to load market analysis.",
+    "recommendationHistoryLoadFailed": "Failed to load recommendation history.",
     "stockQuoteLoadFailed": "Failed to load stock quotes.",
     "quoteRefreshFailed": "Failed to refresh quotes."
   },
@@ -591,6 +592,27 @@
     "latestHeadlines": "Latest headlines",
     "indicatorDetails": "Indicator breakdown",
     "stockQuickLinks": "Quick stock links",
+    "recommendationHistory": {
+      "title": "Daily recommendation ledger",
+      "desc": "Global baseline picks per trading day and 1D / 1W / 1M follow-up returns (α vs benchmark).",
+      "loading": "Loading recommendation history…",
+      "empty": "No saved batches yet. They appear here after the cron job runs.",
+      "emptyItems": "No symbols stored in this batch.",
+      "batchTitle": "Picks for {{date}}",
+      "runMeta": "Run {{runAt}} · engine v{{version}}",
+      "itemCount": "{{count}} symbols",
+      "colSymbol": "Symbol",
+      "colTag": "Tag",
+      "colScore": "Score",
+      "showMore": "Show {{count}} more",
+      "showLess": "Show less",
+      "horizon": {
+        "1d": "1D",
+        "1w": "1W",
+        "1m": "1M"
+      },
+      "disclaimer": "Past recommendation performance does not guarantee future results. For reference only."
+    },
     "panels": {
       "macroTitle": "Economy · volatility · FX · rates",
       "macroSubtitle": "VIX · USD/KRW · US Treasury yields",
@@ -1148,7 +1170,9 @@
           "yieldRising": "10Y yield rising — pressure on growth",
           "sectorAlignment": "Leading sector {{sector}} alignment",
           "investorTag": "Investor profile tag {{tag}} match",
-          "userWatchlist": "Watchlist bonus"
+          "userWatchlist": "Watchlist bonus",
+          "capTier3": "T3 (news/narrative) channel sum capped",
+          "capEnrichment": "Enrichment channel sum capped"
         }
       },
       "regime": {

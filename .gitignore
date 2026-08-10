@@ -51,3 +51,5 @@ apps/web/data/stock-catalog/
 packages/shared/src/*.js
 packages/shared/src/*.d.ts
 packages/shared/src/*.js.map
+
+investment-strategy.md

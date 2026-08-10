@@ -281,6 +281,12 @@ export {
   detectMarketRegimes,
   buildCandidatePool,
   scoreCandidates,
+  scoreKrCandidate,
+  scoreUsCandidate,
+  applyEnrichmentCaps,
+  applyScorePipeline,
+  enrichmentFactor,
+  ENRICHMENT_SCORE_CAPS,
   resolveUsdKrwChange1d,
   resolveUsdKrwRate,
 } from './market-recommendation';
@@ -294,6 +300,25 @@ export type {
   RecommendationContextResponse,
   IndexContextSnapshot,
 } from './market-recommendation';
+export {
+  RECOMMENDATION_ENGINE_VERSION,
+  GLOBAL_RECOMMENDATION_PROFILE_KEY,
+  RECOMMENDATION_OUTCOME_HORIZONS,
+  RECOMMENDATION_HORIZON_DAY_OFFSETS,
+  kstTradingDate,
+  horizonReady,
+  computeReturnPercent,
+} from './recommendation-ledger';
+export type {
+  RecommendationOutcomeHorizon,
+  RecommendationBenchmarkAtRun,
+  RecommendationBatchMacroSnapshot,
+  RecommendationOutcomeView,
+  RecommendationItemView,
+  RecommendationBatchView,
+  RecommendationHistoryResponse,
+} from './recommendation-ledger';
+export { buildGlobalBaselineRecommendations } from './build-global-baseline-recommendations';
 export {
   QUOTE_CHART_RANGES,
   QUOTE_RANGE_LABELS,
