@@ -148,6 +148,16 @@ export function enrichmentFactor(
   name: string,
   delta: number,
   evidenceKey: string,
+  options?: {
+    dedupeKey?: string;
+    evidenceParams?: Record<string, string | number>;
+  },
 ): ScoreBreakdownItem {
-  return { factor: `${channel}:${name}`, delta, evidenceKey };
+  return {
+    factor: `${channel}:${name}`,
+    delta,
+    evidenceKey,
+    dedupeKey: options?.dedupeKey,
+    evidenceParams: options?.evidenceParams,
+  };
 }

@@ -2,11 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { Market } from '@sar/shared';
 import {
   applyEnrichmentCaps,
+  applyEnrichmentDedupe,
   applyScorePipeline,
   enrichmentFactor,
   ENRICHMENT_SCORE_CAPS,
+  figureLinkScopeAllowsSymbolDelta,
   scoreKrCandidate,
-  scoreUsCandidate,
 } from '@sar/shared';
 import type { MarketContext, ScoreBreakdownItem } from '@sar/shared';
 
@@ -37,12 +38,17 @@ function sumAbsT3(breakdown: ScoreBreakdownItem[]): number {
     .reduce((s, b) => s + Math.abs(b.delta), 0);
 }
 
+function deltaOf(breakdown: ScoreBreakdownItem[], prefix: string): number {
+  return breakdown.find((b) => b.factor.startsWith(prefix))?.delta ?? 0;
+}
+
 describe('score-pipeline (G0 / appendix D)', () => {
   describe('FIX_v1_parity (INV-10)', () => {
-    it('applyEnrichmentCaps leaves base-only breakdown unchanged', () => {
+    it('applyEnrichmentDedupe + caps leave base-only breakdown unchanged', () => {
       const breakdown = baseBreakdown();
       const score = 1.42;
-      const result = applyEnrichmentCaps(breakdown, score);
+      const deduped = applyEnrichmentDedupe(breakdown, score);
+      const result = applyEnrichmentCaps(deduped.breakdown, deduped.score);
       expect(result.score).toBeCloseTo(score, 8);
       expect(result.breakdown).toEqual(breakdown);
     });
@@ -74,7 +80,8 @@ describe('score-pipeline (G0 / appendix D)', () => {
         enrichmentFactor('CH_NEWS', 'headlineB', 0.12, 'ev.news2'),
       ];
       const score = breakdown.reduce((s, b) => s + b.delta, 0);
-      const result = applyEnrichmentCaps(breakdown, score);
+      const deduped = applyEnrichmentDedupe(breakdown, score);
+      const result = applyEnrichmentCaps(deduped.breakdown, deduped.score);
 
       expect(sumAbsEnrichment(result.breakdown)).toBeLessThanOrEqual(
         ENRICHMENT_SCORE_CAPS.maxAbsEnrichmentSum + 1e-9,
@@ -100,8 +107,89 @@ describe('score-pipeline (G0 / appendix D)', () => {
     });
   });
 
+  describe('FIX_earnings_d0_news (INV-8)', () => {
+    it('EVENT wins over bearish news on same dedupeKey — CH_NEWS delta 0', () => {
+      const key = 'earnings:2026Q2';
+      const breakdown: ScoreBreakdownItem[] = [
+        ...baseBreakdown(),
+        enrichmentFactor('CH_EVENT', 'earningsD0', 0.15, 'ev.event', {
+          dedupeKey: key,
+          evidenceParams: { eventDay: 'D0' },
+        }),
+        enrichmentFactor('CH_NEWS', 'bearishWrap', 0.12, 'ev.news', {
+          dedupeKey: key,
+          evidenceParams: { tone: 'bearish' },
+        }),
+      ];
+      const score = breakdown.reduce((s, b) => s + b.delta, 0);
+      const result = applyEnrichmentDedupe(breakdown, score);
+
+      expect(deltaOf(result.breakdown, 'CH_EVENT')).toBeCloseTo(0.15, 8);
+      expect(deltaOf(result.breakdown, 'CH_NEWS')).toBe(0);
+      expect(result.breakdown.find((b) => b.factor.startsWith('CH_NEWS'))?.evidenceKey).toBe('ev.news');
+    });
+  });
+
+  describe('FIX_musk_figure_news (INV-9)', () => {
+    it('CH_FIGURE_DIRECT wins — CH_NEWS and CH_NARRATIVE delta 0', () => {
+      const key = 'headline:musk-tsla-bull';
+      const breakdown: ScoreBreakdownItem[] = [
+        enrichmentFactor('CH_FIGURE_DIRECT', 'muskBull', 0.25, 'ev.figure', { dedupeKey: key }),
+        enrichmentFactor('CH_NEWS', 'sameHeadline', 0.12, 'ev.news', { dedupeKey: key }),
+        enrichmentFactor('CH_NARRATIVE', 'crowdedWrap', 0.1, 'ev.narrative', { dedupeKey: key }),
+      ];
+      const score = breakdown.reduce((s, b) => s + b.delta, 0);
+      const result = applyEnrichmentDedupe(breakdown, score);
+
+      expect(deltaOf(result.breakdown, 'CH_FIGURE_DIRECT')).toBeCloseTo(0.25, 8);
+      expect(deltaOf(result.breakdown, 'CH_NEWS')).toBe(0);
+      expect(deltaOf(result.breakdown, 'CH_NARRATIVE')).toBe(0);
+    });
+  });
+
+  describe('FIX_crowded_bullish_chase (INV-7)', () => {
+    it('bullish_news_price_down zeroes CH_NEWS momentum delta', () => {
+      const breakdown: ScoreBreakdownItem[] = [
+        ...baseBreakdown(),
+        enrichmentFactor('CH_NEWS', 'bullishChase', 0.12, 'ev.news', {
+          evidenceParams: { divergence: 'bullish_news_price_down' },
+        }),
+      ];
+      const score = breakdown.reduce((s, b) => s + b.delta, 0);
+      const result = applyEnrichmentDedupe(breakdown, score);
+
+      expect(deltaOf(result.breakdown, 'CH_NEWS')).toBe(0);
+      expect(result.score).toBeCloseTo(score - 0.12, 8);
+    });
+  });
+
+  describe('FIX_trump_macro_only (INV-6, INV-11)', () => {
+    it('macro_only linkScope blocks symbol-level figure deltas', () => {
+      expect(figureLinkScopeAllowsSymbolDelta('macro_only')).toBe(false);
+      expect(figureLinkScopeAllowsSymbolDelta('symbol_direct')).toBe(true);
+      expect(figureLinkScopeAllowsSymbolDelta('topic_conditional')).toBe(true);
+    });
+
+    it('policyUncertainty does not alter base-only cap pass (INV-11 placeholder)', () => {
+      const breakdown = baseBreakdown();
+      const score = 1.42;
+      const withRegimeFlag = [
+        ...breakdown,
+        {
+          factor: 'policyUncertainty',
+          delta: 0,
+          evidenceKey: 'shared.market.regime.policyUncertainty',
+          evidenceParams: { active: 1 },
+        },
+      ];
+      const result = applyEnrichmentCaps(withRegimeFlag, score);
+      expect(result.score).toBeCloseTo(score, 8);
+      expect(result.breakdown.filter((b) => b.factor === 'change1d')).toHaveLength(1);
+    });
+  });
+
   describe('applyScorePipeline', () => {
-    it('updates evidenceItems from top factors after cap', () => {
+    it('runs dedupe then cap and updates evidenceItems', () => {
       const rec = {
         symbol: 'AAPL',
         name: 'Apple',
@@ -124,6 +212,34 @@ describe('score-pipeline (G0 / appendix D)', () => {
       const out = applyScorePipeline(rec);
       expect(out.evidenceItems.length).toBeGreaterThan(0);
       expect(out.evidenceItems.length).toBeLessThanOrEqual(3);
+    });
+
+    it('CH_TECH keeps delta when EVENT wins same dedupeKey over NEWS', () => {
+      const key = 'fact:123';
+      const rec = {
+        symbol: 'NVDA',
+        name: 'NVIDIA',
+        market: Market.US,
+        currency: 'USD',
+        currentPrice: 900,
+        changePercent: 2,
+        tag: 'momentum' as const,
+        tagLabel: '모멘텀',
+        reason: '',
+        reasonKey: 'k',
+        score: 1.5,
+        scoreBreakdown: [
+          enrichmentFactor('CH_TECH', 'trendUp', 0.2, 'ev.tech', { dedupeKey: key }),
+          enrichmentFactor('CH_EVENT', 'beat', 0.15, 'ev.event', { dedupeKey: key }),
+          enrichmentFactor('CH_NEWS', 'wrap', 0.1, 'ev.news', { dedupeKey: key }),
+        ],
+        evidenceItems: [],
+        regimeContext: [],
+      };
+      const out = applyScorePipeline(rec);
+      expect(deltaOf(out.scoreBreakdown, 'CH_TECH')).toBeCloseTo(0.2, 8);
+      expect(deltaOf(out.scoreBreakdown, 'CH_EVENT')).toBeCloseTo(0.15, 8);
+      expect(deltaOf(out.scoreBreakdown, 'CH_NEWS')).toBe(0);
     });
   });
 });

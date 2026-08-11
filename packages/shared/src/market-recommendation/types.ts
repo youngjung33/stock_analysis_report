@@ -40,6 +40,8 @@ export interface ScoreBreakdownItem {
   delta: number;
   evidenceKey: string;
   evidenceParams?: Record<string, string | number>;
+  /** §9.0.2 — groups same fact across channels for dedupe gate */
+  dedupeKey?: string;
 }
 
 export interface EnrichedStockRecommendation extends StockRecommendation {

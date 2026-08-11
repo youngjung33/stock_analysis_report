@@ -182,7 +182,7 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | `portfolio-capital-simulation` | simulation tag rank pipeline |
 | `investor-survey/` | 투자 유형 catalog, 미니 테스트, **profile** |
 | `guide/` | Tip FAQ catalog |
-| `market-recommendation/` | scoring, **G0** score-caps/pipeline, engine |
+| `market-recommendation/` | scoring, **G0** score-caps/dedupe/pipeline, engine |
 | `recommendation-ledger.ts` | engine version, horizons, batch view types |
 | `build-global-baseline-recommendations.ts` | global profile baseline picks |
 
