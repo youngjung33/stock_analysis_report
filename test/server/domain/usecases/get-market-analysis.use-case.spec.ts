@@ -26,11 +26,16 @@ describe('GetMarketAnalysisUseCase', () => {
       }),
     };
 
+    const fetchTechnicalUseCase = {
+      execute: vi.fn().mockResolvedValue([]),
+    };
+
     const marketData = createMockMarketData();
 
     const useCase = new GetMarketAnalysisUseCase(
       getFeaturedQuotesUseCase as never,
       buildMarketContextUseCase as never,
+      fetchTechnicalUseCase as never,
       marketData,
     );
     const report = await useCase.execute();
@@ -40,5 +45,6 @@ describe('GetMarketAnalysisUseCase', () => {
     expect(report.fetchedAt).toBeTruthy();
     expect(getFeaturedQuotesUseCase.execute).toHaveBeenCalled();
     expect(buildMarketContextUseCase.execute).toHaveBeenCalled();
+    expect(fetchTechnicalUseCase.execute).toHaveBeenCalled();
   });
 });

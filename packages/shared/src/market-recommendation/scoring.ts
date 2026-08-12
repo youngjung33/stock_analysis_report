@@ -9,6 +9,7 @@ import type {
   ScoreBreakdownItem,
 } from './types';
 import { applyScorePipeline } from './score-pipeline';
+import { applyTechnicalEnrichment } from './technical-enrichment';
 
 type ValidQuote = QuoteInsightInput & { changePercent: number; currentPrice: number };
 
@@ -197,6 +198,11 @@ export function scoreKrCandidate(quote: ValidQuote, ctx: MarketContext): Enriche
     });
   }
 
+  const techKr = ctx.technicalBySymbol?.[symbolKey(quote.symbol, quote.market)];
+  if (techKr) {
+    breakdown.push(...applyTechnicalEnrichment(tagScores, techKr, ctx, Market.KR));
+  }
+
   const tag = pickTagFromScore(tagScores);
   const score = Object.values(tagScores).reduce((s, v) => s + v, 0) + quote.changePercent * 0.05;
   const topFactors = [...breakdown].sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, 3);
@@ -272,6 +278,11 @@ export function scoreUsCandidate(quote: ValidQuote, ctx: MarketContext): Enriche
       delta: 0.15,
       evidenceKey: 'shared.market.recommendation.evidence.userWatchlist',
     });
+  }
+
+  const techUs = ctx.technicalBySymbol?.[symbolKey(quote.symbol, quote.market)];
+  if (techUs) {
+    breakdown.push(...applyTechnicalEnrichment(tagScores, techUs, ctx, Market.US));
   }
 
   const tag = pickTagFromScore(tagScores);

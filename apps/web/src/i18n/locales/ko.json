@@ -1171,6 +1171,15 @@
           "sectorAlignment": "주도 섹터 {{sector}} 정렬",
           "investorTag": "투자 성향 태그 {{tag}} 일치",
           "userWatchlist": "관심종목 가산",
+          "trendUp": "차트 상승 추세 ({{trend}})",
+          "trendPullback": "단기 조정 구간",
+          "trendDown": "장기 하락 채널",
+          "rsiOversold": "RSI {{rsi}} — 과매도 관찰",
+          "rsiOverbought": "RSI {{rsi}} — 과매수/과열",
+          "rsOutperform": "1주 RS +{{rs}}%p (벤치마크 대비)",
+          "rsUnderperform": "1주 RS {{rs}}%p (벤치마크 대비)",
+          "riskOffOverbought": "리스크오프·RSI {{rsi}} — 모멘텀 축소",
+          "usLeadingCatchUp": "미장 선행·KR RS 양호 — 추격 관찰",
           "capTier3": "T3(뉴스·서사) 채널 합산 cap 적용",
           "capEnrichment": "enrichment 채널 합산 cap 적용"
         }

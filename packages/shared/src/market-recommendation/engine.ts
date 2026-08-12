@@ -28,6 +28,7 @@ export function buildStockRecommendations(
     preferredTags,
     userHoldings: input.userHoldings,
     userWatchlist: input.userWatchlist,
+    technicalSnapshots: input.technicalSnapshots,
   });
 
   const pool = buildCandidatePool({

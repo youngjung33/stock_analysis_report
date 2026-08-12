@@ -3,6 +3,8 @@ import { GetFxRateUseCase } from './domain/usecases/market/get-fx-rate.use-case'
 import { GetMarketAnalysisUseCase } from './domain/usecases/market/get-market-analysis.use-case';
 import { BuildMarketContextUseCase } from './domain/usecases/market/build-market-context.use-case';
 import { FetchRecommendationQuotesUseCase } from './domain/usecases/market/fetch-recommendation-quotes.use-case';
+import { FetchRecommendationTechnicalSnapshotsUseCase } from './domain/usecases/market/fetch-recommendation-technical.use-case';
+import { BuildStockEnrichmentUseCase } from './domain/usecases/market/build-stock-enrichment.use-case';
 import { GetStockQuoteUseCase } from './domain/usecases/market/get-stock-quote.use-case';
 import { FetchQuotesUseCase } from './domain/usecases/market/fetch-quotes.use-case';
 import { GetMarketStatusUseCase } from './domain/usecases/market/get-market-status.use-case';
@@ -108,6 +110,8 @@ export interface ServerServices {
   getMarketAnalysisUseCase: GetMarketAnalysisUseCase;
   buildMarketContextUseCase: BuildMarketContextUseCase;
   fetchRecommendationQuotesUseCase: FetchRecommendationQuotesUseCase;
+  fetchRecommendationTechnicalUseCase: FetchRecommendationTechnicalSnapshotsUseCase;
+  buildStockEnrichmentUseCase: BuildStockEnrichmentUseCase;
   searchStocksUseCase: SearchStocksUseCase;
   getFxRateUseCase: GetFxRateUseCase;
   listCorporateActionsUseCase: ListCorporateActionsUseCase;
@@ -166,6 +170,11 @@ export function getServerServices(): ServerServices {
   const getFeaturedQuotesUseCase = new GetFeaturedQuotesUseCase(fetchQuotesUseCase);
   const buildMarketContextUseCase = new BuildMarketContextUseCase(marketData);
   const fetchRecommendationQuotesUseCase = new FetchRecommendationQuotesUseCase(marketData);
+  const fetchRecommendationTechnicalUseCase = new FetchRecommendationTechnicalSnapshotsUseCase(marketData);
+  const buildStockEnrichmentUseCase = new BuildStockEnrichmentUseCase(
+    fetchRecommendationQuotesUseCase,
+    fetchRecommendationTechnicalUseCase,
+  );
   const recommendationLedgerRepo = new PrismaRecommendationLedgerRepository();
   const getDashboardUseCase = new GetDashboardUseCase(
     stockRepo,
@@ -218,10 +227,13 @@ export function getServerServices(): ServerServices {
     getMarketAnalysisUseCase: new GetMarketAnalysisUseCase(
       getFeaturedQuotesUseCase,
       buildMarketContextUseCase,
+      fetchRecommendationTechnicalUseCase,
       marketData,
     ),
     buildMarketContextUseCase,
     fetchRecommendationQuotesUseCase,
+    fetchRecommendationTechnicalUseCase,
+    buildStockEnrichmentUseCase,
     searchStocksUseCase: new SearchStocksUseCase(catalogRepo, marketData),
     getFxRateUseCase: new GetFxRateUseCase(marketData),
     listCorporateActionsUseCase: new ListCorporateActionsUseCase(corpActionRepo),
@@ -260,13 +272,13 @@ export function getServerServices(): ServerServices {
       watchlistRepo,
       catalogRepo,
       buildMarketContextUseCase,
-      fetchRecommendationQuotesUseCase,
+      buildStockEnrichmentUseCase,
     ),
     runGlobalRecommendationBatchUseCase: new RunGlobalRecommendationBatchUseCase(
       recommendationLedgerRepo,
       getFeaturedQuotesUseCase,
       buildMarketContextUseCase,
-      fetchRecommendationQuotesUseCase,
+      buildStockEnrichmentUseCase,
       catalogRepo,
       marketData,
     ),

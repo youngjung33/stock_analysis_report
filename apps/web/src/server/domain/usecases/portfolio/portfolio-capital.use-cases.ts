@@ -15,7 +15,7 @@ import {
 import { GetDashboardUseCase } from '../portfolio/get-dashboard.use-case';
 import { GetFeaturedQuotesUseCase } from '../market/get-featured-quotes.use-case';
 import { BuildMarketContextUseCase } from '../market/build-market-context.use-case';
-import { FetchRecommendationQuotesUseCase } from '../market/fetch-recommendation-quotes.use-case';
+import { BuildStockEnrichmentUseCase } from '../market/build-stock-enrichment.use-case';
 
 function symbolKey(symbol: string, market: Market): string {
   return `${market}:${symbol.toUpperCase()}`;
@@ -56,7 +56,7 @@ export class GetPortfolioSimulationUseCase {
     private readonly watchlistRepo: IWatchlistRepository,
     private readonly catalogRepo: IStockCatalogRepository,
     private readonly buildMarketContextUseCase: BuildMarketContextUseCase,
-    private readonly fetchRecommendationQuotesUseCase: FetchRecommendationQuotesUseCase,
+    private readonly buildStockEnrichmentUseCase: BuildStockEnrichmentUseCase,
   ) {}
 
   async execute(userId: string) {
@@ -116,15 +116,33 @@ export class GetPortfolioSimulationUseCase {
       (c) => !featuredKeys.has(symbolKey(c.symbol, c.market)),
     );
 
-    const candidateQuotes = await this.fetchRecommendationQuotesUseCase.execute(
-      quoteTargets.map((c) => ({
-        symbol: c.symbol,
-        name: c.name,
-        market: c.market,
-        currency: c.currency,
-        yahooSymbol: c.yahooSymbol,
+    const enrichmentTargets = quoteTargets.map((c) => ({
+      symbol: c.symbol,
+      name: c.name,
+      market: c.market,
+      currency: c.currency,
+      yahooSymbol: c.yahooSymbol,
+    }));
+
+    const featuredTargets = [
+      ...featured.kr.map((q) => ({
+        symbol: q.symbol,
+        market: q.market,
+        yahooSymbol: undefined as string | undefined,
       })),
-    );
+      ...featured.us.map((q) => ({
+        symbol: q.symbol,
+        market: q.market,
+        yahooSymbol: undefined as string | undefined,
+      })),
+    ];
+
+    const { candidateQuotes, technicalSnapshots } = await this.buildStockEnrichmentUseCase.execute([
+      ...enrichmentTargets,
+      ...featuredTargets.filter(
+        (f) => !enrichmentTargets.some((t) => t.symbol === f.symbol && t.market === f.market),
+      ),
+    ]);
 
     const {
       simulation,
@@ -161,6 +179,7 @@ export class GetPortfolioSimulationUseCase {
         userHoldings,
         userWatchlist,
         catalogSymbols,
+        technicalSnapshots,
       },
       candidateQuotes,
     });

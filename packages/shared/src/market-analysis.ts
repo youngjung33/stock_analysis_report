@@ -966,6 +966,7 @@ export function buildMarketAnalysisReport(input: {
   fetchedAt?: string;
   userHoldings?: Array<{ symbol: string; market: Market }>;
   userWatchlist?: Array<{ symbol: string; market: Market }>;
+  technicalSnapshots?: import('./market-recommendation/technical-enrichment').StockTechnicalSnapshot[];
 }): MarketAnalysisReport {
   const indices = input.indexInputs
     .map(buildIndexSnapshot)
@@ -993,6 +994,7 @@ export function buildMarketAnalysisReport(input: {
     usdKrwChange1d: fxMacro?.changePercent1d ?? null,
     userHoldings: input.userHoldings,
     userWatchlist: input.userWatchlist,
+    technicalSnapshots: input.technicalSnapshots,
   });
 
   const insights: AnalysisInsight[] = [

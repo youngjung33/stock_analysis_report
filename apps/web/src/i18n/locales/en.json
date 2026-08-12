@@ -1171,6 +1171,15 @@
           "sectorAlignment": "Leading sector {{sector}} alignment",
           "investorTag": "Investor profile tag {{tag}} match",
           "userWatchlist": "Watchlist bonus",
+          "trendUp": "Chart uptrend ({{trend}})",
+          "trendPullback": "Short-term pullback zone",
+          "trendDown": "Long-term down channel",
+          "rsiOversold": "RSI {{rsi}} — oversold watch",
+          "rsiOverbought": "RSI {{rsi}} — overbought/extended",
+          "rsOutperform": "1W RS +{{rs}}%p vs benchmark",
+          "rsUnderperform": "1W RS {{rs}}%p vs benchmark",
+          "riskOffOverbought": "Risk-off + RSI {{rsi}} — momentum trimmed",
+          "usLeadingCatchUp": "US leading + positive KR RS — catch-up watch",
           "capTier3": "T3 (news/narrative) channel sum capped",
           "capEnrichment": "Enrichment channel sum capped"
         }

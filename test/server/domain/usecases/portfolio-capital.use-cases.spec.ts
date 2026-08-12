@@ -71,7 +71,9 @@ describe('GetPortfolioSimulationUseCase', () => {
         sectorInputs: [],
       }),
     };
-    const fetchRecommendationQuotesUseCase = { execute: vi.fn().mockResolvedValue([]) };
+    const buildStockEnrichmentUseCase = {
+      execute: vi.fn().mockResolvedValue({ candidateQuotes: [], technicalSnapshots: [] }),
+    };
 
     const useCase = new GetPortfolioSimulationUseCase(
       dashboardUseCase as never,
@@ -81,7 +83,7 @@ describe('GetPortfolioSimulationUseCase', () => {
       watchlistRepo as never,
       catalogRepo as never,
       buildMarketContextUseCase as never,
-      fetchRecommendationQuotesUseCase as never,
+      buildStockEnrichmentUseCase as never,
     );
 
     const result = await useCase.execute('user-1');

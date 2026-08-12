@@ -19,7 +19,7 @@ import { IStockCatalogRepository } from '../../repositories';
 import { IRecommendationLedgerRepository } from '../../../data/persistence/recommendation-ledger.repository';
 import type { RecommendationBatchEntity } from '../../entities/recommendation-ledger.entities';
 import { BuildMarketContextUseCase } from './build-market-context.use-case';
-import { FetchRecommendationQuotesUseCase } from './fetch-recommendation-quotes.use-case';
+import { BuildStockEnrichmentUseCase } from './build-stock-enrichment.use-case';
 import { GetFeaturedQuotesUseCase } from './get-featured-quotes.use-case';
 
 function symbolKey(symbol: string, market: Market): string {
@@ -67,7 +67,7 @@ export class RunGlobalRecommendationBatchUseCase {
     private readonly ledgerRepo: IRecommendationLedgerRepository,
     private readonly featuredQuotesUseCase: GetFeaturedQuotesUseCase,
     private readonly buildMarketContextUseCase: BuildMarketContextUseCase,
-    private readonly fetchRecommendationQuotesUseCase: FetchRecommendationQuotesUseCase,
+    private readonly buildStockEnrichmentUseCase: BuildStockEnrichmentUseCase,
     private readonly catalogRepo: IStockCatalogRepository,
     private readonly marketData: IMarketDataProvider,
   ) {}
@@ -121,15 +121,20 @@ export class RunGlobalRecommendationBatchUseCase {
       (c) => !featuredKeys.has(symbolKey(c.symbol, c.market)),
     );
 
-    const candidateQuotes = await this.fetchRecommendationQuotesUseCase.execute(
-      quoteTargets.map((c) => ({
+    const enrichmentTargets = [
+      ...quoteTargets.map((c) => ({
         symbol: c.symbol,
         name: c.name,
         market: c.market,
         currency: c.currency,
         yahooSymbol: c.yahooSymbol,
       })),
-    );
+      ...featured.kr.map((q) => ({ symbol: q.symbol, name: q.name, market: q.market, currency: q.currency })),
+      ...featured.us.map((q) => ({ symbol: q.symbol, name: q.name, market: q.market, currency: q.currency })),
+    ];
+
+    const { candidateQuotes, technicalSnapshots } =
+      await this.buildStockEnrichmentUseCase.execute(enrichmentTargets);
 
     const recResult = buildGlobalBaselineRecommendations({
       featuredKr,
@@ -142,6 +147,7 @@ export class RunGlobalRecommendationBatchUseCase {
         usdKrwRate: marketContext.usdKrwRate,
         usdKrwChange1d: marketContext.usdKrwChange1d,
         catalogSymbols,
+        technicalSnapshots,
       },
     });
 

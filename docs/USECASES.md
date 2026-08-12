@@ -134,6 +134,8 @@ npm run test:e2e     # Playwright (dev server + E2E_USERNAME/PASSWORD for member
 | `GetPortfolioSimulationUseCase` | GET `/api/portfolio/simulation` (+ `regimes`, `recommendations`) | `portfolio-capital.use-cases.spec.ts`, `cash-routes.spec.ts` |
 | `BuildMarketContextUseCase` | (내부) macro/sector/index for recommendation | `get-market-analysis.use-case.spec.ts` |
 | `FetchRecommendationQuotesUseCase` | (내부) candidate pool quotes + 15m cache | `portfolio-capital.use-cases.spec.ts` |
+| `FetchRecommendationTechnicalSnapshotsUseCase` | (내부) candidate chart snapshots + 15m cache | `technical-enrichment.spec.ts` |
+| `BuildStockEnrichmentUseCase` | (내부) quotes + technical batch | portfolio + ledger |
 | `GetHoldingBySymbolUseCase` | GET `/api/portfolio/holding` | `get-holding.use-case.spec.ts` |
 | `RecordCashEntryUseCase` | POST `/api/cash` | `cash.use-cases.spec.ts` + HTTP |
 | `RefreshQuotesUseCase` | POST `/api/market/refresh` | `market.use-cases.spec.ts` |

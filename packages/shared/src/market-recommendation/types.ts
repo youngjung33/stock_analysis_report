@@ -75,6 +75,8 @@ export interface MarketContextInput {
   userWatchlist?: Array<{ symbol: string; market: Market }>;
   preferredTags?: RecommendationTag[];
   catalogSymbols?: Array<{ symbol: string; market: Market; name: string; yahooSymbol?: string }>;
+  /** Phase G — per-symbol chart snapshots keyed via technicalSymbolKey */
+  technicalSnapshots?: import('./technical-enrichment').StockTechnicalSnapshot[];
 }
 
 export interface MarketContext {
@@ -91,6 +93,8 @@ export interface MarketContext {
   watchlistSymbols: Set<string>;
   leadingKrSectors: string[];
   leadingUsSectors: string[];
+  /** symbolKey → StockTechnicalSnapshot (Phase G) */
+  technicalBySymbol: Record<string, import('./technical-enrichment').StockTechnicalSnapshot>;
 }
 
 export interface StockRecommendationsResult {
