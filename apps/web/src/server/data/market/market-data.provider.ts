@@ -6,7 +6,7 @@ import {
   IMarketDataProvider,
   NewsItemData,
 } from '../../domain/ports/market-data.port';
-import { fetchFinnhubMarketNews } from './finnhub-news.client';
+import { fetchFinnhubMarketNews, fetchFinnhubCompanyNews } from './finnhub-news.client';
 import { fetchGoogleNewsRss } from './google-news-rss.client';
 import { fetchUsdKrwRate } from './usd-krw.client';
 import { fetchYahooChartQuote, fetchYahooChartSeries } from './yahoo-chart.client';
@@ -104,6 +104,17 @@ export class MarketDataProvider implements IMarketDataProvider {
       publishedAt: new Date(item.datetime * 1000).toISOString(),
       url: item.url,
       market: 'global' as const,
+    }));
+  }
+
+  async fetchCompanyNews(symbol: string, limit = 5): Promise<NewsItemData[]> {
+    const items = await fetchFinnhubCompanyNews(symbol, limit);
+    return items.map((item) => ({
+      title: item.headline,
+      source: item.source,
+      publishedAt: new Date(item.datetime * 1000).toISOString(),
+      url: item.url,
+      market: Market.US,
     }));
   }
 

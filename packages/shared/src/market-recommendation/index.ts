@@ -4,6 +4,7 @@ export * from './sector-tags';
 export * from './candidate-pool';
 export * from './scoring';
 export * from './technical-enrichment';
+export * from './news-enrichment';
 export * from './score-caps';
 export * from './score-dedupe';
 export * from './score-pipeline';

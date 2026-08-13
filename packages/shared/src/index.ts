@@ -20,8 +20,10 @@ export {
 } from './theme';
 export type { ThemeMode } from './theme';
 
-export { Market, TransactionType } from './enums';
+export { newsToneFromTitle } from './news-tone';
+export type { NewsTone } from './news-tone';
 
+export { Market, TransactionType } from './enums';
 export const REFRESH_TOKEN_COOKIE = 'refreshToken';
 export const ACCESS_TOKEN_COOKIE = 'accessToken';
 
@@ -285,7 +287,10 @@ export {
   scoreUsCandidate,
   buildStockTechnicalSnapshot,
   applyTechnicalEnrichment,
+  buildStockNewsSnapshot,
+  applyNewsEnrichment,
   indexTechnicalSnapshots,
+  indexNewsSnapshots,
   technicalSymbolKey,
   applyEnrichmentCaps,
   applyEnrichmentDedupe,
@@ -303,6 +308,7 @@ export type {
   MarketRegimeId,
   EnrichedStockRecommendation,
   StockTechnicalSnapshot,
+  StockNewsSnapshot,
   StockRecommendationsResult,
   RecommendationContextResponse,
   IndexContextSnapshot,

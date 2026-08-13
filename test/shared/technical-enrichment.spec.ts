@@ -53,6 +53,7 @@ function baseContext(overrides?: Partial<MarketContext>): MarketContext {
     watchlistSymbols: new Set(),
     preferredTags: [],
     technicalBySymbol: {},
+    newsBySymbol: {},
     ...overrides,
   };
 }

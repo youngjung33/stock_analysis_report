@@ -1181,7 +1181,10 @@
           "riskOffOverbought": "리스크오프·RSI {{rsi}} — 모멘텀 축소",
           "usLeadingCatchUp": "미장 선행·KR RS 양호 — 추격 관찰",
           "capTier3": "T3(뉴스·서사) 채널 합산 cap 적용",
-          "capEnrichment": "enrichment 채널 합산 cap 적용"
+          "capEnrichment": "enrichment 채널 합산 cap 적용",
+          "newsBullish": "호재 헤드라인 — {{headline}}",
+          "newsBearish": "악재 헤드라인 — {{headline}}",
+          "newsBullishWatch": "호재·관심 가산 — {{headline}}"
         }
       },
       "regime": {

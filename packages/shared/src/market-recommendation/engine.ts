@@ -29,6 +29,7 @@ export function buildStockRecommendations(
     userHoldings: input.userHoldings,
     userWatchlist: input.userWatchlist,
     technicalSnapshots: input.technicalSnapshots,
+    newsSnapshots: input.newsSnapshots,
   });
 
   const pool = buildCandidatePool({

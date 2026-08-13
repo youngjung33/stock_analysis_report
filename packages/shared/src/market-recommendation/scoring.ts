@@ -10,6 +10,7 @@ import type {
 } from './types';
 import { applyScorePipeline } from './score-pipeline';
 import { applyTechnicalEnrichment } from './technical-enrichment';
+import { applyNewsEnrichment } from './news-enrichment';
 
 type ValidQuote = QuoteInsightInput & { changePercent: number; currentPrice: number };
 
@@ -203,6 +204,11 @@ export function scoreKrCandidate(quote: ValidQuote, ctx: MarketContext): Enriche
     breakdown.push(...applyTechnicalEnrichment(tagScores, techKr, ctx, Market.KR));
   }
 
+  const newsKr = ctx.newsBySymbol?.[symbolKey(quote.symbol, quote.market)];
+  if (newsKr) {
+    breakdown.push(...applyNewsEnrichment(tagScores, newsKr, quote.changePercent));
+  }
+
   const tag = pickTagFromScore(tagScores);
   const score = Object.values(tagScores).reduce((s, v) => s + v, 0) + quote.changePercent * 0.05;
   const topFactors = [...breakdown].sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, 3);
@@ -283,6 +289,11 @@ export function scoreUsCandidate(quote: ValidQuote, ctx: MarketContext): Enriche
   const techUs = ctx.technicalBySymbol?.[symbolKey(quote.symbol, quote.market)];
   if (techUs) {
     breakdown.push(...applyTechnicalEnrichment(tagScores, techUs, ctx, Market.US));
+  }
+
+  const newsUs = ctx.newsBySymbol?.[symbolKey(quote.symbol, quote.market)];
+  if (newsUs) {
+    breakdown.push(...applyNewsEnrichment(tagScores, newsUs, quote.changePercent));
   }
 
   const tag = pickTagFromScore(tagScores);

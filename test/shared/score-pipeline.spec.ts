@@ -282,5 +282,6 @@ function minimalKrContext(): MarketContext {
     watchlistSymbols: new Set(),
     preferredTags: [],
     technicalBySymbol: {},
+    newsBySymbol: {},
   };
 }

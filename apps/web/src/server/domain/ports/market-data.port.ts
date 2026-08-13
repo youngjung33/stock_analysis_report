@@ -63,6 +63,8 @@ export interface IMarketDataProvider {
     category: 'general' | 'forex' | 'crypto' | 'merger',
     limit?: number,
   ): Promise<NewsItemData[]>;
+  /** US company news (Finnhub) — Phase H */
+  fetchCompanyNews(symbol: string, limit?: number): Promise<NewsItemData[]>;
   /** DB catalog 없을 때 Yahoo 종목 검색 fallback */
   searchRemoteStocks(query: string, market: Market): Promise<StockSearchResult[]>;
 }

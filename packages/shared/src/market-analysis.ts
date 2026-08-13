@@ -17,6 +17,7 @@ import {
   stochastic,
   volumeRatio,
 } from './technical-analysis';
+import { newsToneFromTitle } from './news-tone';
 import {
   MarketInsightsResult,
   QuoteInsightInput,
@@ -732,17 +733,8 @@ function sectorInsights(sectors: SectorEtfSnapshot[]): AnalysisInsight[] {
   return items;
 }
 
-const BULLISH_NEWS = ['surge', 'rally', 'gain', 'record', 'beat', '상승', ' rally', '급등', '호재', '반등', '신고가'];
-const BEARISH_NEWS = ['fall', 'drop', 'plunge', 'loss', 'miss', '하락', '급락', '우려', '침체', '매도', '조정', ' recession'];
-
 function newsTone(title: string): AnalysisTone {
-  const lower = title.toLowerCase();
-  let score = 0;
-  for (const w of BULLISH_NEWS) if (lower.includes(w.toLowerCase())) score += 1;
-  for (const w of BEARISH_NEWS) if (lower.includes(w.toLowerCase())) score -= 1;
-  if (score > 0) return 'bullish';
-  if (score < 0) return 'bearish';
-  return 'neutral';
+  return newsToneFromTitle(title);
 }
 
 function newsInsights(news: NewsAnalysisInput[]): AnalysisInsight[] {

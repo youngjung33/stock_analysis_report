@@ -17,7 +17,10 @@ export function buildGlobalBaselineRecommendations(input: {
   marketContext: Omit<
     MarketContextInput,
     'krQuotes' | 'usQuotes' | 'investorProfile' | 'preferredTags' | 'userHoldings' | 'userWatchlist'
-  > & { technicalSnapshots?: MarketContextInput['technicalSnapshots'] };
+  > & {
+    technicalSnapshots?: MarketContextInput['technicalSnapshots'];
+    newsSnapshots?: MarketContextInput['newsSnapshots'];
+  };
   maxRecommendations?: number;
 }): StockRecommendationsResult {
   const builtProfile = buildInvestorProfile(createDefaultStoredProfile());

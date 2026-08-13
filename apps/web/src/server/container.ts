@@ -4,6 +4,7 @@ import { GetMarketAnalysisUseCase } from './domain/usecases/market/get-market-an
 import { BuildMarketContextUseCase } from './domain/usecases/market/build-market-context.use-case';
 import { FetchRecommendationQuotesUseCase } from './domain/usecases/market/fetch-recommendation-quotes.use-case';
 import { FetchRecommendationTechnicalSnapshotsUseCase } from './domain/usecases/market/fetch-recommendation-technical.use-case';
+import { FetchRecommendationNewsSnapshotsUseCase } from './domain/usecases/market/fetch-recommendation-news.use-case';
 import { BuildStockEnrichmentUseCase } from './domain/usecases/market/build-stock-enrichment.use-case';
 import { GetStockQuoteUseCase } from './domain/usecases/market/get-stock-quote.use-case';
 import { FetchQuotesUseCase } from './domain/usecases/market/fetch-quotes.use-case';
@@ -171,9 +172,11 @@ export function getServerServices(): ServerServices {
   const buildMarketContextUseCase = new BuildMarketContextUseCase(marketData);
   const fetchRecommendationQuotesUseCase = new FetchRecommendationQuotesUseCase(marketData);
   const fetchRecommendationTechnicalUseCase = new FetchRecommendationTechnicalSnapshotsUseCase(marketData);
+  const fetchRecommendationNewsUseCase = new FetchRecommendationNewsSnapshotsUseCase(marketData);
   const buildStockEnrichmentUseCase = new BuildStockEnrichmentUseCase(
     fetchRecommendationQuotesUseCase,
     fetchRecommendationTechnicalUseCase,
+    fetchRecommendationNewsUseCase,
   );
   const recommendationLedgerRepo = new PrismaRecommendationLedgerRepository();
   const getDashboardUseCase = new GetDashboardUseCase(

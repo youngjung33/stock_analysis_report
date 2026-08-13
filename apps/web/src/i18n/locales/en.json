@@ -1181,7 +1181,10 @@
           "riskOffOverbought": "Risk-off + RSI {{rsi}} — momentum trimmed",
           "usLeadingCatchUp": "US leading + positive KR RS — catch-up watch",
           "capTier3": "T3 (news/narrative) channel sum capped",
-          "capEnrichment": "Enrichment channel sum capped"
+          "capEnrichment": "Enrichment channel sum capped",
+          "newsBullish": "Bullish headline — {{headline}}",
+          "newsBearish": "Bearish headline — {{headline}}",
+          "newsBullishWatch": "Bullish watchlist boost — {{headline}}"
         }
       },
       "regime": {

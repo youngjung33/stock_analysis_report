@@ -3,6 +3,7 @@ import type { MacroIndicatorSnapshot } from '../market-macro';
 import type { RecommendationTag, RegionSentiment } from '../market-sentiment';
 import type { MarketContext, MarketRegime, MarketRegimeId, IndexContextSnapshot } from './types';
 import { indexTechnicalSnapshots } from './technical-enrichment';
+import { indexNewsSnapshots } from './news-enrichment';
 
 function isBullish(label: RegionSentiment['label']): boolean {
   return label === 'strong_bull' || label === 'bull';
@@ -72,6 +73,7 @@ export function buildMarketContext(input: {
   userHoldings?: Array<{ symbol: string; market: Market }>;
   userWatchlist?: Array<{ symbol: string; market: Market }>;
   technicalSnapshots?: import('./technical-enrichment').StockTechnicalSnapshot[];
+  newsSnapshots?: import('./news-enrichment').StockNewsSnapshot[];
 }): MarketContext {
   const macro = input.macro ?? [];
   const sectors = input.sectors ?? [];
@@ -116,6 +118,7 @@ export function buildMarketContext(input: {
     leadingKrSectors,
     leadingUsSectors,
     technicalBySymbol: indexTechnicalSnapshots(input.technicalSnapshots ?? []),
+    newsBySymbol: indexNewsSnapshots(input.newsSnapshots ?? []),
   };
 }
 
