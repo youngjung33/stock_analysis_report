@@ -1184,7 +1184,18 @@
           "capEnrichment": "Enrichment channel sum capped",
           "newsBullish": "Bullish headline — {{headline}}",
           "newsBearish": "Bearish headline — {{headline}}",
-          "newsBullishWatch": "Bullish watchlist boost — {{headline}}"
+          "newsBullishWatch": "Bullish watchlist boost — {{headline}}",
+          "narrativeDivergence": "News–price divergence ({{divergence}}) — follow signal limited",
+          "narrativeContrarianBull": "Bearish headlines vs rising price — mild contrarian watch",
+          "narrativeContrarianWatch": "Narrative divergence — watchlist bias",
+          "narrativeCrowdedBull": "Crowded bullish headlines — crowd narrative trimmed",
+          "narrativeCrowdedBear": "Crowded bearish headlines — oversold watch",
+          "eventEarningsBeat": "Earnings beat ({{eventDay}}, +{{surprise}}%)",
+          "eventEarningsMiss": "Earnings miss ({{eventDay}})",
+          "eventEarningsUpcoming": "Earnings ahead ({{eventDay}})",
+          "eventEarningsNeutral": "Earnings day ({{eventDay}})",
+          "eventDividend": "Dividend / shareholder return event",
+          "eventBuyback": "Buyback / capital return event"
         }
       },
       "regime": {

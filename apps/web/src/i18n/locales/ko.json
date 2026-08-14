@@ -1184,7 +1184,18 @@
           "capEnrichment": "enrichment 채널 합산 cap 적용",
           "newsBullish": "호재 헤드라인 — {{headline}}",
           "newsBearish": "악재 헤드라인 — {{headline}}",
-          "newsBullishWatch": "호재·관심 가산 — {{headline}}"
+          "newsBullishWatch": "호재·관심 가산 — {{headline}}",
+          "narrativeDivergence": "뉴스·가격 괴리 ({{divergence}}) — 추종 신호 제한",
+          "narrativeContrarianBull": "악재 헤드라인·가격 상승 괴리 — 소폭 역관찰",
+          "narrativeContrarianWatch": "서사 괴리 — 관심 위주",
+          "narrativeCrowdedBull": "호재 기사 과다 — 군중 서사 감점",
+          "narrativeCrowdedBear": "악재 기사 과다 — 과매도 관찰",
+          "eventEarningsBeat": "실적 서프라이즈 ({{eventDay}}, +{{surprise}}%)",
+          "eventEarningsMiss": "실적 부진 ({{eventDay}})",
+          "eventEarningsUpcoming": "실적 발표 임박 ({{eventDay}})",
+          "eventEarningsNeutral": "실적 발표일 ({{eventDay}})",
+          "eventDividend": "배당·주주환원 이벤트",
+          "eventBuyback": "자사주 매입·환원 이벤트"
         }
       },
       "regime": {

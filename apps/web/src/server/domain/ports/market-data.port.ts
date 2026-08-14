@@ -65,6 +65,16 @@ export interface IMarketDataProvider {
   ): Promise<NewsItemData[]>;
   /** US company news (Finnhub) — Phase H */
   fetchCompanyNews(symbol: string, limit?: number): Promise<NewsItemData[]>;
+  /** US earnings calendar rows — Phase I */
+  fetchCompanyEarnings(symbol: string): Promise<
+    Array<{
+      period: string;
+      reportDate: string;
+      actual?: number | null;
+      estimate?: number | null;
+      surprisePercent?: number | null;
+    }>
+  >;
   /** DB catalog 없을 때 Yahoo 종목 검색 fallback */
   searchRemoteStocks(query: string, market: Market): Promise<StockSearchResult[]>;
 }

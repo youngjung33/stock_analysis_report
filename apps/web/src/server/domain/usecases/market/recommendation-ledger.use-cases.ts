@@ -133,7 +133,7 @@ export class RunGlobalRecommendationBatchUseCase {
       ...featured.us.map((q) => ({ symbol: q.symbol, name: q.name, market: q.market, currency: q.currency })),
     ];
 
-    const { candidateQuotes, technicalSnapshots, newsSnapshots } =
+    const { candidateQuotes, technicalSnapshots, newsSnapshots, eventSnapshots } =
       await this.buildStockEnrichmentUseCase.execute(enrichmentTargets);
 
     const recResult = buildGlobalBaselineRecommendations({
@@ -149,6 +149,7 @@ export class RunGlobalRecommendationBatchUseCase {
         catalogSymbols,
         technicalSnapshots,
         newsSnapshots,
+        eventSnapshots,
       },
     });
 

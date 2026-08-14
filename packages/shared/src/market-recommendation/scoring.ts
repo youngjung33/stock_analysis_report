@@ -11,6 +11,8 @@ import type {
 import { applyScorePipeline } from './score-pipeline';
 import { applyTechnicalEnrichment } from './technical-enrichment';
 import { applyNewsEnrichment } from './news-enrichment';
+import { computeNarrativeDivergence, applyNarrativeEnrichment } from './narrative-enrichment';
+import { applyEventEnrichment } from './event-enrichment';
 
 type ValidQuote = QuoteInsightInput & { changePercent: number; currentPrice: number };
 
@@ -205,8 +207,19 @@ export function scoreKrCandidate(quote: ValidQuote, ctx: MarketContext): Enriche
   }
 
   const newsKr = ctx.newsBySymbol?.[symbolKey(quote.symbol, quote.market)];
+  const narrativeKr = newsKr
+    ? computeNarrativeDivergence({ news: newsKr, technical: techKr, changePercent1d: quote.changePercent })
+    : null;
   if (newsKr) {
-    breakdown.push(...applyNewsEnrichment(tagScores, newsKr, quote.changePercent));
+    breakdown.push(...applyNewsEnrichment(tagScores, newsKr, quote.changePercent, narrativeKr));
+  }
+  if (narrativeKr) {
+    breakdown.push(...applyNarrativeEnrichment(tagScores, narrativeKr, techKr));
+  }
+
+  const eventKr = ctx.eventsBySymbol?.[symbolKey(quote.symbol, quote.market)];
+  if (eventKr) {
+    breakdown.push(...applyEventEnrichment(tagScores, eventKr));
   }
 
   const tag = pickTagFromScore(tagScores);
@@ -292,8 +305,19 @@ export function scoreUsCandidate(quote: ValidQuote, ctx: MarketContext): Enriche
   }
 
   const newsUs = ctx.newsBySymbol?.[symbolKey(quote.symbol, quote.market)];
+  const narrativeUs = newsUs
+    ? computeNarrativeDivergence({ news: newsUs, technical: techUs, changePercent1d: quote.changePercent })
+    : null;
   if (newsUs) {
-    breakdown.push(...applyNewsEnrichment(tagScores, newsUs, quote.changePercent));
+    breakdown.push(...applyNewsEnrichment(tagScores, newsUs, quote.changePercent, narrativeUs));
+  }
+  if (narrativeUs) {
+    breakdown.push(...applyNarrativeEnrichment(tagScores, narrativeUs, techUs));
+  }
+
+  const eventUs = ctx.eventsBySymbol?.[symbolKey(quote.symbol, quote.market)];
+  if (eventUs) {
+    breakdown.push(...applyEventEnrichment(tagScores, eventUs));
   }
 
   const tag = pickTagFromScore(tagScores);

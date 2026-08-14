@@ -3,6 +3,7 @@ import { newsToneFromTitle, type NewsTone } from '../news-tone';
 import type { RecommendationTag } from '../market-sentiment';
 import type { ScoreBreakdownItem } from './types';
 import { technicalSymbolKey } from './technical-enrichment';
+import type { StockNarrativeSnapshot } from './narrative-enrichment';
 
 export interface StockNewsArticleInput {
   title: string;
@@ -124,6 +125,7 @@ export function applyNewsEnrichment(
   tagScores: Record<RecommendationTag, number>,
   snapshot: StockNewsSnapshot,
   changePercent1d: number,
+  narrative?: StockNarrativeSnapshot | null,
 ): ScoreBreakdownItem[] {
   if (snapshot.relevanceScore < 0.5) return [];
   if (snapshot.tone === 'neutral') return [];
@@ -133,19 +135,20 @@ export function applyNewsEnrichment(
     return [];
   }
 
-  let multiplier = 1;
+  let multiplier = narrative?.newsWeightMultiplier ?? 1;
   if (snapshot.secondarySourceCount > snapshot.primarySourceCount) {
     multiplier *= 0.7;
   }
-  if (snapshot.articleCount >= 3) {
+  if (snapshot.articleCount >= 3 && (narrative?.divergence !== 'crowded_bullish' && narrative?.divergence !== 'crowded_bearish')) {
     multiplier *= 0.5;
   }
 
   const breakdown: ScoreBreakdownItem[] = [];
   const headlineParam = { headline: snapshot.headlineSample.slice(0, 120) };
+  const div = narrative?.divergence;
 
   if (snapshot.tone === 'bullish') {
-    if (changePercent1d < -0.3) {
+    if (div === 'bullish_news_price_down' || (changePercent1d < -0.3 && !narrative)) {
       return [
         newsFactor(
           'bullishHeadlines',
@@ -156,6 +159,7 @@ export function applyNewsEnrichment(
         ),
       ];
     }
+    if (multiplier === 0) return [];
     const mom = 0.1 * multiplier;
     const watch = 0.05 * multiplier;
     tagScores.momentum += mom;
@@ -165,6 +169,7 @@ export function applyNewsEnrichment(
       newsFactor('bullishWatch', watch, 'shared.market.recommendation.evidence.newsBullishWatch', snapshot.dedupeKey, headlineParam),
     );
   } else if (snapshot.tone === 'bearish') {
+    if (multiplier === 0) return [];
     const pull = 0.1 * multiplier;
     const mom = -0.1 * multiplier;
     tagScores.pullback += pull;

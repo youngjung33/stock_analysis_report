@@ -30,6 +30,7 @@ export function buildStockRecommendations(
     userWatchlist: input.userWatchlist,
     technicalSnapshots: input.technicalSnapshots,
     newsSnapshots: input.newsSnapshots,
+    eventSnapshots: input.eventSnapshots,
   });
 
   const pool = buildCandidatePool({

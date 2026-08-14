@@ -79,6 +79,8 @@ export interface MarketContextInput {
   technicalSnapshots?: import('./technical-enrichment').StockTechnicalSnapshot[];
   /** Phase H — per-symbol news snapshots */
   newsSnapshots?: import('./news-enrichment').StockNewsSnapshot[];
+  /** Phase I — per-symbol event snapshots (earnings, dividend) */
+  eventSnapshots?: import('./event-enrichment').StockEventSnapshot[];
 }
 
 export interface MarketContext {
@@ -99,6 +101,8 @@ export interface MarketContext {
   technicalBySymbol: Record<string, import('./technical-enrichment').StockTechnicalSnapshot>;
   /** symbolKey → StockNewsSnapshot (Phase H) */
   newsBySymbol: Record<string, import('./news-enrichment').StockNewsSnapshot>;
+  /** symbolKey → StockEventSnapshot (Phase I) */
+  eventsBySymbol: Record<string, import('./event-enrichment').StockEventSnapshot>;
 }
 
 export interface StockRecommendationsResult {

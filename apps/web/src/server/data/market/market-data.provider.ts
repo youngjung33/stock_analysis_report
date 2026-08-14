@@ -7,6 +7,7 @@ import {
   NewsItemData,
 } from '../../domain/ports/market-data.port';
 import { fetchFinnhubMarketNews, fetchFinnhubCompanyNews } from './finnhub-news.client';
+import { fetchFinnhubEarningsCalendar } from './finnhub-earnings.client';
 import { fetchGoogleNewsRss } from './google-news-rss.client';
 import { fetchUsdKrwRate } from './usd-krw.client';
 import { fetchYahooChartQuote, fetchYahooChartSeries } from './yahoo-chart.client';
@@ -115,6 +116,24 @@ export class MarketDataProvider implements IMarketDataProvider {
       publishedAt: new Date(item.datetime * 1000).toISOString(),
       url: item.url,
       market: Market.US,
+    }));
+  }
+
+  async fetchCompanyEarnings(symbol: string) {
+    const from = new Date();
+    from.setDate(from.getDate() - 3);
+    const to = new Date();
+    to.setDate(to.getDate() + 3);
+    const rows = await fetchFinnhubEarningsCalendar(symbol, from, to);
+    return rows.map((row) => ({
+      period: `${row.year ?? ''}Q${row.quarter ?? ''}`,
+      reportDate: row.date,
+      actual: row.epsActual ?? null,
+      estimate: row.epsEstimate ?? null,
+      surprisePercent:
+        row.epsActual != null && row.epsEstimate != null && row.epsEstimate !== 0
+          ? ((row.epsActual - row.epsEstimate) / Math.abs(row.epsEstimate)) * 100
+          : null,
     }));
   }
 

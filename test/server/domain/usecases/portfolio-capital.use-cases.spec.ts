@@ -72,7 +72,7 @@ describe('GetPortfolioSimulationUseCase', () => {
       }),
     };
     const buildStockEnrichmentUseCase = {
-      execute: vi.fn().mockResolvedValue({ candidateQuotes: [], technicalSnapshots: [], newsSnapshots: [] }),
+      execute: vi.fn().mockResolvedValue({ candidateQuotes: [], technicalSnapshots: [], newsSnapshots: [], eventSnapshots: [] }),
     };
 
     const useCase = new GetPortfolioSimulationUseCase(
