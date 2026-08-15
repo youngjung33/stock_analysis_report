@@ -55,6 +55,7 @@ function baseContext(overrides?: Partial<MarketContext>): MarketContext {
     technicalBySymbol: {},
     newsBySymbol: {},
     eventsBySymbol: {},
+    figureStatements: [],
     ...overrides,
   };
 }

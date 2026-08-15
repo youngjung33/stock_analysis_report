@@ -76,6 +76,7 @@ export function buildMarketContext(input: {
   technicalSnapshots?: import('./technical-enrichment').StockTechnicalSnapshot[];
   newsSnapshots?: import('./news-enrichment').StockNewsSnapshot[];
   eventSnapshots?: import('./event-enrichment').StockEventSnapshot[];
+  figureStatements?: import('./figure-enrichment').FigureStatementSnapshot[];
 }): MarketContext {
   const macro = input.macro ?? [];
   const sectors = input.sectors ?? [];
@@ -122,6 +123,7 @@ export function buildMarketContext(input: {
     technicalBySymbol: indexTechnicalSnapshots(input.technicalSnapshots ?? []),
     newsBySymbol: indexNewsSnapshots(input.newsSnapshots ?? []),
     eventsBySymbol: indexEventSnapshots(input.eventSnapshots ?? []),
+    figureStatements: input.figureStatements ?? [],
   };
 }
 

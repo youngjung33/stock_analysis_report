@@ -13,6 +13,7 @@ import { applyTechnicalEnrichment } from './technical-enrichment';
 import { applyNewsEnrichment } from './news-enrichment';
 import { computeNarrativeDivergence, applyNarrativeEnrichment } from './narrative-enrichment';
 import { applyEventEnrichment } from './event-enrichment';
+import { applyFigureEnrichmentsForCandidate } from './figure-enrichment';
 
 type ValidQuote = QuoteInsightInput & { changePercent: number; currentPrice: number };
 
@@ -206,6 +207,15 @@ export function scoreKrCandidate(quote: ValidQuote, ctx: MarketContext): Enriche
     breakdown.push(...applyTechnicalEnrichment(tagScores, techKr, ctx, Market.KR));
   }
 
+  const eventKr = ctx.eventsBySymbol?.[symbolKey(quote.symbol, quote.market)];
+  if (eventKr) {
+    breakdown.push(...applyEventEnrichment(tagScores, eventKr));
+  }
+
+  breakdown.push(
+    ...applyFigureEnrichmentsForCandidate(tagScores, ctx, quote.symbol, quote.market, sectorTags),
+  );
+
   const newsKr = ctx.newsBySymbol?.[symbolKey(quote.symbol, quote.market)];
   const narrativeKr = newsKr
     ? computeNarrativeDivergence({ news: newsKr, technical: techKr, changePercent1d: quote.changePercent })
@@ -215,11 +225,6 @@ export function scoreKrCandidate(quote: ValidQuote, ctx: MarketContext): Enriche
   }
   if (narrativeKr) {
     breakdown.push(...applyNarrativeEnrichment(tagScores, narrativeKr, techKr));
-  }
-
-  const eventKr = ctx.eventsBySymbol?.[symbolKey(quote.symbol, quote.market)];
-  if (eventKr) {
-    breakdown.push(...applyEventEnrichment(tagScores, eventKr));
   }
 
   const tag = pickTagFromScore(tagScores);
@@ -304,6 +309,15 @@ export function scoreUsCandidate(quote: ValidQuote, ctx: MarketContext): Enriche
     breakdown.push(...applyTechnicalEnrichment(tagScores, techUs, ctx, Market.US));
   }
 
+  const eventUs = ctx.eventsBySymbol?.[symbolKey(quote.symbol, quote.market)];
+  if (eventUs) {
+    breakdown.push(...applyEventEnrichment(tagScores, eventUs));
+  }
+
+  breakdown.push(
+    ...applyFigureEnrichmentsForCandidate(tagScores, ctx, quote.symbol, quote.market, sectorTags),
+  );
+
   const newsUs = ctx.newsBySymbol?.[symbolKey(quote.symbol, quote.market)];
   const narrativeUs = newsUs
     ? computeNarrativeDivergence({ news: newsUs, technical: techUs, changePercent1d: quote.changePercent })
@@ -313,11 +327,6 @@ export function scoreUsCandidate(quote: ValidQuote, ctx: MarketContext): Enriche
   }
   if (narrativeUs) {
     breakdown.push(...applyNarrativeEnrichment(tagScores, narrativeUs, techUs));
-  }
-
-  const eventUs = ctx.eventsBySymbol?.[symbolKey(quote.symbol, quote.market)];
-  if (eventUs) {
-    breakdown.push(...applyEventEnrichment(tagScores, eventUs));
   }
 
   const tag = pickTagFromScore(tagScores);

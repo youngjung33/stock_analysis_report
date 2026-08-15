@@ -284,5 +284,6 @@ function minimalKrContext(): MarketContext {
     technicalBySymbol: {},
     newsBySymbol: {},
     eventsBySymbol: {},
+    figureStatements: [],
   };
 }

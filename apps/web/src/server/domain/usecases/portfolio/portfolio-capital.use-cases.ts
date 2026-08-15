@@ -137,7 +137,7 @@ export class GetPortfolioSimulationUseCase {
       })),
     ];
 
-    const { candidateQuotes, technicalSnapshots, newsSnapshots, eventSnapshots } = await this.buildStockEnrichmentUseCase.execute([
+    const { candidateQuotes, technicalSnapshots, newsSnapshots, eventSnapshots, figureStatements } = await this.buildStockEnrichmentUseCase.execute([
       ...enrichmentTargets,
       ...featuredTargets.filter(
         (f) => !enrichmentTargets.some((t) => t.symbol === f.symbol && t.market === f.market),
@@ -182,6 +182,7 @@ export class GetPortfolioSimulationUseCase {
         technicalSnapshots,
         newsSnapshots,
         eventSnapshots,
+        figureStatements,
       },
       candidateQuotes,
     });

@@ -137,7 +137,8 @@ npm run test:e2e     # Playwright (dev server + E2E_USERNAME/PASSWORD for member
 | `FetchRecommendationTechnicalSnapshotsUseCase` | (내부) candidate chart snapshots + 15m cache | `technical-enrichment.spec.ts` |
 | `FetchRecommendationNewsSnapshotsUseCase` | (내부) KR Google RSS / US Finnhub company news + 15m cache | `news-enrichment.spec.ts` |
 | `FetchRecommendationEventSnapshotsUseCase` | (내부) US Finnhub earnings + KR headline fallback + 15m cache | `event-enrichment.spec.ts` |
-| `BuildStockEnrichmentUseCase` | (내부) quotes + technical + news + events batch | portfolio + ledger |
+| `FetchRecommendationFigureStatementsUseCase` | (내부) global figure RSS scan + 15m cache | `figure-enrichment.spec.ts` |
+| `BuildStockEnrichmentUseCase` | (내부) quotes + technical + news + events + figures batch | portfolio + ledger |
 | `GetHoldingBySymbolUseCase` | GET `/api/portfolio/holding` | `get-holding.use-case.spec.ts` |
 | `RecordCashEntryUseCase` | POST `/api/cash` | `cash.use-cases.spec.ts` + HTTP |
 | `RefreshQuotesUseCase` | POST `/api/market/refresh` | `market.use-cases.spec.ts` |

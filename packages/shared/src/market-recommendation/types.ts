@@ -81,6 +81,8 @@ export interface MarketContextInput {
   newsSnapshots?: import('./news-enrichment').StockNewsSnapshot[];
   /** Phase I — per-symbol event snapshots (earnings, dividend) */
   eventSnapshots?: import('./event-enrichment').StockEventSnapshot[];
+  /** Phase J — global figure statements (v3) */
+  figureStatements?: import('./figure-enrichment').FigureStatementSnapshot[];
 }
 
 export interface MarketContext {
@@ -103,6 +105,8 @@ export interface MarketContext {
   newsBySymbol: Record<string, import('./news-enrichment').StockNewsSnapshot>;
   /** symbolKey → StockEventSnapshot (Phase I) */
   eventsBySymbol: Record<string, import('./event-enrichment').StockEventSnapshot>;
+  /** Recent influential-figure statements (Phase J) */
+  figureStatements: import('./figure-enrichment').FigureStatementSnapshot[];
 }
 
 export interface StockRecommendationsResult {

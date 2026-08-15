@@ -6,6 +6,7 @@ import { FetchRecommendationQuotesUseCase } from './domain/usecases/market/fetch
 import { FetchRecommendationTechnicalSnapshotsUseCase } from './domain/usecases/market/fetch-recommendation-technical.use-case';
 import { FetchRecommendationNewsSnapshotsUseCase } from './domain/usecases/market/fetch-recommendation-news.use-case';
 import { FetchRecommendationEventSnapshotsUseCase } from './domain/usecases/market/fetch-recommendation-events.use-case';
+import { FetchRecommendationFigureStatementsUseCase } from './domain/usecases/market/fetch-recommendation-figures.use-case';
 import { BuildStockEnrichmentUseCase } from './domain/usecases/market/build-stock-enrichment.use-case';
 import { GetStockQuoteUseCase } from './domain/usecases/market/get-stock-quote.use-case';
 import { FetchQuotesUseCase } from './domain/usecases/market/fetch-quotes.use-case';
@@ -175,11 +176,13 @@ export function getServerServices(): ServerServices {
   const fetchRecommendationTechnicalUseCase = new FetchRecommendationTechnicalSnapshotsUseCase(marketData);
   const fetchRecommendationNewsUseCase = new FetchRecommendationNewsSnapshotsUseCase(marketData);
   const fetchRecommendationEventsUseCase = new FetchRecommendationEventSnapshotsUseCase(marketData);
+  const fetchRecommendationFiguresUseCase = new FetchRecommendationFigureStatementsUseCase(marketData);
   const buildStockEnrichmentUseCase = new BuildStockEnrichmentUseCase(
     fetchRecommendationQuotesUseCase,
     fetchRecommendationTechnicalUseCase,
     fetchRecommendationNewsUseCase,
     fetchRecommendationEventsUseCase,
+    fetchRecommendationFiguresUseCase,
   );
   const recommendationLedgerRepo = new PrismaRecommendationLedgerRepository();
   const getDashboardUseCase = new GetDashboardUseCase(

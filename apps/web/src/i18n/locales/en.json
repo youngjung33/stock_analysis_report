@@ -1195,7 +1195,11 @@
           "eventEarningsUpcoming": "Earnings ahead ({{eventDay}})",
           "eventEarningsNeutral": "Earnings day ({{eventDay}})",
           "eventDividend": "Dividend / shareholder return event",
-          "eventBuyback": "Buyback / capital return event"
+          "eventBuyback": "Buyback / capital return event",
+          "figureBullishDirect": "Figure statement (bullish) — {{figure}}: {{headline}}",
+          "figureBearishDirect": "Figure statement (bearish) — {{figure}}: {{headline}}",
+          "figureSectorBullish": "Policy figure — {{figure}} (sector aligned)",
+          "figureSectorBearish": "Policy figure — {{figure}} (sector risk)"
         }
       },
       "regime": {

@@ -21,6 +21,7 @@ export function buildGlobalBaselineRecommendations(input: {
     technicalSnapshots?: MarketContextInput['technicalSnapshots'];
     newsSnapshots?: MarketContextInput['newsSnapshots'];
     eventSnapshots?: MarketContextInput['eventSnapshots'];
+    figureStatements?: MarketContextInput['figureStatements'];
   };
   maxRecommendations?: number;
 }): StockRecommendationsResult {

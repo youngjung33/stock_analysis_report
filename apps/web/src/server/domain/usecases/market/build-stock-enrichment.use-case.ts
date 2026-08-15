@@ -1,4 +1,5 @@
 import type {
+  FigureStatementSnapshot,
   QuoteInsightInput,
   StockEventSnapshot,
   StockNewsSnapshot,
@@ -17,14 +18,16 @@ import {
   FetchRecommendationEventSnapshotsUseCase,
   type RecommendationEventRequest,
 } from './fetch-recommendation-events.use-case';
+import { FetchRecommendationFigureStatementsUseCase } from './fetch-recommendation-figures.use-case';
 
-/** Phase G/H/I — batch fetch quotes + technical + news + events */
+/** Phase G–J — batch fetch quotes + technical + news + events + figure statements */
 export class BuildStockEnrichmentUseCase {
   constructor(
     private readonly fetchQuotesUseCase: FetchRecommendationQuotesUseCase,
     private readonly fetchTechnicalUseCase: FetchRecommendationTechnicalSnapshotsUseCase,
     private readonly fetchNewsUseCase: FetchRecommendationNewsSnapshotsUseCase,
     private readonly fetchEventsUseCase: FetchRecommendationEventSnapshotsUseCase,
+    private readonly fetchFiguresUseCase: FetchRecommendationFigureStatementsUseCase,
   ) {}
 
   async execute(targets: RecommendationQuoteRequest[]): Promise<{
@@ -32,6 +35,7 @@ export class BuildStockEnrichmentUseCase {
     technicalSnapshots: StockTechnicalSnapshot[];
     newsSnapshots: StockNewsSnapshot[];
     eventSnapshots: StockEventSnapshot[];
+    figureStatements: FigureStatementSnapshot[];
   }> {
     const newsTargets: RecommendationNewsRequest[] = targets.map((t) => ({
       symbol: t.symbol,
@@ -39,10 +43,11 @@ export class BuildStockEnrichmentUseCase {
       market: t.market,
     }));
 
-    const [candidateQuotes, technicalSnapshots, newsSnapshots] = await Promise.all([
+    const [candidateQuotes, technicalSnapshots, newsSnapshots, figureStatements] = await Promise.all([
       this.fetchQuotesUseCase.execute(targets),
       this.fetchTechnicalUseCase.execute(targets as RecommendationTechnicalRequest[]),
       this.fetchNewsUseCase.execute(newsTargets),
+      this.fetchFiguresUseCase.execute(),
     ]);
 
     const headlineByKey = new Map(
@@ -57,6 +62,6 @@ export class BuildStockEnrichmentUseCase {
 
     const eventSnapshots = await this.fetchEventsUseCase.execute(eventTargets);
 
-    return { candidateQuotes, technicalSnapshots, newsSnapshots, eventSnapshots };
+    return { candidateQuotes, technicalSnapshots, newsSnapshots, eventSnapshots, figureStatements };
   }
 }
