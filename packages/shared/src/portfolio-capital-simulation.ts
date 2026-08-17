@@ -15,6 +15,7 @@ import {
   type PortfolioSimulationResult,
   type SimulationHoldingInput,
 } from './portfolio-simulation';
+import { hasPolicyUncertaintyPulse } from './market-recommendation/figure-enrichment';
 
 export interface FeaturedQuoteInput {
   symbol: string;
@@ -98,6 +99,7 @@ export function buildRankedPortfolioSimulation(input: {
     recommendations: recResult.recommendations,
     usdKrwRate: input.usdKrwRate,
     regimes: recResult.regimes.map((r) => r.id),
+    policyUncertainty: hasPolicyUncertaintyPulse(input.marketContext?.figureStatements ?? []),
   });
 
   return {

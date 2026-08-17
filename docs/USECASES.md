@@ -184,10 +184,11 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | `app-error-codes` | 공통 에러 코드·사용자 메시지 |
 | `auth`, `auth-tokens`, `route-access` | 가입 검증, 토큰, middleware 경로 |
 | `portfolio-dashboard` | dashboard summary/holdings 집계 (guest/server 공유) |
-| `portfolio-capital-simulation` | simulation tag rank pipeline |
+| `portfolio-capital-simulation` | enrichment-aware simulation rank + deploy cap (Phase K) |
 | `investor-survey/` | 투자 유형 catalog, 미니 테스트, **profile** |
 | `guide/` | Tip FAQ catalog |
-| `market-recommendation/` | scoring, **G0** score-caps/dedupe/pipeline, engine |
+| `market-recommendation/` | scoring, **G0** score-caps/dedupe/pipeline, engine, enrichment (G–J) |
+| `simulation-ranking.ts` | §10 v2 add priority (buyback boost, narrative/earnings/figure deprioritize), deploy cap |
 | `recommendation-ledger.ts` | engine version, horizons, batch view types |
 | `build-global-baseline-recommendations.ts` | global profile baseline picks |
 

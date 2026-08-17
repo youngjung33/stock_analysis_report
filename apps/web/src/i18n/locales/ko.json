@@ -573,6 +573,7 @@
     "sentimentTitle": "시장 정세 요약",
     "regimeTitle": "시장 레짐",
     "scoreBreakdownTitle": "추천 근거",
+    "narrativeDivergenceBadge": "서사–가격 괴리 · {{divergence}}",
     "sentimentDesc": "대표 종목 오늘 시세 기준 · 변동성·업종·차트 지표는 상세 페이지",
     "detailAnalysisLink": "상세 분석 →",
     "loadingQuotes": "시세 불러오는 중...",
@@ -1124,6 +1125,12 @@
         "trimUnitTooSmall": "과집중이나 매도 단위 미달 — 관찰",
         "addRecommendation": "추천 내용 참고",
         "reserveCash": "조정 후 남는 예수금 — 추가 매수·비상금으로 활용"
+      },
+      "addPriority": {
+        "buyback": "주주환원 이벤트 — 매수 우선 검토",
+        "narrativeDivergence": "뉴스·가격 괴리({{divergence}}) — 추격 매수 후순위",
+        "earningsEvent": "실적 이벤트({{eventDay}}) — 변동성 — 매수 후순위",
+        "figureVolatile": "인물 발언({{figure}}) — 변동성 — 매수 후순위"
       },
       "cashName": "가용 현금"
     },

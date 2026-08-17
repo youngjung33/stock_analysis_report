@@ -7,6 +7,7 @@ import {
   AnalysisCategory,
   AnalysisInsight,
   AnalysisTone,
+  extractNarrativeDivergence,
   MarketAnalysisReport,
   sentimentBadgeClass,
 } from '@sar/shared';
@@ -113,13 +114,20 @@ function RecommendationBreakdown({ report }: { report: MarketAnalysisReport }) {
     <div className="space-y-3 rounded-xl border border-slate-800 bg-slate-950/30 p-4">
       <h3 className="text-sm font-semibold text-white">{t('market.scoreBreakdownTitle')}</h3>
       <ul className="space-y-3">
-        {report.recommendations.slice(0, 6).map((rec) => (
+        {report.recommendations.slice(0, 6).map((rec) => {
+          const divergence = extractNarrativeDivergence(rec);
+          return (
           <li key={`${rec.market}-${rec.symbol}`} className="text-xs text-slate-300">
             <span className="font-medium text-white">
               {rec.name} ({rec.symbol})
             </span>
             {rec.score != null && (
               <span className="ml-2 text-slate-500">score {rec.score.toFixed(2)}</span>
+            )}
+            {divergence && (
+              <span className="ml-2 rounded-full border border-amber-500/40 bg-amber-950/40 px-2 py-0.5 text-[10px] font-medium text-amber-200">
+                {t('market.narrativeDivergenceBadge', { divergence })}
+              </span>
             )}
             {rec.scoreBreakdown && rec.scoreBreakdown.length > 0 && (
               <ul className="mt-1 list-inside list-disc text-slate-400">
@@ -136,7 +144,8 @@ function RecommendationBreakdown({ report }: { report: MarketAnalysisReport }) {
               </ul>
             )}
           </li>
-        ))}
+          );
+        })}
       </ul>
     </div>
   );

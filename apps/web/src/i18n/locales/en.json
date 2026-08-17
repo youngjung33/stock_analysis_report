@@ -573,6 +573,7 @@
     "sentimentTitle": "Market sentiment summary",
     "regimeTitle": "Market regime",
     "scoreBreakdownTitle": "Recommendation rationale",
+    "narrativeDivergenceBadge": "Narrative–price divergence · {{divergence}}",
     "sentimentDesc": "Featured stocks today · See volatility, sectors, and chart indicators on the detail page",
     "detailAnalysisLink": "Detailed analysis →",
     "loadingQuotes": "Loading quotes...",
@@ -1124,6 +1125,12 @@
         "trimUnitTooSmall": "Overweight but below sell unit — watch",
         "addRecommendation": "See recommendation details",
         "reserveCash": "Remaining cash after adjustment — for additional buys or emergency reserve"
+      },
+      "addPriority": {
+        "buyback": "Shareholder return event — prioritize for buys",
+        "narrativeDivergence": "News–price divergence ({{divergence}}) — deprioritize chase buys",
+        "earningsEvent": "Earnings event ({{eventDay}}) — volatility — deprioritize buys",
+        "figureVolatile": "Figure statement ({{figure}}) — volatility — deprioritize buys"
       },
       "cashName": "Available cash"
     },

@@ -149,6 +149,13 @@ export {
   buildPortfolioSimulation,
 } from './portfolio-simulation';
 export {
+  resolveSimulationAddPriority,
+  resolveSimulationDeployCapRatio,
+  sortRecommendationsForSimulationAdd,
+  extractNarrativeDivergence,
+} from './simulation-ranking';
+export type { SimulationAddPriority, SimulationAddPriorityResult } from './simulation-ranking';
+export {
   buildRankedPortfolioSimulation,
   toFeaturedQuoteInputs,
 } from './portfolio-capital-simulation';

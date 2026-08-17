@@ -104,4 +104,103 @@ describe('buildPortfolioSimulation', () => {
       expect(totalAdd).toBeLessThanOrEqual(10_000_000 * 0.15 + 1);
     }
   });
+
+  it('deprioritizes narrative-divergence picks in add ordering', () => {
+    const result = buildPortfolioSimulation({
+      cash: { krw: 0, usd: 8_000 },
+      holdings: [
+        {
+          symbol: '005930',
+          name: '삼성전자',
+          market: Market.KR,
+          currency: 'KRW',
+          quantity: 5,
+          currentPrice: 70000,
+          marketValueKrw: 350_000,
+          weightPercent: 5,
+        },
+      ],
+      preferences: {
+        targetKrPercent: 30,
+        targetUsPercent: 70,
+        maxSingleWeightPercent: 40,
+      },
+      recommendations: [
+        {
+          symbol: 'NVDA',
+          name: 'NVIDIA',
+          market: Market.US,
+          currency: 'USD',
+          currentPrice: 900,
+          changePercent: 2,
+          tag: 'momentum',
+          tagLabel: '상승',
+          reason: 'test',
+          score: 5,
+          scoreBreakdown: [
+            {
+              factor: 'CH_NARRATIVE',
+              delta: -0.15,
+              evidenceKey: 'ev',
+              evidenceParams: { divergence: 'bullish_news_price_down' },
+            },
+          ],
+        },
+        {
+          symbol: 'AAPL',
+          name: 'Apple',
+          market: Market.US,
+          currency: 'USD',
+          currentPrice: 180,
+          changePercent: -1,
+          tag: 'pullback',
+          tagLabel: '조정',
+          reason: 'test',
+          score: 3,
+        },
+      ],
+      usdKrwRate: 1300,
+    });
+
+    const addActions = result.actions.filter((a) => a.type === 'add');
+    expect(addActions.length).toBeGreaterThan(0);
+    expect(addActions[0]?.symbol).toBe('AAPL');
+    const nvdaAdd = addActions.find((a) => a.symbol === 'NVDA');
+    if (nvdaAdd) {
+      expect(nvdaAdd.addPriority).toBe('deprioritized');
+    }
+  });
+
+  it('caps deploy at 10% under policy uncertainty', () => {
+    const result = buildPortfolioSimulation({
+      cash: { krw: 0, usd: 10_000 },
+      holdings: [],
+      preferences: {
+        targetKrPercent: 30,
+        targetUsPercent: 70,
+        maxSingleWeightPercent: 40,
+      },
+      recommendations: [
+        {
+          symbol: 'AAPL',
+          name: 'Apple',
+          market: Market.US,
+          currency: 'USD',
+          currentPrice: 180,
+          changePercent: 1,
+          tag: 'momentum',
+          tagLabel: '상승',
+          reason: 'test',
+          score: 4,
+        },
+      ],
+      usdKrwRate: 1300,
+      policyUncertainty: true,
+    });
+
+    const addActions = result.actions.filter((a) => a.type === 'add');
+    expect(addActions.length).toBeGreaterThan(0);
+    const totalAdd = addActions.reduce((s, a) => s + (a.suggestedAmountKrw ?? 0), 0);
+    expect(totalAdd).toBeLessThanOrEqual(10_000 * 1300 * 0.1 + 1);
+  });
 });

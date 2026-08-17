@@ -3,6 +3,11 @@ import { CashBalances, cashToKrw, formatCashAmount } from './cash-ledger';
 import { AllocationByMarket } from './portfolio-allocation';
 import { StockRecommendation } from './market-insights.types';
 import type { MarketRegimeId } from './market-recommendation/types';
+import {
+  resolveSimulationAddPriority,
+  resolveSimulationDeployCapRatio,
+  sortRecommendationsForSimulationAdd,
+} from './simulation-ranking';
 
 export interface PortfolioPreferences {
   targetKrPercent: number;
@@ -46,6 +51,10 @@ export interface SimulationAction {
   suggestedQuantity: number | null;
   tagLabel?: string;
   tag?: import('./market-insights').RecommendationTag;
+  /** Phase K — add pick priority from enrichment signals */
+  addPriority?: import('./simulation-ranking').SimulationAddPriority;
+  deprioritizeReasonKey?: string;
+  deprioritizeReasonParams?: Record<string, string | number>;
 }
 
 export interface PortfolioSimulationResult {
@@ -111,8 +120,10 @@ export function buildPortfolioSimulation(input: {
   recommendations: StockRecommendation[];
   usdKrwRate: number | null;
   regimes?: MarketRegimeId[];
+  /** Tier-1 macro figure bearish pulse — deploy cap 10% (Phase K) */
+  policyUncertainty?: boolean;
 }): PortfolioSimulationResult {
-  const { cash, holdings, preferences, recommendations, usdKrwRate, regimes = [] } = input;
+  const { cash, holdings, preferences, recommendations, usdKrwRate, regimes = [], policyUncertainty = false } = input;
   const prefs = {
     targetKrPercent: clampPercent(preferences.targetKrPercent),
     targetUsPercent: clampPercent(preferences.targetUsPercent),
@@ -215,28 +226,32 @@ export function buildPortfolioSimulation(input: {
 
   const heldKeys = new Set(holdings.map((h) => `${h.market}:${h.symbol.toUpperCase()}`));
   const riskOff = regimes.includes('globalRiskOff');
-  const fxWeak = regimes.includes('fxKrwWeak');
 
-  // 2) 시장별 부족분 → add (추천 종목)
+  // 2) 시장별 부족분 → add (추천 종목, enrichment-aware rank)
   const underweightMarket =
     allocationGapPercent.kr >= allocationGapPercent.us ? Market.KR : Market.US;
   const gapPercent = Math.max(allocationGapPercent.kr, allocationGapPercent.us);
 
   let cashDeployRatio = gapPercent > 2 ? 0.6 : 0.3;
-  if (riskOff) cashDeployRatio = Math.min(cashDeployRatio, 0.15);
+  cashDeployRatio = resolveSimulationDeployCapRatio({
+    regimes,
+    policyUncertainty,
+    baseRatio: cashDeployRatio,
+  });
 
   const deployKrw =
     totalAssetsKrw > 0 && gapPercent > 2
       ? Math.min(cashTotalKrw * cashDeployRatio, (gapPercent / 100) * totalAssetsKrw)
-      : Math.min(cashTotalKrw * (riskOff ? 0.15 : 0.3), cashTotalKrw);
+      : Math.min(cashTotalKrw * cashDeployRatio, cashTotalKrw);
 
-  const sortedRecs = [...recommendations]
-    .filter((r) => !heldKeys.has(`${r.market}:${r.symbol.toUpperCase()}`))
-    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+  const sortedRecs = sortRecommendationsForSimulationAdd(
+    recommendations.filter((r) => !heldKeys.has(`${r.market}:${r.symbol.toUpperCase()}`)),
+  );
 
   const marketRecs = sortedRecs.filter((r) => r.market === underweightMarket);
   let picks = marketRecs.length > 0 ? marketRecs : sortedRecs;
 
+  const fxWeak = regimes.includes('fxKrwWeak');
   if (fxWeak && underweightMarket === Market.US) {
     picks = sortedRecs.filter((r) => r.market === Market.KR).concat(
       sortedRecs.filter((r) => r.market === Market.US),
@@ -261,6 +276,8 @@ export function buildPortfolioSimulation(input: {
     else projectedCash.usd -= spendNative;
     projectedInvestedKrw += spendKrw;
 
+    const addPriority = resolveSimulationAddPriority(rec);
+
     actions.push({
       type: 'add',
       symbol: rec.symbol,
@@ -276,6 +293,9 @@ export function buildPortfolioSimulation(input: {
           : {}),
       },
       tag: rec.tag,
+      addPriority: addPriority.priority,
+      deprioritizeReasonKey: addPriority.reasonKey,
+      deprioritizeReasonParams: addPriority.reasonParams,
       currentWeightPercent: null,
       targetWeightPercent: null,
       suggestedAmountKrw: spendKrw,

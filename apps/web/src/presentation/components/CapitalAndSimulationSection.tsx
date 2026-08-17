@@ -240,6 +240,16 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
                   <span className="rounded bg-slate-800 px-2 py-0.5 text-xs font-medium">
                     {t(ACTION_LABEL_KEY[action.type])}
                   </span>
+                  {action.type === 'add' && action.addPriority === 'boosted' && action.deprioritizeReasonKey && (
+                    <span className="rounded-full border border-emerald-500/40 bg-emerald-950/40 px-2 py-0.5 text-[10px] font-medium text-emerald-200">
+                      {t(action.deprioritizeReasonKey, action.deprioritizeReasonParams)}
+                    </span>
+                  )}
+                  {action.type === 'add' && action.addPriority === 'deprioritized' && action.deprioritizeReasonKey && (
+                    <span className="rounded-full border border-amber-500/40 bg-amber-950/40 px-2 py-0.5 text-[10px] font-medium text-amber-200">
+                      {t(action.deprioritizeReasonKey, action.deprioritizeReasonParams)}
+                    </span>
+                  )}
                   {action.tagLabel && action.tag && (
                     <span className="text-xs text-emerald-400">{translateTag(action.tag, t)}</span>
                   )}
