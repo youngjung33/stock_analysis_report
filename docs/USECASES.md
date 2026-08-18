@@ -136,7 +136,7 @@ npm run test:e2e     # Playwright (dev server + E2E_USERNAME/PASSWORD for member
 | `FetchRecommendationQuotesUseCase` | (내부) candidate pool quotes + 15m cache | `portfolio-capital.use-cases.spec.ts` |
 | `FetchRecommendationTechnicalSnapshotsUseCase` | (내부) candidate chart snapshots + 15m cache | `technical-enrichment.spec.ts` |
 | `FetchRecommendationNewsSnapshotsUseCase` | (내부) KR Google RSS / US Finnhub company news + 15m cache | `news-enrichment.spec.ts` |
-| `FetchRecommendationEventSnapshotsUseCase` | (내부) US Finnhub earnings + KR headline fallback + 15m cache | `event-enrichment.spec.ts` |
+| `FetchRecommendationEventSnapshotsUseCase` | (내부) US Finnhub earnings + **KR DART** + headline fallback + 15m cache | `event-enrichment.spec.ts`, `kr-disclosure-enrichment.spec.ts` |
 | `FetchRecommendationFigureStatementsUseCase` | (내부) global figure RSS scan + 15m cache | `figure-enrichment.spec.ts` |
 | `BuildStockEnrichmentUseCase` | (내부) quotes + technical + news + events + figures batch | portfolio + ledger |
 | `GetHoldingBySymbolUseCase` | GET `/api/portfolio/holding` | `get-holding.use-case.spec.ts` |
@@ -189,6 +189,7 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | `guide/` | Tip FAQ catalog |
 | `market-recommendation/` | scoring, **G0** score-caps/dedupe/pipeline, engine, enrichment (G–J) |
 | `simulation-ranking.ts` | §10 v2 add priority (buyback boost, narrative/earnings/figure deprioritize), deploy cap |
+| `kr-corp-registry.ts` · `kr-disclosure-enrichment.ts` | Phase L — DART corp_code · 공시→CH_EVENT |
 | `recommendation-ledger.ts` | engine version, horizons, batch view types |
 | `build-global-baseline-recommendations.ts` | global profile baseline picks |
 

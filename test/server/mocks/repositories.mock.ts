@@ -235,6 +235,7 @@ export function createMockMarketData(
     fetchFinnhubMarketNews: vi.fn().mockResolvedValue([]),
     fetchCompanyNews: vi.fn().mockResolvedValue([]),
     fetchCompanyEarnings: vi.fn().mockResolvedValue([]),
+    fetchKrDisclosures: vi.fn().mockResolvedValue([]),
     searchRemoteStocks: vi.fn().mockResolvedValue([]),
     ...overrides,
   };

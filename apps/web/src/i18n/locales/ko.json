@@ -1203,6 +1203,8 @@
           "eventEarningsNeutral": "실적 발표일 ({{eventDay}})",
           "eventDividend": "배당·주주환원 이벤트",
           "eventBuyback": "자사주 매입·환원 이벤트",
+          "eventKrDisclosureBuyback": "DART 공시 — 자사주·환원 ({{reportName}})",
+          "eventKrDisclosureDividend": "DART 공시 — 배당 ({{reportName}})",
           "figureBullishDirect": "인물 발언(호재) — {{figure}}: {{headline}}",
           "figureBearishDirect": "인물 발언(악재) — {{figure}}: {{headline}}",
           "figureSectorBullish": "정책·인물 발언 — {{figure}} (섹터 정렬)",

@@ -7,6 +7,8 @@ export * from './technical-enrichment';
 export * from './news-enrichment';
 export * from './narrative-enrichment';
 export * from './event-enrichment';
+export * from './kr-corp-registry';
+export * from './kr-disclosure-enrichment';
 export * from './figure-registry';
 export * from './figure-enrichment';
 export * from './score-caps';

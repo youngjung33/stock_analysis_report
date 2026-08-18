@@ -75,6 +75,10 @@ export interface IMarketDataProvider {
       surprisePercent?: number | null;
     }>
   >;
+  /** KR DART disclosure list — Phase L (requires corp_code + DART_API_KEY) */
+  fetchKrDisclosures(corpCode: string): Promise<
+    Array<{ reportName: string; receiptDate: string }>
+  >;
   /** DB catalog 없을 때 Yahoo 종목 검색 fallback */
   searchRemoteStocks(query: string, market: Market): Promise<StockSearchResult[]>;
 }

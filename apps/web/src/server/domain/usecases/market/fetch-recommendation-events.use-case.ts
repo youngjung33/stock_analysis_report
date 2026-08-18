@@ -1,7 +1,9 @@
 import {
   Market,
   buildStockEventFromHeadline,
+  buildStockEventFromKrDisclosure,
   buildStockEventSnapshot,
+  resolveKrCorpCode,
   type StockEventSnapshot,
 } from '@sar/shared';
 import { IMarketDataProvider } from '../../ports/market-data.port';
@@ -17,7 +19,7 @@ export interface RecommendationEventRequest {
   headlineSample?: string;
 }
 
-/** §8.3 — US Finnhub earnings calendar + KR headline fallback, 15m TTL */
+/** §8.3 — US Finnhub earnings + KR DART disclosures + headline fallback, 15m TTL */
 export class FetchRecommendationEventSnapshotsUseCase {
   constructor(private readonly marketData: IMarketDataProvider) {}
 
@@ -50,6 +52,8 @@ export class FetchRecommendationEventSnapshotsUseCase {
 
       if (stock.market === Market.US) {
         await sleep(1100);
+      } else {
+        await sleep(250);
       }
     }
 
@@ -65,6 +69,19 @@ export class FetchRecommendationEventSnapshotsUseCase {
         earnings,
       });
       if (snap) return snap;
+    }
+
+    if (stock.market === Market.KR) {
+      const corpCode = resolveKrCorpCode(stock.symbol);
+      if (corpCode) {
+        const disclosures = await this.marketData.fetchKrDisclosures(corpCode);
+        const dartSnap = buildStockEventFromKrDisclosure({
+          symbol: stock.symbol,
+          market: stock.market,
+          disclosures,
+        });
+        if (dartSnap) return dartSnap;
+      }
     }
 
     if (stock.headlineSample) {

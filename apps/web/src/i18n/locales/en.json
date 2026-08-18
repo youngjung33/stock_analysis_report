@@ -1203,6 +1203,8 @@
           "eventEarningsNeutral": "Earnings day ({{eventDay}})",
           "eventDividend": "Dividend / shareholder return event",
           "eventBuyback": "Buyback / capital return event",
+          "eventKrDisclosureBuyback": "DART filing — buyback / return ({{reportName}})",
+          "eventKrDisclosureDividend": "DART filing — dividend ({{reportName}})",
           "figureBullishDirect": "Figure statement (bullish) — {{figure}}: {{headline}}",
           "figureBearishDirect": "Figure statement (bearish) — {{figure}}: {{headline}}",
           "figureSectorBullish": "Policy figure — {{figure}} (sector aligned)",

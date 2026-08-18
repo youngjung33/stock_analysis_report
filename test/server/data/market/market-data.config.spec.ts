@@ -25,6 +25,13 @@ describe('MarketDataConfig', () => {
     expect(config.isFinnhubConfigured()).toBe(false);
   });
 
+  it('returns null when DART_API_KEY is missing', () => {
+    delete process.env.DART_API_KEY;
+    const config = new MarketDataConfig();
+    expect(config.dartApiKey).toBeNull();
+    expect(config.isDartConfigured()).toBe(false);
+  });
+
   it('returns trimmed key when configured', () => {
     process.env.FINNHUB_API_KEY = '  abc123  ';
     const config = new MarketDataConfig();

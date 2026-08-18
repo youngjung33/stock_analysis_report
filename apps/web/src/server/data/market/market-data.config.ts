@@ -12,4 +12,15 @@ export class MarketDataConfig {
   isFinnhubConfigured(): boolean {
     return this.finnhubApiKey !== null;
   }
+
+  /** DART Open API (optional — Phase L KR disclosures) */
+  get dartApiKey(): string | null {
+    const raw = process.env.DART_API_KEY?.trim();
+    if (!raw) return null;
+    return raw;
+  }
+
+  isDartConfigured(): boolean {
+    return this.dartApiKey !== null;
+  }
 }

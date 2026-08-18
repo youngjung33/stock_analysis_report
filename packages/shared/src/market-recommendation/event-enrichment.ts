@@ -29,11 +29,13 @@ export interface StockEventSnapshot {
   dedupeKey: string;
   surprisePercent?: number | null;
   headlineSample?: string;
+  /** Phase L — disclosure provenance for evidence */
+  source?: 'finnhub' | 'dart' | 'headline';
 }
 
 const MS_DAY = 24 * 60 * 60 * 1000;
 
-function eventDayOffset(reportDate: string, now = Date.now()): StockEventDay | null {
+export function eventDayOffsetFromDate(reportDate: string, now = Date.now()): StockEventDay | null {
   const target = new Date(reportDate).setHours(0, 0, 0, 0);
   if (!Number.isFinite(target)) return null;
   const today = new Date(now).setHours(0, 0, 0, 0);
@@ -42,6 +44,10 @@ function eventDayOffset(reportDate: string, now = Date.now()): StockEventDay | n
   if (diffDays === 0) return 'D0';
   if (diffDays === 1) return 'D+1';
   return null;
+}
+
+function eventDayOffset(reportDate: string, now = Date.now()): StockEventDay | null {
+  return eventDayOffsetFromDate(reportDate, now);
 }
 
 function classifyEarnings(input: StockEventEarningsInput): StockEventKind {
@@ -75,6 +81,7 @@ export function buildStockEventSnapshot(input: {
       eventDay: day,
       dedupeKey,
       surprisePercent: row.surprisePercent ?? null,
+      source: 'finnhub',
     };
   }
 
@@ -103,6 +110,7 @@ export function buildStockEventFromHeadline(input: {
     eventDay: 'D0',
     dedupeKey: `headline:${input.symbol.toUpperCase()}:${kind}`,
     headlineSample: h.slice(0, 120),
+    source: 'headline',
   };
 }
 
@@ -134,6 +142,9 @@ export function applyEventEnrichment(
   };
   if (snapshot.surprisePercent != null) {
     params.surprise = snapshot.surprisePercent.toFixed(1);
+  }
+  if (snapshot.headlineSample && snapshot.source === 'dart') {
+    params.reportName = snapshot.headlineSample.slice(0, 80);
   }
 
   const key = snapshot.dedupeKey;
@@ -182,16 +193,16 @@ export function applyEventEnrichment(
     case 'buyback': {
       const def = 0.1;
       tagScores.defensive += def;
-      breakdown.push(
-        eventFactor(
-          snapshot.kind,
-          def,
-          snapshot.kind === 'dividend'
+      const evidenceKey =
+        snapshot.source === 'dart'
+          ? snapshot.kind === 'dividend'
+            ? 'shared.market.recommendation.evidence.eventKrDisclosureDividend'
+            : 'shared.market.recommendation.evidence.eventKrDisclosureBuyback'
+          : snapshot.kind === 'dividend'
             ? 'shared.market.recommendation.evidence.eventDividend'
-            : 'shared.market.recommendation.evidence.eventBuyback',
-          key,
-          params,
-        ),
+            : 'shared.market.recommendation.evidence.eventBuyback';
+      breakdown.push(
+        eventFactor(snapshot.kind, def, evidenceKey, key, params),
       );
       break;
     }

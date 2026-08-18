@@ -8,6 +8,7 @@ import {
 } from '../../domain/ports/market-data.port';
 import { fetchFinnhubMarketNews, fetchFinnhubCompanyNews } from './finnhub-news.client';
 import { fetchFinnhubEarningsCalendar } from './finnhub-earnings.client';
+import { fetchDartDisclosureList } from './dart-disclosure.client';
 import { fetchGoogleNewsRss } from './google-news-rss.client';
 import { fetchUsdKrwRate } from './usd-krw.client';
 import { fetchYahooChartQuote, fetchYahooChartSeries } from './yahoo-chart.client';
@@ -135,6 +136,10 @@ export class MarketDataProvider implements IMarketDataProvider {
           ? ((row.epsActual - row.epsEstimate) / Math.abs(row.epsEstimate)) * 100
           : null,
     }));
+  }
+
+  fetchKrDisclosures(corpCode: string) {
+    return fetchDartDisclosureList(corpCode);
   }
 
   searchRemoteStocks(query: string, market: Market): Promise<StockSearchResult[]> {
