@@ -256,6 +256,8 @@ export {
 export type { StockSearchResult, YahooSearchQuote } from './stock-search';
 export {
   dedupeCatalogEntries,
+  enrichKrCatalogWithDartCorpCodes,
+  parseDartCorpCodeXml,
   parseKindCorpListHtml,
   parseNasdaqListedTxt,
   parseOtherListedTxt,
@@ -303,6 +305,8 @@ export {
   buildStockEventFromKrDisclosure,
   classifyKrDisclosureReport,
   resolveKrCorpCode,
+  KR_CORP_CODE_FALLBACK,
+  isKrCorpCodeRegistered,
   applyEventEnrichment,
   buildFigureStatementSnapshots,
   applyFigureEnrichment,

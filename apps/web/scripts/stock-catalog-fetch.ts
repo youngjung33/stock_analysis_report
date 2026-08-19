@@ -4,10 +4,13 @@ import path from 'node:path';
 import {
   StockCatalogEntry,
   dedupeCatalogEntries,
+  enrichKrCatalogWithDartCorpCodes,
+  parseDartCorpCodeXml,
   parseKindCorpListHtml,
   parseNasdaqListedTxt,
   parseOtherListedTxt,
 } from '@sar/shared';
+import { fetchDartCorpCodeXml } from '../src/server/data/market/dart-corp-code.client';
 
 const NASDAQ_LISTED_URL = 'https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqlisted.txt';
 const OTHER_LISTED_URL = 'https://www.nasdaqtrader.com/dynamic/SymDir/otherlisted.txt';
@@ -142,7 +145,24 @@ export async function fetchKrStockCatalog(): Promise<{
   });
 
   const entries = parseKindCorpListHtml(kind.content);
-  return { html: kind.content, entries, changed: kind.changed };
+  let enriched = entries;
+
+  const dartKey = process.env.DART_API_KEY?.trim();
+  if (dartKey) {
+    try {
+      const xml = await fetchDartCorpCodeXml(dartKey);
+      const corpMap = parseDartCorpCodeXml(xml);
+      enriched = enrichKrCatalogWithDartCorpCodes(entries, corpMap);
+      const withCode = enriched.filter((e) => e.dartCorpCode).length;
+      console.log(`  DART corp_code: ${withCode}/${entries.length} KR 종목 매핑`);
+    } catch (err) {
+      console.warn('  DART corp_code fetch 실패 (fallback registry만 사용):', err);
+    }
+  } else {
+    console.log('  DART_API_KEY 없음 — dartCorpCode 생략 (fetch 후 import 시 registry fallback)');
+  }
+
+  return { html: kind.content, entries: enriched, changed: kind.changed };
 }
 
 export async function writeJson(filePath: string, data: unknown): Promise<void> {

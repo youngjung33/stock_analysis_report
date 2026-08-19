@@ -175,7 +175,10 @@ export function getServerServices(): ServerServices {
   const fetchRecommendationQuotesUseCase = new FetchRecommendationQuotesUseCase(marketData);
   const fetchRecommendationTechnicalUseCase = new FetchRecommendationTechnicalSnapshotsUseCase(marketData);
   const fetchRecommendationNewsUseCase = new FetchRecommendationNewsSnapshotsUseCase(marketData);
-  const fetchRecommendationEventsUseCase = new FetchRecommendationEventSnapshotsUseCase(marketData);
+  const fetchRecommendationEventsUseCase = new FetchRecommendationEventSnapshotsUseCase(
+    marketData,
+    catalogRepo,
+  );
   const fetchRecommendationFiguresUseCase = new FetchRecommendationFigureStatementsUseCase(marketData);
   const buildStockEnrichmentUseCase = new BuildStockEnrichmentUseCase(
     fetchRecommendationQuotesUseCase,

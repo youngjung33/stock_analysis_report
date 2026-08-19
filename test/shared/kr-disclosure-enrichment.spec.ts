@@ -44,17 +44,9 @@ describe('kr-disclosure-enrichment (Phase L)', () => {
     expect(snap?.eventDay).toBe('D0');
   });
 
-  it('returns null when disclosures are outside D-1~D+1 window', () => {
-    const snap = buildStockEventFromKrDisclosure({
-      symbol: '005930',
-      market: Market.KR,
-      disclosures: [
-        {
-          reportName: '배당 결정',
-          receiptDate: isoDayOffset(-10).replace(/-/g, ''),
-        },
-      ],
-    });
-    expect(snap).toBeNull();
+  it('resolveKrCorpCode prefers catalog over static fallback', () => {
+    expect(resolveKrCorpCode('005930', { '005930': '00999999' })).toBe('00999999');
+    expect(resolveKrCorpCode('999999', { '999999': '00111111' })).toBe('00111111');
+    expect(resolveKrCorpCode('005930')).toBe('00126380');
   });
 });

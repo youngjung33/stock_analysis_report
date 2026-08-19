@@ -190,6 +190,7 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | `market-recommendation/` | scoring, **G0** score-caps/dedupe/pipeline, engine, enrichment (G–J) |
 | `simulation-ranking.ts` | §10 v2 add priority (buyback boost, narrative/earnings/figure deprioritize), deploy cap |
 | `kr-corp-registry.ts` · `kr-disclosure-enrichment.ts` | Phase L — DART corp_code · 공시→CH_EVENT |
+| `StockCatalog.dartCorpCode` | Phase M — Catalog DB corp_code lookup |
 | `recommendation-ledger.ts` | engine version, horizons, batch view types |
 | `build-global-baseline-recommendations.ts` | global profile baseline picks |
 

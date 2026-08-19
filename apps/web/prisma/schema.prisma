@@ -125,6 +125,7 @@ model StockCatalog {
   market      String
   board       String
   yahooSymbol String
+  dartCorpCode String?
   isActive    Boolean  @default(true)
   syncedAt    DateTime @default(now())
 

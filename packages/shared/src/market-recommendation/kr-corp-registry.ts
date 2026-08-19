@@ -1,5 +1,5 @@
-/** §8.3 KR — DART corp_code (8-digit) for featured / candidate symbols (Phase L) */
-const KR_CORP_CODE_BY_SYMBOL: Record<string, string> = {
+/** §8.3 KR — DART corp_code fallback + Catalog DB lookup (Phase L/M) */
+export const KR_CORP_CODE_FALLBACK: Record<string, string> = {
   '005930': '00126380', // 삼성전자
   '000660': '00164779', // SK하이닉스
   '035420': '00266961', // NAVER
@@ -17,11 +17,26 @@ const KR_CORP_CODE_BY_SYMBOL: Record<string, string> = {
   '000270': '00106641', // 기아
 };
 
-export function resolveKrCorpCode(symbol: string): string | null {
-  const code = KR_CORP_CODE_BY_SYMBOL[symbol.trim()];
-  return code ?? null;
+function normalizeKrSymbol(symbol: string): string {
+  const trimmed = symbol.trim();
+  if (/^\d+$/.test(trimmed)) return trimmed.padStart(6, '0');
+  return trimmed.toUpperCase();
 }
 
-export function isKrCorpCodeRegistered(symbol: string): boolean {
-  return resolveKrCorpCode(symbol) != null;
+/** Catalog DB map first, then static fallback (featured / major names) */
+export function resolveKrCorpCode(
+  symbol: string,
+  catalog?: Record<string, string | null | undefined>,
+): string | null {
+  const key = normalizeKrSymbol(symbol);
+  const fromCatalog = catalog?.[key];
+  if (fromCatalog) return fromCatalog;
+  return KR_CORP_CODE_FALLBACK[key] ?? null;
+}
+
+export function isKrCorpCodeRegistered(
+  symbol: string,
+  catalog?: Record<string, string | null | undefined>,
+): boolean {
+  return resolveKrCorpCode(symbol, catalog) != null;
 }

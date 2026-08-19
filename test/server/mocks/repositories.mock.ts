@@ -120,6 +120,7 @@ export function createMockCatalogRepo(
     countByMarket: vi.fn().mockResolvedValue(0),
     search: vi.fn().mockResolvedValue([]),
     findBySymbols: vi.fn().mockResolvedValue([]),
+    findDartCorpCodesBySymbols: vi.fn().mockResolvedValue({}),
     ...overrides,
   };
 }

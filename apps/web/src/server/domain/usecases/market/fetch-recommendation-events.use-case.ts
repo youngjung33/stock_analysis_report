@@ -7,6 +7,7 @@ import {
   type StockEventSnapshot,
 } from '@sar/shared';
 import { IMarketDataProvider } from '../../ports/market-data.port';
+import { IStockCatalogRepository } from '../../repositories';
 import {
   getCachedRecommendationEvent,
   setCachedRecommendationEvent,
@@ -19,12 +20,20 @@ export interface RecommendationEventRequest {
   headlineSample?: string;
 }
 
-/** §8.3 — US Finnhub earnings + KR DART disclosures + headline fallback, 15m TTL */
+/** §8.3 — US Finnhub earnings + KR DART (Catalog corp_code) + headline fallback, 15m TTL */
 export class FetchRecommendationEventSnapshotsUseCase {
-  constructor(private readonly marketData: IMarketDataProvider) {}
+  constructor(
+    private readonly marketData: IMarketDataProvider,
+    private readonly catalogRepo?: IStockCatalogRepository,
+  ) {}
 
   async execute(stocks: RecommendationEventRequest[]): Promise<StockEventSnapshot[]> {
     if (stocks.length === 0) return [];
+
+    const krSymbols = stocks.filter((s) => s.market === Market.KR).map((s) => s.symbol);
+    const catalogCorpCodes = this.catalogRepo
+      ? await this.catalogRepo.findDartCorpCodesBySymbols(krSymbols).catch(() => ({}))
+      : {};
 
     const snapshots: StockEventSnapshot[] = [];
     const seen = new Set<string>();
@@ -41,7 +50,7 @@ export class FetchRecommendationEventSnapshotsUseCase {
       }
 
       try {
-        const snap = await this.fetchSnapshot(stock);
+        const snap = await this.fetchSnapshot(stock, catalogCorpCodes);
         if (snap) {
           setCachedRecommendationEvent(snap);
           snapshots.push(snap);
@@ -60,7 +69,10 @@ export class FetchRecommendationEventSnapshotsUseCase {
     return snapshots;
   }
 
-  private async fetchSnapshot(stock: RecommendationEventRequest): Promise<StockEventSnapshot | null> {
+  private async fetchSnapshot(
+    stock: RecommendationEventRequest,
+    catalogCorpCodes: Record<string, string>,
+  ): Promise<StockEventSnapshot | null> {
     if (stock.market === Market.US) {
       const earnings = await this.marketData.fetchCompanyEarnings(stock.symbol);
       const snap = buildStockEventSnapshot({
@@ -72,7 +84,7 @@ export class FetchRecommendationEventSnapshotsUseCase {
     }
 
     if (stock.market === Market.KR) {
-      const corpCode = resolveKrCorpCode(stock.symbol);
+      const corpCode = resolveKrCorpCode(stock.symbol, catalogCorpCodes);
       if (corpCode) {
         const disclosures = await this.marketData.fetchKrDisclosures(corpCode);
         const dartSnap = buildStockEventFromKrDisclosure({

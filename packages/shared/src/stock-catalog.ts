@@ -7,6 +7,8 @@ export interface StockCatalogEntry {
   market: Market;
   board: string;
   yahooSymbol: string;
+  /** DART Open API corp_code (8-digit) — Phase M */
+  dartCorpCode?: string;
 }
 
 const US_BOARD_BY_EXCHANGE: Record<string, string> = {
@@ -148,5 +150,35 @@ export function dedupeCatalogEntries(entries: StockCatalogEntry[]): StockCatalog
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
+  });
+}
+
+/** DART CORPCODE.xml → { [stock_code]: corp_code } (Phase M) */
+export function parseDartCorpCodeXml(xml: string): Record<string, string> {
+  const map: Record<string, string> = {};
+  const listRegex = /<list>([\s\S]*?)<\/list>/gi;
+  let match: RegExpExecArray | null;
+
+  while ((match = listRegex.exec(xml)) !== null) {
+    const block = match[1];
+    const corpCode = block.match(/<corp_code>\s*([^<]+?)\s*<\/corp_code>/i)?.[1]?.trim();
+    const stockCode = block.match(/<stock_code>\s*([^<]+?)\s*<\/stock_code>/i)?.[1]?.trim();
+    if (!corpCode || !stockCode || !/^\d{6}$/.test(stockCode)) continue;
+    map[stockCode] = corpCode;
+  }
+
+  return map;
+}
+
+/** Merge DART corp_code map into KR catalog entries (existing dartCorpCode wins) */
+export function enrichKrCatalogWithDartCorpCodes(
+  entries: StockCatalogEntry[],
+  corpCodeBySymbol: Record<string, string>,
+): StockCatalogEntry[] {
+  return entries.map((entry) => {
+    if (entry.market !== Market.KR) return entry;
+    if (entry.dartCorpCode) return entry;
+    const code = corpCodeBySymbol[entry.symbol];
+    return code ? { ...entry, dartCorpCode: code } : entry;
   });
 }

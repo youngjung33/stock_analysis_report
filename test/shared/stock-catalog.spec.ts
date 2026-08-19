@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { Market } from '@sar/shared';
 import {
   dedupeCatalogEntries,
+  enrichKrCatalogWithDartCorpCodes,
+  parseDartCorpCodeXml,
   parseKindCorpListHtml,
   parseNasdaqListedTxt,
   parseOtherListedTxt,
@@ -75,5 +77,60 @@ describe('dedupeCatalogEntries', () => {
       { symbol: 'AAPL', name: 'B', market: Market.US, board: 'NASDAQ', yahooSymbol: 'AAPL' },
     ]);
     expect(rows).toHaveLength(1);
+  });
+});
+
+const DART_XML_SAMPLE = `<?xml version="1.0" encoding="UTF-8"?>
+<result>
+  <list>
+    <corp_code>00126380</corp_code>
+    <corp_name>삼성전자</corp_name>
+    <stock_code>005930</stock_code>
+  </list>
+  <list>
+    <corp_code>00258801</corp_code>
+    <corp_name>카카오</corp_name>
+    <stock_code>035720</stock_code>
+  </list>
+  <list>
+    <corp_code>00000000</corp_code>
+    <corp_name>비상장</corp_name>
+    <stock_code></stock_code>
+  </list>
+</result>`;
+
+describe('parseDartCorpCodeXml', () => {
+  it('maps listed stock_code to corp_code', () => {
+    const map = parseDartCorpCodeXml(DART_XML_SAMPLE);
+    expect(map['005930']).toBe('00126380');
+    expect(map['035720']).toBe('00258801');
+    expect(Object.keys(map)).toHaveLength(2);
+  });
+});
+
+describe('enrichKrCatalogWithDartCorpCodes', () => {
+  it('adds dartCorpCode without overwriting existing', () => {
+    const entries = enrichKrCatalogWithDartCorpCodes(
+      [
+        {
+          symbol: '005930',
+          name: '삼성전자',
+          market: Market.KR,
+          board: 'KOSPI',
+          yahooSymbol: '005930.KS',
+        },
+        {
+          symbol: '035720',
+          name: '카카오',
+          market: Market.KR,
+          board: 'KOSDAQ',
+          yahooSymbol: '035720.KQ',
+          dartCorpCode: 'EXISTING',
+        },
+      ],
+      { '005930': '00126380', '035720': '00258801' },
+    );
+    expect(entries[0].dartCorpCode).toBe('00126380');
+    expect(entries[1].dartCorpCode).toBe('EXISTING');
   });
 });

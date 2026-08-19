@@ -24,7 +24,8 @@ npm run fetch:stocks
 | `all-stocks.json` | 한국+미국 합본 |
 
 한국·미국 모두 **원본 파일 1~2회 HTTP 다운로드 → SHA256 해시 비교** 방식입니다.  
-내용이 같으면 json 재생성을 건너뜁니다. API 키는 필요 없습니다.
+내용이 같으면 json 재생성을 건너뜁니다. API 키는 필요 없습니다.  
+`DART_API_KEY` 가 있으면 KR json에 **dartCorpCode** 가 자동 채워집니다 (OpenDART CORPCODE.xml).
 
 스크립트: `apps/web/scripts/fetch-stocks.ts` (내부: `stock-catalog-fetch.ts`)
 
@@ -37,7 +38,8 @@ npm run fetch:stocks
     "name": "삼성전자",
     "market": "KR",
     "board": "KOSPI",
-    "yahooSymbol": "005930.KS"
+    "yahooSymbol": "005930.KS",
+    "dartCorpCode": "00126380"
   },
   {
     "symbol": "AAPL",
@@ -59,6 +61,7 @@ Supabase `StockCatalog` 테이블 컬럼 (Prisma schema 기준, 로컬 파일):
 | market | text | `KR` 또는 `US` |
 | board | text | KOSPI, KOSDAQ, NASDAQ, NYSE, AMEX 등 |
 | yahooSymbol | text | 시세 조회용 |
+| dartCorpCode | text | KR DART corp_code (8자리, Phase M) |
 | isActive | boolean | 기본 `true` |
 | syncedAt | timestamptz | 임포트 시각 |
 

@@ -10,7 +10,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { PrismaClient } from '@prisma/client';
-import { Market, StockCatalogEntry } from '@sar/shared';
+import { Market, StockCatalogEntry, KR_CORP_CODE_FALLBACK } from '@sar/shared';
 import { STOCK_CATALOG_DIR } from './stock-catalog-fetch';
 
 const prisma = new PrismaClient();
@@ -66,8 +66,12 @@ async function loadEntries(filePath: string): Promise<StockCatalogEntry[]> {
 async function upsertBatch(entries: StockCatalogEntry[]): Promise<void> {
   const now = new Date();
   await prisma.$transaction(
-    entries.map((entry) =>
-      prisma.stockCatalog.upsert({
+    entries.map((entry) => {
+      const dartCorpCode =
+        entry.dartCorpCode ??
+        (entry.market === Market.KR ? KR_CORP_CODE_FALLBACK[entry.symbol] : undefined) ??
+        null;
+      return prisma.stockCatalog.upsert({
         where: {
           symbol_market: { symbol: entry.symbol, market: entry.market },
         },
@@ -77,6 +81,7 @@ async function upsertBatch(entries: StockCatalogEntry[]): Promise<void> {
           market: entry.market,
           board: entry.board,
           yahooSymbol: entry.yahooSymbol,
+          dartCorpCode,
           isActive: true,
           syncedAt: now,
         },
@@ -84,11 +89,12 @@ async function upsertBatch(entries: StockCatalogEntry[]): Promise<void> {
           name: entry.name,
           board: entry.board,
           yahooSymbol: entry.yahooSymbol,
+          dartCorpCode,
           isActive: true,
           syncedAt: now,
         },
-      }),
-    ),
+      });
+    }),
   );
 }
 
