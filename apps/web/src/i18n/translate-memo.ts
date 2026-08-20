@@ -6,6 +6,7 @@ import type { TFunction } from 'i18next';
 const LEGACY_BUY = /^(.+)\s+매수$/;
 const LEGACY_SELL = /^(.+)\s+매도$/;
 const LEGACY_DIVIDEND = /^(.+)\s+배당$/;
+const TYPED_TRADE_STT = /^(.+)\s+SELL\|STT:(\d+)$/;
 const TYPED_TRADE = /^(.+)\s+(BUY|SELL)$/;
 const TYPED_DIVIDEND = /^(.+)\s+DIVIDEND$/;
 const TYPED_CASH = /^(INITIAL|DEPOSIT|WITHDRAW):(KRW|USD)$/;
@@ -57,6 +58,15 @@ export function translateLedgerMemo(memo: string | null | undefined, t: TFunctio
   const legacyDividend = memo.match(LEGACY_DIVIDEND);
   if (legacyDividend) {
     return t('transactions.memo.dividend', { symbol: legacyDividend[1] });
+  }
+
+  const typedTradeStt = memo.match(TYPED_TRADE_STT);
+  if (typedTradeStt) {
+    return t('transactions.memo.tradeWithStt', {
+      symbol: typedTradeStt[1],
+      side: t('transactions.form.sell'),
+      tax: Number(typedTradeStt[2]).toLocaleString(),
+    });
   }
 
   const typedTrade = memo.match(TYPED_TRADE);

@@ -1,6 +1,6 @@
 import { vi, type Mock } from 'vitest';
 import { ValidationError, EntityNotFoundError } from '@server/domain/errors/domain.errors';
-import { AppErrorCode, Market, TransactionType } from '@sar/shared';
+import { AppErrorCode, Market, TransactionType, CashLedgerType } from '@sar/shared';
 import { CreateTransactionUseCase } from '@server/domain/usecases/transactions/create-transaction.use-case';
 import { DeleteTransactionUseCase } from '@server/domain/usecases/transactions/delete-transaction.use-case';
 import { ListTransactionsUseCase } from '@server/domain/usecases/transactions/list-transactions.use-case';
@@ -176,6 +176,41 @@ describe('CreateTransactionUseCase', () => {
         tradedAt: new Date(),
       }),
     ).rejects.toThrow(ValidationError);
+  });
+
+  it('credits net KR sell proceeds after securities transaction tax', async () => {
+    const stock = createMockStock({ market: Market.KR, currency: 'KRW', symbol: '005930' });
+    const stockRepo = createMockStockRepo();
+    stockRepo.findBySymbolAndMarket.mockResolvedValue(stock);
+
+    const txRepo = createMockTransactionRepo();
+    txRepo.findByUserAndStock.mockResolvedValue([
+      createMockTransaction({ quantity: 10, type: TransactionType.BUY, price: 70_000 }),
+    ]);
+    txRepo.create.mockResolvedValue(createMockTransaction({ id: 'tx-sell-1' }));
+
+    const cashCreate = vi.fn().mockResolvedValue({});
+    const cashRepo = createMockCashRepo({ create: cashCreate });
+
+    const useCase = new CreateTransactionUseCase(stockRepo, txRepo, cashRepo);
+    await useCase.execute({
+      userId: 'user-1',
+      stockSymbol: '005930',
+      market: Market.KR,
+      name: '삼성전자',
+      type: TransactionType.SELL,
+      quantity: 10,
+      price: 100_000,
+      tradedAt: new Date(),
+    });
+
+    expect(cashCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: CashLedgerType.SELL_SETTLE,
+        amount: 998_000,
+        memo: '005930 SELL|STT:2000',
+      }),
+    );
   });
 });
 

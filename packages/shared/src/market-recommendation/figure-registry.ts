@@ -106,3 +106,10 @@ export function headlineMatchesTopic(title: string, topicTags: string[]): boolea
   const lower = title.toLowerCase();
   return topicTags.some((t) => lower.includes(t.toLowerCase()));
 }
+
+/** Phase N+ — Google News site:x.com secondary scan for figure posts */
+export function buildFigureSnsNewsQuery(): string {
+  const names = [...new Set(FIGURE_REGISTRY.map((e) => e.displayName))];
+  const nameClause = names.map((n) => `"${n}"`).join(' OR ');
+  return `(${nameClause}) (site:x.com OR site:twitter.com)`;
+}

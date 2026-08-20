@@ -6,7 +6,14 @@ export function formatCashLedgerMemo(kind: CashLedgerMemoKind, currency: 'KRW' |
 }
 
 /** Trade memo — machine-readable; UI translates at display time */
-export function formatTradeLedgerMemo(symbol: string, side: 'BUY' | 'SELL'): string {
+export function formatTradeLedgerMemo(
+  symbol: string,
+  side: 'BUY' | 'SELL',
+  options?: { securitiesTaxKrw?: number },
+): string {
+  if (side === 'SELL' && options?.securitiesTaxKrw && options.securitiesTaxKrw > 0) {
+    return `${symbol} SELL|STT:${options.securitiesTaxKrw}`;
+  }
   return `${symbol} ${side}`;
 }
 

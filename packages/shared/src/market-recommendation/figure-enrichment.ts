@@ -10,10 +10,13 @@ import {
 } from './figure-registry';
 import { figureLinkScopeAllowsSymbolDelta } from './score-dedupe';
 
+export type FigureStatementSourceChannel = 'rss' | 'sns';
+
 export interface FigureStatementArticleInput {
   title: string;
   publishedAt: string;
   source?: string;
+  sourceChannel?: FigureStatementSourceChannel;
 }
 
 export interface FigureStatementSnapshot {
@@ -25,6 +28,7 @@ export interface FigureStatementSnapshot {
   headline: string;
   publishedAt: string;
   dedupeKey: string;
+  sourceChannel: FigureStatementSourceChannel;
   primarySymbols: string[];
   sectorTags: StockSectorTag[];
   topicTags: string[];
@@ -32,8 +36,44 @@ export interface FigureStatementSnapshot {
 
 const STATEMENT_WINDOW_MS = 72 * 60 * 60 * 1000;
 
+/** Matches FetchRecommendationFigureStatementsUseCase RSS(15) + SNS(10) merge cap */
+export const FIGURE_RSS_FETCH_LIMIT = 15;
+export const FIGURE_SNS_FETCH_LIMIT = 10;
+export const FIGURE_STATEMENT_ARTICLE_SCAN_LIMIT =
+  FIGURE_RSS_FETCH_LIMIT + FIGURE_SNS_FETCH_LIMIT;
+
 function simpleHeadlineKey(title: string): string {
   return title.toLowerCase().replace(/\s+/g, ' ').trim().slice(0, 80);
+}
+
+export function figureHeadlineDedupeKey(title: string, figureId?: string): string {
+  const key = simpleHeadlineKey(title);
+  return figureId ? `figure:${figureId}:${key}` : key;
+}
+
+/** Merge RSS (primary) + SNS (secondary); RSS wins on duplicate headlines */
+export function mergeFigureStatementArticles(
+  primary: FigureStatementArticleInput[],
+  secondary: FigureStatementArticleInput[],
+): FigureStatementArticleInput[] {
+  const seen = new Set<string>();
+  const merged: FigureStatementArticleInput[] = [];
+
+  for (const article of primary) {
+    const key = figureHeadlineDedupeKey(article.title);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push({ ...article, sourceChannel: article.sourceChannel ?? 'rss' });
+  }
+
+  for (const article of secondary) {
+    const key = figureHeadlineDedupeKey(article.title);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push({ ...article, sourceChannel: article.sourceChannel ?? 'sns' });
+  }
+
+  return merged;
 }
 
 function snapshotFromArticle(
@@ -55,7 +95,8 @@ function snapshotFromArticle(
     tone: newsToneFromTitle(article.title),
     headline: article.title,
     publishedAt: article.publishedAt,
-    dedupeKey: `figure:${entry.id}:${simpleHeadlineKey(article.title)}`,
+    dedupeKey: figureHeadlineDedupeKey(article.title, entry.id),
+    sourceChannel: article.sourceChannel ?? 'rss',
     primarySymbols: (entry.primarySymbols ?? []).map((s) => s.toUpperCase()),
     sectorTags: entry.sectorTags ?? [],
     topicTags: entry.topicTags ?? [],
@@ -69,7 +110,7 @@ export function buildFigureStatementSnapshots(
   const snapshots: FigureStatementSnapshot[] = [];
   const seen = new Set<string>();
 
-  for (const article of articles.slice(0, 20)) {
+  for (const article of articles.slice(0, FIGURE_STATEMENT_ARTICLE_SCAN_LIMIT)) {
     const entry = findFigureInHeadline(article.title);
     if (!entry) continue;
 

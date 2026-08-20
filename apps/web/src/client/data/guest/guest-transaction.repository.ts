@@ -1,4 +1,11 @@
-import { AppErrorCode, CashLedgerType, TransactionType, computePosition, formatTradeLedgerMemo } from '@sar/shared';
+import {
+  AppErrorCode,
+  CashLedgerType,
+  TransactionType,
+  computeKrSellNetProceeds,
+  computePosition,
+  formatTradeLedgerMemo,
+} from '@sar/shared';
 import { AppError } from '../../domain/errors/app-error';
 import { CreateTransactionInput, Transaction } from '../../domain/models';
 import { ITransactionRepository } from '../../domain/repositories';
@@ -60,15 +67,25 @@ export class GuestTransactionRepository implements ITransactionRepository {
 
     saveGuestTransaction(tx);
 
+    const sellSettlement =
+      input.type === TransactionType.SELL
+        ? computeKrSellNetProceeds(notional, stock.market)
+        : null;
+    const settleAmount =
+      input.type === TransactionType.SELL && sellSettlement ? sellSettlement.netKrw : notional;
+
     saveGuestCashEntry({
       currency,
       type:
         input.type === TransactionType.BUY ? CashLedgerType.BUY_SETTLE : CashLedgerType.SELL_SETTLE,
-      amount: notional,
+      amount: settleAmount,
       refId: tx.id,
       memo: formatTradeLedgerMemo(
         stock.symbol,
         input.type === TransactionType.BUY ? 'BUY' : 'SELL',
+        sellSettlement && sellSettlement.securitiesTaxKrw > 0
+          ? { securitiesTaxKrw: sellSettlement.securitiesTaxKrw }
+          : undefined,
       ),
       occurredAt: input.tradedAt,
     });

@@ -223,6 +223,8 @@ export {
   DOMESTIC_DIVIDEND_WITHHOLDING_RATE,
   FOREIGN_CAPITAL_GAINS_RATE,
   SECURITIES_TRANSACTION_TAX_RATE,
+  computeKrSecuritiesTransactionTax,
+  computeKrSellNetProceeds,
   ISA_ACCOUNT_OPTIONS,
   ISA_OVERFLOW_TAX_RATE,
   PENSION_SAVINGS_ANNUAL_LIMIT_KRW,
@@ -309,6 +311,11 @@ export {
   isKrCorpCodeRegistered,
   applyEventEnrichment,
   buildFigureStatementSnapshots,
+  mergeFigureStatementArticles,
+  buildFigureSnsNewsQuery,
+  FIGURE_RSS_FETCH_LIMIT,
+  FIGURE_SNS_FETCH_LIMIT,
+  FIGURE_STATEMENT_ARTICLE_SCAN_LIMIT,
   applyFigureEnrichment,
   applyFigureEnrichmentsForCandidate,
   FIGURE_REGISTRY,
@@ -336,6 +343,7 @@ export type {
   StockNarrativeSnapshot,
   StockEventSnapshot,
   FigureStatementSnapshot,
+  FigureStatementSourceChannel,
   NarrativeDivergenceKind,
   StockRecommendationsResult,
   RecommendationContextResponse,
@@ -350,6 +358,20 @@ export {
   horizonReady,
   computeReturnPercent,
 } from './recommendation-ledger';
+export {
+  computeRecommendationBacktestSummary,
+} from './recommendation-backtest';
+export type {
+  RecommendationBacktestSummary,
+  RecommendationBacktestHorizonStats,
+  RecommendationBacktestTagStats,
+} from './recommendation-backtest';
+export {
+  suggestDeltaTuningHints,
+  ENRICHMENT_DELTA_PROFILE_VERSION,
+  enrichmentScoreCapsSnapshot,
+} from './market-recommendation/enrichment-delta-tuning';
+export type { DeltaTuningHint, DeltaTuningHintSeverity } from './market-recommendation/enrichment-delta-tuning';
 export type {
   RecommendationOutcomeHorizon,
   RecommendationBenchmarkAtRun,

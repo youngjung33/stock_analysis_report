@@ -137,7 +137,7 @@ npm run test:e2e     # Playwright (dev server + E2E_USERNAME/PASSWORD for member
 | `FetchRecommendationTechnicalSnapshotsUseCase` | (내부) candidate chart snapshots + 15m cache | `technical-enrichment.spec.ts` |
 | `FetchRecommendationNewsSnapshotsUseCase` | (내부) KR Google RSS / US Finnhub company news + 15m cache | `news-enrichment.spec.ts` |
 | `FetchRecommendationEventSnapshotsUseCase` | (내부) US Finnhub earnings + **KR DART** + headline fallback + 15m cache | `event-enrichment.spec.ts`, `kr-disclosure-enrichment.spec.ts` |
-| `FetchRecommendationFigureStatementsUseCase` | (내부) global figure RSS scan + 15m cache | `figure-enrichment.spec.ts` |
+| `FetchRecommendationFigureStatementsUseCase` | (내부) global figure **RSS + X/SNS 2차** + 15m cache | `figure-enrichment.spec.ts`, `figure-sns-merge.spec.ts` |
 | `BuildStockEnrichmentUseCase` | (내부) quotes + technical + news + events + figures batch | portfolio + ledger |
 | `GetHoldingBySymbolUseCase` | GET `/api/portfolio/holding` | `get-holding.use-case.spec.ts` |
 | `RecordCashEntryUseCase` | POST `/api/cash` | `cash.use-cases.spec.ts` + HTTP |
@@ -149,9 +149,9 @@ npm run test:e2e     # Playwright (dev server + E2E_USERNAME/PASSWORD for member
 | `SearchStocksUseCase` | GET `/api/market/search` | `search-stocks.use-case.spec.ts` |
 | `GetFxRateUseCase` | GET `/api/market/fx` | client `market.use-cases.spec.ts` |
 | `GetMarketAnalysisUseCase` | GET `/api/market/analysis` | `get-market-analysis.use-case.spec.ts` |
-| `RunGlobalRecommendationBatchUseCase` | POST `/api/cron/recommendation-batch` | `recommendation-ledger.use-cases` + cron route |
-| `EvaluateRecommendationOutcomesUseCase` | POST `/api/cron/recommendation-outcomes` | outcome evaluation + cron route |
-| `ListRecommendationHistoryUseCase` | GET `/api/market/recommendation-history` | `recommendation-ledger.spec.ts` |
+| `RunGlobalRecommendationBatchUseCase` | POST `/api/cron/recommendation-batch` | `global-baseline-recommendations.spec.ts`, cron route |
+| `EvaluateRecommendationOutcomesUseCase` | POST `/api/cron/recommendation-outcomes` | cron route + ledger repository |
+| `ListRecommendationHistoryUseCase` | GET `/api/market/recommendation-history` | `recommendation-ledger.spec.ts`, `recommendation-backtest.spec.ts` |
 | `GetRecommendationBatchUseCase` | GET `/api/market/recommendation-history/[batchId]` | ledger repository |
 | `BuildMarketContextUseCase` | GET `/api/market/recommendation-context` | shared with analysis/simulation |
 | Watchlist use cases | `/api/watchlist` | domain + `portfolio-api-routes.spec.ts` |
@@ -172,7 +172,7 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | **Investor profile** | `presentation/hooks/useInvestorProfile.ts`, `client/domain/services/` | shared + hydrate + pending specs |
 | Watchlist | `client/domain/usecases/watchlist/` | `watchlist.use-cases.spec.ts` |
 | Corporate actions | `client/domain/usecases/corporate-actions/` | `corporate-actions.use-cases.spec.ts` |
-| Market | `client/domain/usecases/market/` (+ `GetRecommendationHistoryUseCase`) | `market.use-cases.spec.ts`, `score-pipeline.spec.ts` |
+| Market | `client/domain/usecases/market/` (+ `GetRecommendationHistoryUseCase`) | `market.use-cases.spec.ts`, `recommendation-backtest.spec.ts` |
 | Guest adapters | `client/data/guest/` | `guest-repositories.spec.ts` |
 
 ---
@@ -187,11 +187,13 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | `portfolio-capital-simulation` | enrichment-aware simulation rank + deploy cap (Phase K) |
 | `investor-survey/` | 투자 유형 catalog, 미니 테스트, **profile** |
 | `guide/` | Tip FAQ catalog |
-| `market-recommendation/` | scoring, **G0** score-caps/dedupe/pipeline, engine, enrichment (G–J) |
+| `market-recommendation/` | scoring, **G0** score-caps/dedupe/pipeline, engine, enrichment **(G–N+)** |
 | `simulation-ranking.ts` | §10 v2 add priority (buyback boost, narrative/earnings/figure deprioritize), deploy cap |
 | `kr-corp-registry.ts` · `kr-disclosure-enrichment.ts` | Phase L — DART corp_code · 공시→CH_EVENT |
 | `StockCatalog.dartCorpCode` | Phase M — Catalog DB corp_code lookup |
 | `recommendation-ledger.ts` | engine version, horizons, batch view types |
+| `recommendation-backtest.ts` | Phase N+ — horizon/tag α 집계 |
+| `enrichment-delta-tuning.ts` | delta profile version, ledger 기반 튜닝 힌트 (`enrichment-delta-tuning.spec.ts`) |
 | `build-global-baseline-recommendations.ts` | global profile baseline picks |
 
 투자 프로필 상세: [investor-profile.md](investor-profile.md)

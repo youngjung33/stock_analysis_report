@@ -11,6 +11,7 @@ export * from './kr-corp-registry';
 export * from './kr-disclosure-enrichment';
 export * from './figure-registry';
 export * from './figure-enrichment';
+export * from './enrichment-delta-tuning';
 export * from './score-caps';
 export * from './score-dedupe';
 export * from './score-pipeline';

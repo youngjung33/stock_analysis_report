@@ -203,4 +203,43 @@ describe('buildPortfolioSimulation', () => {
     const totalAdd = addActions.reduce((s, a) => s + (a.suggestedAmountKrw ?? 0), 0);
     expect(totalAdd).toBeLessThanOrEqual(10_000 * 1300 * 0.1 + 1);
   });
+
+  it('deducts securities tax from projected cash on KR trim', () => {
+    const result = buildPortfolioSimulation({
+      cash: { krw: 1_000_000, usd: 0 },
+      holdings: [
+        {
+          symbol: '005930',
+          name: '삼성전자',
+          market: Market.KR,
+          currency: 'KRW',
+          quantity: 100,
+          currentPrice: 70_000,
+          marketValueKrw: 7_000_000,
+          weightPercent: 100,
+        },
+      ],
+      preferences: {
+        targetKrPercent: 70,
+        targetUsPercent: 30,
+        maxSingleWeightPercent: 40,
+      },
+      recommendations: [],
+      usdKrwRate: 1300,
+    });
+
+    const trim = result.actions.find((a) => a.type === 'trim');
+    expect(trim).toBeDefined();
+    expect(trim?.securitiesTaxKrw).toBeGreaterThan(0);
+    expect(trim?.reasonKey).toBe('shared.simulation.reason.trimWeightWithStt');
+
+    const grossTrim = trim?.suggestedAmountNative ?? 0;
+    const tax = trim?.securitiesTaxKrw ?? 0;
+    expect(result.projectedCash.krw).toBeCloseTo(1_000_000 + grossTrim - tax, 5);
+    expect(result.projectedTotalAssetsKrw).toBeCloseTo(
+      result.projectedInvestedKrw + result.projectedCashTotalKrw,
+      5,
+    );
+    expect(result.projectedTotalAssetsKrw).toBeLessThan(8_000_000);
+  });
 });

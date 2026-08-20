@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   RECOMMENDATION_OUTCOME_HORIZONS,
+  computeRecommendationBacktestSummary,
+  suggestDeltaTuningHints,
   type RecommendationBatchView,
   type RecommendationOutcomeHorizon,
 } from '@sar/shared';
@@ -40,6 +42,108 @@ function OutcomeCell({
         </span>
       )}
     </span>
+  );
+}
+
+function BacktestSummaryPanel({ batches }: { batches: RecommendationBatchView[] }) {
+  const { t } = useTranslation();
+  const summary = useMemo(() => computeRecommendationBacktestSummary(batches), [batches]);
+  const hints = useMemo(() => suggestDeltaTuningHints(summary), [summary]);
+
+  if (summary.itemCount === 0) return null;
+
+  const topTags = summary.byTag.slice(0, 4);
+
+  return (
+    <article className="rounded-xl border border-indigo-900/50 bg-indigo-950/20 p-4">
+      <h3 className="text-sm font-semibold text-indigo-200">
+        {t('market.recommendationHistory.backtest.title')}
+      </h3>
+      <p className="mt-1 text-[11px] text-slate-500">
+        {t('market.recommendationHistory.backtest.desc', {
+          batches: summary.batchCount,
+          items: summary.itemCount,
+        })}
+      </p>
+
+      <div className="mt-3 overflow-x-auto">
+        <table className="w-full min-w-[420px] text-left text-xs">
+          <thead>
+            <tr className="border-b border-slate-800 text-slate-500">
+              <th className="pb-2 pr-3 font-medium">{t('market.recommendationHistory.backtest.colHorizon')}</th>
+              <th className="pb-2 pr-3 font-medium">{t('market.recommendationHistory.backtest.colSamples')}</th>
+              <th className="pb-2 pr-3 font-medium">{t('market.recommendationHistory.backtest.colReturn')}</th>
+              <th className="pb-2 pr-3 font-medium">{t('market.recommendationHistory.backtest.colAlpha')}</th>
+              <th className="pb-2 font-medium">{t('market.recommendationHistory.backtest.colHitRate')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {summary.horizons.map((row) => (
+              <tr key={row.horizon} className="border-b border-slate-900/80 text-slate-300">
+                <td className="py-2 pr-3">{t(`market.recommendationHistory.horizon.${row.horizon}`)}</td>
+                <td className="py-2 pr-3 text-slate-400">{row.evaluatedCount}</td>
+                <td className="py-2 pr-3">
+                  <OutcomeCell value={row.avgReturnPercent} />
+                </td>
+                <td className="py-2 pr-3">
+                  <OutcomeCell value={row.avgAlphaPercent} />
+                </td>
+                <td className="py-2">
+                  {row.hitRatePercent == null ? (
+                    <span className="text-slate-600">—</span>
+                  ) : (
+                    <span className="text-slate-300">{row.hitRatePercent.toFixed(0)}%</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {topTags.length > 0 && (
+        <div className="mt-3">
+          <p className="text-[11px] font-medium text-slate-400">
+            {t('market.recommendationHistory.backtest.tagBreakdown')}
+          </p>
+          <ul className="mt-1 space-y-1 text-[11px] text-slate-500">
+            {topTags.map((tagRow) => (
+              <li key={`${tagRow.tag}-${tagRow.horizon}`}>
+                {translateTag(tagRow.tag as import('@sar/shared').RecommendationTag, t)}{' '}
+                · {t(`market.recommendationHistory.horizon.${tagRow.horizon}`)} · n={tagRow.sampleCount}
+                {tagRow.avgAlphaPercent != null && (
+                  <span className={`ml-1 ${pnlClass(tagRow.avgAlphaPercent)}`}>
+                    α {formatPercent(tagRow.avgAlphaPercent)}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {hints.length > 0 && (
+        <ul className="mt-3 space-y-1 text-[11px]">
+          {hints.map((hint, idx) => {
+            const params = { ...hint.params };
+            if (typeof params.horizon === 'string') {
+              params.horizon = t(`market.recommendationHistory.horizon.${params.horizon}`);
+            }
+            if (hint.hintKey === 'tagUnderperform' && typeof params.tag === 'string') {
+              params.tag = translateTag(params.tag as import('@sar/shared').RecommendationTag, t);
+            }
+            return (
+              <li
+                key={`${hint.hintKey}-${idx}`}
+                className={hint.severity === 'warn' ? 'text-amber-400/90' : 'text-slate-500'}
+              >
+                {t(`market.recommendationHistory.backtest.hints.${hint.hintKey}`, params)}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </article>
   );
 }
 
@@ -151,6 +255,10 @@ export function RecommendationHistorySection() {
         <p className="rounded-xl border border-dashed border-slate-800 p-4 text-sm text-slate-500">
           {t('market.recommendationHistory.empty')}
         </p>
+      )}
+
+      {!isLoading && !isError && data && data.batches.length > 0 && (
+        <BacktestSummaryPanel batches={data.batches} />
       )}
 
       {data?.batches.map((batch) => (

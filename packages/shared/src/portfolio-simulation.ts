@@ -1,5 +1,6 @@
 import { Market } from './enums';
 import { CashBalances, cashToKrw, formatCashAmount } from './cash-ledger';
+import { computeKrSellNetProceeds } from './korean-tax';
 import { AllocationByMarket } from './portfolio-allocation';
 import { StockRecommendation } from './market-insights.types';
 import type { MarketRegimeId } from './market-recommendation/types';
@@ -49,6 +50,8 @@ export interface SimulationAction {
   suggestedAmountKrw: number | null;
   suggestedAmountNative: number | null;
   suggestedQuantity: number | null;
+  /** KR trim 시뮬 — 증권거래세 (원) */
+  securitiesTaxKrw?: number | null;
   tagLabel?: string;
   tag?: import('./market-insights').RecommendationTag;
   /** Phase K — add pick priority from enrichment signals */
@@ -184,7 +187,13 @@ export function buildPortfolioSimulation(input: {
       h.currency === 'USD' && usdKrwRate ? actualTrimNative * usdKrwRate : actualTrimNative;
 
     if (trimQty > 0) {
-      if (h.currency === 'KRW') projectedCash.krw += actualTrimNative;
+      const krSettlement =
+        h.market === Market.KR && h.currency === 'KRW'
+          ? computeKrSellNetProceeds(actualTrimNative, Market.KR)
+          : null;
+      const cashCreditNative = krSettlement?.netKrw ?? actualTrimNative;
+
+      if (h.currency === 'KRW') projectedCash.krw += cashCreditNative;
       else projectedCash.usd += actualTrimNative;
       projectedInvestedKrw -= actualTrimKrw;
 
@@ -195,16 +204,23 @@ export function buildPortfolioSimulation(input: {
         market: h.market,
         currency: h.currency,
         reason: `비중 ${weight.toFixed(1)}% → 목표 ${targetWeight.toFixed(0)}% 이하로 조정 검토`,
-        reasonKey: 'shared.simulation.reason.trimWeight',
+        reasonKey:
+          krSettlement && krSettlement.securitiesTaxKrw > 0
+            ? 'shared.simulation.reason.trimWeightWithStt'
+            : 'shared.simulation.reason.trimWeight',
         reasonParams: {
           weight: weight.toFixed(1),
           target: targetWeight.toFixed(0),
+          ...(krSettlement && krSettlement.securitiesTaxKrw > 0
+            ? { securitiesTax: krSettlement.securitiesTaxKrw.toLocaleString('ko-KR') }
+            : {}),
         },
         currentWeightPercent: h.weightPercent,
         targetWeightPercent: targetWeight,
         suggestedAmountKrw: actualTrimKrw,
         suggestedAmountNative: actualTrimNative,
         suggestedQuantity: trimQty,
+        securitiesTaxKrw: krSettlement?.securitiesTaxKrw ?? null,
       });
     } else {
       actions.push({

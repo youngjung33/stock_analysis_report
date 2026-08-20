@@ -4,6 +4,7 @@ import { extractRealizedEvents, filterEventsByYear } from '../../packages/shared
 import {
   CAPITAL_GAINS_BASIC_DEDUCTION_KRW,
   DEFAULT_KOREAN_TAX_PROFILE,
+  computeKrSellNetProceeds,
   estimateKoreanTax,
   FINANCIAL_INCOME_THRESHOLD_KRW,
   FOREIGN_CAPITAL_GAINS_RATE,
@@ -71,6 +72,20 @@ describe('resolveApplicableTaxRules', () => {
       investsForeign: false,
     });
     expect(rules.find((r) => r.ruleId === 'us-capital')?.status).toBe('not_applicable');
+  });
+});
+
+describe('computeKrSellNetProceeds', () => {
+  it('deducts 0.2% securities tax for KR sells', () => {
+    const result = computeKrSellNetProceeds(1_000_000, Market.KR);
+    expect(result.securitiesTaxKrw).toBe(2_000);
+    expect(result.netKrw).toBe(998_000);
+  });
+
+  it('does not tax US sells', () => {
+    const result = computeKrSellNetProceeds(1_000_000, Market.US);
+    expect(result.securitiesTaxKrw).toBe(0);
+    expect(result.netKrw).toBe(1_000_000);
   });
 });
 

@@ -43,4 +43,10 @@ describe('translateLedgerMemo', () => {
       .replace('{{symbol}}', 'AAPL')
       .replace('{{side}}', ko.transactions.form.buy));
   });
+
+  it('translates KR sell memo with securities tax', () => {
+    const tKo = makeT(ko);
+    expect(translateLedgerMemo('005930 SELL|STT:2000', tKo)).toContain('005930');
+    expect(translateLedgerMemo('005930 SELL|STT:2000', tKo)).toContain('2,000');
+  });
 });

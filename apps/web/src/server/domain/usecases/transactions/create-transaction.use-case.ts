@@ -1,4 +1,11 @@
-import { AppErrorCode, formatTradeLedgerMemo, CashLedgerType, TransactionType, computeCashBalances } from '@sar/shared';
+import {
+  AppErrorCode,
+  CashLedgerType,
+  TransactionType,
+  computeCashBalances,
+  computeKrSellNetProceeds,
+  formatTradeLedgerMemo,
+} from '@sar/shared';
 import { TransactionEntity } from '../../entities';
 import {
   CreateTransactionInput,
@@ -61,6 +68,12 @@ export class CreateTransactionUseCase {
 
     const notional = input.quantity * input.price;
     const currency = stock.currency === 'USD' ? 'USD' : 'KRW';
+    const sellSettlement =
+      input.type === TransactionType.SELL
+        ? computeKrSellNetProceeds(notional, stock.market)
+        : null;
+    const settleAmount =
+      input.type === TransactionType.SELL && sellSettlement ? sellSettlement.netKrw : notional;
 
     if (input.type === TransactionType.BUY) {
       const entries = await this.cashRepo.findByUser(input.userId);
@@ -86,12 +99,15 @@ export class CreateTransactionUseCase {
       currency,
       type:
         input.type === TransactionType.BUY ? CashLedgerType.BUY_SETTLE : CashLedgerType.SELL_SETTLE,
-      amount: notional,
+      amount: settleAmount,
       occurredAt: input.tradedAt,
       refId: tx.id,
       memo: formatTradeLedgerMemo(
         symbol,
         input.type === TransactionType.BUY ? 'BUY' : 'SELL',
+        sellSettlement && sellSettlement.securitiesTaxKrw > 0
+          ? { securitiesTaxKrw: sellSettlement.securitiesTaxKrw }
+          : undefined,
       ),
     });
 

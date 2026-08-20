@@ -383,6 +383,7 @@
     },
     "memo": {
       "trade": "{{symbol}} · {{side}}",
+      "tradeWithStt": "{{symbol}} · {{side}} (증권거래세 ₩{{tax}})",
       "dividend": "{{symbol}} · 배당"
     }
   },
@@ -611,6 +612,20 @@
         "1d": "1일",
         "1w": "1주",
         "1m": "1개월"
+      },
+      "backtest": {
+        "title": "백테스트 요약",
+        "desc": "저장된 {{batches}}개 배치 · {{items}}건 추천의 사후 수익률 집계입니다.",
+        "colHorizon": "기간",
+        "colSamples": "표본",
+        "colReturn": "평균 수익",
+        "colAlpha": "평균 α",
+        "colHitRate": "승률",
+        "tagBreakdown": "태그별 α (상위)",
+        "hints": {
+          "negativeAlphaHorizon": "{{horizon}} 구간 평균 α {{alpha}}% (n={{count}}) — enrichment delta·cap 재검토 권장",
+          "tagUnderperform": "{{tag}} · {{horizon}} α {{alpha}}% (n={{count}}) — 해당 태그 가중치 튜닝 후보"
+        }
       },
       "disclaimer": "과거 추천 성과는 미래 수익을 보장하지 않으며, 참고용 기록입니다."
     },
@@ -1103,7 +1118,7 @@
       "disclaimers": {
         "0": "본 추정은 참고용이며, 실제 세액·신고 의무는 국세청·세무사 확인이 필요합니다.",
         "1": "해외주식 환산은 단일 환율(현재 또는 입력값)로 단순 추정합니다. 실제는 거래일별 환율·선입선출 적용.",
-        "2": "증권거래세·대주주 요건·필요경비(수수료)는 반영하지 않았거나 단순화했습니다.",
+        "2": "증권거래세는 KR 매도 시 현금·시뮬 trim에 0.20% 반영 (평가금액 미반영). 대주주·수수료는 단순화.",
         "3": "금융투자소득세(금투세)는 미반영 (2026년 기준 미시행 가정).",
         "4": "ISA는 계좌 단위 손익통산·비율 분할로 단순 추정합니다. 실제는 금융사 정산·만기 시 확정됩니다."
       }
@@ -1122,6 +1137,7 @@
         "withinTarget": "목표 비중 내 — 유지",
         "smallHolding": "소량 보유 — 유지",
         "trimWeight": "비중 {{weight}}% → 목표 {{target}}% 이하로 조정 검토",
+        "trimWeightWithStt": "비중 {{weight}}% → 목표 {{target}}% 이하 (증권거래세 ₩{{securitiesTax}} 차감)",
         "trimUnitTooSmall": "과집중이나 매도 단위 미달 — 관찰",
         "addRecommendation": "추천 내용 참고",
         "reserveCash": "조정 후 남는 예수금 — 추가 매수·비상금으로 활용"

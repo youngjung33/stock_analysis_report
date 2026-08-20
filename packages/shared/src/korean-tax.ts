@@ -53,6 +53,28 @@ export const MAJOR_SHAREHOLDER_HIGH_BRACKET_KRW = 300_000_000;
 /** 증권거래세 (매도 대금 기준, KOSPI·KOSDAQ 평균 참고) */
 export const SECURITIES_TRANSACTION_TAX_RATE = 0.002;
 
+/** KR 매도 대금에 대한 증권거래세 (원) */
+export function computeKrSecuritiesTransactionTax(proceedsKrw: number): number {
+  if (proceedsKrw <= 0) return 0;
+  return Math.round(proceedsKrw * SECURITIES_TRANSACTION_TAX_RATE);
+}
+
+/** KR 매도 체결 — 세전 대금에서 증권거래세 차감 후 실수령 */
+export function computeKrSellNetProceeds(
+  grossProceedsKrw: number,
+  market: Market,
+): { grossKrw: number; securitiesTaxKrw: number; netKrw: number } {
+  if (market !== Market.KR || grossProceedsKrw <= 0) {
+    return { grossKrw: grossProceedsKrw, securitiesTaxKrw: 0, netKrw: grossProceedsKrw };
+  }
+  const securitiesTaxKrw = computeKrSecuritiesTransactionTax(grossProceedsKrw);
+  return {
+    grossKrw: grossProceedsKrw,
+    securitiesTaxKrw,
+    netKrw: grossProceedsKrw - securitiesTaxKrw,
+  };
+}
+
 export type ForeignDividendSource = 'US' | 'JP' | 'CN' | 'HK' | 'UK' | 'OTHER';
 
 export interface ForeignDividendWithholdingRule {
@@ -515,7 +537,7 @@ export function estimateKoreanTax(
   const disclaimers = [
     '본 추정은 참고용이며, 실제 세액·신고 의무는 국세청·세무사 확인이 필요합니다.',
     '해외주식 환산은 단일 환율(현재 또는 입력값)로 단순 추정합니다. 실제는 거래일별 환율·선입선출 적용.',
-    '증권거래세·대주주 요건·필요경비(수수료)는 반영하지 않았거나 단순화했습니다.',
+    '증권거래세는 KR 매도 시 현금 원장·시뮬 trim에서 0.20% 차감 (평가금액 미반영).',
     '금융투자소득세(금투세)는 미반영 (2026년 기준 미시행 가정).',
   ];
 

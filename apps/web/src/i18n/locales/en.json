@@ -383,6 +383,7 @@
     },
     "memo": {
       "trade": "{{symbol}} · {{side}}",
+      "tradeWithStt": "{{symbol}} · {{side}} (securities tax ₩{{tax}})",
       "dividend": "{{symbol}} · Dividend"
     }
   },
@@ -611,6 +612,20 @@
         "1d": "1D",
         "1w": "1W",
         "1m": "1M"
+      },
+      "backtest": {
+        "title": "Backtest summary",
+        "desc": "Aggregated follow-up returns from {{batches}} batches · {{items}} picks.",
+        "colHorizon": "Horizon",
+        "colSamples": "Samples",
+        "colReturn": "Avg return",
+        "colAlpha": "Avg α",
+        "colHitRate": "Hit rate",
+        "tagBreakdown": "Tag α (top)",
+        "hints": {
+          "negativeAlphaHorizon": "{{horizon}} avg α {{alpha}}% (n={{count}}) — review enrichment caps/deltas",
+          "tagUnderperform": "{{tag}} · {{horizon}} α {{alpha}}% (n={{count}}) — candidate for tag weight tuning"
+        }
       },
       "disclaimer": "Past recommendation performance does not guarantee future results. For reference only."
     },
@@ -1103,7 +1118,7 @@
       "disclaimers": {
         "0": "This estimate is for reference only. Confirm actual tax and filing obligations with NTS or a tax professional.",
         "1": "Foreign stock FX conversion uses a single rate (current or input). Actual filing uses trade-date rates and FIFO.",
-        "2": "Securities transaction tax, major shareholder rules, and expenses (commissions) are omitted or simplified.",
+        "2": "Securities transaction tax (0.20%) is deducted on KR sells in cash ledger and simulation trim — not on holdings valuation. Major shareholder rules and commissions are simplified.",
         "3": "Financial investment income tax (2026: not in effect) is not included.",
         "4": "ISA is estimated via account-level netting and income share split. Actual settlement is at financial institution maturity."
       }
@@ -1122,6 +1137,7 @@
         "withinTarget": "Within target weight — hold",
         "smallHolding": "Small position — hold",
         "trimWeight": "Weight {{weight}}% → consider trimming to {{target}}% or below",
+        "trimWeightWithStt": "Weight {{weight}}% → trim to {{target}}% or below (securities tax ₩{{securitiesTax}} deducted)",
         "trimUnitTooSmall": "Overweight but below sell unit — watch",
         "addRecommendation": "See recommendation details",
         "reserveCash": "Remaining cash after adjustment — for additional buys or emergency reserve"
