@@ -3,6 +3,7 @@ import { TransactionType } from '@sar/shared';
 import { AppError } from '@/client/domain/errors/app-error';
 import { CreateTransactionUseCase } from '@/client/domain/usecases/transactions/create-transaction.use-case';
 import { DeleteTransactionUseCase } from '@/client/domain/usecases/transactions/delete-transaction.use-case';
+import { UpdateTransactionUseCase } from '@/client/domain/usecases/transactions/update-transaction.use-case';
 import { ListTransactionsUseCase } from '@/client/domain/usecases/transactions/list-transactions.use-case';
 import {
   createFakeTransactionRepository,
@@ -66,5 +67,22 @@ describe('DeleteTransactionUseCase', () => {
     const useCase = new DeleteTransactionUseCase(repo);
     await useCase.execute('tx-99');
     expect(repo.delete).toHaveBeenCalledWith('tx-99');
+  });
+});
+
+describe('UpdateTransactionUseCase', () => {
+  it('delegates to transaction repository update', async () => {
+    const repo = createFakeTransactionRepository();
+    const useCase = new UpdateTransactionUseCase(repo);
+    const input = { quantity: 5, price: 100, tradedAt: new Date().toISOString() };
+    await useCase.execute('tx-1', input);
+    expect(repo.update).toHaveBeenCalledWith('tx-1', input);
+  });
+
+  it('throws AppError for zero quantity', () => {
+    const useCase = new UpdateTransactionUseCase(createFakeTransactionRepository());
+    expect(() =>
+      useCase.execute('tx-1', { quantity: 0, price: 100, tradedAt: new Date().toISOString() }),
+    ).toThrow(AppError);
   });
 });

@@ -75,6 +75,9 @@ describe('recommendation-backtest (Phase N+)', () => {
     expect(oneWeek?.avgAlphaPercent).toBeCloseTo(-0.5, 5);
     expect(oneWeek?.hitRatePercent).toBeCloseTo(50, 5);
     expect(summary.byTag.some((t) => t.tag === 'momentum' && t.horizon === '1w')).toBe(true);
+    expect(summary.coverage.outcomeSlotsTotal).toBe(6);
+    expect(summary.coverage.outcomeEvaluatedCount).toBe(2);
+    expect(summary.coverage.coveragePercent).toBeCloseTo(33.333, 1);
   });
 
   it('suggestDeltaTuningHints flags weak tag alpha', () => {

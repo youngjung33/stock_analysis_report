@@ -3,6 +3,7 @@ import { ValidationError, EntityNotFoundError } from '@server/domain/errors/doma
 import { AppErrorCode, Market, TransactionType, CashLedgerType } from '@sar/shared';
 import { CreateTransactionUseCase } from '@server/domain/usecases/transactions/create-transaction.use-case';
 import { DeleteTransactionUseCase } from '@server/domain/usecases/transactions/delete-transaction.use-case';
+import { UpdateTransactionUseCase } from '@server/domain/usecases/transactions/update-transaction.use-case';
 import { ListTransactionsUseCase } from '@server/domain/usecases/transactions/list-transactions.use-case';
 import {
   createMockCashRepo,
@@ -265,5 +266,74 @@ describe('DeleteTransactionUseCase', () => {
     const useCase = new DeleteTransactionUseCase(txRepo, createMockCashRepo());
 
     await expect(useCase.execute('user-1', 'missing')).rejects.toThrow(EntityNotFoundError);
+  });
+});
+
+describe('UpdateTransactionUseCase', () => {
+  it('updates quantity and re-settles cash', async () => {
+    const stock = createMockStock({ market: Market.KR, currency: 'KRW', symbol: '005930' });
+    const txRepo = createMockTransactionRepo();
+    const cashRepo = createMockCashRepo();
+    const existing = {
+      ...createMockTransaction({ type: TransactionType.BUY, quantity: 10, price: 100 }),
+      stock,
+    };
+
+    txRepo.findById
+      .mockResolvedValueOnce(existing)
+      .mockResolvedValueOnce({ ...existing, quantity: 5, price: 100 });
+    txRepo.update.mockResolvedValue({ ...existing, quantity: 5, price: 100 });
+    cashRepo.findByUser.mockResolvedValue([
+      {
+        id: 'cash-krw',
+        userId: 'user-1',
+        currency: 'KRW',
+        type: 'DEPOSIT',
+        amount: 5000,
+        occurredAt: new Date(),
+        memo: null,
+        refId: null,
+      },
+      {
+        id: 'buy-settle',
+        userId: 'user-1',
+        currency: 'KRW',
+        type: 'BUY_SETTLE',
+        amount: 1000,
+        occurredAt: new Date(),
+        memo: null,
+        refId: 'tx-1',
+      },
+    ]);
+
+    const useCase = new UpdateTransactionUseCase(txRepo, cashRepo);
+    const result = await useCase.execute('user-1', 'tx-1', {
+      quantity: 5,
+      price: 100,
+      tradedAt: new Date(),
+      memo: null,
+    });
+
+    expect(txRepo.update).toHaveBeenCalled();
+    expect(cashRepo.deleteByRefId).toHaveBeenCalledWith('user-1', 'tx-1');
+    expect(result.quantity).toBe(5);
+  });
+
+  it('throws NotFound for other user transaction', async () => {
+    const txRepo = createMockTransactionRepo();
+    txRepo.findById.mockResolvedValue({
+      ...createMockTransaction({ userId: 'other-user' }),
+      stock: createMockStock(),
+    });
+
+    const useCase = new UpdateTransactionUseCase(txRepo, createMockCashRepo());
+
+    await expect(
+      useCase.execute('user-1', 'tx-1', {
+        quantity: 1,
+        price: 100,
+        tradedAt: new Date(),
+      }),
+    ).rejects.toThrow(EntityNotFoundError);
   });
 });

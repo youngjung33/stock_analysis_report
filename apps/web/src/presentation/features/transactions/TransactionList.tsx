@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next';
+import { Transaction } from '@/client/domain/models';
 import { translateLedgerMemo } from '@/i18n/translate-memo';
 import { useTransactionList } from '../../hooks/screens/useTransactionList';
 import { formatNumber } from '../../shared/formatters';
+import { TransactionEditDialog } from './TransactionEditDialog';
 
 interface Props {
   refreshKey: number;
@@ -22,12 +24,45 @@ function EmptyTransactions() {
   );
 }
 
+function TransactionActions({
+  tx,
+  onEdit,
+  onDelete,
+}: {
+  tx: Transaction;
+  onEdit: (tx: Transaction) => void;
+  onDelete: (id: string) => void;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="flex gap-3">
+      <button
+        type="button"
+        onClick={() => onEdit(tx)}
+        className="text-sm text-indigo-400 hover:text-indigo-300"
+      >
+        {t('common.edit')}
+      </button>
+      <button
+        type="button"
+        onClick={() => onDelete(tx.id)}
+        className="text-sm text-rose-400 hover:text-rose-300"
+      >
+        {t('common.delete')}
+      </button>
+    </div>
+  );
+}
+
 function TransactionTable({
   data,
   handleDelete,
+  handleEdit,
 }: {
   data: NonNullable<ReturnType<typeof useTransactionList>['data']>;
   handleDelete: (id: string) => void;
+  handleEdit: (tx: Transaction) => void;
 }) {
   const { t, i18n } = useTranslation();
   const dateLocale = i18n.language === 'ko' ? 'ko-KR' : 'en-US';
@@ -67,13 +102,7 @@ function TransactionTable({
               </td>
               <td className="px-4 py-3 text-slate-500">{translateLedgerMemo(tx.memo, t)}</td>
               <td className="px-4 py-3">
-                <button
-                  type="button"
-                  onClick={() => handleDelete(tx.id)}
-                  className="text-sm text-rose-400 hover:text-rose-300"
-                >
-                  {t('common.delete')}
-                </button>
+                <TransactionActions tx={tx} onEdit={handleEdit} onDelete={handleDelete} />
               </td>
             </tr>
           ))}
@@ -86,9 +115,11 @@ function TransactionTable({
 function TransactionCardList({
   data,
   handleDelete,
+  handleEdit,
 }: {
   data: NonNullable<ReturnType<typeof useTransactionList>['data']>;
   handleDelete: (id: string) => void;
+  handleEdit: (tx: Transaction) => void;
 }) {
   const { t, i18n } = useTranslation();
   const dateLocale = i18n.language === 'ko' ? 'ko-KR' : 'en-US';
@@ -128,13 +159,9 @@ function TransactionCardList({
               <dd className="text-slate-400">{translateLedgerMemo(tx.memo, t)}</dd>
             </div>
           </dl>
-          <button
-            type="button"
-            onClick={() => handleDelete(tx.id)}
-            className="mt-3 text-sm text-rose-400 hover:text-rose-300"
-          >
-            {t('common.delete')}
-          </button>
+          <div className="mt-3">
+            <TransactionActions tx={tx} onEdit={handleEdit} onDelete={handleDelete} />
+          </div>
         </li>
       ))}
     </ul>
@@ -144,7 +171,15 @@ function TransactionCardList({
 /** responsive 거래 내역 — mobile 카드 / desktop 테이블 */
 export function TransactionList({ refreshKey }: Props) {
   const { t } = useTranslation();
-  const { data, isLoading, handleDelete } = useTransactionList(refreshKey);
+  const {
+    data,
+    isLoading,
+    handleDelete,
+    editing,
+    handleEdit,
+    handleEditClose,
+    handleEditSuccess,
+  } = useTransactionList(refreshKey);
 
   if (isLoading) {
     return <p className="text-sm text-slate-400 md:text-base">{t('transactions.list.loading')}</p>;
@@ -156,8 +191,13 @@ export function TransactionList({ refreshKey }: Props) {
 
   return (
     <>
-      <TransactionCardList data={data} handleDelete={handleDelete} />
-      <TransactionTable data={data} handleDelete={handleDelete} />
+      <TransactionCardList data={data} handleDelete={handleDelete} handleEdit={handleEdit} />
+      <TransactionTable data={data} handleDelete={handleDelete} handleEdit={handleEdit} />
+      <TransactionEditDialog
+        transaction={editing}
+        onClose={handleEditClose}
+        onSuccess={handleEditSuccess}
+      />
     </>
   );
 }

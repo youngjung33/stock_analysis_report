@@ -40,6 +40,7 @@ import { GetPortfolioAnalysisUseCase } from './usecases/portfolio/get-portfolio-
 import { RefreshQuotesUseCase } from './usecases/portfolio/refresh-quotes.use-case';
 import { CreateTransactionUseCase } from './usecases/transactions/create-transaction.use-case';
 import { DeleteTransactionUseCase } from './usecases/transactions/delete-transaction.use-case';
+import { UpdateTransactionUseCase } from './usecases/transactions/update-transaction.use-case';
 import { ListTransactionsUseCase } from './usecases/transactions/list-transactions.use-case';
 import {
   GetCashSummaryUseCase,
@@ -60,6 +61,7 @@ export interface AppServices {
   createTransactionUseCase: CreateTransactionUseCase;
   listTransactionsUseCase: ListTransactionsUseCase;
   deleteTransactionUseCase: DeleteTransactionUseCase;
+  updateTransactionUseCase: UpdateTransactionUseCase;
   getDashboardUseCase: GetDashboardUseCase;
   getHoldingBySymbolUseCase: GetHoldingBySymbolUseCase;
   getPortfolioAnalysisUseCase: GetPortfolioAnalysisUseCase;

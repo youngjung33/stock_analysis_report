@@ -1,6 +1,7 @@
 import {
   CorporateAction,
   CreateTransactionInput,
+  UpdateTransactionInput,
   Dashboard,
   FeaturedQuotesResult,
   LoginResult,
@@ -61,6 +62,7 @@ export interface IAuthRepository {
 
 export interface ITransactionRepository {
   create(input: CreateTransactionInput): Promise<Transaction>;
+  update(id: string, input: UpdateTransactionInput): Promise<Transaction>;
   list(filters?: { stockId?: string; type?: string }): Promise<Transaction[]>;
   delete(id: string): Promise<void>;
 }

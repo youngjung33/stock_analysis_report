@@ -47,12 +47,17 @@ function OutcomeCell({
 
 function BacktestSummaryPanel({ batches }: { batches: RecommendationBatchView[] }) {
   const { t } = useTranslation();
+  const [tagsExpanded, setTagsExpanded] = useState(false);
   const summary = useMemo(() => computeRecommendationBacktestSummary(batches), [batches]);
   const hints = useMemo(() => suggestDeltaTuningHints(summary), [summary]);
 
   if (summary.itemCount === 0) return null;
 
-  const topTags = summary.byTag.slice(0, 4);
+  const tagLimit = tagsExpanded ? summary.byTag.length : 4;
+  const visibleTags = summary.byTag.slice(0, tagLimit);
+  const { coverage } = summary;
+  const hasPendingOutcomes =
+    coverage.outcomeEvaluatedCount === 0 && coverage.outcomeSlotsTotal > 0;
 
   return (
     <article className="rounded-xl border border-indigo-900/50 bg-indigo-950/20 p-4">
@@ -66,48 +71,76 @@ function BacktestSummaryPanel({ batches }: { batches: RecommendationBatchView[] 
         })}
       </p>
 
-      <div className="mt-3 overflow-x-auto">
-        <table className="w-full min-w-[420px] text-left text-xs">
-          <thead>
-            <tr className="border-b border-slate-800 text-slate-500">
-              <th className="pb-2 pr-3 font-medium">{t('market.recommendationHistory.backtest.colHorizon')}</th>
-              <th className="pb-2 pr-3 font-medium">{t('market.recommendationHistory.backtest.colSamples')}</th>
-              <th className="pb-2 pr-3 font-medium">{t('market.recommendationHistory.backtest.colReturn')}</th>
-              <th className="pb-2 pr-3 font-medium">{t('market.recommendationHistory.backtest.colAlpha')}</th>
-              <th className="pb-2 font-medium">{t('market.recommendationHistory.backtest.colHitRate')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {summary.horizons.map((row) => (
-              <tr key={row.horizon} className="border-b border-slate-900/80 text-slate-300">
-                <td className="py-2 pr-3">{t(`market.recommendationHistory.horizon.${row.horizon}`)}</td>
-                <td className="py-2 pr-3 text-slate-400">{row.evaluatedCount}</td>
-                <td className="py-2 pr-3">
-                  <OutcomeCell value={row.avgReturnPercent} />
-                </td>
-                <td className="py-2 pr-3">
-                  <OutcomeCell value={row.avgAlphaPercent} />
-                </td>
-                <td className="py-2">
-                  {row.hitRatePercent == null ? (
-                    <span className="text-slate-600">—</span>
-                  ) : (
-                    <span className="text-slate-300">{row.hitRatePercent.toFixed(0)}%</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {coverage.outcomeSlotsTotal > 0 && (
+        <div className="mt-3">
+          <div className="flex items-center justify-between gap-2 text-[11px] text-slate-500">
+            <span>
+              {t('market.recommendationHistory.backtest.coverage', {
+                evaluated: coverage.outcomeEvaluatedCount,
+                total: coverage.outcomeSlotsTotal,
+                percent: coverage.coveragePercent?.toFixed(0) ?? '0',
+              })}
+            </span>
+          </div>
+          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-800">
+            <div
+              className="h-full rounded-full bg-indigo-500/80 transition-all"
+              style={{ width: `${coverage.coveragePercent ?? 0}%` }}
+            />
+          </div>
+        </div>
+      )}
 
-      {topTags.length > 0 && (
+      {hasPendingOutcomes && (
+        <p className="mt-3 rounded-lg border border-dashed border-slate-700/80 bg-slate-950/40 p-3 text-[11px] leading-relaxed text-slate-500">
+          {t('market.recommendationHistory.backtest.pendingOutcomes')}
+        </p>
+      )}
+
+      {!hasPendingOutcomes && (
+        <div className="mt-3 overflow-x-auto">
+          <table className="w-full min-w-[420px] text-left text-xs">
+            <thead>
+              <tr className="border-b border-slate-800 text-slate-500">
+                <th className="pb-2 pr-3 font-medium">{t('market.recommendationHistory.backtest.colHorizon')}</th>
+                <th className="pb-2 pr-3 font-medium">{t('market.recommendationHistory.backtest.colSamples')}</th>
+                <th className="pb-2 pr-3 font-medium">{t('market.recommendationHistory.backtest.colReturn')}</th>
+                <th className="pb-2 pr-3 font-medium">{t('market.recommendationHistory.backtest.colAlpha')}</th>
+                <th className="pb-2 font-medium">{t('market.recommendationHistory.backtest.colHitRate')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {summary.horizons.map((row) => (
+                <tr key={row.horizon} className="border-b border-slate-900/80 text-slate-300">
+                  <td className="py-2 pr-3">{t(`market.recommendationHistory.horizon.${row.horizon}`)}</td>
+                  <td className="py-2 pr-3 text-slate-400">{row.evaluatedCount}</td>
+                  <td className="py-2 pr-3">
+                    <OutcomeCell value={row.avgReturnPercent} />
+                  </td>
+                  <td className="py-2 pr-3">
+                    <OutcomeCell value={row.avgAlphaPercent} />
+                  </td>
+                  <td className="py-2">
+                    {row.hitRatePercent == null ? (
+                      <span className="text-slate-600">—</span>
+                    ) : (
+                      <span className="text-slate-300">{row.hitRatePercent.toFixed(0)}%</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {visibleTags.length > 0 && (
         <div className="mt-3">
           <p className="text-[11px] font-medium text-slate-400">
             {t('market.recommendationHistory.backtest.tagBreakdown')}
           </p>
           <ul className="mt-1 space-y-1 text-[11px] text-slate-500">
-            {topTags.map((tagRow) => (
+            {visibleTags.map((tagRow) => (
               <li key={`${tagRow.tag}-${tagRow.horizon}`}>
                 {translateTag(tagRow.tag as import('@sar/shared').RecommendationTag, t)}{' '}
                 · {t(`market.recommendationHistory.horizon.${tagRow.horizon}`)} · n={tagRow.sampleCount}
@@ -119,6 +152,19 @@ function BacktestSummaryPanel({ batches }: { batches: RecommendationBatchView[] 
               </li>
             ))}
           </ul>
+          {summary.byTag.length > 4 && (
+            <button
+              type="button"
+              onClick={() => setTagsExpanded((v) => !v)}
+              className="mt-2 text-xs text-indigo-400 hover:text-indigo-300"
+            >
+              {tagsExpanded
+                ? t('market.recommendationHistory.backtest.showLessTags')
+                : t('market.recommendationHistory.backtest.showAllTags', {
+                    count: summary.byTag.length,
+                  })}
+            </button>
+          )}
         </div>
       )}
 

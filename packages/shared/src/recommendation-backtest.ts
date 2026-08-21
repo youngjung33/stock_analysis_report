@@ -21,9 +21,17 @@ export interface RecommendationBacktestTagStats {
   avgAlphaPercent: number | null;
 }
 
+export interface RecommendationBacktestCoverage {
+  outcomeSlotsTotal: number;
+  outcomeEvaluatedCount: number;
+  outcomePendingCount: number;
+  coveragePercent: number | null;
+}
+
 export interface RecommendationBacktestSummary {
   batchCount: number;
   itemCount: number;
+  coverage: RecommendationBacktestCoverage;
   horizons: RecommendationBacktestHorizonStats[];
   byTag: RecommendationBacktestTagStats[];
 }
@@ -103,9 +111,31 @@ export function computeRecommendationBacktestSummary(
     })
     .sort((a, b) => b.sampleCount - a.sampleCount);
 
+  const outcomeSlotsTotal = itemCount * RECOMMENDATION_OUTCOME_HORIZONS.length;
+  let outcomeEvaluatedCount = 0;
+  for (const batch of batches) {
+    for (const item of batch.items) {
+      for (const horizon of RECOMMENDATION_OUTCOME_HORIZONS) {
+        const outcome = item.outcomes.find((o) => o.horizon === horizon);
+        if (outcome?.returnPercent != null) {
+          outcomeEvaluatedCount += 1;
+        }
+      }
+    }
+  }
+
+  const coverage: RecommendationBacktestCoverage = {
+    outcomeSlotsTotal,
+    outcomeEvaluatedCount,
+    outcomePendingCount: outcomeSlotsTotal - outcomeEvaluatedCount,
+    coveragePercent:
+      outcomeSlotsTotal > 0 ? (outcomeEvaluatedCount / outcomeSlotsTotal) * 100 : null,
+  };
+
   return {
     batchCount: batches.length,
     itemCount,
+    coverage,
     horizons,
     byTag,
   };

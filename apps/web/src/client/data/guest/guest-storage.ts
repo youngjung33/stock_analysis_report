@@ -90,6 +90,18 @@ export function deleteGuestTransaction(id: string): void {
   writeStore(store);
 }
 
+export function updateGuestTransaction(
+  id: string,
+  patch: Pick<Transaction, 'quantity' | 'price' | 'tradedAt' | 'memo'>,
+): Transaction | null {
+  const store = readStore();
+  const idx = store.transactions.findIndex((tx) => tx.id === id);
+  if (idx === -1) return null;
+  store.transactions[idx] = { ...store.transactions[idx], ...patch };
+  writeStore(store);
+  return store.transactions[idx];
+}
+
 export function getGuestQuotes(): Record<string, GuestQuote> {
   return readStore().quotes;
 }

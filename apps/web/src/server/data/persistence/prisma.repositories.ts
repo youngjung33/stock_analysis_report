@@ -188,6 +188,14 @@ export class PrismaTransactionRepository implements ITransactionRepository {
     return mapTransaction(created);
   }
 
+  async update(
+    id: string,
+    data: Pick<TransactionEntity, 'quantity' | 'price' | 'tradedAt' | 'memo'>,
+  ) {
+    const updated = await this.prisma.transaction.update({ where: { id }, data });
+    return mapTransaction(updated);
+  }
+
   async findByUser(userId: string, filters?: { stockId?: string; type?: TransactionType }) {
     const rows = await this.prisma.transaction.findMany({
       where: {

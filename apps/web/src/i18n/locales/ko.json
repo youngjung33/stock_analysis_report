@@ -2,8 +2,10 @@
   "common": {
     "loading": "불러오는 중...",
     "save": "저장",
+    "saving": "저장 중...",
     "cancel": "취소",
     "delete": "삭제",
+    "edit": "수정",
     "confirm": "확인",
     "close": "닫기",
     "guest": "비회원",
@@ -364,6 +366,9 @@
       "buy": "매수",
       "sell": "매도"
     },
+    "edit": {
+      "title": "매매 수정"
+    },
     "list": {
       "loading": "매매 내역 불러오는 중...",
       "empty": "등록된 매매가 없습니다."
@@ -376,7 +381,9 @@
       "registered": "매매가 등록되었습니다.",
       "registerFailed": "매매 등록에 실패했습니다.",
       "deleted": "매매가 삭제되었습니다.",
-      "deleteFailed": "매매 삭제에 실패했습니다."
+      "deleteFailed": "매매 삭제에 실패했습니다.",
+      "updated": "매매가 수정되었습니다.",
+      "updateFailed": "매매 수정에 실패했습니다."
     },
     "confirm": {
       "delete": "이 매매 내역을 삭제할까요?"
@@ -622,6 +629,10 @@
         "colAlpha": "평균 α",
         "colHitRate": "승률",
         "tagBreakdown": "태그별 α (상위)",
+        "coverage": "사후 평가 {{evaluated}} / {{total}} ({{percent}}%)",
+        "pendingOutcomes": "배치는 저장되었으나 아직 1일·1주·1개월 사후 수익률이 집계되지 않았습니다. 기간이 지나면 자동으로 채워집니다.",
+        "showAllTags": "태그 전체 보기 ({{count}})",
+        "showLessTags": "태그 접기",
         "hints": {
           "negativeAlphaHorizon": "{{horizon}} 구간 평균 α {{alpha}}% (n={{count}}) — enrichment delta·cap 재검토 권장",
           "tagUnderperform": "{{tag}} · {{horizon}} α {{alpha}}% (n={{count}}) — 해당 태그 가중치 튜닝 후보"

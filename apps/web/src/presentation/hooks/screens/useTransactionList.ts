@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { Transaction } from '@/client/domain/models';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
 import { useToast } from '../../components/Toast';
 import { useServices } from '../useServices';
@@ -12,6 +14,7 @@ export function useTransactionList(refreshKey: number) {
   const { listTransactionsUseCase, deleteTransactionUseCase } = useServices();
   const queryClient = useQueryClient();
   const { showError, showSuccess } = useToast();
+  const [editing, setEditing] = useState<Transaction | null>(null);
   const { data, isLoading, refetch } = useQuery({
     queryKey: [...MARKET_QUERY_KEYS.transactions, refreshKey],
     queryFn: () => listTransactionsUseCase.execute(),
@@ -31,5 +34,26 @@ export function useTransactionList(refreshKey: number) {
     }
   }
 
-  return { data, isLoading, handleDelete };
+  function handleEdit(tx: Transaction) {
+    setEditing(tx);
+  }
+
+  function handleEditClose() {
+    setEditing(null);
+  }
+
+  async function handleEditSuccess() {
+    await invalidatePortfolioLocal(queryClient);
+    refetch();
+  }
+
+  return {
+    data,
+    isLoading,
+    handleDelete,
+    editing,
+    handleEdit,
+    handleEditClose,
+    handleEditSuccess,
+  };
 }

@@ -78,6 +78,7 @@ export function createFakeTransactionRepository(
       memo: null,
     } satisfies Transaction),
     list: vi.fn().mockResolvedValue([]),
+    update: vi.fn(),
     delete: vi.fn(),
     ...overrides,
   };

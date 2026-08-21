@@ -36,6 +36,7 @@ import {
 } from './domain/usecases/watchlist/watchlist.use-cases';
 import { CreateTransactionUseCase } from './domain/usecases/transactions/create-transaction.use-case';
 import { DeleteTransactionUseCase } from './domain/usecases/transactions/delete-transaction.use-case';
+import { UpdateTransactionUseCase } from './domain/usecases/transactions/update-transaction.use-case';
 import { ListTransactionsUseCase } from './domain/usecases/transactions/list-transactions.use-case';
 import { ITokenService } from './domain/repositories';
 import { BcryptPasswordHasher } from './data/auth/password-hasher';
@@ -102,6 +103,7 @@ export interface ServerServices {
   createTransactionUseCase: CreateTransactionUseCase;
   listTransactionsUseCase: ListTransactionsUseCase;
   deleteTransactionUseCase: DeleteTransactionUseCase;
+  updateTransactionUseCase: UpdateTransactionUseCase;
   getDashboardUseCase: GetDashboardUseCase;
   getHoldingBySymbolUseCase: GetHoldingBySymbolUseCase;
   getPortfolioAnalysisUseCase: GetPortfolioAnalysisUseCase;
@@ -219,6 +221,7 @@ export function getServerServices(): ServerServices {
     createTransactionUseCase: new CreateTransactionUseCase(stockRepo, txRepo, cashRepo),
     listTransactionsUseCase: new ListTransactionsUseCase(txRepo),
     deleteTransactionUseCase: new DeleteTransactionUseCase(txRepo, cashRepo),
+    updateTransactionUseCase: new UpdateTransactionUseCase(txRepo, cashRepo),
     getDashboardUseCase,
     getHoldingBySymbolUseCase: new GetHoldingBySymbolUseCase(
       stockRepo,

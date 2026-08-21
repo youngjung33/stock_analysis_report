@@ -78,8 +78,19 @@ export interface IStockRepository {
   findHeldByUser(userId: string): Promise<StockEntity[]>;
 }
 
+export interface UpdateTransactionInput {
+  quantity: number;
+  price: number;
+  tradedAt: Date;
+  memo?: string | null;
+}
+
 export interface ITransactionRepository {
   create(data: Omit<TransactionEntity, 'id' | 'createdAt'>): Promise<TransactionEntity>;
+  update(
+    id: string,
+    data: Pick<TransactionEntity, 'quantity' | 'price' | 'tradedAt' | 'memo'>,
+  ): Promise<TransactionEntity>;
   findByUser(userId: string, filters?: { stockId?: string; type?: TransactionType }): Promise<
     (TransactionEntity & { stock: StockEntity })[]
   >;

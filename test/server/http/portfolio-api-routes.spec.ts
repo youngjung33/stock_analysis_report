@@ -9,6 +9,7 @@ vi.mock('@/server/container', () => ({
 
 import { getServerServices } from '@/server/container';
 import { GET as listTransactions, POST as createTransaction } from '@/app/api/transactions/route';
+import { PATCH as updateTransaction } from '@/app/api/transactions/[id]/route';
 import { GET as getDashboard } from '@/app/api/portfolio/dashboard/route';
 import { GET as listWatchlist, POST as addWatchlist } from '@/app/api/watchlist/route';
 import { GET as listCorporateActions, POST as createCorporateAction } from '@/app/api/corporate-actions/route';
@@ -37,6 +38,9 @@ function mockServices(overrides: Record<string, unknown> = {}) {
     },
     createTransactionUseCase: {
       execute: vi.fn().mockResolvedValue({ id: 'tx-new' }),
+    },
+    updateTransactionUseCase: {
+      execute: vi.fn().mockResolvedValue({ id: 'tx-1', quantity: 5 }),
     },
     getDashboardUseCase: {
       execute: vi.fn().mockResolvedValue({
@@ -103,6 +107,22 @@ describe('portfolio & transactions API routes', () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.id).toBe('tx-new');
+  });
+
+  it('PATCH /api/transactions/[id] updates transaction', async () => {
+    const req = authedRequest('http://localhost/api/transactions/tx-1', {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json', authorization: 'Bearer test-token' },
+      body: JSON.stringify({
+        quantity: 5,
+        price: 70000,
+        tradedAt: new Date().toISOString(),
+      }),
+    });
+    const res = await updateTransaction(req, { params: Promise.resolve({ id: 'tx-1' }) });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.quantity).toBe(5);
   });
 
   it('GET /api/portfolio/dashboard returns dashboard', async () => {

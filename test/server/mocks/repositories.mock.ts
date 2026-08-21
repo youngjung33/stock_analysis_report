@@ -142,6 +142,7 @@ export function createMockTransactionRepo(
 ): ITransactionRepository {
   return {
     create: vi.fn(),
+    update: vi.fn(),
     findByUser: vi.fn(),
     findById: vi.fn(),
     delete: vi.fn(),

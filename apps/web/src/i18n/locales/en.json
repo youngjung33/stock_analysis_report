@@ -2,8 +2,10 @@
   "common": {
     "loading": "Loading...",
     "save": "Save",
+    "saving": "Saving...",
     "cancel": "Cancel",
     "delete": "Delete",
+    "edit": "Edit",
     "confirm": "Confirm",
     "close": "Close",
     "guest": "Guest",
@@ -364,6 +366,9 @@
       "buy": "Buy",
       "sell": "Sell"
     },
+    "edit": {
+      "title": "Edit trade"
+    },
     "list": {
       "loading": "Loading trade history...",
       "empty": "No trades registered."
@@ -376,7 +381,9 @@
       "registered": "Trade registered.",
       "registerFailed": "Failed to register trade.",
       "deleted": "Trade deleted.",
-      "deleteFailed": "Failed to delete trade."
+      "deleteFailed": "Failed to delete trade.",
+      "updated": "Trade updated.",
+      "updateFailed": "Failed to update trade."
     },
     "confirm": {
       "delete": "Delete this trade?"
@@ -622,6 +629,10 @@
         "colAlpha": "Avg α",
         "colHitRate": "Hit rate",
         "tagBreakdown": "Tag α (top)",
+        "coverage": "Follow-up evaluated {{evaluated}} / {{total}} ({{percent}}%)",
+        "pendingOutcomes": "Batches are saved but 1D · 1W · 1M follow-up returns are not yet aggregated. They fill in automatically after each horizon elapses.",
+        "showAllTags": "Show all tags ({{count}})",
+        "showLessTags": "Show fewer tags",
         "hints": {
           "negativeAlphaHorizon": "{{horizon}} avg α {{alpha}}% (n={{count}}) — review enrichment caps/deltas",
           "tagUnderperform": "{{tag}} · {{horizon}} α {{alpha}}% (n={{count}}) — candidate for tag weight tuning"

@@ -29,6 +29,7 @@ import { GetPortfolioAnalysisUseCase } from './domain/usecases/portfolio/get-por
 import { RefreshQuotesUseCase } from './domain/usecases/portfolio/refresh-quotes.use-case';
 import { CreateTransactionUseCase } from './domain/usecases/transactions/create-transaction.use-case';
 import { DeleteTransactionUseCase } from './domain/usecases/transactions/delete-transaction.use-case';
+import { UpdateTransactionUseCase } from './domain/usecases/transactions/update-transaction.use-case';
 import { ListTransactionsUseCase } from './domain/usecases/transactions/list-transactions.use-case';
 import { accountRepository } from './data/repositories/account.repository';
 import {
@@ -74,6 +75,7 @@ export function wireAppServices(): AppServices {
     createTransactionUseCase: new CreateTransactionUseCase(transactionRepository),
     listTransactionsUseCase: new ListTransactionsUseCase(transactionRepository),
     deleteTransactionUseCase: new DeleteTransactionUseCase(transactionRepository),
+    updateTransactionUseCase: new UpdateTransactionUseCase(transactionRepository),
     getDashboardUseCase: new GetDashboardUseCase(portfolioRepository),
     getHoldingBySymbolUseCase: new GetHoldingBySymbolUseCase(portfolioRepository),
     getPortfolioAnalysisUseCase: new GetPortfolioAnalysisUseCase(portfolioRepository),

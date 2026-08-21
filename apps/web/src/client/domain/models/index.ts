@@ -199,6 +199,13 @@ export interface SessionResult {
   username: string | null;
 }
 
+export interface UpdateTransactionInput {
+  quantity: number;
+  price: number;
+  tradedAt: string;
+  memo?: string;
+}
+
 export interface CreateTransactionInput {
   stockSymbol: string;
   market: Market;

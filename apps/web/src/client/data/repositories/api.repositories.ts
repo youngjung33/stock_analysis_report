@@ -3,6 +3,7 @@ import { OAuthProviderId, OAuthProviderMeta, RegisterInput } from '@sar/shared';
 import {
   CorporateAction,
   CreateTransactionInput,
+  UpdateTransactionInput,
   FeaturedQuotesResult,
   LoginResult,
   RegisterResult,
@@ -95,6 +96,11 @@ export class ApiAuthRepository implements IAuthRepository {
 export class ApiTransactionRepository implements ITransactionRepository {
   async create(input: CreateTransactionInput) {
     const { data } = await apiClient.post('/transactions', input);
+    return data;
+  }
+
+  async update(id: string, input: UpdateTransactionInput) {
+    const { data } = await apiClient.patch(`/transactions/${id}`, input);
     return data;
   }
 
