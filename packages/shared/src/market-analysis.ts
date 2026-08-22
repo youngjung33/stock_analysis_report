@@ -26,6 +26,7 @@ import {
   buildMarketInsights,
   computeRegionSentiment,
 } from './market-insights';
+import { hasPolicyUncertaintyPulse } from './market-recommendation/figure-enrichment';
 
 export type AnalysisCategory =
   | 'breadth'
@@ -142,6 +143,8 @@ export interface MarketAnalysisReport extends MarketInsightsResult {
   sectors: SectorEtfSnapshot[];
   insights: AnalysisInsight[];
   news: NewsAnalysisInput[];
+  figureStatements: import('./market-recommendation/figure-enrichment').FigureStatementSnapshot[];
+  policyUncertainty: boolean;
 }
 
 const CATEGORY_LABEL: Record<AnalysisCategory, string> = {
@@ -959,6 +962,7 @@ export function buildMarketAnalysisReport(input: {
   userHoldings?: Array<{ symbol: string; market: Market }>;
   userWatchlist?: Array<{ symbol: string; market: Market }>;
   technicalSnapshots?: import('./market-recommendation/technical-enrichment').StockTechnicalSnapshot[];
+  figureStatements?: import('./market-recommendation/figure-enrichment').FigureStatementSnapshot[];
 }): MarketAnalysisReport {
   const indices = input.indexInputs
     .map(buildIndexSnapshot)
@@ -987,6 +991,7 @@ export function buildMarketAnalysisReport(input: {
     userHoldings: input.userHoldings,
     userWatchlist: input.userWatchlist,
     technicalSnapshots: input.technicalSnapshots,
+    figureStatements: input.figureStatements,
   });
 
   const insights: AnalysisInsight[] = [
@@ -1009,6 +1014,8 @@ export function buildMarketAnalysisReport(input: {
     sectors,
     insights,
     news: input.news,
+    figureStatements: input.figureStatements ?? [],
+    policyUncertainty: hasPolicyUncertaintyPulse(input.figureStatements ?? []),
   };
 }
 

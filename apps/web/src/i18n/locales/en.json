@@ -471,6 +471,7 @@
     "statProjectedCash": "Projected cash",
     "suggestedTrade": "{{quantity}} shares · approx. {{amount}}",
     "suggestedAmount": "approx. {{amount}}",
+    "securitiesTaxLine": "Est. securities tax (0.2% on KR sell): {{amount}}",
     "memoInitialCapital": "Invested capital",
     "memoInitialCapitalUsd": "Invested capital (USD)",
     "memoDeposit": "Deposit",
@@ -580,6 +581,23 @@
     "detailSubtitle": "Volatility · Economy · Sectors · Chart indicators",
     "sentimentTitle": "Market sentiment summary",
     "regimeTitle": "Market regime",
+    "figurePulse": {
+      "title": "Figure pulse",
+      "desc": "Influential figure headlines in the last 72h — RSS + SNS secondary sources",
+      "sourceRss": "RSS",
+      "sourceSns": "SNS",
+      "policyUncertainty": "Negative tier-1 macro figure activity detected. Simulation deploy cap may be reduced.",
+      "tone": {
+        "bullish": "Bullish",
+        "bearish": "Bearish",
+        "neutral": "Neutral"
+      },
+      "linkScope": {
+        "macro_only": "Macro",
+        "symbol_direct": "Direct symbol",
+        "topic_conditional": "Sector · topic"
+      }
+    },
     "scoreBreakdownTitle": "Recommendation rationale",
     "narrativeDivergenceBadge": "Narrative–price divergence · {{divergence}}",
     "sentimentDesc": "Featured stocks today · See volatility, sectors, and chart indicators on the detail page",

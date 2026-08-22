@@ -471,6 +471,7 @@
     "statProjectedCash": "조정 후 예수금",
     "suggestedTrade": "{{quantity}}주 · 약 {{amount}}",
     "suggestedAmount": "약 {{amount}}",
+    "securitiesTaxLine": "증권거래세(매도 0.2%) 예상: {{amount}}",
     "memoInitialCapital": "투자 원금",
     "memoInitialCapitalUsd": "투자 원금 (USD)",
     "memoDeposit": "입금",
@@ -580,6 +581,23 @@
     "detailSubtitle": "변동성 · 경기 · 업종 · 차트 지표",
     "sentimentTitle": "시장 정세 요약",
     "regimeTitle": "시장 레짐",
+    "figurePulse": {
+      "title": "인물 발언 Pulse",
+      "desc": "최근 72시간 내 영향력 인물 헤드라인 — RSS·SNS 2차 소스",
+      "sourceRss": "RSS",
+      "sourceSns": "SNS",
+      "policyUncertainty": "Tier-1 매크로 인물의 부정적 발언이 감지되었습니다. 시뮬레이션 deploy cap이 낮아질 수 있습니다.",
+      "tone": {
+        "bullish": "긍정",
+        "bearish": "부정",
+        "neutral": "중립"
+      },
+      "linkScope": {
+        "macro_only": "매크로",
+        "symbol_direct": "종목 직접",
+        "topic_conditional": "업종·주제"
+      }
+    },
     "scoreBreakdownTitle": "추천 근거",
     "narrativeDivergenceBadge": "서사–가격 괴리 · {{divergence}}",
     "sentimentDesc": "대표 종목 오늘 시세 기준 · 변동성·업종·차트 지표는 상세 페이지",

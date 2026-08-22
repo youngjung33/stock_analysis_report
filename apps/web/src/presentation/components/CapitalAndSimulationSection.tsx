@@ -262,6 +262,15 @@ export function CapitalAndSimulationSection({ onPortfolioUpdated }: Props) {
                 <p className="mt-2 text-xs text-muted-foreground md:text-sm">
                   {translateSimulationReason(action, t)}
                 </p>
+                {action.type === 'trim' &&
+                  action.securitiesTaxKrw != null &&
+                  action.securitiesTaxKrw > 0 && (
+                    <p className="mt-1 text-xs text-amber-300/90">
+                      {t('capital.securitiesTaxLine', {
+                        amount: formatCashAmount(action.securitiesTaxKrw, 'KRW'),
+                      })}
+                    </p>
+                  )}
                 {action.type === 'add' && rec?.evidenceItems && rec.evidenceItems.length > 0 && (
                   <ul className="mt-2 list-inside list-disc space-y-0.5 text-xs text-muted-foreground">
                     {rec.evidenceItems.map((evidence) => (

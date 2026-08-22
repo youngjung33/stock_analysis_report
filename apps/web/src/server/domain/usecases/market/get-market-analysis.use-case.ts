@@ -7,6 +7,7 @@ import {
 import { GetFeaturedQuotesUseCase } from './get-featured-quotes.use-case';
 import { BuildMarketContextUseCase } from './build-market-context.use-case';
 import { FetchRecommendationTechnicalSnapshotsUseCase } from './fetch-recommendation-technical.use-case';
+import { FetchRecommendationFigureStatementsUseCase } from './fetch-recommendation-figures.use-case';
 import { IMarketDataProvider } from '../../ports/market-data.port';
 
 /** 시장 심층 분석 리포트 생성 use case */
@@ -15,6 +16,7 @@ export class GetMarketAnalysisUseCase {
     private readonly getFeaturedQuotesUseCase: GetFeaturedQuotesUseCase,
     private readonly buildMarketContextUseCase: BuildMarketContextUseCase,
     private readonly fetchTechnicalUseCase: FetchRecommendationTechnicalSnapshotsUseCase,
+    private readonly fetchFiguresUseCase: FetchRecommendationFigureStatementsUseCase,
     private readonly marketData: IMarketDataProvider,
   ) {}
 
@@ -23,12 +25,13 @@ export class GetMarketAnalysisUseCase {
     userHoldings?: Array<{ symbol: string; market: Market }>;
     userWatchlist?: Array<{ symbol: string; market: Market }>;
   }): Promise<MarketAnalysisReport> {
-    const [featured, marketContext, krNews, usNewsGoogle, finnhubNews] = await Promise.all([
+    const [featured, marketContext, krNews, usNewsGoogle, finnhubNews, figureStatements] = await Promise.all([
       this.getFeaturedQuotesUseCase.execute(),
       this.buildMarketContextUseCase.execute(),
       this.marketData.fetchGoogleNews('코스피+증시+주식', Market.KR, 'ko', 'KR', 6).catch(() => []),
       this.marketData.fetchGoogleNews('US+stock+market+S&P', Market.US, 'en-US', 'US', 6).catch(() => []),
       this.marketData.fetchFinnhubMarketNews('general', 6).catch(() => []),
+      this.fetchFiguresUseCase.execute().catch(() => []),
     ]);
 
     const technicalSnapshots = await this.fetchTechnicalUseCase.execute([
@@ -53,6 +56,7 @@ export class GetMarketAnalysisUseCase {
       userHoldings: options?.userHoldings,
       userWatchlist: options?.userWatchlist,
       technicalSnapshots,
+      figureStatements,
     });
   }
 }

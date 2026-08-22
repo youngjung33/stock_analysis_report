@@ -29,6 +29,7 @@ import {
   SectorStrengthPanel,
 } from './market-analysis/MarketAnalysisPanels';
 import { RecommendationHistorySection } from './market-analysis/RecommendationHistorySection';
+import { FigurePulseSection } from './market-analysis/FigurePulseSection';
 
 interface Props {
   compact?: boolean;
@@ -273,6 +274,10 @@ export function MarketAnalysisDetailSection({ compact }: Props) {
         <>
           <SentimentSummary report={data} compact={compact} />
           <RegimeBadges report={data} />
+          <FigurePulseSection
+            figureStatements={data.figureStatements}
+            policyUncertainty={data.policyUncertainty}
+          />
           <RecommendationBreakdown report={data} />
           <MacroPanel macro={data.macro} compact={compact} />
           <IndexTechnicalPanel indices={data.indices} compact={compact} />

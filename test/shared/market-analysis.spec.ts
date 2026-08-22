@@ -80,5 +80,37 @@ describe('buildMarketAnalysisReport', () => {
     const breadth = report.insights.find((i) => i.category === 'breadth');
     expect(breadth?.reasoning.length).toBeGreaterThan(10);
     expect(breadth?.links.length).toBeGreaterThan(0);
+    expect(report.figureStatements).toEqual([]);
+    expect(report.policyUncertainty).toBe(false);
+  });
+
+  it('sets policyUncertainty when tier-1 macro bearish figure present', () => {
+    const report = buildMarketAnalysisReport({
+      krQuotes: [],
+      usQuotes: [],
+      indexInputs: [],
+      macroInputs: [],
+      sectorInputs: [],
+      news: [],
+      figureStatements: [
+        {
+          figureId: 'trump',
+          figureName: 'Trump',
+          impactTier: 1,
+          linkScope: 'macro_only',
+          tone: 'bearish',
+          headline: 'Tariff concerns weigh on markets',
+          publishedAt: new Date().toISOString(),
+          dedupeKey: 'test-1',
+          sourceChannel: 'rss',
+          primarySymbols: [],
+          sectorTags: [],
+          topicTags: [],
+        },
+      ],
+    });
+
+    expect(report.policyUncertainty).toBe(true);
+    expect(report.figureStatements).toHaveLength(1);
   });
 });

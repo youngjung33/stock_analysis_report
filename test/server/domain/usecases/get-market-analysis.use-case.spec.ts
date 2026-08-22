@@ -30,12 +30,32 @@ describe('GetMarketAnalysisUseCase', () => {
       execute: vi.fn().mockResolvedValue([]),
     };
 
+    const fetchFiguresUseCase = {
+      execute: vi.fn().mockResolvedValue([
+        {
+          figureId: 'musk',
+          figureName: 'Musk',
+          impactTier: 2,
+          linkScope: 'symbol_direct',
+          tone: 'bullish',
+          headline: 'Tesla outlook',
+          publishedAt: new Date().toISOString(),
+          dedupeKey: 'fig-1',
+          sourceChannel: 'rss',
+          primarySymbols: ['TSLA'],
+          sectorTags: [],
+          topicTags: [],
+        },
+      ]),
+    };
+
     const marketData = createMockMarketData();
 
     const useCase = new GetMarketAnalysisUseCase(
       getFeaturedQuotesUseCase as never,
       buildMarketContextUseCase as never,
       fetchTechnicalUseCase as never,
+      fetchFiguresUseCase as never,
       marketData,
     );
     const report = await useCase.execute();
@@ -43,8 +63,10 @@ describe('GetMarketAnalysisUseCase', () => {
     expect(report.krQuotes.length).toBeGreaterThan(0);
     expect(report.usQuotes.length).toBeGreaterThan(0);
     expect(report.fetchedAt).toBeTruthy();
+    expect(report.figureStatements).toHaveLength(1);
     expect(getFeaturedQuotesUseCase.execute).toHaveBeenCalled();
     expect(buildMarketContextUseCase.execute).toHaveBeenCalled();
     expect(fetchTechnicalUseCase.execute).toHaveBeenCalled();
+    expect(fetchFiguresUseCase.execute).toHaveBeenCalled();
   });
 });

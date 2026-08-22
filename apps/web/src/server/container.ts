@@ -243,6 +243,7 @@ export function getServerServices(): ServerServices {
       getFeaturedQuotesUseCase,
       buildMarketContextUseCase,
       fetchRecommendationTechnicalUseCase,
+      fetchRecommendationFiguresUseCase,
       marketData,
     ),
     buildMarketContextUseCase,
