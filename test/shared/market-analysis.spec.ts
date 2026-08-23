@@ -113,4 +113,67 @@ describe('buildMarketAnalysisReport', () => {
     expect(report.policyUncertainty).toBe(true);
     expect(report.figureStatements).toHaveLength(1);
   });
+
+  it('passes news and figure enrichment into recommendation scoreBreakdown', () => {
+    const report = buildMarketAnalysisReport({
+      krQuotes: [
+        {
+          symbol: '005930',
+          name: '삼성전자',
+          market: Market.KR,
+          currency: 'KRW',
+          currentPrice: 70000,
+          changePercent: 2.1,
+        },
+      ],
+      usQuotes: [
+        {
+          symbol: 'AAPL',
+          name: 'Apple',
+          market: Market.US,
+          currency: 'USD',
+          currentPrice: 190,
+          changePercent: 1.5,
+        },
+      ],
+      indexInputs: [],
+      macroInputs: [],
+      sectorInputs: [],
+      news: [],
+      newsSnapshots: [
+        {
+          symbol: 'AAPL',
+          market: Market.US,
+          headlineSample: 'Apple stock surges on strong iPhone outlook',
+          tone: 'bullish',
+          relevanceScore: 0.8,
+          articleCount: 1,
+          primarySourceCount: 0,
+          secondarySourceCount: 2,
+          dedupeKey: 'news:AAPL:test',
+        },
+      ],
+      figureStatements: [
+        {
+          figureId: 'cook',
+          figureName: 'Tim Cook',
+          impactTier: 3,
+          linkScope: 'symbol_direct',
+          tone: 'bullish',
+          headline: 'Tim Cook says Apple iPhone demand remains strong',
+          publishedAt: new Date().toISOString(),
+          dedupeKey: 'fig-aapl',
+          sourceChannel: 'rss',
+          primarySymbols: ['AAPL'],
+          sectorTags: [],
+          topicTags: [],
+        },
+      ],
+    });
+
+    const aapl = report.recommendations.find((r) => r.symbol === 'AAPL');
+    expect(aapl).toBeDefined();
+    expect(aapl?.scoreBreakdown?.some((b) => b.factor.startsWith('CH_FIGURE'))).toBe(true);
+    expect(aapl?.scoreBreakdown?.some((b) => b.factor.startsWith('CH_NEWS'))).toBe(true);
+  });
 });

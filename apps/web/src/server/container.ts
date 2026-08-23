@@ -242,8 +242,7 @@ export function getServerServices(): ServerServices {
     getMarketAnalysisUseCase: new GetMarketAnalysisUseCase(
       getFeaturedQuotesUseCase,
       buildMarketContextUseCase,
-      fetchRecommendationTechnicalUseCase,
-      fetchRecommendationFiguresUseCase,
+      buildStockEnrichmentUseCase,
       marketData,
     ),
     buildMarketContextUseCase,

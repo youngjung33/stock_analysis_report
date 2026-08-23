@@ -962,6 +962,8 @@ export function buildMarketAnalysisReport(input: {
   userHoldings?: Array<{ symbol: string; market: Market }>;
   userWatchlist?: Array<{ symbol: string; market: Market }>;
   technicalSnapshots?: import('./market-recommendation/technical-enrichment').StockTechnicalSnapshot[];
+  newsSnapshots?: import('./market-recommendation/news-enrichment').StockNewsSnapshot[];
+  eventSnapshots?: import('./market-recommendation/event-enrichment').StockEventSnapshot[];
   figureStatements?: import('./market-recommendation/figure-enrichment').FigureStatementSnapshot[];
 }): MarketAnalysisReport {
   const indices = input.indexInputs
@@ -991,6 +993,8 @@ export function buildMarketAnalysisReport(input: {
     userHoldings: input.userHoldings,
     userWatchlist: input.userWatchlist,
     technicalSnapshots: input.technicalSnapshots,
+    newsSnapshots: input.newsSnapshots,
+    eventSnapshots: input.eventSnapshots,
     figureStatements: input.figureStatements,
   });
 
