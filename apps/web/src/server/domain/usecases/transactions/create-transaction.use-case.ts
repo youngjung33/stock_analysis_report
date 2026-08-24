@@ -3,7 +3,7 @@ import {
   CashLedgerType,
   TransactionType,
   computeCashBalances,
-  computeKrSellNetProceeds,
+  computeTradeCashSettlement,
   formatTradeLedgerMemo,
 } from '@sar/shared';
 import { TransactionEntity } from '../../entities';
@@ -38,6 +38,10 @@ export class CreateTransactionUseCase {
     if (input.price <= 0) {
       throw new ValidationError(AppErrorCode.TRANSACTION_PRICE_INVALID);
     }
+    const commission = input.commission ?? 0;
+    if (commission < 0) {
+      throw new ValidationError(AppErrorCode.TRANSACTION_COMMISSION_INVALID);
+    }
 
     if (!input.name?.trim()) {
       throw new ValidationError(AppErrorCode.STOCK_REQUIRED);
@@ -66,20 +70,20 @@ export class CreateTransactionUseCase {
       }
     }
 
-    const notional = input.quantity * input.price;
-    const currency = stock.currency === 'USD' ? 'USD' : 'KRW';
-    const sellSettlement =
-      input.type === TransactionType.SELL
-        ? computeKrSellNetProceeds(notional, stock.market)
-        : null;
-    const settleAmount =
-      input.type === TransactionType.SELL && sellSettlement ? sellSettlement.netKrw : notional;
+    const settlement = computeTradeCashSettlement({
+      type: input.type,
+      quantity: input.quantity,
+      price: input.price,
+      market: stock.market,
+      commission,
+    });
+    const currency = settlement.currency;
 
     if (input.type === TransactionType.BUY) {
       const entries = await this.cashRepo.findByUser(input.userId);
       const balances = computeCashBalances(entries);
       const available = currency === 'KRW' ? balances.krw : balances.usd;
-      if (available < notional) {
+      if (available < settlement.settleAmount) {
         throw new ValidationError(AppErrorCode.CASH_INSUFFICIENT);
       }
     }
@@ -90,6 +94,7 @@ export class CreateTransactionUseCase {
       type: input.type,
       quantity: input.quantity,
       price: input.price,
+      commission,
       tradedAt: input.tradedAt,
       memo: input.memo ?? null,
     });
@@ -99,15 +104,17 @@ export class CreateTransactionUseCase {
       currency,
       type:
         input.type === TransactionType.BUY ? CashLedgerType.BUY_SETTLE : CashLedgerType.SELL_SETTLE,
-      amount: settleAmount,
+      amount: settlement.settleAmount,
       occurredAt: input.tradedAt,
       refId: tx.id,
       memo: formatTradeLedgerMemo(
         symbol,
         input.type === TransactionType.BUY ? 'BUY' : 'SELL',
-        sellSettlement && sellSettlement.securitiesTaxKrw > 0
-          ? { securitiesTaxKrw: sellSettlement.securitiesTaxKrw }
-          : undefined,
+        {
+          securitiesTaxKrw:
+            settlement.securitiesTaxKrw > 0 ? settlement.securitiesTaxKrw : undefined,
+          commission: settlement.commission > 0 ? settlement.commission : undefined,
+        },
       ),
     });
 

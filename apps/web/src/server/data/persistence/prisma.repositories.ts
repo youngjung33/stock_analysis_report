@@ -45,6 +45,7 @@ function mapTransaction(tx: {
   type: string;
   quantity: number;
   price: number;
+  commission: number;
   tradedAt: Date;
   memo: string | null;
   createdAt: Date;
@@ -190,7 +191,7 @@ export class PrismaTransactionRepository implements ITransactionRepository {
 
   async update(
     id: string,
-    data: Pick<TransactionEntity, 'quantity' | 'price' | 'tradedAt' | 'memo'>,
+    data: Pick<TransactionEntity, 'quantity' | 'price' | 'commission' | 'tradedAt' | 'memo'>,
   ) {
     const updated = await this.prisma.transaction.update({ where: { id }, data });
     return mapTransaction(updated);

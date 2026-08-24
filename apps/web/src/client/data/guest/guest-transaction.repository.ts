@@ -2,8 +2,8 @@ import {
   AppErrorCode,
   CashLedgerType,
   TransactionType,
-  computeKrSellNetProceeds,
   computePosition,
+  computeTradeCashSettlement,
   formatTradeLedgerMemo,
 } from '@sar/shared';
 import { AppError } from '../../domain/errors/app-error';
@@ -21,6 +21,16 @@ import {
   updateGuestTransaction,
 } from '../guest/guest-storage';
 
+function tradeMemoOptions(
+  settlement: ReturnType<typeof computeTradeCashSettlement>,
+): { securitiesTaxKrw?: number; commission?: number } {
+  return {
+    securitiesTaxKrw:
+      settlement.securitiesTaxKrw > 0 ? settlement.securitiesTaxKrw : undefined,
+    commission: settlement.commission > 0 ? settlement.commission : undefined,
+  };
+}
+
 export class GuestTransactionRepository implements ITransactionRepository {
   async create(input: CreateTransactionInput): Promise<Transaction> {
     if (!input.name?.trim()) {
@@ -28,8 +38,19 @@ export class GuestTransactionRepository implements ITransactionRepository {
     }
 
     const stock = createGuestStock(input.stockSymbol, input.market, input.name);
-    const notional = input.quantity * input.price;
-    const currency = stock.currency === 'USD' ? 'USD' : 'KRW';
+    const commission = input.commission ?? 0;
+    if (commission < 0) {
+      throw new AppError('', AppErrorCode.TRANSACTION_COMMISSION_INVALID);
+    }
+
+    const settlement = computeTradeCashSettlement({
+      type: input.type,
+      quantity: input.quantity,
+      price: input.price,
+      market: stock.market,
+      commission,
+    });
+    const currency = settlement.currency;
 
     if (input.type === TransactionType.SELL) {
       const existing = guestTransactionsForStock(stock.id);
@@ -49,7 +70,7 @@ export class GuestTransactionRepository implements ITransactionRepository {
     if (input.type === TransactionType.BUY) {
       const balances = getGuestCashBalances();
       const available = currency === 'KRW' ? balances.krw : balances.usd;
-      if (available < notional) {
+      if (available < settlement.settleAmount) {
         throw new AppError('', AppErrorCode.CASH_INSUFFICIENT);
       }
     }
@@ -61,6 +82,7 @@ export class GuestTransactionRepository implements ITransactionRepository {
       type: input.type,
       quantity: input.quantity,
       price: input.price,
+      commission,
       tradedAt: input.tradedAt,
       memo: input.memo ?? null,
       stock,
@@ -68,25 +90,16 @@ export class GuestTransactionRepository implements ITransactionRepository {
 
     saveGuestTransaction(tx);
 
-    const sellSettlement =
-      input.type === TransactionType.SELL
-        ? computeKrSellNetProceeds(notional, stock.market)
-        : null;
-    const settleAmount =
-      input.type === TransactionType.SELL && sellSettlement ? sellSettlement.netKrw : notional;
-
     saveGuestCashEntry({
       currency,
       type:
         input.type === TransactionType.BUY ? CashLedgerType.BUY_SETTLE : CashLedgerType.SELL_SETTLE,
-      amount: settleAmount,
+      amount: settlement.settleAmount,
       refId: tx.id,
       memo: formatTradeLedgerMemo(
         stock.symbol,
         input.type === TransactionType.BUY ? 'BUY' : 'SELL',
-        sellSettlement && sellSettlement.securitiesTaxKrw > 0
-          ? { securitiesTaxKrw: sellSettlement.securitiesTaxKrw }
-          : undefined,
+        tradeMemoOptions(settlement),
       ),
       occurredAt: input.tradedAt,
     });
@@ -117,9 +130,26 @@ export class GuestTransactionRepository implements ITransactionRepository {
     }
 
     const stock = existing.stock;
-    const oldNotional = existing.quantity * existing.price;
-    const newNotional = input.quantity * input.price;
-    const currency = stock.currency === 'USD' ? 'USD' : 'KRW';
+    const commission = input.commission ?? existing.commission ?? 0;
+    if (commission < 0) {
+      throw new AppError('', AppErrorCode.TRANSACTION_COMMISSION_INVALID);
+    }
+
+    const oldSettlement = computeTradeCashSettlement({
+      type: existing.type,
+      quantity: existing.quantity,
+      price: existing.price,
+      market: stock.market,
+      commission: existing.commission ?? 0,
+    });
+    const newSettlement = computeTradeCashSettlement({
+      type: existing.type,
+      quantity: input.quantity,
+      price: input.price,
+      market: stock.market,
+      commission,
+    });
+    const currency = newSettlement.currency;
 
     if (existing.type === TransactionType.SELL) {
       const siblings = guestTransactionsForStock(stock.id).filter((tx) => tx.id !== id);
@@ -139,7 +169,7 @@ export class GuestTransactionRepository implements ITransactionRepository {
     if (existing.type === TransactionType.BUY) {
       const balances = getGuestCashBalances();
       const available = currency === 'KRW' ? balances.krw : balances.usd;
-      if (available + oldNotional < newNotional) {
+      if (available + oldSettlement.settleAmount < newSettlement.settleAmount) {
         throw new AppError('', AppErrorCode.CASH_INSUFFICIENT);
       }
     }
@@ -149,6 +179,7 @@ export class GuestTransactionRepository implements ITransactionRepository {
     const updated = updateGuestTransaction(id, {
       quantity: input.quantity,
       price: input.price,
+      commission,
       tradedAt: input.tradedAt,
       memo: input.memo ?? null,
     });
@@ -156,25 +187,16 @@ export class GuestTransactionRepository implements ITransactionRepository {
       throw new AppError('', AppErrorCode.NOT_FOUND);
     }
 
-    const sellSettlement =
-      existing.type === TransactionType.SELL
-        ? computeKrSellNetProceeds(newNotional, stock.market)
-        : null;
-    const settleAmount =
-      existing.type === TransactionType.SELL && sellSettlement ? sellSettlement.netKrw : newNotional;
-
     saveGuestCashEntry({
       currency,
       type:
         existing.type === TransactionType.BUY ? CashLedgerType.BUY_SETTLE : CashLedgerType.SELL_SETTLE,
-      amount: settleAmount,
+      amount: newSettlement.settleAmount,
       refId: id,
       memo: formatTradeLedgerMemo(
         stock.symbol,
         existing.type === TransactionType.BUY ? 'BUY' : 'SELL',
-        sellSettlement && sellSettlement.securitiesTaxKrw > 0
-          ? { securitiesTaxKrw: sellSettlement.securitiesTaxKrw }
-          : undefined,
+        tradeMemoOptions(newSettlement),
       ),
       occurredAt: input.tradedAt,
     });

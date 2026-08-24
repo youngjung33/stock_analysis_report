@@ -35,4 +35,17 @@ describe('SearchStocksUseCase', () => {
     expect(results.length).toBeGreaterThan(0);
     expect(marketData.searchRemoteStocks).toHaveBeenCalled();
   });
+
+  it('falls back when catalog count fails', async () => {
+    const catalog = createMockCatalogRepo();
+    catalog.countByMarket.mockRejectedValue(new Error('db down'));
+    const marketData = createMockMarketData();
+    marketData.searchRemoteStocks.mockResolvedValue([]);
+
+    const useCase = new SearchStocksUseCase(catalog, marketData);
+    const results = await useCase.execute('005930', Market.KR);
+
+    expect(results.some((r) => r.symbol === '005930')).toBe(true);
+    expect(catalog.search).not.toHaveBeenCalled();
+  });
 });

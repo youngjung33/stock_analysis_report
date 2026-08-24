@@ -49,4 +49,19 @@ describe('translateLedgerMemo', () => {
     expect(translateLedgerMemo('005930 SELL|STT:2000', tKo)).toContain('005930');
     expect(translateLedgerMemo('005930 SELL|STT:2000', tKo)).toContain('2,000');
   });
+
+  it('translates trade memo with commission', () => {
+    const tKo = makeT(ko);
+    const result = translateLedgerMemo('005930 BUY|FEE:1500', tKo);
+    expect(result).toContain('005930');
+    expect(result).toContain('1,500');
+  });
+
+  it('translates KR sell memo with STT and commission', () => {
+    const tKo = makeT(ko);
+    const result = translateLedgerMemo('005930 SELL|STT:2000|FEE:500', tKo);
+    expect(result).toContain('005930');
+    expect(result).toContain('2,000');
+    expect(result).toContain('500');
+  });
 });

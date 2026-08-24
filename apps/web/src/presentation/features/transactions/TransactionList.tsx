@@ -77,6 +77,7 @@ function TransactionTable({
             <th className="px-4 py-3">{t('common.type')}</th>
             <th className="px-4 py-3">{t('common.quantity')}</th>
             <th className="px-4 py-3">{t('common.unitPrice')}</th>
+            <th className="px-4 py-3">{t('common.commissionOptional')}</th>
             <th className="px-4 py-3">{t('common.memo')}</th>
             <th className="px-4 py-3"></th>
           </tr>
@@ -99,6 +100,11 @@ function TransactionTable({
               <td className="px-4 py-3 text-slate-300">{tx.quantity}</td>
               <td className="px-4 py-3 text-slate-300">
                 {formatNumber(tx.price, tx.stock?.currency)}
+              </td>
+              <td className="px-4 py-3 text-slate-300">
+                {tx.commission && tx.commission > 0
+                  ? formatNumber(tx.commission, tx.stock?.currency)
+                  : '-'}
               </td>
               <td className="px-4 py-3 text-slate-500">{translateLedgerMemo(tx.memo, t)}</td>
               <td className="px-4 py-3">
@@ -153,6 +159,14 @@ function TransactionCardList({
             <div>
               <dt className="text-slate-500">{t('common.unitPrice')}</dt>
               <dd className="text-slate-200">{formatNumber(tx.price, tx.stock?.currency)}</dd>
+            </div>
+            <div>
+              <dt className="text-slate-500">{t('common.commissionOptional')}</dt>
+              <dd className="text-slate-200">
+                {tx.commission && tx.commission > 0
+                  ? formatNumber(tx.commission, tx.stock?.currency)
+                  : '-'}
+              </dd>
             </div>
             <div>
               <dt className="text-slate-500">{t('common.memo')}</dt>

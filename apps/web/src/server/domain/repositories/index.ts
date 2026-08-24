@@ -81,6 +81,7 @@ export interface IStockRepository {
 export interface UpdateTransactionInput {
   quantity: number;
   price: number;
+  commission?: number;
   tradedAt: Date;
   memo?: string | null;
 }
@@ -89,7 +90,7 @@ export interface ITransactionRepository {
   create(data: Omit<TransactionEntity, 'id' | 'createdAt'>): Promise<TransactionEntity>;
   update(
     id: string,
-    data: Pick<TransactionEntity, 'quantity' | 'price' | 'tradedAt' | 'memo'>,
+    data: Pick<TransactionEntity, 'quantity' | 'price' | 'commission' | 'tradedAt' | 'memo'>,
   ): Promise<TransactionEntity>;
   findByUser(userId: string, filters?: { stockId?: string; type?: TransactionType }): Promise<
     (TransactionEntity & { stock: StockEntity })[]
@@ -158,6 +159,7 @@ export interface CreateTransactionInput {
   type: TransactionType;
   quantity: number;
   price: number;
+  commission?: number;
   tradedAt: Date;
   memo?: string;
 }

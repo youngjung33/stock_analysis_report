@@ -92,7 +92,7 @@ export function deleteGuestTransaction(id: string): void {
 
 export function updateGuestTransaction(
   id: string,
-  patch: Pick<Transaction, 'quantity' | 'price' | 'tradedAt' | 'memo'>,
+  patch: Pick<Transaction, 'quantity' | 'price' | 'commission' | 'tradedAt' | 'memo'>,
 ): Transaction | null {
   const store = readStore();
   const idx = store.transactions.findIndex((tx) => tx.id === id);

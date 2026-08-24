@@ -9,12 +9,16 @@ export function formatCashLedgerMemo(kind: CashLedgerMemoKind, currency: 'KRW' |
 export function formatTradeLedgerMemo(
   symbol: string,
   side: 'BUY' | 'SELL',
-  options?: { securitiesTaxKrw?: number },
+  options?: { securitiesTaxKrw?: number; commission?: number },
 ): string {
+  const parts: string[] = [`${symbol} ${side}`];
   if (side === 'SELL' && options?.securitiesTaxKrw && options.securitiesTaxKrw > 0) {
-    return `${symbol} SELL|STT:${options.securitiesTaxKrw}`;
+    parts[0] = `${symbol} SELL|STT:${options.securitiesTaxKrw}`;
   }
-  return `${symbol} ${side}`;
+  if (options?.commission && options.commission > 0) {
+    parts.push(`FEE:${Math.round(options.commission)}`);
+  }
+  return parts.join('|');
 }
 
 export function formatDividendLedgerMemo(symbol: string): string {

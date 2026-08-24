@@ -235,6 +235,8 @@ export {
   resolveIsaTaxFreeLimit,
   splitIncomeByIsaAccount,
 } from './korean-tax';
+export type { TradeCashSettlement } from './trade-settlement';
+export { computeTradeCashSettlement } from './trade-settlement';
 export type {
   KoreanTaxProfile,
   KoreanTaxRuleItem,

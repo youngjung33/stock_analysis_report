@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
       type: body.type as TransactionType,
       quantity: Number(body.quantity),
       price: Number(body.price),
+      commission: body.commission != null ? Number(body.commission) : undefined,
       tradedAt: new Date(body.tradedAt),
       memo: body.memo,
     });

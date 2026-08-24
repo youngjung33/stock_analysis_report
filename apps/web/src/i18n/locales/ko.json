@@ -22,6 +22,7 @@
     "symbol": "종목",
     "quantity": "수량",
     "unitPrice": "단가",
+    "commissionOptional": "수수료 (선택)",
     "memo": "메모",
     "memoOptional": "메모 (선택)",
     "type": "유형",
@@ -391,6 +392,8 @@
     "memo": {
       "trade": "{{symbol}} · {{side}}",
       "tradeWithStt": "{{symbol}} · {{side}} (증권거래세 ₩{{tax}})",
+      "tradeWithFee": "{{symbol}} · {{side}} (수수료 ₩{{fee}})",
+      "tradeWithSttAndFee": "{{symbol}} · {{side}} (증권거래세 ₩{{tax}}, 수수료 ₩{{fee}})",
       "dividend": "{{symbol}} · 배당"
     }
   },

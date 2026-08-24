@@ -1,10 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-async function enterAsGuest(page: import('@playwright/test').Page) {
-  await page.goto('/login');
-  await page.getByRole('button', { name: '비회원으로 입장' }).click();
-  await expect(page).toHaveURL('/', { timeout: 15_000 });
-}
+import { enterAsGuest } from './helpers';
 
 test.describe('smoke', () => {
   test('login page renders', async ({ page }) => {

@@ -89,6 +89,18 @@ export function extractAccessToken(req: NextRequest): string | null {
   return null;
 }
 
+export function tryGetAuth(req: NextRequest): AuthUser | null {
+  const token = extractAccessToken(req);
+  if (!token) return null;
+  try {
+    const { tokenService } = getServerServices();
+    const payload = tokenService.verifyAccessToken(token);
+    return { userId: payload.sub, username: payload.username };
+  } catch {
+    return null;
+  }
+}
+
 /**
  * JWT access token 검증 — userId는 payload.sub만 신뢰 (요청 body/query userId 무시)
  */

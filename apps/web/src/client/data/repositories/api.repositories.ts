@@ -157,7 +157,17 @@ export class ApiMarketRepository implements IMarketRepository {
     return data;
   }
 
-  async getMarketAnalysis() {
+  async getMarketAnalysis(options?: {
+    userHoldings?: Array<{ symbol: string; market: Market }>;
+    userWatchlist?: Array<{ symbol: string; market: Market }>;
+  }) {
+    if (options?.userHoldings?.length || options?.userWatchlist?.length) {
+      const { data } = await apiClient.post<import('@sar/shared').MarketAnalysisReport>(
+        '/market/analysis',
+        options,
+      );
+      return data;
+    }
     const { data } = await apiClient.get<import('@sar/shared').MarketAnalysisReport>('/market/analysis');
     return data;
   }

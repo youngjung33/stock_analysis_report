@@ -10,6 +10,23 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:3000',
     trace: 'on-first-retry',
+    extraHTTPHeaders: {
+      'Accept-Language': 'ko-KR,ko;q=0.9',
+    },
+    storageState: {
+      cookies: [
+        {
+          name: 'sar_locale',
+          value: 'ko',
+          domain: '127.0.0.1',
+          path: '/',
+          expires: -1,
+          httpOnly: false,
+          secure: false,
+          sameSite: 'Lax',
+        },
+      ],
+    },
   },
   projects: [
     {
@@ -22,5 +39,12 @@ export default defineConfig({
     url: 'http://127.0.0.1:3000/login',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    env: {
+      ...process.env,
+      JWT_ACCESS_SECRET:
+        process.env.JWT_ACCESS_SECRET ?? 'e2e-jwt-access-secret-min-32-chars',
+      DATABASE_URL:
+        process.env.DATABASE_URL ?? 'postgresql://test:test@localhost:5432/test',
+    },
   },
 });

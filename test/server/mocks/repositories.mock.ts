@@ -49,6 +49,7 @@ export function createMockTransaction(
     type: TransactionType.BUY,
     quantity: 10,
     price: 100,
+    commission: 0,
     tradedAt: new Date('2024-01-01'),
     memo: null,
     createdAt: new Date(),

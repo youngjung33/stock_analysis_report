@@ -61,6 +61,7 @@ export interface TransactionEntity {
   type: TransactionType;
   quantity: number;
   price: number;
+  commission: number;
   tradedAt: Date;
   memo: string | null;
   createdAt: Date;

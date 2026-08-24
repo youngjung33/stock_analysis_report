@@ -3,7 +3,7 @@ import {
   CashLedgerType,
   TransactionType,
   computeCashBalances,
-  computeKrSellNetProceeds,
+  computeTradeCashSettlement,
   formatTradeLedgerMemo,
 } from '@sar/shared';
 import { TransactionEntity } from '../../entities';
@@ -16,7 +16,7 @@ import { computePosition } from '../../services/position-calculator';
 import { ValidationError, EntityNotFoundError } from '../../errors/domain.errors';
 import { SettleCashUseCase } from '../cash/cash.use-cases';
 
-/** 거래 수정 — quantity/price/tradedAt/memo; 현금 원장 재결제 */
+/** 거래 수정 — quantity/price/commission/tradedAt/memo; 현금 원장 재결제 */
 export class UpdateTransactionUseCase {
   private readonly settleCash: SettleCashUseCase;
 
@@ -38,6 +38,10 @@ export class UpdateTransactionUseCase {
     if (input.price <= 0) {
       throw new ValidationError(AppErrorCode.TRANSACTION_PRICE_INVALID);
     }
+    const commission = input.commission ?? 0;
+    if (commission < 0) {
+      throw new ValidationError(AppErrorCode.TRANSACTION_COMMISSION_INVALID);
+    }
 
     const existing = await this.transactionRepo.findById(txId);
     if (!existing || existing.userId !== userId) {
@@ -45,9 +49,21 @@ export class UpdateTransactionUseCase {
     }
 
     const { stock } = existing;
-    const currency = stock.currency === 'USD' ? 'USD' : 'KRW';
-    const oldNotional = existing.quantity * existing.price;
-    const newNotional = input.quantity * input.price;
+    const oldSettlement = computeTradeCashSettlement({
+      type: existing.type,
+      quantity: existing.quantity,
+      price: existing.price,
+      market: stock.market,
+      commission: existing.commission,
+    });
+    const newSettlement = computeTradeCashSettlement({
+      type: existing.type,
+      quantity: input.quantity,
+      price: input.price,
+      market: stock.market,
+      commission,
+    });
+    const currency = newSettlement.currency;
 
     if (existing.type === TransactionType.SELL) {
       const siblings = await this.transactionRepo.findByUserAndStock(userId, stock.id);
@@ -63,29 +79,21 @@ export class UpdateTransactionUseCase {
       const entries = await this.cashRepo.findByUser(userId);
       const balances = computeCashBalances(entries);
       const available = currency === 'KRW' ? balances.krw : balances.usd;
-      const effectiveAvailable = available + oldNotional;
-      if (effectiveAvailable < newNotional) {
+      const effectiveAvailable = available + oldSettlement.settleAmount;
+      if (effectiveAvailable < newSettlement.settleAmount) {
         throw new ValidationError(AppErrorCode.CASH_INSUFFICIENT);
       }
     }
 
     await this.cashRepo.deleteByRefId(userId, txId);
 
-    const updated = await this.transactionRepo.update(txId, {
+    await this.transactionRepo.update(txId, {
       quantity: input.quantity,
       price: input.price,
+      commission,
       tradedAt: input.tradedAt,
       memo: input.memo ?? null,
     });
-
-    const sellSettlement =
-      existing.type === TransactionType.SELL
-        ? computeKrSellNetProceeds(newNotional, stock.market)
-        : null;
-    const settleAmount =
-      existing.type === TransactionType.SELL && sellSettlement
-        ? sellSettlement.netKrw
-        : newNotional;
 
     await this.settleCash.execute({
       userId,
@@ -94,15 +102,17 @@ export class UpdateTransactionUseCase {
         existing.type === TransactionType.BUY
           ? CashLedgerType.BUY_SETTLE
           : CashLedgerType.SELL_SETTLE,
-      amount: settleAmount,
+      amount: newSettlement.settleAmount,
       occurredAt: input.tradedAt,
       refId: txId,
       memo: formatTradeLedgerMemo(
         stock.symbol,
         existing.type === TransactionType.BUY ? 'BUY' : 'SELL',
-        sellSettlement && sellSettlement.securitiesTaxKrw > 0
-          ? { securitiesTaxKrw: sellSettlement.securitiesTaxKrw }
-          : undefined,
+        {
+          securitiesTaxKrw:
+            newSettlement.securitiesTaxKrw > 0 ? newSettlement.securitiesTaxKrw : undefined,
+          commission: newSettlement.commission > 0 ? newSettlement.commission : undefined,
+        },
       ),
     });
 

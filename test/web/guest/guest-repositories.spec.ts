@@ -2,12 +2,14 @@
  * @vitest-environment jsdom
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Market, TransactionType } from '@sar/shared';
+import { Market, TransactionType, CashLedgerType } from '@sar/shared';
 import { GuestWatchlistRepository, GuestCorporateActionRepository } from '@/client/data/guest/guest-feature.repositories';
 import { GuestPortfolioRepository } from '@/client/data/guest/guest-portfolio.repository';
+import { GuestTransactionRepository } from '@/client/data/guest/guest-transaction.repository';
 import {
   clearGuestStore,
   getGuestCashBalances,
+  saveGuestCashEntry,
   saveGuestTransaction,
   createGuestStock,
 } from '@/client/data/guest/guest-storage';
@@ -131,5 +133,35 @@ describe('GuestPortfolioRepository', () => {
     const dashboard = await repo.getDashboard();
     expect(dashboard.summary.holdingsCount).toBe(1);
     expect(dashboard.holdings[0]?.symbol).toBe('005930');
+  });
+});
+
+describe('GuestTransactionRepository', () => {
+  beforeEach(() => {
+    clearGuestStore();
+    saveGuestCashEntry({
+      currency: 'KRW',
+      type: CashLedgerType.DEPOSIT,
+      amount: 10_000_000,
+      refId: null,
+      memo: 'DEPOSIT:KRW',
+      occurredAt: new Date().toISOString(),
+    });
+  });
+
+  it('deducts commission from guest cash on KR buy', async () => {
+    const repo = new GuestTransactionRepository();
+    await repo.create({
+      stockSymbol: '005930',
+      market: Market.KR,
+      name: '삼성전자',
+      type: TransactionType.BUY,
+      quantity: 10,
+      price: 70_000,
+      commission: 1_000,
+      tradedAt: new Date().toISOString(),
+    });
+
+    expect(getGuestCashBalances().krw).toBe(10_000_000 - 701_000);
   });
 });

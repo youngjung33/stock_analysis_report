@@ -67,6 +67,9 @@ export const transactionRepository: ITransactionRepository = {
   list(filters) {
     return pickTransactionRepo().list(filters);
   },
+  update(id, input) {
+    return pickTransactionRepo().update(id, input);
+  },
   delete(id) {
     return pickTransactionRepo().delete(id);
   },

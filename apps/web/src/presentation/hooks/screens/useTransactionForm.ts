@@ -17,6 +17,7 @@ export function useTransactionForm(onSuccess: () => void) {
   const [type, setType] = useState<TransactionType>(TransactionType.BUY);
   const [quantity, setQuantity] = useState('');
   const [price, setPrice] = useState('');
+  const [commission, setCommission] = useState('');
   const [tradedAt, setTradedAt] = useState(new Date().toISOString().slice(0, 10));
   const [memo, setMemo] = useState('');
   const [loading, setLoading] = useState(false);
@@ -44,12 +45,14 @@ export function useTransactionForm(onSuccess: () => void) {
         type,
         quantity: Number(quantity),
         price: parseAmountInput(price),
+        commission: commission.trim() ? parseAmountInput(commission) : undefined,
         tradedAt: new Date(tradedAt).toISOString(),
         memo: memo || undefined,
       });
       setSelectedStock(null);
       setQuantity('');
       setPrice('');
+      setCommission('');
       setMemo('');
       showSuccess(t('transactions.toast.registered'));
       onSuccess();
@@ -71,6 +74,8 @@ export function useTransactionForm(onSuccess: () => void) {
     setQuantity,
     price,
     setPrice,
+    commission,
+    setCommission,
     tradedAt,
     setTradedAt,
     memo,

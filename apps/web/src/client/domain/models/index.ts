@@ -19,6 +19,7 @@ export interface Transaction {
   type: TransactionType;
   quantity: number;
   price: number;
+  commission?: number;
   tradedAt: string;
   memo: string | null;
   stock?: Stock;
@@ -202,6 +203,7 @@ export interface SessionResult {
 export interface UpdateTransactionInput {
   quantity: number;
   price: number;
+  commission?: number;
   tradedAt: string;
   memo?: string;
 }
@@ -214,6 +216,7 @@ export interface CreateTransactionInput {
   type: TransactionType;
   quantity: number;
   price: number;
+  commission?: number;
   tradedAt: string;
   memo?: string;
 }

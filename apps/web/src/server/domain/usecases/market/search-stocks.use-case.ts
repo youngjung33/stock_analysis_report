@@ -19,7 +19,13 @@ export class SearchStocksUseCase {
     const trimmed = query.trim();
     if (trimmed.length < 1) return [];
 
-    const catalogCount = await this.catalogRepo.countByMarket(market);
+    let catalogCount = 0;
+    try {
+      catalogCount = await this.catalogRepo.countByMarket(market);
+    } catch {
+      catalogCount = 0;
+    }
+
     if (catalogCount > 0) {
       return this.catalogRepo.search(trimmed, market, 15);
     }

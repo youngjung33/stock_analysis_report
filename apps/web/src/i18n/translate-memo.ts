@@ -6,8 +6,6 @@ import type { TFunction } from 'i18next';
 const LEGACY_BUY = /^(.+)\s+매수$/;
 const LEGACY_SELL = /^(.+)\s+매도$/;
 const LEGACY_DIVIDEND = /^(.+)\s+배당$/;
-const TYPED_TRADE_STT = /^(.+)\s+SELL\|STT:(\d+)$/;
-const TYPED_TRADE = /^(.+)\s+(BUY|SELL)$/;
 const TYPED_DIVIDEND = /^(.+)\s+DIVIDEND$/;
 const TYPED_CASH = /^(INITIAL|DEPOSIT|WITHDRAW):(KRW|USD)$/;
 
@@ -22,6 +20,34 @@ const LEGACY_CASH_MEMOS: Record<string, string> = {
   Withdrawal: 'capital.memoWithdraw',
 };
 
+interface ParsedTradeMemo {
+  symbol: string;
+  side: 'BUY' | 'SELL';
+  stt?: number;
+  fee?: number;
+}
+
+function parseTradeMemo(memo: string): ParsedTradeMemo | null {
+  const segments = memo.split('|');
+  const head = segments[0];
+  let fee: number | undefined;
+  let stt: number | undefined;
+
+  for (let i = 1; i < segments.length; i++) {
+    const feeMatch = segments[i].match(/^FEE:(\d+)$/);
+    if (feeMatch) fee = Number(feeMatch[1]);
+    const sttMatch = segments[i].match(/^STT:(\d+)$/);
+    if (sttMatch) stt = Number(sttMatch[1]);
+  }
+
+  const plain = head.match(/^(.+)\s+(BUY|SELL)$/);
+  if (plain) {
+    return { symbol: plain[1], side: plain[2] as 'BUY' | 'SELL', stt, fee };
+  }
+
+  return null;
+}
+
 function translateCashMemoKind(kind: string, currency: string, t: TFunction): string {
   if (kind === 'INITIAL') {
     return currency === 'USD'
@@ -31,6 +57,35 @@ function translateCashMemoKind(kind: string, currency: string, t: TFunction): st
   if (kind === 'DEPOSIT') return t('capital.memoDeposit');
   if (kind === 'WITHDRAW') return t('capital.memoWithdraw');
   return `${kind}:${currency}`;
+}
+
+function translateTradeMemo(parsed: ParsedTradeMemo, t: TFunction): string {
+  const sideKey = parsed.side === 'BUY' ? 'buy' : 'sell';
+  const side = t(`transactions.form.${sideKey}`);
+
+  if (parsed.stt != null && parsed.fee != null) {
+    return t('transactions.memo.tradeWithSttAndFee', {
+      symbol: parsed.symbol,
+      side,
+      tax: parsed.stt.toLocaleString(),
+      fee: parsed.fee.toLocaleString(),
+    });
+  }
+  if (parsed.stt != null) {
+    return t('transactions.memo.tradeWithStt', {
+      symbol: parsed.symbol,
+      side,
+      tax: parsed.stt.toLocaleString(),
+    });
+  }
+  if (parsed.fee != null) {
+    return t('transactions.memo.tradeWithFee', {
+      symbol: parsed.symbol,
+      side,
+      fee: parsed.fee.toLocaleString(),
+    });
+  }
+  return t('transactions.memo.trade', { symbol: parsed.symbol, side });
 }
 
 /** Ledger memo — supports legacy Korean and machine-readable BUY/SELL/DIVIDEND/CASH formats */
@@ -60,22 +115,9 @@ export function translateLedgerMemo(memo: string | null | undefined, t: TFunctio
     return t('transactions.memo.dividend', { symbol: legacyDividend[1] });
   }
 
-  const typedTradeStt = memo.match(TYPED_TRADE_STT);
-  if (typedTradeStt) {
-    return t('transactions.memo.tradeWithStt', {
-      symbol: typedTradeStt[1],
-      side: t('transactions.form.sell'),
-      tax: Number(typedTradeStt[2]).toLocaleString(),
-    });
-  }
-
-  const typedTrade = memo.match(TYPED_TRADE);
-  if (typedTrade) {
-    const sideKey = typedTrade[2] === 'BUY' ? 'buy' : 'sell';
-    return t('transactions.memo.trade', {
-      symbol: typedTrade[1],
-      side: t(`transactions.form.${sideKey}`),
-    });
+  const parsedTrade = parseTradeMemo(memo);
+  if (parsedTrade) {
+    return translateTradeMemo(parsedTrade, t);
   }
 
   const typedDividend = memo.match(TYPED_DIVIDEND);

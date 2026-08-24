@@ -213,6 +213,56 @@ describe('CreateTransactionUseCase', () => {
       }),
     );
   });
+
+  it('includes commission in buy settlement and memo', async () => {
+    const stock = createMockStock({ market: Market.KR, currency: 'KRW', symbol: '005930' });
+    const stockRepo = createMockStockRepo();
+    stockRepo.findBySymbolAndMarket.mockResolvedValue(stock);
+
+    const txRepo = createMockTransactionRepo();
+    txRepo.create.mockResolvedValue(createMockTransaction({ id: 'tx-buy-1' }));
+
+    const cashCreate = vi.fn().mockResolvedValue({});
+    const cashRepo = createMockCashRepo({
+      findByUser: vi.fn().mockResolvedValue([
+        {
+          id: 'cash-krw',
+          userId: 'user-1',
+          currency: 'KRW',
+          type: 'DEPOSIT',
+          amount: 1_000_000,
+          occurredAt: new Date(),
+          memo: null,
+          refId: null,
+        },
+      ]),
+      create: cashCreate,
+    });
+
+    const useCase = new CreateTransactionUseCase(stockRepo, txRepo, cashRepo);
+    await useCase.execute({
+      userId: 'user-1',
+      stockSymbol: '005930',
+      market: Market.KR,
+      name: '삼성전자',
+      type: TransactionType.BUY,
+      quantity: 10,
+      price: 70_000,
+      commission: 1_000,
+      tradedAt: new Date(),
+    });
+
+    expect(txRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({ commission: 1_000 }),
+    );
+    expect(cashCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: CashLedgerType.BUY_SETTLE,
+        amount: -701_000,
+        memo: '005930 BUY|FEE:1000',
+      }),
+    );
+  });
 });
 
 describe('ListTransactionsUseCase', () => {

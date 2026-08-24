@@ -9,7 +9,7 @@ export class GuestSessionAdapter implements IGuestSessionPort {
   }
 
   activate() {
-    guestSession.activate();
+    return guestSession.activate();
   }
 
   clear() {
@@ -17,7 +17,7 @@ export class GuestSessionAdapter implements IGuestSessionPort {
   }
 
   syncCookie() {
-    guestSession.syncCookie();
+    return guestSession.syncCookie();
   }
 }
 

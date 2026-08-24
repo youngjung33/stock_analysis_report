@@ -22,6 +22,7 @@
     "symbol": "Symbol",
     "quantity": "Quantity",
     "unitPrice": "Unit price",
+    "commissionOptional": "Commission (optional)",
     "memo": "Memo",
     "memoOptional": "Memo (optional)",
     "type": "Type",
@@ -391,6 +392,8 @@
     "memo": {
       "trade": "{{symbol}} · {{side}}",
       "tradeWithStt": "{{symbol}} · {{side}} (securities tax ₩{{tax}})",
+      "tradeWithFee": "{{symbol}} · {{side}} (commission ₩{{fee}})",
+      "tradeWithSttAndFee": "{{symbol}} · {{side}} (securities tax ₩{{tax}}, commission ₩{{fee}})",
       "dividend": "{{symbol}} · Dividend"
     }
   },

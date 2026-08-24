@@ -35,9 +35,12 @@ export class GetMarketStatusUseCase {
 export class GetMarketAnalysisUseCase {
   constructor(private readonly marketRepo: IMarketRepository) {}
 
-  /** marketRepo.getMarketAnalysis — MarketAnalysisReport */
-  execute() {
-    return this.marketRepo.getMarketAnalysis();
+  /** marketRepo.getMarketAnalysis — optional holdings/watchlist personalization */
+  execute(options?: {
+    userHoldings?: Array<{ symbol: string; market: import('@sar/shared').Market }>;
+    userWatchlist?: Array<{ symbol: string; market: import('@sar/shared').Market }>;
+  }) {
+    return this.marketRepo.getMarketAnalysis(options);
   }
 }
 

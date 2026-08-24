@@ -74,6 +74,15 @@ export function TransactionForm({ onSuccess }: Props) {
             required
           />
         </label>
+        <label className="block">
+          <span className="text-xs text-slate-400 md:text-sm">{t('common.commissionOptional')}</span>
+          <AmountInput
+            className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-white md:py-2"
+            value={form.commission}
+            onValueChange={form.setCommission}
+            formatOptions={{ maxFractionDigits: 0 }}
+          />
+        </label>
         <label className="block sm:col-span-2">
           <span className="text-xs text-slate-400 md:text-sm">{t('common.memoOptional')}</span>
           <input

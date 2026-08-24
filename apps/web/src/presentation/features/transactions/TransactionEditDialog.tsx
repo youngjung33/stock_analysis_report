@@ -22,6 +22,7 @@ export function TransactionEditDialog({ transaction, onClose, onSuccess }: Props
   const { showError, showSuccess } = useToast();
   const [quantity, setQuantity] = useState('');
   const [price, setPrice] = useState('');
+  const [commission, setCommission] = useState('');
   const [tradedAt, setTradedAt] = useState('');
   const [memo, setMemo] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,6 +31,9 @@ export function TransactionEditDialog({ transaction, onClose, onSuccess }: Props
     if (!transaction) return;
     setQuantity(String(transaction.quantity));
     setPrice(String(transaction.price));
+    setCommission(
+      transaction.commission && transaction.commission > 0 ? String(transaction.commission) : '',
+    );
     setTradedAt(transaction.tradedAt.slice(0, 10));
     setMemo(transaction.memo ?? '');
   }, [transaction]);
@@ -43,6 +47,7 @@ export function TransactionEditDialog({ transaction, onClose, onSuccess }: Props
       await updateTransactionUseCase.execute(transaction!.id, {
         quantity: Number(quantity),
         price: parseAmountInput(price),
+        commission: commission.trim() ? parseAmountInput(commission) : undefined,
         tradedAt: new Date(tradedAt).toISOString(),
         memo: memo || undefined,
       });
@@ -102,6 +107,15 @@ export function TransactionEditDialog({ transaction, onClose, onSuccess }: Props
               onValueChange={setPrice}
               formatOptions={{ maxFractionDigits: 2 }}
               required
+            />
+          </label>
+          <label className="block">
+            <span className="text-xs text-slate-400">{t('common.commissionOptional')}</span>
+            <AmountInput
+              className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
+              value={commission}
+              onValueChange={setCommission}
+              formatOptions={{ maxFractionDigits: 0 }}
             />
           </label>
           <label className="block">

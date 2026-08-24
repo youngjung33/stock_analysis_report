@@ -99,6 +99,7 @@ model Transaction {
   type      String
   quantity  Float
   price     Float
+  commission Float    @default(0)
   tradedAt  DateTime
   memo      String?
   createdAt DateTime @default(now())

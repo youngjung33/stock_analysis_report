@@ -78,7 +78,10 @@ export interface IMarketRepository {
   getFeaturedQuotes(): Promise<FeaturedQuotesResult>;
   getStockQuote(symbol: string, market: Market, range: QuoteChartRange): Promise<StockQuoteSnapshot>;
   getMarketStatus(): Promise<MarketProviderStatus[]>;
-  getMarketAnalysis(): Promise<MarketAnalysisReport>;
+  getMarketAnalysis(options?: {
+    userHoldings?: Array<{ symbol: string; market: Market }>;
+    userWatchlist?: Array<{ symbol: string; market: Market }>;
+  }): Promise<MarketAnalysisReport>;
   getRecommendationHistory(limit?: number): Promise<import('@sar/shared').RecommendationHistoryResponse>;
   getRecommendationContext(): Promise<import('@sar/shared').RecommendationContextResponse>;
   searchStocks(query: string, market: Market): Promise<StockSearchResult[]>;
@@ -123,9 +126,9 @@ export interface IPortfolioCapitalRepository {
 
 export interface IGuestSessionPort {
   isActive(): boolean;
-  activate(): void;
+  activate(): Promise<void>;
   clear(): void;
-  syncCookie(): void;
+  syncCookie(): Promise<void>;
 }
 
 export interface IGuestStorePort {

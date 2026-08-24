@@ -16,6 +16,7 @@ export async function PATCH(
     const updated = await updateTransactionUseCase.execute(user.userId, id, {
       quantity: Number(body.quantity),
       price: Number(body.price),
+      commission: body.commission != null ? Number(body.commission) : undefined,
       tradedAt: new Date(body.tradedAt),
       memo: body.memo ?? null,
     });
