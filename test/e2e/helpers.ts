@@ -31,3 +31,22 @@ export async function seedGuestCapital(page: Page, amount = '10000000'): Promise
 export function tradeRegistrationForm(page: Page) {
   return page.locator('form').filter({ has: page.getByRole('heading', { name: '매매 등록' }) });
 }
+
+export async function loginAsMember(page: Page): Promise<void> {
+  const username = process.env.E2E_USERNAME;
+  const password = process.env.E2E_PASSWORD;
+  if (!username || !password) {
+    throw new Error('E2E_USERNAME and E2E_PASSWORD are required for member E2E');
+  }
+
+  await page.goto('/login');
+  await ensureKoreanLocale(page);
+  await page.getByPlaceholder('아이디').fill(username);
+  await page.getByPlaceholder('비밀번호').fill(password);
+  await page.getByRole('button', { name: '로그인' }).click();
+  await expect(page).toHaveURL('/', { timeout: 20_000 });
+}
+
+export function hasMemberE2ECredentials(): boolean {
+  return Boolean(process.env.E2E_USERNAME?.trim() && process.env.E2E_PASSWORD?.trim());
+}

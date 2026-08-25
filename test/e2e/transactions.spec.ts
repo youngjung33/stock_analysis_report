@@ -1,5 +1,11 @@
 import { test, expect } from '@playwright/test';
-import { enterAsGuest, seedGuestCapital, tradeRegistrationForm } from './helpers';
+import {
+  enterAsGuest,
+  hasMemberE2ECredentials,
+  loginAsMember,
+  seedGuestCapital,
+  tradeRegistrationForm,
+} from './helpers';
 
 test.describe('guest transactions', () => {
   test.setTimeout(90_000);
@@ -46,6 +52,33 @@ test.describe('guest transactions', () => {
 
     await expect(page.getByText('매매가 등록되었습니다.')).toBeVisible({ timeout: 15_000 });
     await expect(page.locator('table tbody').getByText('매도')).toBeVisible();
+  });
+});
+
+test.describe('member transactions', () => {
+  test.setTimeout(90_000);
+
+  test.beforeEach(() => {
+    test.skip(
+      !hasMemberE2ECredentials(),
+      'Set E2E_USERNAME and E2E_PASSWORD to run member transaction E2E',
+    );
+  });
+
+  test('member can register KR buy', async ({ page }) => {
+    await loginAsMember(page);
+    await seedGuestCapital(page);
+
+    await page.goto('/transactions');
+    const form = tradeRegistrationForm(page);
+    await form.getByPlaceholder('종목명 또는 코드 (예: 삼성전자, 005930)').fill('005930');
+    await form.getByRole('button', { name: '005930' }).first().click({ timeout: 20_000 });
+    await form.locator('input[type="number"]').fill('3');
+    await form.getByLabel('단가').fill('70000');
+    await form.getByRole('button', { name: '등록' }).click();
+
+    await expect(page.getByText('매매가 등록되었습니다.')).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator('table tbody').getByText('005930')).toBeVisible();
   });
 });
 
