@@ -51,6 +51,9 @@ export class FetchRecommendationTechnicalSnapshotsUseCase {
       try {
         const yahoo =
           stock.yahooSymbol ?? resolveYahooSymbol(stock.symbol, stock.market);
+        if (!yahoo) {
+          continue;
+        }
         const series = await this.marketData.fetchChartSeries(yahoo, '6mo');
         const snap = buildStockTechnicalSnapshot(
           {

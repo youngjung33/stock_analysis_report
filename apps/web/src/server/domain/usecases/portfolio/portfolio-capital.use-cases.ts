@@ -127,12 +127,16 @@ export class GetPortfolioSimulationUseCase {
     const featuredTargets = [
       ...featured.kr.map((q) => ({
         symbol: q.symbol,
+        name: q.name,
         market: q.market,
+        currency: q.currency,
         yahooSymbol: undefined as string | undefined,
       })),
       ...featured.us.map((q) => ({
         symbol: q.symbol,
+        name: q.name,
         market: q.market,
+        currency: q.currency,
         yahooSymbol: undefined as string | undefined,
       })),
     ];

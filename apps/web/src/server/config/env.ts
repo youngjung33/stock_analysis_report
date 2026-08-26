@@ -19,13 +19,8 @@ export function validateServerEnv(): void {
   if (process.env.NODE_ENV === 'production') {
     const missingRecommended = OPTIONAL_BUT_RECOMMENDED.filter((key) => !process.env[key]?.trim());
     if (missingRecommended.length > 0) {
-      console.warn(
-        JSON.stringify({
-          level: 'warn',
-          msg: 'recommended env vars missing for production hardening',
-          keys: missingRecommended,
-          ts: new Date().toISOString(),
-        }),
+      throw new Error(
+        `Missing required environment variables for production: ${missingRecommended.join(', ')}`,
       );
     }
   }

@@ -5,10 +5,9 @@ import type { MarketContext, ScoreBreakdownItem, StockSectorTag } from './types'
 import {
   findFigureInHeadline,
   headlineMatchesTopic,
-  type FigureLinkScope,
   type FigureRegistryEntry,
 } from './figure-registry';
-import { figureLinkScopeAllowsSymbolDelta } from './score-dedupe';
+import { figureLinkScopeAllowsSymbolDelta, type FigureLinkScope } from './score-dedupe';
 
 export type FigureStatementSourceChannel = 'rss' | 'sns';
 

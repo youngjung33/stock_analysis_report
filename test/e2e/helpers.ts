@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test';
+import { hasMemberE2E, resolveMemberE2ECredentials } from './member-e2e-env';
 
 /** E2E helpers — locale-safe (defaults to Korean UI) */
 
@@ -33,11 +34,11 @@ export function tradeRegistrationForm(page: Page) {
 }
 
 export async function loginAsMember(page: Page): Promise<void> {
-  const username = process.env.E2E_USERNAME;
-  const password = process.env.E2E_PASSWORD;
-  if (!username || !password) {
-    throw new Error('E2E_USERNAME and E2E_PASSWORD are required for member E2E');
+  if (!hasMemberE2E()) {
+    throw new Error('Member E2E requires DATABASE_URL and seed credentials');
   }
+
+  const { username, password } = resolveMemberE2ECredentials();
 
   await page.goto('/login');
   await ensureKoreanLocale(page);
@@ -47,6 +48,4 @@ export async function loginAsMember(page: Page): Promise<void> {
   await expect(page).toHaveURL('/', { timeout: 20_000 });
 }
 
-export function hasMemberE2ECredentials(): boolean {
-  return Boolean(process.env.E2E_USERNAME?.trim() && process.env.E2E_PASSWORD?.trim());
-}
+export { hasMemberE2E, MEMBER_E2E_SKIP_REASON } from './member-e2e-env';

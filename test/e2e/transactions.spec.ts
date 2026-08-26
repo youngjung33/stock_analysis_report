@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
 import {
   enterAsGuest,
-  hasMemberE2ECredentials,
+  hasMemberE2E,
   loginAsMember,
+  MEMBER_E2E_SKIP_REASON,
   seedGuestCapital,
   tradeRegistrationForm,
 } from './helpers';
@@ -59,10 +60,7 @@ test.describe('member transactions', () => {
   test.setTimeout(90_000);
 
   test.beforeEach(() => {
-    test.skip(
-      !hasMemberE2ECredentials(),
-      'Set E2E_USERNAME and E2E_PASSWORD to run member transaction E2E',
-    );
+    test.skip(!hasMemberE2E(), MEMBER_E2E_SKIP_REASON);
   });
 
   test('member can register KR buy', async ({ page }) => {

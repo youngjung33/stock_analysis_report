@@ -44,7 +44,6 @@ export const TIER_LIMITS: Record<RateLimitTier, { limit: number; windowMs: numbe
 type UpstashModule = typeof import('@upstash/ratelimit');
 type RedisModule = typeof import('@upstash/redis');
 
-let upstashWarned = false;
 const upstashLimiters = new Map<RateLimitTier, InstanceType<UpstashModule['Ratelimit']>>();
 
 function clientIp(req: NextRequest): string {
@@ -101,7 +100,7 @@ async function enforceUpstashRateLimit(key: string, tier: RateLimitTier): Promis
   }
 }
 
-/** IP 기준 rate limit — Upstash Redis(선택) 또는 프로세스 메모리 fallback */
+/** IP 기준 rate limit — production은 Upstash 필수, dev/test는 in-memory fallback */
 export async function enforceRateLimit(
   req: NextRequest,
   scope: string,
@@ -115,14 +114,11 @@ export async function enforceRateLimit(
     return;
   }
 
-  if (process.env.NODE_ENV === 'production' && !upstashWarned) {
-    upstashWarned = true;
-    console.warn(
-      JSON.stringify({
-        level: 'warn',
-        msg: 'rate limit using in-memory store; set UPSTASH_REDIS_REST_URL/TOKEN for production',
-        ts: new Date().toISOString(),
-      }),
+  if (process.env.NODE_ENV === 'production') {
+    throw new HttpError(
+      resolveAppErrorMessage(AppErrorCode.INTERNAL),
+      503,
+      AppErrorCode.INTERNAL,
     );
   }
 
@@ -133,5 +129,4 @@ export async function enforceRateLimit(
 export function resetRateLimitStoreForTests(): void {
   memoryBuckets.clear();
   upstashLimiters.clear();
-  upstashWarned = false;
 }

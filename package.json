@@ -13,6 +13,7 @@
     "test:e2e": "npm run test:e2e -w @sar/web",
     "lint": "npm run lint -w @sar/web",
     "db:migrate": "npm run db:migrate -w @sar/web",
+    "db:deploy": "npm run db:deploy -w @sar/web",
     "db:push": "npm run db:push -w @sar/web",
     "db:seed": "npm run db:seed -w @sar/web",
     "fetch:stocks": "npm run fetch:stocks -w @sar/web",

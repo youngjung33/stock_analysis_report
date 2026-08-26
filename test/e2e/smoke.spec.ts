@@ -1,5 +1,11 @@
 import { test, expect } from '@playwright/test';
-import { enterAsGuest, ensureKoreanLocale, loginAsMember } from './helpers';
+import {
+  enterAsGuest,
+  ensureKoreanLocale,
+  hasMemberE2E,
+  loginAsMember,
+  MEMBER_E2E_SKIP_REASON,
+} from './helpers';
 
 test.describe('smoke', () => {
   test('login page renders', async ({ page }) => {
@@ -105,7 +111,7 @@ test.describe('smoke', () => {
   });
 
   test('member can login with seeded credentials', async ({ page }) => {
-    test.skip(!process.env.E2E_USERNAME || !process.env.E2E_PASSWORD, 'Set E2E_USERNAME and E2E_PASSWORD to run member login E2E');
+    test.skip(!hasMemberE2E(), MEMBER_E2E_SKIP_REASON);
 
     await loginAsMember(page);
     await expect(page.getByRole('heading', { name: '투자 현황', level: 1 })).toBeVisible();

@@ -1,8 +1,8 @@
 import { Market } from '../enums';
-import type { StockSectorTag } from './market-recommendation/types';
+import type { FigureLinkScope } from './score-dedupe';
+import type { StockSectorTag } from './types';
 
 export type FigureCategory = 'us_policy' | 'central_bank' | 'mega_cap_ceo' | 'kr_chaebol';
-export type FigureLinkScope = 'macro_only' | 'symbol_direct' | 'topic_conditional';
 
 export interface FigureRegistryEntry {
   id: string;

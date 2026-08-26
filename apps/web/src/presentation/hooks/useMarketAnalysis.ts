@@ -1,15 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
-import { guestSession } from '@/client/data/guest/guest-session';
+import { useAuth } from './useAuth';
 import { useServices } from './useServices';
 import { MARKET_QUERY_KEYS, QUERY_STALE } from '../lib/query-config';
 
 export function useMarketAnalysis() {
   const { getMarketAnalysisUseCase, getDashboardUseCase, listWatchlistUseCase } = useServices();
+  const { isGuest } = useAuth();
 
   return useQuery({
     queryKey: MARKET_QUERY_KEYS.marketAnalysis,
     queryFn: async () => {
-      if (!guestSession.isActive()) {
+      if (!isGuest) {
         return getMarketAnalysisUseCase.execute();
       }
 

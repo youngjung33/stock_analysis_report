@@ -23,6 +23,7 @@ out/
 # Test / coverage
 coverage/
 apps/web/test-results/
+test/e2e/.member-e2e-ready
 
 # Logs
 *.log
