@@ -111,7 +111,7 @@ export type {
   QuoteUnavailableReasonCode,
 } from './quote-reason-codes';
 
-export { computePosition } from './position-calculator';
+export { computePosition, toPositionTransaction } from './position-calculator';
 export type { PositionState, PositionTransaction } from './position-calculator';
 export {
   aggregatePortfolioTodayPnl,

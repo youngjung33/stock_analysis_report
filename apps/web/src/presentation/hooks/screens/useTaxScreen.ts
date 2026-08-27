@@ -40,6 +40,7 @@ export function useTaxScreen(refreshKey = 0) {
           quantity: tx.quantity,
           price: tx.price,
           tradedAt: tx.tradedAt,
+          commission: tx.commission,
         });
         byStock.set(tx.stockId, existing);
       }

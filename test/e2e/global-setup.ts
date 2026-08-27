@@ -2,6 +2,7 @@ import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { config as loadEnv } from 'dotenv';
 import { hasMemberE2E, isE2EDatabaseConfigured, setMemberE2EDbReady } from './member-e2e-env';
+import { seedE2ECatalogFixture } from './seed-catalog-fixture';
 
 const webRoot = path.resolve(__dirname, '../../apps/web');
 
@@ -18,6 +19,7 @@ export default async function globalSetup(): Promise<void> {
     console.log('[e2e] applying migrations and seeding member test user…');
     execSync('npx prisma migrate deploy', { cwd: webRoot, stdio: 'inherit', env: process.env });
     execSync('npx tsx prisma/seed.ts', { cwd: webRoot, stdio: 'inherit', env: process.env });
+    await seedE2ECatalogFixture(webRoot);
     setMemberE2EDbReady(true);
     if (!hasMemberE2E()) {
       setMemberE2EDbReady(false);

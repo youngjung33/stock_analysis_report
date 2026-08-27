@@ -5,6 +5,7 @@ import {
   computePosition,
   computeTradeCashSettlement,
   formatTradeLedgerMemo,
+  toPositionTransaction,
 } from '@sar/shared';
 import { AppError } from '../../domain/errors/app-error';
 import { CreateTransactionInput, Transaction, UpdateTransactionInput } from '../../domain/models';
@@ -54,14 +55,7 @@ export class GuestTransactionRepository implements ITransactionRepository {
 
     if (input.type === TransactionType.SELL) {
       const existing = guestTransactionsForStock(stock.id);
-      const held = computePosition(
-        existing.map((tx) => ({
-          type: tx.type,
-          quantity: tx.quantity,
-          price: tx.price,
-          tradedAt: tx.tradedAt,
-        })),
-      ).quantity;
+      const held = computePosition(existing.map(toPositionTransaction)).quantity;
       if (input.quantity > held) {
         throw new AppError('', AppErrorCode.HOLDING_INSUFFICIENT);
       }
@@ -153,14 +147,7 @@ export class GuestTransactionRepository implements ITransactionRepository {
 
     if (existing.type === TransactionType.SELL) {
       const siblings = guestTransactionsForStock(stock.id).filter((tx) => tx.id !== id);
-      const held = computePosition(
-        siblings.map((tx) => ({
-          type: tx.type,
-          quantity: tx.quantity,
-          price: tx.price,
-          tradedAt: tx.tradedAt,
-        })),
-      ).quantity;
+      const held = computePosition(siblings.map(toPositionTransaction)).quantity;
       if (input.quantity > held) {
         throw new AppError('', AppErrorCode.HOLDING_INSUFFICIENT);
       }

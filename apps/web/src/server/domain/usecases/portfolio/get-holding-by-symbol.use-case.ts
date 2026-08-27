@@ -1,4 +1,4 @@
-import { Market, applyCorporateActions, buildHoldingWithKrw, buildRawDashboardHolding } from '@sar/shared';
+import { Market, applyCorporateActions, buildHoldingWithKrw, buildRawDashboardHolding, toPositionTransaction } from '@sar/shared';
 import { HoldingResult } from '../../entities';
 import {
   ICorporateActionRepository,
@@ -26,12 +26,7 @@ export class GetHoldingBySymbolUseCase {
     const txs = await this.transactionRepo.findByUserAndStock(userId, stock.id);
     const actions = await this.corpActionRepo.findByUserAndStock(userId, stock.id);
     const position = applyCorporateActions(
-      txs.map((tx) => ({
-        type: tx.type,
-        quantity: tx.quantity,
-        price: tx.price,
-        tradedAt: tx.tradedAt,
-      })),
+      txs.map(toPositionTransaction),
       actions.map((a) => ({
         type: a.type,
         effectiveAt: a.effectiveAt,

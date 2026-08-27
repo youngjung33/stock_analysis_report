@@ -83,8 +83,10 @@ export function extractRealizedEvents(
   const sells: SellEvent[] = [];
 
   for (const tx of sorted) {
+    const commission = Math.max(0, tx.commission ?? 0);
+
     if (tx.type === TransactionType.BUY) {
-      totalCost += tx.quantity * tx.price;
+      totalCost += tx.quantity * tx.price + commission;
       quantity += tx.quantity;
       continue;
     }
@@ -92,12 +94,12 @@ export function extractRealizedEvents(
     if (tx.quantity > quantity) continue;
 
     const avgCost = quantity > 0 ? totalCost / quantity : 0;
-    const gain = (tx.price - avgCost) * tx.quantity;
+    const gain = (tx.price - avgCost) * tx.quantity - commission;
     sells.push({
       tradedAt: String(tx.tradedAt),
       quantity: tx.quantity,
       price: tx.price,
-      proceeds: tx.price * tx.quantity,
+      proceeds: tx.price * tx.quantity - commission,
       gain,
       averageCostAtSell: avgCost,
     });

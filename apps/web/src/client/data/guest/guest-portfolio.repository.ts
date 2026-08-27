@@ -6,6 +6,7 @@ import {
   buildRawDashboardHolding,
   nextQuoteRefreshState,
   normalizeDashboardSummary,
+  toPositionTransaction,
   type QuoteRefreshState,
   type RawDashboardHolding,
 } from '@sar/shared';
@@ -47,12 +48,7 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
 
       const corpActions = listGuestCorporateActions().filter((a) => a.stockId === stockId);
       const position = applyCorporateActions(
-        stockTxs.map((tx) => ({
-          type: tx.type,
-          quantity: tx.quantity,
-          price: tx.price,
-          tradedAt: tx.tradedAt,
-        })),
+        stockTxs.map(toPositionTransaction),
         corpActions.map((a) => ({
           type: a.type,
           effectiveAt: a.effectiveAt,
@@ -115,12 +111,7 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
 
     const corpActions = listGuestCorporateActions().filter((a) => a.stockId === stockId);
     const position = applyCorporateActions(
-      stockTxs.map((tx) => ({
-        type: tx.type,
-        quantity: tx.quantity,
-        price: tx.price,
-        tradedAt: tx.tradedAt,
-      })),
+      stockTxs.map(toPositionTransaction),
       corpActions.map((a) => ({
         type: a.type,
         effectiveAt: a.effectiveAt,

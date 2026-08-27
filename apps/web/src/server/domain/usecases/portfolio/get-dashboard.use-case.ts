@@ -1,4 +1,4 @@
-import { Market, applyCorporateActions, buildDashboardFromRawHoldings, buildRawDashboardHolding, computeCashBalances, nextQuoteRefreshState, normalizeDashboardSummary, type QuoteRefreshState, type RawDashboardHolding } from '@sar/shared';
+import { Market, applyCorporateActions, buildDashboardFromRawHoldings, buildRawDashboardHolding, computeCashBalances, nextQuoteRefreshState, normalizeDashboardSummary, toPositionTransaction, type QuoteRefreshState, type RawDashboardHolding } from '@sar/shared';
 import { DashboardResult } from '../../entities';
 import {
   ICashLedgerRepository,
@@ -34,12 +34,7 @@ export class GetDashboardUseCase {
       const txs = await this.transactionRepo.findByUserAndStock(userId, stock.id);
       const actions = await this.corpActionRepo.findByUserAndStock(userId, stock.id);
       const position = applyCorporateActions(
-        txs.map((tx) => ({
-          type: tx.type,
-          quantity: tx.quantity,
-          price: tx.price,
-          tradedAt: tx.tradedAt,
-        })),
+        txs.map(toPositionTransaction),
         actions.map((a) => ({
           type: a.type,
           effectiveAt: a.effectiveAt,

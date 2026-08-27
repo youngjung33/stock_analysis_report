@@ -164,4 +164,23 @@ describe('GuestTransactionRepository', () => {
 
     expect(getGuestCashBalances().krw).toBe(10_000_000 - 701_000);
   });
+
+  it('reflects buy commission in guest holding average cost', async () => {
+    const txRepo = new GuestTransactionRepository();
+    await txRepo.create({
+      stockSymbol: '005930',
+      market: Market.KR,
+      name: '삼성전자',
+      type: TransactionType.BUY,
+      quantity: 10,
+      price: 70_000,
+      commission: 1_000,
+      tradedAt: new Date().toISOString(),
+    });
+
+    const portfolioRepo = new GuestPortfolioRepository(createFakeMarketRepo());
+    const dashboard = await portfolioRepo.getDashboard();
+    expect(dashboard.holdings[0]?.averageCost).toBe(70_100);
+    expect(dashboard.holdings[0]?.costBasis).toBe(701_000);
+  });
 });
