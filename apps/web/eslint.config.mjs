@@ -19,6 +19,7 @@ const eslintConfig = [
       'src/presentation/features/**/*.{ts,tsx}',
       'src/presentation/pages/**/*.{ts,tsx}',
       'src/presentation/hooks/**/*.{ts,tsx}',
+      'src/presentation/components/**/*.{ts,tsx}',
     ],
     rules: {
       'no-restricted-imports': [

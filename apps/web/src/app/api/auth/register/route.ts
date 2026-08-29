@@ -10,7 +10,7 @@ import {
 } from '@/server/http/route-utils';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 
-/** ???????? ???? */
+/** POST — 회원가입 및 access/refresh 쿠키 발급 */
 export async function POST(req: NextRequest) {
   try {
     await enforceRateLimit(req, 'auth:register', 'authRegister');

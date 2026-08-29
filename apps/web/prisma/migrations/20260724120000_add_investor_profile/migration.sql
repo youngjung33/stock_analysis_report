@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE "PortfolioPreference" ADD COLUMN "investorProfile" JSONB;
+ALTER TABLE "PortfolioPreference" ADD COLUMN IF NOT EXISTS "investorProfile" JSONB;

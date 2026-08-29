@@ -5,7 +5,7 @@ import { enforceRateLimit } from '@/server/http/rate-limit';
 import { handleRouteError, jsonData } from '@/server/http/route-utils';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 
-/** GET /api/auth/check-username?username= ? ??? ????? ?? */
+/** GET — 아이디 중복 여부 조회 (`?username=`) */
 export async function GET(req: NextRequest) {
   try {
     await enforceRateLimit(req, 'auth:check-username', 'authCheckUsername');

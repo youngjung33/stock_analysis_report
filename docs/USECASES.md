@@ -59,9 +59,11 @@ apps/web/src/
 
 | MVVM | 위치 |
 |------|------|
-| View | `presentation/pages/*`, `layout/AppShell`, feature 컴포넌트 |
+| View | `presentation/pages/*`, `layout/AppShell`, feature·components |
 | ViewModel | `presentation/hooks/screens/*`, `useInvestorProfile`, … |
 | Model | `server/domain`, `client/domain` |
+
+상세(AppShell 패턴·ESLint·JSDoc): [`docs/PRESENTATION.md`](PRESENTATION.md)
 
 ---
 
@@ -234,4 +236,4 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 - **server/data** → server/domain
 - **app/api** → server/container
 - **client/** → client/domain
-- **presentation/** → client/domain, hooks (ESLint: `@/client/data`, `@/server` import 금지)
+- **presentation/** → client/domain, hooks (ESLint: `@/client/data`, `@/server` import 금지 — `components/` 포함, [`PRESENTATION.md`](PRESENTATION.md))

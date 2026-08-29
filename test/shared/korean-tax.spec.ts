@@ -33,6 +33,31 @@ describe('extractRealizedEvents', () => {
     expect(dividends).toHaveLength(1);
     expect(dividends[0].amount).toBe(50_000);
   });
+
+  it('reduces sell gain and proceeds when commission is set', () => {
+    const { sells } = extractRealizedEvents(
+      [
+        {
+          type: TransactionType.BUY,
+          quantity: 10,
+          price: 100_000,
+          commission: 1_000,
+          tradedAt: '2026-01-01',
+        },
+        {
+          type: TransactionType.SELL,
+          quantity: 10,
+          price: 120_000,
+          commission: 500,
+          tradedAt: '2026-06-01',
+        },
+      ],
+      [],
+    );
+    expect(sells).toHaveLength(1);
+    expect(sells[0].gain).toBe(198_500);
+    expect(sells[0].proceeds).toBe(1_199_500);
+  });
 });
 
 describe('filterEventsByYear', () => {
@@ -110,6 +135,40 @@ describe('estimateKoreanTax', () => {
     expect(result.domesticCapitalGainTaxKrw).toBe(0);
     expect(result.domesticCapitalGainKrw).toBe(200_000);
     expect(result.domesticSecuritiesTaxKrw).toBeGreaterThan(0);
+  });
+
+  it('lowers domestic capital gain when trade commission is recorded', () => {
+    const withCommission = estimateKoreanTax(
+      [
+        {
+          symbol: '005930',
+          market: Market.KR,
+          currency: 'KRW',
+          transactions: [
+            {
+              type: TransactionType.BUY,
+              quantity: 10,
+              price: 100_000,
+              commission: 1_000,
+              tradedAt: '2026-01-01',
+            },
+            {
+              type: TransactionType.SELL,
+              quantity: 10,
+              price: 120_000,
+              commission: 500,
+              tradedAt: '2026-06-01',
+            },
+          ],
+          corporateActions: [],
+        },
+      ],
+      { ...DEFAULT_KOREAN_TAX_PROFILE, taxYear: 2026, isMajorShareholder: false },
+      null,
+    );
+
+    expect(withCommission.domesticCapitalGainKrw).toBe(198_500);
+    expect(withCommission.domesticCapitalGainTaxKrw).toBe(0);
   });
 
   it('taxes foreign capital gains after basic deduction', () => {
