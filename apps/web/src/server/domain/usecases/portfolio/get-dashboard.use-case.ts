@@ -1,4 +1,4 @@
-import { Market, applyCorporateActions, buildDashboardFromRawHoldings, buildRawDashboardHolding, computeCashBalances, nextQuoteRefreshState, normalizeDashboardSummary, toPositionTransaction, type QuoteRefreshState, type RawDashboardHolding } from '@sar/shared';
+import { Market, buildDashboardFromRawHoldings, buildRawHoldingsFromStockBundles, computeCashBalances, normalizeDashboardSummary } from '@sar/shared';
 import { DashboardResult } from '../../entities';
 import {
   ICashLedgerRepository,
@@ -27,15 +27,18 @@ export class GetDashboardUseCase {
     const quotes = await this.quoteRepo.findByStockIds(stockIds);
     const quoteMap = new Map(quotes.map((q) => [q.stockId, q]));
 
-    const rawHoldings: RawDashboardHolding[] = [];
-    let quoteState: QuoteRefreshState = { lastRefreshedAt: null, hasAllQuotes: true };
-
+    const bundles = [];
     for (const stock of stocks) {
       const txs = await this.transactionRepo.findByUserAndStock(userId, stock.id);
       const actions = await this.corpActionRepo.findByUserAndStock(userId, stock.id);
-      const position = applyCorporateActions(
-        txs.map(toPositionTransaction),
-        actions.map((a) => ({
+      bundles.push({
+        stockId: stock.id,
+        symbol: stock.symbol,
+        name: stock.name,
+        market: stock.market as Market,
+        currency: stock.currency,
+        transactions: txs,
+        corporateActions: actions.map((a) => ({
           type: a.type,
           effectiveAt: a.effectiveAt,
           cashAmount: a.cashAmount,
@@ -43,22 +46,11 @@ export class GetDashboardUseCase {
           targetQuantity: a.targetQuantity,
           targetPrice: a.targetPrice,
         })),
-      );
-
-      const quote = quoteMap.get(stock.id);
-      quoteState = nextQuoteRefreshState(quoteState, quote ?? null);
-
-      const raw = buildRawDashboardHolding({
-        stockId: stock.id,
-        symbol: stock.symbol,
-        name: stock.name,
-        market: stock.market as Market,
-        currency: stock.currency,
-        position,
-        quote,
+        quote: quoteMap.get(stock.id) ?? null,
       });
-      if (raw) rawHoldings.push(raw);
     }
+
+    const { rawHoldings, quoteState } = buildRawHoldingsFromStockBundles(bundles);
 
     const hasUsdHoldings = rawHoldings.some((h) => h.currency === 'USD');
     let usdKrwRate = hasUsdHoldings ? await this.marketData.fetchUsdKrwRate() : null;

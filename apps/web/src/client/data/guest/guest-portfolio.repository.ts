@@ -4,14 +4,13 @@ import {
   buildDashboardFromRawHoldings,
   buildHoldingWithKrw,
   buildRawDashboardHolding,
-  nextQuoteRefreshState,
+  buildRawHoldingsFromStockBundles,
   normalizeDashboardSummary,
   toPositionTransaction,
-  type QuoteRefreshState,
-  type RawDashboardHolding,
 } from '@sar/shared';
-import { Dashboard, PortfolioHolding, RefreshQuoteResult } from '../../domain/models';
+import { Dashboard, PortfolioAnalysisResult, PortfolioHolding, RefreshQuoteResult } from '../../domain/models';
 import { IMarketRepository, IPortfolioRepository } from '../../domain/repositories';
+import { apiClient } from '../api/client';
 import {
   getGuestQuotes,
   getGuestCashBalances,
@@ -38,18 +37,20 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
     const stockIds = [...new Set(txs.map((tx) => tx.stockId))];
     const quotes = getGuestQuotes();
 
-    const rawHoldings: RawDashboardHolding[] = [];
-    let quoteState: QuoteRefreshState = { lastRefreshedAt: null, hasAllQuotes: true };
-
-    for (const stockId of stockIds) {
+    const bundles = stockIds.map((stockId) => {
       const stockTxs = guestTransactionsForStock(stockId);
       const sample = stockTxs[0]?.stock;
-      if (!sample) continue;
+      if (!sample) return null;
 
       const corpActions = listGuestCorporateActions().filter((a) => a.stockId === stockId);
-      const position = applyCorporateActions(
-        stockTxs.map(toPositionTransaction),
-        corpActions.map((a) => ({
+      return {
+        stockId,
+        symbol: sample.symbol,
+        name: sample.name,
+        market: sample.market as Market,
+        currency: sample.currency,
+        transactions: stockTxs,
+        corporateActions: corpActions.map((a) => ({
           type: a.type,
           effectiveAt: a.effectiveAt,
           cashAmount: a.cashAmount,
@@ -57,22 +58,11 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
           targetQuantity: a.targetQuantity,
           targetPrice: a.targetPrice,
         })),
-      );
+        quote: quotes[stockId] ?? null,
+      };
+    }).filter((b): b is NonNullable<typeof b> => b !== null);
 
-      const quote = quotes[stockId];
-      quoteState = nextQuoteRefreshState(quoteState, quote ?? null);
-
-      const raw = buildRawDashboardHolding({
-        stockId,
-        symbol: sample.symbol,
-        name: sample.name,
-        market: sample.market as Market,
-        currency: sample.currency,
-        position,
-        quote,
-      });
-      if (raw) rawHoldings.push(raw);
-    }
+    const { rawHoldings, quoteState } = buildRawHoldingsFromStockBundles(bundles);
 
     const cashBalances = getGuestCashBalances();
     const hasUsdHoldings = rawHoldings.some((h) => h.currency === 'USD');
@@ -87,7 +77,6 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
       usdKrwRate,
       hasAllQuotes: quoteState.hasAllQuotes,
       lastRefreshedAt: quoteState.lastRefreshedAt,
-      zeroWhenEmpty: true,
     });
 
     return {
@@ -160,7 +149,16 @@ export class GuestPortfolioRepository implements IPortfolioRepository {
     return { updated: data.updated, succeeded: data.succeeded, failed: data.failed };
   }
 
-  async getAnalysis(): Promise<import('../../domain/models').PortfolioAnalysisResult> {
-    throw new Error('Guest mode does not support portfolio analysis');
+  async getAnalysis(): Promise<PortfolioAnalysisResult> {
+    const dashboard = await this.getDashboard();
+    const hasAllQuotes =
+      dashboard.holdings.length === 0 ||
+      dashboard.holdings.every((h) => h.currentPrice !== null);
+
+    const { data } = await apiClient.post<PortfolioAnalysisResult>('/portfolio/analysis', {
+      holdings: dashboard.holdings,
+      hasAllQuotes,
+    });
+    return data;
   }
 }

@@ -1,5 +1,6 @@
 import { Market } from './enums';
-import type { PositionState } from './position-calculator';
+import { applyCorporateActions } from './corporate-actions';
+import { toPositionTransaction, type PositionState } from './position-calculator';
 import { enrichHoldingKrw } from './portfolio-fx';
 import type { BuiltDashboardHolding, RawDashboardHolding } from './portfolio-dashboard';
 
@@ -85,4 +86,47 @@ export function buildHoldingWithKrw(
     weightPercent: null,
     usdKrwRate,
   };
+}
+
+type PositionTransactionInput = Parameters<typeof toPositionTransaction>[0];
+type CorporateActionInput = Parameters<typeof applyCorporateActions>[1][number];
+
+export interface StockHoldingBundle {
+  stockId: string;
+  symbol: string;
+  name: string;
+  market: Market;
+  currency: string;
+  transactions: PositionTransactionInput[];
+  corporateActions: CorporateActionInput[];
+  quote?: HoldingQuoteSnapshot | null;
+}
+
+/** Transactions + corp actions + quotes → raw dashboard holdings (server/guest shared). */
+export function buildRawHoldingsFromStockBundles(
+  bundles: StockHoldingBundle[],
+  initialQuoteState: QuoteRefreshState = { lastRefreshedAt: null, hasAllQuotes: true },
+): { rawHoldings: RawDashboardHolding[]; quoteState: QuoteRefreshState } {
+  const rawHoldings: RawDashboardHolding[] = [];
+  let quoteState = initialQuoteState;
+
+  for (const bundle of bundles) {
+    const position = applyCorporateActions(
+      bundle.transactions.map(toPositionTransaction),
+      bundle.corporateActions,
+    );
+    quoteState = nextQuoteRefreshState(quoteState, bundle.quote ?? null);
+    const raw = buildRawDashboardHolding({
+      stockId: bundle.stockId,
+      symbol: bundle.symbol,
+      name: bundle.name,
+      market: bundle.market,
+      currency: bundle.currency,
+      position,
+      quote: bundle.quote,
+    });
+    if (raw) rawHoldings.push(raw);
+  }
+
+  return { rawHoldings, quoteState };
 }

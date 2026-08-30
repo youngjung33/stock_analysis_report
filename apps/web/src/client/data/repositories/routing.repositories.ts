@@ -30,10 +30,7 @@ const apiTransactionRepository = new ApiTransactionRepository();
 const apiPortfolioRepository = new ApiPortfolioRepository();
 const apiMarketRepository = new ApiMarketRepository();
 const guestPortfolioRepository = new GuestPortfolioRepository(apiMarketRepository);
-const guestPortfolioCapitalRepository = new GuestPortfolioCapitalRepository(
-  guestPortfolioRepository,
-  apiMarketRepository,
-);
+const guestPortfolioCapitalRepository = new GuestPortfolioCapitalRepository(guestPortfolioRepository);
 const guestCashRepository = new GuestCashRepository();
 const apiCashRepository = new ApiCashRepository();
 const apiPortfolioCapitalRepository = new ApiPortfolioCapitalRepository();

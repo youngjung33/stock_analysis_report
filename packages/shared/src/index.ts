@@ -170,11 +170,13 @@ export {
 export {
   buildHoldingWithKrw,
   buildRawDashboardHolding,
+  buildRawHoldingsFromStockBundles,
   nextQuoteRefreshState,
 } from './portfolio-holding-build';
 export type {
   HoldingQuoteSnapshot,
   QuoteRefreshState,
+  StockHoldingBundle,
 } from './portfolio-holding-build';
 export type {
   DashboardSummaryNormalized,

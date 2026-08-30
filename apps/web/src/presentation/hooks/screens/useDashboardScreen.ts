@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
-import { buildQuoteRefreshNotice, QuoteRefreshNotice } from '@/client/domain/services/quote-notice';
+import { buildMarketStatusLines, buildQuoteRefreshNotice, QuoteRefreshNotice } from '@/client/domain/services/quote-notice';
 import { useToast } from '../../components/Toast';
 import { useAuth } from '../useAuth';
 import { useDashboard } from '../useDashboard';
@@ -20,6 +20,13 @@ export function useDashboardScreen() {
   const searchParams = useSearchParams();
   const [refreshNotice, setRefreshNotice] = useState<QuoteRefreshNotice | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  const marketStatusLines = useMemo(() => {
+    const providers = marketStatus.data ?? [];
+    const unavailable = providers.filter((p) => !p.available);
+    if (unavailable.length === 0) return [];
+    return buildMarketStatusLines(unavailable, t);
+  }, [marketStatus.data, t]);
 
   useEffect(() => {
     if (searchParams.get('welcome') !== '1') return;
@@ -61,6 +68,7 @@ export function useDashboardScreen() {
     data,
     isLoading,
     marketProviders: marketStatus.data ?? [],
+    marketStatusLines,
     marketStatusLoading: marketStatus.isLoading,
     refreshNotice,
     refreshing,

@@ -110,9 +110,28 @@ describe('GuestPortfolioRepository', () => {
     expect(dashboard.summary.holdingsCount).toBe(0);
   });
 
-  it('getAnalysis throws for guest mode', async () => {
+  it('getAnalysis posts holdings snapshot to server', async () => {
+    const { apiClient } = await import('@/client/data/api/client');
+    const postSpy = vi.spyOn(apiClient, 'post').mockResolvedValue({
+      data: {
+        portfolioReturns: [],
+        holdingReturns: [],
+        benchmarkComparisons: [],
+        holdingsInsights: [],
+        fxRate: null,
+        asOf: new Date().toISOString(),
+        allocationByMarket: { kr: 0, us: 0, cash: 0 },
+      },
+    } as never);
+
     const repo = new GuestPortfolioRepository(createFakeMarketRepo());
-    await expect(repo.getAnalysis()).rejects.toThrow(/Guest mode/);
+    const result = await repo.getAnalysis();
+    expect(result.portfolioReturns).toEqual([]);
+    expect(postSpy).toHaveBeenCalledWith(
+      '/portfolio/analysis',
+      expect.objectContaining({ holdings: expect.any(Array) }),
+    );
+    postSpy.mockRestore();
   });
 
   it('aggregates dashboard from guest transactions', async () => {

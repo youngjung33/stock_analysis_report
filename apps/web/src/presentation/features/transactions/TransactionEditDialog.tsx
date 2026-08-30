@@ -1,13 +1,9 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { parseAmountInput } from '@sar/shared';
 import { Transaction } from '@/client/domain/models';
-import { getErrorMessage } from '@/client/domain/errors/app-error';
-import { useToast } from '../../components/Toast';
-import { useServices } from '../../hooks/useServices';
 import { AmountInput } from '../../shared/AmountInput';
+import { useTransactionEditDialog } from '../../hooks/screens/useTransactionEditDialog';
 
 interface Props {
   transaction: Transaction | null;
@@ -18,48 +14,9 @@ interface Props {
 /** 거래 수정 모달 — 수량·단가·일자·메모 */
 export function TransactionEditDialog({ transaction, onClose, onSuccess }: Props) {
   const { t } = useTranslation();
-  const { updateTransactionUseCase } = useServices();
-  const { showError, showSuccess } = useToast();
-  const [quantity, setQuantity] = useState('');
-  const [price, setPrice] = useState('');
-  const [commission, setCommission] = useState('');
-  const [tradedAt, setTradedAt] = useState('');
-  const [memo, setMemo] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!transaction) return;
-    setQuantity(String(transaction.quantity));
-    setPrice(String(transaction.price));
-    setCommission(
-      transaction.commission && transaction.commission > 0 ? String(transaction.commission) : '',
-    );
-    setTradedAt(transaction.tradedAt.slice(0, 10));
-    setMemo(transaction.memo ?? '');
-  }, [transaction]);
+  const screen = useTransactionEditDialog(transaction, onClose, onSuccess);
 
   if (!transaction) return null;
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await updateTransactionUseCase.execute(transaction!.id, {
-        quantity: Number(quantity),
-        price: parseAmountInput(price),
-        commission: commission.trim() ? parseAmountInput(commission) : undefined,
-        tradedAt: new Date(tradedAt).toISOString(),
-        memo: memo || undefined,
-      });
-      showSuccess(t('transactions.toast.updated'));
-      onSuccess();
-      onClose();
-    } catch (err) {
-      showError(getErrorMessage(err, t('transactions.toast.updateFailed')));
-    } finally {
-      setLoading(false);
-    }
-  }
 
   return (
     <div
@@ -76,14 +33,14 @@ export function TransactionEditDialog({ transaction, onClose, onSuccess }: Props
           {transaction.stock?.symbol} · {t(`transactions.types.${transaction.type}`)}
         </p>
 
-        <form onSubmit={handleSubmit} className="mt-4 space-y-3">
+        <form onSubmit={screen.handleSubmit} className="mt-4 space-y-3">
           <label className="block">
             <span className="text-xs text-slate-400">{t('common.tradeDate')}</span>
             <input
               type="date"
               className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
-              value={tradedAt}
-              onChange={(e) => setTradedAt(e.target.value)}
+              value={screen.tradedAt}
+              onChange={(e) => screen.setTradedAt(e.target.value)}
               required
             />
           </label>
@@ -94,8 +51,8 @@ export function TransactionEditDialog({ transaction, onClose, onSuccess }: Props
               step="any"
               min="0"
               className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
+              value={screen.quantity}
+              onChange={(e) => screen.setQuantity(e.target.value)}
               required
             />
           </label>
@@ -103,8 +60,8 @@ export function TransactionEditDialog({ transaction, onClose, onSuccess }: Props
             <span className="text-xs text-slate-400">{t('common.unitPrice')}</span>
             <AmountInput
               className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
-              value={price}
-              onValueChange={setPrice}
+              value={screen.price}
+              onValueChange={screen.setPrice}
               formatOptions={{ maxFractionDigits: 2 }}
               required
             />
@@ -113,8 +70,8 @@ export function TransactionEditDialog({ transaction, onClose, onSuccess }: Props
             <span className="text-xs text-slate-400">{t('common.commissionOptional')}</span>
             <AmountInput
               className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
-              value={commission}
-              onValueChange={setCommission}
+              value={screen.commission}
+              onValueChange={screen.setCommission}
               formatOptions={{ maxFractionDigits: 0 }}
             />
           </label>
@@ -122,8 +79,8 @@ export function TransactionEditDialog({ transaction, onClose, onSuccess }: Props
             <span className="text-xs text-slate-400">{t('common.memoOptional')}</span>
             <input
               className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white"
-              value={memo}
-              onChange={(e) => setMemo(e.target.value)}
+              value={screen.memo}
+              onChange={(e) => screen.setMemo(e.target.value)}
             />
           </label>
 
@@ -137,10 +94,10 @@ export function TransactionEditDialog({ transaction, onClose, onSuccess }: Props
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={screen.loading}
               className="flex-1 rounded-lg bg-indigo-600 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
             >
-              {loading ? t('common.saving') : t('common.save')}
+              {screen.loading ? t('common.saving') : t('common.save')}
             </button>
           </div>
         </form>

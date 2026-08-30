@@ -1,19 +1,15 @@
 'use client';
 
 import { useTranslation } from 'react-i18next';
-import { buildMarketStatusLines } from '@/client/domain/services/quote-notice';
-import { MarketProviderStatus } from '@/client/domain/models';
 
 interface Props {
-  providers: MarketProviderStatus[];
+  lines: string[];
 }
 
-export function MarketStatusBanner({ providers }: Props) {
+export function MarketStatusBanner({ lines }: Props) {
   const { t } = useTranslation();
-  const unavailable = providers.filter((p) => !p.available);
-  if (unavailable.length === 0) return null;
 
-  const lines = buildMarketStatusLines(providers, t);
+  if (lines.length === 0) return null;
 
   return (
     <div className="rounded-lg border border-sky-900/50 bg-sky-950/40 px-4 py-3 text-sm text-sky-100/90">

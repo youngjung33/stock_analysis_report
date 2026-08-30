@@ -4,6 +4,7 @@ import {
   buildCandidatePool,
   buildRankedPortfolioSimulation,
   toFeaturedQuoteInputs,
+  type StoredInvestorProfile,
 } from '@sar/shared';
 import { PortfolioPreferenceEntity } from '../../entities';
 import {
@@ -19,6 +20,29 @@ import { BuildStockEnrichmentUseCase } from '../market/build-stock-enrichment.us
 
 function symbolKey(symbol: string, market: Market): string {
   return `${market}:${symbol.toUpperCase()}`;
+}
+
+export interface PortfolioSimulationSnapshot {
+  cash: { krw: number; usd: number };
+  holdings: Array<{
+    symbol: string;
+    name: string;
+    market: Market;
+    currency: string;
+    quantity: number;
+    currentPrice: number | null;
+    marketValueKrw: number | null;
+    weightPercent: number | null;
+  }>;
+  preferences: {
+    targetKrPercent: number;
+    targetUsPercent: number;
+    maxSingleWeightPercent: number;
+    investorProfile?: StoredInvestorProfile | null;
+  };
+  watchlist: Array<{ symbol: string; market: Market; name: string }>;
+  usdKrwRate?: number | null;
+  ledgerEntryCount?: number;
 }
 
 export class GetPortfolioPreferencesUseCase {
@@ -60,32 +84,59 @@ export class GetPortfolioSimulationUseCase {
   ) {}
 
   async execute(userId: string) {
-    const [dashboard, featured, cashEntries, prefRow, watchlistItems, marketContext] =
-      await Promise.all([
-        this.dashboardUseCase.execute(userId),
-        this.featuredQuotesUseCase.execute(),
-        this.cashRepo.findByUser(userId),
-        this.prefRepo.findByUser(userId),
-        this.watchlistRepo.findByUser(userId),
-        this.buildMarketContextUseCase.execute(),
-      ]);
+    const [dashboard, cashEntries, prefRow, watchlistItems] = await Promise.all([
+      this.dashboardUseCase.execute(userId),
+      this.cashRepo.findByUser(userId),
+      this.prefRepo.findByUser(userId),
+      this.watchlistRepo.findByUser(userId),
+    ]);
 
     const preferences = prefRow ?? { userId, ...DEFAULT_PORTFOLIO_PREFERENCES, investorProfile: null };
-    const cash = {
-      krw: dashboard.summary.cashKrw,
-      usd: dashboard.summary.cashUsd,
-    };
 
-    const userHoldings = dashboard.holdings.map((h) => ({
+    return this.executeFromSnapshot({
+      cash: {
+        krw: dashboard.summary.cashKrw,
+        usd: dashboard.summary.cashUsd,
+      },
+      holdings: dashboard.holdings.map((h) => ({
+        symbol: h.symbol,
+        name: h.name,
+        market: h.market,
+        currency: h.currency,
+        quantity: h.quantity,
+        currentPrice: h.currentPrice,
+        marketValueKrw: h.marketValueKrw,
+        weightPercent: h.weightPercent,
+      })),
+      preferences: {
+        targetKrPercent: preferences.targetKrPercent,
+        targetUsPercent: preferences.targetUsPercent,
+        maxSingleWeightPercent: preferences.maxSingleWeightPercent,
+        investorProfile: preferences.investorProfile,
+      },
+      watchlist: watchlistItems.map((w) => ({
+        symbol: w.symbol,
+        market: w.market,
+        name: w.name,
+      })),
+      usdKrwRate: dashboard.summary.usdKrwRate,
+      ledgerEntryCount: cashEntries.length,
+    });
+  }
+
+  /** Guest/client snapshot — full server enrichment pipeline */
+  async executeFromSnapshot(snapshot: PortfolioSimulationSnapshot) {
+    const [featured, marketContext] = await Promise.all([
+      this.featuredQuotesUseCase.execute(),
+      this.buildMarketContextUseCase.execute(),
+    ]);
+
+    const userHoldings = snapshot.holdings.map((h) => ({
       symbol: h.symbol,
       market: h.market,
       name: h.name,
     }));
-    const userWatchlist = watchlistItems.map((w) => ({
-      symbol: w.symbol,
-      market: w.market,
-      name: w.name,
-    }));
+    const userWatchlist = snapshot.watchlist;
 
     const pool = buildCandidatePool({ userHoldings, userWatchlist });
     const featuredKeys = new Set([
@@ -141,12 +192,13 @@ export class GetPortfolioSimulationUseCase {
       })),
     ];
 
-    const { candidateQuotes, technicalSnapshots, newsSnapshots, eventSnapshots, figureStatements } = await this.buildStockEnrichmentUseCase.execute([
-      ...enrichmentTargets,
-      ...featuredTargets.filter(
-        (f) => !enrichmentTargets.some((t) => t.symbol === f.symbol && t.market === f.market),
-      ),
-    ]);
+    const { candidateQuotes, technicalSnapshots, newsSnapshots, eventSnapshots, figureStatements } =
+      await this.buildStockEnrichmentUseCase.execute([
+        ...enrichmentTargets,
+        ...featuredTargets.filter(
+          (f) => !enrichmentTargets.some((t) => t.symbol === f.symbol && t.market === f.market),
+        ),
+      ]);
 
     const {
       simulation,
@@ -154,26 +206,17 @@ export class GetPortfolioSimulationUseCase {
       recommendations,
       regimes,
     } = buildRankedPortfolioSimulation({
-      cash,
-      holdings: dashboard.holdings.map((h) => ({
-        symbol: h.symbol,
-        name: h.name,
-        market: h.market,
-        currency: h.currency,
-        quantity: h.quantity,
-        currentPrice: h.currentPrice,
-        marketValueKrw: h.marketValueKrw,
-        weightPercent: h.weightPercent,
-      })),
+      cash: snapshot.cash,
+      holdings: snapshot.holdings,
       preferences: {
-        targetKrPercent: preferences.targetKrPercent,
-        targetUsPercent: preferences.targetUsPercent,
-        maxSingleWeightPercent: preferences.maxSingleWeightPercent,
+        targetKrPercent: snapshot.preferences.targetKrPercent,
+        targetUsPercent: snapshot.preferences.targetUsPercent,
+        maxSingleWeightPercent: snapshot.preferences.maxSingleWeightPercent,
       },
       featuredKr: toFeaturedQuoteInputs(featured.kr),
       featuredUs: toFeaturedQuoteInputs(featured.us),
-      storedProfile: preferences.investorProfile,
-      usdKrwRate: dashboard.summary.usdKrwRate ?? marketContext.usdKrwRate,
+      storedProfile: snapshot.preferences.investorProfile ?? null,
+      usdKrwRate: snapshot.usdKrwRate ?? marketContext.usdKrwRate,
       marketContext: {
         macro: marketContext.macro,
         sectors: marketContext.sectors,
@@ -192,9 +235,14 @@ export class GetPortfolioSimulationUseCase {
     });
 
     return {
-      preferences,
+      preferences: {
+        targetKrPercent: snapshot.preferences.targetKrPercent,
+        targetUsPercent: snapshot.preferences.targetUsPercent,
+        maxSingleWeightPercent: snapshot.preferences.maxSingleWeightPercent,
+        investorProfile: snapshot.preferences.investorProfile ?? null,
+      },
       simulation,
-      ledgerEntryCount: cashEntries.length,
+      ledgerEntryCount: snapshot.ledgerEntryCount ?? 0,
       asOf: featured.fetchedAt,
       investorProfile: builtProfile,
       recommendations,

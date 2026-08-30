@@ -36,7 +36,9 @@ apiClient.interceptors.response.use(
       original.url?.includes('/market/status') ||
       original.url?.includes('/market/featured') ||
       original.url?.includes('/market/quote') ||
-      original.url?.includes('/market/search')
+      original.url?.includes('/market/search') ||
+      original.url?.includes('/portfolio/analysis') ||
+      original.url?.includes('/portfolio/simulation')
     ) {
       return Promise.reject(error);
     }

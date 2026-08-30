@@ -45,8 +45,8 @@ export function DashboardPage() {
           </p>
         )}
 
-        {!screen.marketStatusLoading && screen.marketProviders.length > 0 && (
-          <MarketStatusBanner providers={screen.marketProviders} />
+        {!screen.marketStatusLoading && screen.marketStatusLines.length > 0 && (
+          <MarketStatusBanner lines={screen.marketStatusLines} />
         )}
 
         {screen.refreshNotice && <QuoteRefreshNoticeBox notice={screen.refreshNotice} />}

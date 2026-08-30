@@ -17,14 +17,17 @@ import {
   translateOtherIncomeBracket,
   translateTaxRule,
 } from '@/i18n';
-import { Surface } from '../design-system';
+import { Surface, PageStack } from '../design-system';
 import { TaxRulesReference } from '../features/tax/TaxRulesReference';
+import { AppShell } from '../layout';
 
 export function TaxGuidePage() {
   const { t, i18n } = useTranslation();
   const locale = i18n.language;
 
   return (
+    <AppShell title={t('pages.tax.title')} subtitle={t('tax.guideTitle')}>
+      <PageStack>
     <div className="space-y-8">
       <Surface variant="section" className="space-y-2 border-indigo-900/30 bg-indigo-950/20">
         <h2 className="text-lg font-semibold md:text-xl">{t('tax.guideTitle')}</h2>
@@ -157,5 +160,7 @@ export function TaxGuidePage() {
         </dl>
       </Surface>
     </div>
+      </PageStack>
+    </AppShell>
   );
 }
