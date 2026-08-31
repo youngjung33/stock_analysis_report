@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
-import { fetchYahooChartQuote } from '@server/data/market/yahoo-chart.client';
+import { fetchYahooChartQuote, fetchYahooChartSeries } from '@server/data/market/yahoo-chart.client';
 
 describe('fetchYahooChartQuote range', () => {
   afterEach(() => {
@@ -54,5 +54,39 @@ describe('fetchYahooChartQuote range', () => {
       expect.stringContaining('interval=1wk&range=5y'),
       expect.any(Object),
     );
+  });
+});
+
+describe('fetchYahooChartSeries', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('derives 1d change from daily bars when last bar is today', async () => {
+    const todaySec = Math.floor(Date.now() / 1000);
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        chart: {
+          result: [
+            {
+              meta: { regularMarketPrice: 18_650, chartPreviousClose: 10_050 },
+              timestamp: [todaySec - 172_800, todaySec - 86_400, todaySec],
+              indicators: {
+                quote: [{
+                  close: [10_000, 10_050, 10_072],
+                  volume: [1, 1, 1],
+                  high: [10_010, 10_060, 10_080],
+                  low: [9_990, 10_040, 10_060],
+                }],
+              },
+            },
+          ],
+        },
+      }),
+    });
+
+    const series = await fetchYahooChartSeries('091160.KS');
+    expect(series.changePercent1d).toBeCloseTo(0.219, 2);
   });
 });

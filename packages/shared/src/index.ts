@@ -393,7 +393,8 @@ export {
   isQuoteChartRange,
 } from './chart-range';
 export type { QuoteChartRange } from './chart-range';
-export { sma, rsi, ema, macdLine, stdDev, rangePosition, volumeRatio, bollingerBands, stochastic, changePercentOverBars } from './technical-analysis';
+export { sma, rsi, ema, macdLine, stdDev, rangePosition, volumeRatio, bollingerBands, stochastic, changePercentOverBars, dailyChangePercentFromCloses } from './technical-analysis';
+export type { DailyChangeFromClosesOptions } from './technical-analysis';
 export type { BollingerBandsResult, StochasticResult } from './technical-analysis';
 export {
   INDEX_BENCHMARKS,

@@ -1,5 +1,5 @@
 import { Market } from './enums';
-import { changePercentOverBars } from './technical-analysis';
+import { changePercentOverBars, dailyChangePercentFromCloses } from './technical-analysis';
 
 export interface SectorSeriesInput {
   yahooSymbol: string;
@@ -57,7 +57,7 @@ export function buildSectorSnapshot(input: SectorSeriesInput): SectorEtfSnapshot
     sectorLabel: input.sectorLabel,
     market: input.market,
     currentPrice,
-    changePercent1d: input.changePercent1d,
+    changePercent1d: dailyChangePercentFromCloses(closes),
     changePercent1w: change1w,
     changePercent1mo: change1mo,
     rsBenchmark1w: rs1w,

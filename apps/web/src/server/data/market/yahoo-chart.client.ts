@@ -1,4 +1,4 @@
-import { QuoteChartRange } from '@sar/shared';
+import { QuoteChartRange, dailyChangePercentFromCloses } from '@sar/shared';
 
 export interface StockPricePoint {
   timestamp: string;
@@ -164,6 +164,7 @@ function seriesFromResult(symbol: string, result: YahooChartResult): YahooChartS
   const volumes: number[] = [];
   const highs: number[] = [];
   const lows: number[] = [];
+  let lastBarEpochSec: number | null = null;
 
   const len = timestamps.length;
   for (let i = 0; i < len; i++) {
@@ -173,13 +174,14 @@ function seriesFromResult(symbol: string, result: YahooChartResult): YahooChartS
     volumes.push(quote?.volume?.[i] ?? 0);
     highs.push(quote?.high?.[i] ?? close);
     lows.push(quote?.low?.[i] ?? close);
+    lastBarEpochSec = timestamps[i] ?? null;
   }
 
   const meta = result.meta;
-  const current = meta?.regularMarketPrice ?? closes.at(-1);
-  const prev = meta?.chartPreviousClose ?? closes.at(-2);
-  const changePercent1d =
-    current && prev && prev > 0 ? ((current - prev) / prev) * 100 : null;
+  const changePercent1d = dailyChangePercentFromCloses(closes, {
+    livePrice: meta?.regularMarketPrice,
+    lastBarEpochSec,
+  });
 
   return { symbol, closes, volumes, highs, lows, changePercent1d };
 }

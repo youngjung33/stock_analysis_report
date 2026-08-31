@@ -124,6 +124,54 @@ export function changePercentOverBars(closes: number[], bars: number): number | 
   return ((current - base) / base) * 100;
 }
 
+function isSameUtcDay(aMs: number, bMs: number): boolean {
+  const a = new Date(aMs);
+  const b = new Date(bMs);
+  return (
+    a.getUTCFullYear() === b.getUTCFullYear() &&
+    a.getUTCMonth() === b.getUTCMonth() &&
+    a.getUTCDate() === b.getUTCDate()
+  );
+}
+
+export interface DailyChangeFromClosesOptions {
+  /** 최신 체결가(장중). 마지막 일봉이 전 거래일일 때만 사용 */
+  livePrice?: number | null;
+  /** 마지막 일봉 unix seconds */
+  lastBarEpochSec?: number | null;
+  asOfMs?: number;
+}
+
+/**
+ * 일봉 종가 시리즈 기준 1일 등락률.
+ * - 마지막 봉이 오늘이면: 오늘 종가(봉) vs 전일 종가 — meta live/chartPreviousClose 미사용
+ * - 마지막 봉이 전 거래일이면: live vs 전일 종가, 없으면 마지막 두 봉
+ */
+export function dailyChangePercentFromCloses(
+  closes: number[],
+  options?: DailyChangeFromClosesOptions,
+): number | null {
+  if (closes.length < 2) return null;
+
+  const lastBar = closes[closes.length - 1];
+  const prevBar = closes[closes.length - 2];
+  const asOfMs = options?.asOfMs ?? Date.now();
+  const lastBarEpochSec = options?.lastBarEpochSec;
+  const lastBarIsToday =
+    lastBarEpochSec != null && isSameUtcDay(lastBarEpochSec * 1000, asOfMs);
+
+  if (lastBarIsToday) {
+    return ((lastBar - prevBar) / prevBar) * 100;
+  }
+
+  const live = options?.livePrice;
+  if (live != null && live > 0 && lastBar > 0) {
+    return ((live - lastBar) / lastBar) * 100;
+  }
+
+  return changePercentOverBars(closes, 1);
+}
+
 export function stdDev(values: number[]): number | null {
   if (values.length < 2) return null;
   const mean = values.reduce((s, v) => s + v, 0) / values.length;
