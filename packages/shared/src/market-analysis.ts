@@ -27,8 +27,10 @@ import {
   computeRegionSentiment,
 } from './market-insights';
 import { hasPolicyUncertaintyPulse } from './market-recommendation/figure-enrichment';
+import { buildMarketMoveReasonInsights } from './market-move-reason';
 
 export type AnalysisCategory =
+  | 'moveReason'
   | 'breadth'
   | 'index'
   | 'technical'
@@ -148,6 +150,7 @@ export interface MarketAnalysisReport extends MarketInsightsResult {
 }
 
 const CATEGORY_LABEL: Record<AnalysisCategory, string> = {
+  moveReason: '전일 움직임',
   breadth: '시장 폭',
   index: '지수·차트',
   technical: '기술적 지표',
@@ -999,6 +1002,14 @@ export function buildMarketAnalysisReport(input: {
   });
 
   const insights: AnalysisInsight[] = [
+    ...buildMarketMoveReasonInsights({
+      kr: base.kr,
+      us: base.us,
+      indices,
+      sectors,
+      macro,
+      news: input.news,
+    }),
     ...macroPanelInsights(macro),
     macroInsight(base.kr, base.us),
     ...breadthInsights(base.kr, base.us, input.krQuotes, input.usQuotes),

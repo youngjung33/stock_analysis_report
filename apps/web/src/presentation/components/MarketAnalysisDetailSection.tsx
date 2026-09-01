@@ -42,6 +42,7 @@ const TONE_STYLE: Record<AnalysisTone, string> = {
 };
 
 const CATEGORY_ORDER: AnalysisCategory[] = [
+  'moveReason',
   'macro',
   'breadth',
   'index',
@@ -152,6 +153,66 @@ function RecommendationBreakdown({ report }: { report: MarketAnalysisReport }) {
   );
 }
 
+function MoveReasonSection({ report, compact }: { report: MarketAnalysisReport; compact?: boolean }) {
+  const { t } = useTranslation();
+  const items = report.insights.filter((i) => i.category === 'moveReason');
+  if (items.length === 0) return null;
+
+  return (
+    <div className="space-y-3 rounded-xl border border-indigo-500/30 bg-indigo-950/20 p-4">
+      <div>
+        <h3 className="text-sm font-semibold text-indigo-100">{t('market.moveReasonTitle')}</h3>
+        <p className="mt-1 text-xs text-indigo-200/70">{t('market.moveReasonDesc')}</p>
+      </div>
+      <div className="space-y-3">
+        {items.map((item) => (
+          <MoveReasonCard key={item.id} item={item} compact={compact} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MoveReasonCard({ item, compact }: { item: AnalysisInsight; compact?: boolean }) {
+  const { t } = useTranslation();
+  const localized = translateAnalysisInsight(item, t);
+
+  return (
+    <article className={`rounded-xl border p-4 ${TONE_STYLE[item.tone]}`}>
+      <div className="min-w-0">
+        <span className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
+          {localized.categoryLabel}
+        </span>
+        <h4 className={`mt-1 font-semibold text-white ${compact ? 'text-sm' : 'text-base'}`}>
+          {localized.title}
+        </h4>
+        <p className="mt-2 text-xs leading-relaxed text-slate-300">{localized.summary}</p>
+      </div>
+      <div className="mt-3 space-y-3 border-t border-slate-800/80 pt-3">
+        <p className="text-xs leading-relaxed text-slate-300">{localized.reasoning}</p>
+        <ul className="list-inside list-disc space-y-1 text-xs text-slate-400">
+          {localized.evidence.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+        <div className="flex flex-wrap gap-2">
+          {localized.links.map((link) => (
+            <a
+              key={link.url}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-md border border-slate-700 bg-slate-900/60 px-2 py-1 text-[10px] text-indigo-300 hover:border-indigo-500/50"
+            >
+              {link.label} ↗
+            </a>
+          ))}
+        </div>
+      </div>
+    </article>
+  );
+}
+
 function InsightCard({ item, compact }: { item: AnalysisInsight; compact?: boolean }) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
@@ -249,7 +310,7 @@ export function MarketAnalysisDetailSection({ compact }: Props) {
   }, [data, t]);
 
   const narrativeGroups = groupedInsights.filter(
-    (g) => !['macro', 'index', 'sector', 'technical'].includes(g.category),
+    (g) => !['macro', 'index', 'sector', 'technical', 'moveReason'].includes(g.category),
   );
 
   return (
@@ -273,6 +334,7 @@ export function MarketAnalysisDetailSection({ compact }: Props) {
       {data && (
         <>
           <SentimentSummary report={data} compact={compact} />
+          <MoveReasonSection report={data} compact={compact} />
           <RegimeBadges report={data} />
           <FigurePulseSection
             figureStatements={data.figureStatements}

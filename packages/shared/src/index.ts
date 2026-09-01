@@ -414,6 +414,7 @@ export {
   buildIndexSnapshot,
   ANALYSIS_CATEGORY_LABEL,
 } from './market-analysis';
+export { buildMarketMoveReasonInsights } from './market-move-reason';
 export type {
   AnalysisCategory,
   AnalysisInsight,

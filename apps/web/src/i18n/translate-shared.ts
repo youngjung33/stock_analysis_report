@@ -42,6 +42,11 @@ function resolveInsightParams(
     delete resolved.biasKey;
   }
 
+  if (resolved.directionKey !== undefined) {
+    resolved.direction = t(`shared.market.insights.moveReason.direction.${resolved.directionKey}`);
+    delete resolved.directionKey;
+  }
+
   if (resolved.trendKey !== undefined) {
     resolved.trend = t(String(resolved.trendKey), {
       defaultValue: String(resolved.trendKey),

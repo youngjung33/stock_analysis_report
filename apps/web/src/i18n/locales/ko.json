@@ -617,6 +617,8 @@
     "seeMoreInDetail": "상세에서 더 보기",
     "deepAnalysisTitle": "시장 정세 · 심층 분석",
     "deepAnalysisLoading": "경기·지수·업종·뉴스 분석 중… (최대 25초)",
+    "moveReasonTitle": "전 거래일, 왜 올랐/내렸나?",
+    "moveReasonDesc": "전 거래일 종가 기준 지수·대표주·업종·매크로·뉴스(48시간)를 교차 분석한 해설입니다.",
     "expandAnalysis": "왜 그렇게 보는지 · 근거 ▼",
     "collapseAnalysis": "분석 접기 ▲",
     "latestHeadlines": "최신 헤드라인",
@@ -1184,6 +1186,7 @@
     },
     "market": {
       "categories": {
+        "moveReason": "전일 움직임",
         "breadth": "시장 폭",
         "index": "지수·차트",
         "technical": "기술적 지표",
@@ -1347,6 +1350,20 @@
           "reasoningDiverge": "한국과 미국 대표주 평균 등락이 크게 다르면 환율·금리·업종 이슈 등 지역 요인이 작용 중일 수 있습니다. 환율(KRW/USD)과 함께 보는 것이 일반적입니다.",
           "reasoningSync": "양 시장이 비슷한 방향이면 글로벌 투자 심리가 공통 변수일 가능성이 큽니다. 연준·원화·유가 등 경제 헤드라인과 교차 확인하세요."
         },
+        "moveReason": {
+          "title": "{{region}} 시장 전 거래일 {{direction}} ({{change}}) — 주요 요인",
+          "summary": "{{factors}}",
+          "direction": {
+            "up": "상승",
+            "down": "하락",
+            "flat": "보합"
+          },
+          "reasoning": {
+            "up": "전 거래일 종가 기준 지수·대표주·업종·매크로·뉴스를 교차해 상승 요인을 정리했습니다. 단일 변수보다 여러 신호가 같은 방향일 때 설명력이 높습니다. 이미 가격에 반영된 뉴스일 수 있습니다.",
+            "down": "전 거래일 종가 기준 지수·대표주·업종·매크로·뉴스를 교차해 하락 요인을 정리했습니다. 지수만 빠지고 폭은 좁은지, 대표주 전반이 약한지 함께 보는 것이 좋습니다.",
+            "flat": "전 거래일 등락이 크지 않아 방향성이 약합니다. 상승·하락 종목이 엇갈리거나 매크로·뉴스 신호가 혼재된 구간으로 해석할 수 있습니다."
+          }
+        },
         "recommendation": {
           "title": "[{{tag}}] {{name}}",
           "reasoning": {
@@ -1431,7 +1448,25 @@
           "tempGap": "온도차 {{gap}}%p",
           "recPrice": "현재가 {{price}} {{currency}}",
           "recChange": "당일 등락 {{change}}",
-          "recTag": "태그: {{tag}}"
+          "recTag": "태그: {{tag}}",
+          "moveReasonIndex": "{{name}} 전 거래일 {{change}}",
+          "moveReasonBreadthUp": "대표주 상승 우위 ({{up}}↑ {{down}}↓, 비율 {{ratio}})",
+          "moveReasonBreadthDown": "대표주 하락 우위 ({{up}}↑ {{down}}↓, 비율 {{ratio}})",
+          "moveReasonBreadthMixed": "대표주 혼조 ({{up}}↑ {{down}}↓)",
+          "moveReasonSectorLead": "주도 업종 {{sector}} {{change}} (RS1w {{rs}})",
+          "moveReasonSectorLag": "부진 업종 {{sector}} {{change}} (RS1w {{rs}})",
+          "moveReasonFxWeak": "원화 약세 USD/KRW {{change}} ({{value}}원) — 수출·반도체 우호",
+          "moveReasonFxStrong": "원화 강세 USD/KRW {{change}} ({{value}}원) — 외국인·수출주 부담",
+          "moveReasonUsSync": "미국 {{name}} {{change}} — 전일 글로벌 동조",
+          "moveReasonUsDiverge": "미국 {{name}} {{change}} — 전일 한·미 온도차",
+          "moveReasonNasdaqSync": "NASDAQ {{change}} — 성장주 동조",
+          "moveReasonNasdaqDiverge": "NASDAQ {{change}} — 대형주·성장주 온도차",
+          "moveReasonVixDown": "VIX {{change}} ({{value}}) — 리스크온",
+          "moveReasonVixUp": "VIX {{change}} ({{value}}) — 공포·헤지 수요",
+          "moveReasonYieldDown": "10Y 금리 {{change}} ({{value}}%) — 할인율·성장주 우호",
+          "moveReasonYieldUp": "10Y 금리 {{change}} ({{value}}%) — 밸류에이션·금융주 부담",
+          "moveReasonNewsTone": "최근 48시간 뉴스 {{count}}건 · 긍정 {{bull}} · 부정 {{bear}}",
+          "moveReasonNewsHeadline": "「{{headline}}」 ({{source}})"
         }
       },
       "trends": {

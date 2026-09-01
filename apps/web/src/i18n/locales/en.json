@@ -617,6 +617,8 @@
     "seeMoreInDetail": "See more in detail",
     "deepAnalysisTitle": "Market outlook · deep analysis",
     "deepAnalysisLoading": "Analyzing economy, indices, sectors, news… (up to 25s)",
+    "moveReasonTitle": "Previous session: why up or down?",
+    "moveReasonDesc": "Cross-check of index, leaders, sectors, macro, and news (48h) vs the prior session close.",
     "expandAnalysis": "Why this view · rationale ▼",
     "collapseAnalysis": "Collapse analysis ▲",
     "latestHeadlines": "Latest headlines",
@@ -1184,6 +1186,7 @@
     },
     "market": {
       "categories": {
+        "moveReason": "Prior session move",
         "breadth": "Market breadth",
         "index": "Index & charts",
         "technical": "Technical indicators",
@@ -1347,6 +1350,20 @@
           "reasoningDiverge": "Large gaps in featured-stock averages may reflect FX, rates, or regional themes — often read alongside USD/KRW.",
           "reasoningSync": "Similar direction in both markets suggests a common global driver — cross-check Fed, FX, and macro headlines."
         },
+        "moveReason": {
+          "title": "{{region}} market prior session {{direction}} ({{change}}) — key drivers",
+          "summary": "{{factors}}",
+          "direction": {
+            "up": "gain",
+            "down": "decline",
+            "flat": "flat"
+          },
+          "reasoning": {
+            "up": "We cross-checked index, leaders, sectors, macro, and news for the prior session close. Multiple aligned signals are more informative than a single driver; news may already be priced in.",
+            "down": "We cross-checked index, leaders, sectors, macro, and news for the prior session close. Check whether only the index fell or breadth was weak as well.",
+            "flat": "The prior session move was small — mixed leaders or conflicting macro/news may explain the lack of direction."
+          }
+        },
         "recommendation": {
           "title": "[{{tag}}] {{name}}",
           "reasoning": {
@@ -1431,7 +1448,25 @@
           "tempGap": "Temperature gap {{gap}}%p",
           "recPrice": "Price {{price}} {{currency}}",
           "recChange": "Day change {{change}}",
-          "recTag": "Tag: {{tag}}"
+          "recTag": "Tag: {{tag}}",
+          "moveReasonIndex": "{{name}} prior session {{change}}",
+          "moveReasonBreadthUp": "Featured stocks upside bias ({{up}}↑ {{down}}↓, ratio {{ratio}})",
+          "moveReasonBreadthDown": "Featured stocks downside bias ({{up}}↑ {{down}}↓, ratio {{ratio}})",
+          "moveReasonBreadthMixed": "Featured stocks mixed ({{up}}↑ {{down}}↓)",
+          "moveReasonSectorLead": "Leading sector {{sector}} {{change}} (1W RS {{rs}})",
+          "moveReasonSectorLag": "Lagging sector {{sector}} {{change}} (1W RS {{rs}})",
+          "moveReasonFxWeak": "KRW weakness USD/KRW {{change}} ({{value}}) — export/semiconductor friendly",
+          "moveReasonFxStrong": "KRW strength USD/KRW {{change}} ({{value}}) — foreign/outflow pressure",
+          "moveReasonUsSync": "US {{name}} {{change}} — prior-session global sync",
+          "moveReasonUsDiverge": "US {{name}} {{change}} — prior-session KR–US gap",
+          "moveReasonNasdaqSync": "NASDAQ {{change}} — growth in sync",
+          "moveReasonNasdaqDiverge": "NASDAQ {{change}} — large-cap vs growth gap",
+          "moveReasonVixDown": "VIX {{change}} ({{value}}) — risk-on",
+          "moveReasonVixUp": "VIX {{change}} ({{value}}) — fear/hedging demand",
+          "moveReasonYieldDown": "10Y yield {{change}} ({{value}}%) — growth/multiple friendly",
+          "moveReasonYieldUp": "10Y yield {{change}} ({{value}}%) — valuation/financials pressure",
+          "moveReasonNewsTone": "News last 48h {{count}} · bullish {{bull}} · bearish {{bear}}",
+          "moveReasonNewsHeadline": "「{{headline}}」 ({{source}})"
         }
       },
       "trends": {
