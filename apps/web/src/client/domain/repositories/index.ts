@@ -82,6 +82,12 @@ export interface IMarketRepository {
     userHoldings?: Array<{ symbol: string; market: Market }>;
     userWatchlist?: Array<{ symbol: string; market: Market }>;
   }): Promise<MarketAnalysisReport>;
+  getStockAnalysis(input: {
+    symbol: string;
+    name: string;
+    market: Market;
+    yahooSymbol?: string;
+  }): Promise<import('@sar/shared').StockPriceExplanationReport>;
   getRecommendationHistory(limit?: number): Promise<import('@sar/shared').RecommendationHistoryResponse>;
   getRecommendationContext(): Promise<import('@sar/shared').RecommendationContextResponse>;
   searchStocks(query: string, market: Market): Promise<StockSearchResult[]>;

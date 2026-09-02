@@ -319,6 +319,7 @@
     "HOLDING_PARAMS_REQUIRED": "symbol and market are required.",
     "dashboardLoadFailed": "Failed to load portfolio.",
     "marketAnalysisLoadFailed": "Failed to load market analysis.",
+    "stockAnalysisLoadFailed": "Failed to load stock analysis.",
     "recommendationHistoryLoadFailed": "Failed to load recommendation history.",
     "stockQuoteLoadFailed": "Failed to load stock quotes.",
     "quoteRefreshFailed": "Failed to refresh quotes."
@@ -619,6 +620,14 @@
     "deepAnalysisLoading": "Analyzing economy, indices, sectors, news… (up to 25s)",
     "moveReasonTitle": "Previous session: why up or down?",
     "moveReasonDesc": "Cross-check of index, leaders, sectors, macro, and news (48h) vs the prior session close.",
+    "stockFocusTitle": "Stock focus — why this price?",
+    "stockFocusDesc": "Pick a symbol to see recent history, current drivers, and observation points ahead.",
+    "stockFocusLoading": "Analyzing chart, news, events… (up to 25s)",
+    "stockFocusToday": "Today {{percent}}",
+    "stockFocus1w": "1W {{percent}}",
+    "stockFocusChartLink": "Chart detail",
+    "stockFocusScoreTitle": "Engine score breakdown",
+    "stockFocusDisclaimer": "Past/present notes and ‘outlook’ are rule-based observation points — not price forecasts or investment advice.",
     "expandAnalysis": "Why this view · rationale ▼",
     "collapseAnalysis": "Collapse analysis ▲",
     "latestHeadlines": "Latest headlines",
@@ -1187,6 +1196,9 @@
     "market": {
       "categories": {
         "moveReason": "Prior session move",
+        "stockPast": "Past & recent",
+        "stockPresent": "Current price",
+        "stockOutlook": "Outlook & watch",
         "breadth": "Market breadth",
         "index": "Index & charts",
         "technical": "Technical indicators",
@@ -1364,6 +1376,24 @@
             "flat": "The prior session move was small — mixed leaders or conflicting macro/news may explain the lack of direction."
           }
         },
+        "stockFocus": {
+          "past": {
+            "title": "{{name}} — recent flow",
+            "summary": "1D {{change1d}} · 1W {{change1w}} · {{event}}",
+            "reasoning": "1D/1W/1M returns, relative strength vs the benchmark, and earnings/news events help explain why the stock trades here recently. Sharp moves may already reflect known catalysts."
+          },
+          "present": {
+            "title": "{{name}} — price now ({{price}})",
+            "summary": "Today {{change}} · {{trend}}",
+            "reasoning": "The current price blends today’s flow, chart trend, and market regime (risk-on/off, FX, etc.). News–price divergence may mean the narrative is being digested or read the other way."
+          },
+          "outlook": {
+            "title": "{{name}} — what to watch next",
+            "summary": "{{tag}} lens · key factor {{factor}}",
+            "summaryEmpty": "Not enough data for a structured scenario.",
+            "reasoning": "Factors below combine chart, news, events, and regime from the recommendation engine. This is **not** a price forecast or investment advice. Cross-check earnings dates, support/resistance, volume, and index linkage."
+          }
+        },
         "recommendation": {
           "title": "[{{tag}}] {{name}}",
           "reasoning": {
@@ -1466,7 +1496,36 @@
           "moveReasonYieldDown": "10Y yield {{change}} ({{value}}%) — growth/multiple friendly",
           "moveReasonYieldUp": "10Y yield {{change}} ({{value}}%) — valuation/financials pressure",
           "moveReasonNewsTone": "News last 48h {{count}} · bullish {{bull}} · bearish {{bear}}",
-          "moveReasonNewsHeadline": "「{{headline}}」 ({{source}})"
+          "moveReasonNewsHeadline": "「{{headline}}」 ({{source}})",
+          "stockPast1d": "1D {{change}}",
+          "stockPast1w": "1W {{change}}",
+          "stockPast1mo": "1M {{change}}",
+          "stockPastRs": "1W RS vs benchmark {{rs}}",
+          "stockPastEvent": "{{kind}} ({{day}})",
+          "stockPastNews": "News tone {{tone}} · {{count}} articles · 「{{headline}}」",
+          "stockPresentPrice": "Price {{price}} {{currency}} · today {{change}}",
+          "stockPresentSma": "SMA20 {{sma20}} · SMA200 {{sma200}}",
+          "stockPresentRegime": "Market regime: {{regimes}}",
+          "stockPresentDivergence": "News–price divergence: {{divergence}}",
+          "stockOutlookTag": "Engine tag {{tag}} (score {{score}})",
+          "stockOutlookEmpty": "Insufficient data for scoring",
+          "eventKind": {
+            "earnings_beat": "Earnings beat",
+            "earnings_miss": "Earnings miss",
+            "earnings_neutral": "Earnings report",
+            "earnings_upcoming": "Earnings ahead",
+            "dividend": "Dividend / return",
+            "buyback": "Buyback"
+          },
+          "newsTone": {
+            "bullish": "bullish",
+            "bearish": "bearish",
+            "neutral": "neutral"
+          },
+          "smaSide": {
+            "above": "above",
+            "below": "below"
+          }
         }
       },
       "trends": {

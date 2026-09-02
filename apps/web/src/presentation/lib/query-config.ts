@@ -22,6 +22,7 @@ export const MARKET_QUERY_KEYS = {
   dashboard: ['dashboard'] as const,
   featuredQuotes: ['featured-quotes'] as const,
   marketAnalysis: ['market-analysis'] as const,
+  stockAnalysisRoot: ['stock-analysis'] as const,
   recommendationHistory: ['recommendation-history'] as const,
   marketStatus: ['market-status'] as const,
   portfolioAnalysis: ['portfolio', 'analysis'] as const,

@@ -319,6 +319,7 @@
     "HOLDING_PARAMS_REQUIRED": "symbol과 market이 필요합니다.",
     "dashboardLoadFailed": "투자 현황을 불러오지 못했습니다.",
     "marketAnalysisLoadFailed": "시장 분석을 불러오지 못했습니다.",
+    "stockAnalysisLoadFailed": "종목 분석을 불러오지 못했습니다.",
     "recommendationHistoryLoadFailed": "추천 기록을 불러오지 못했습니다.",
     "stockQuoteLoadFailed": "종목 시세를 불러오지 못했습니다.",
     "quoteRefreshFailed": "시세 갱신에 실패했습니다."
@@ -619,6 +620,14 @@
     "deepAnalysisLoading": "경기·지수·업종·뉴스 분석 중… (최대 25초)",
     "moveReasonTitle": "전 거래일, 왜 올랐/내렸나?",
     "moveReasonDesc": "전 거래일 종가 기준 지수·대표주·업종·매크로·뉴스(48시간)를 교차 분석한 해설입니다.",
+    "stockFocusTitle": "종목 집중 분석 — 왜 이 가격인가?",
+    "stockFocusDesc": "종목을 선택하면 과거 흐름·현재 가격 요인·앞으로 관찰할 포인트를 정리합니다.",
+    "stockFocusLoading": "차트·뉴스·이벤트 분석 중… (최대 25초)",
+    "stockFocusToday": "당일 {{percent}}",
+    "stockFocus1w": "1주 {{percent}}",
+    "stockFocusChartLink": "차트 상세",
+    "stockFocusScoreTitle": "엔진 점수 근거",
+    "stockFocusDisclaimer": "과거·현재 해설과 ‘전망’은 규칙 기반 관찰 포인트이며 가격 예측·투자 권유가 아닙니다.",
     "expandAnalysis": "왜 그렇게 보는지 · 근거 ▼",
     "collapseAnalysis": "분석 접기 ▲",
     "latestHeadlines": "최신 헤드라인",
@@ -1187,6 +1196,9 @@
     "market": {
       "categories": {
         "moveReason": "전일 움직임",
+        "stockPast": "과거·최근",
+        "stockPresent": "현재 가격",
+        "stockOutlook": "전망·관찰",
         "breadth": "시장 폭",
         "index": "지수·차트",
         "technical": "기술적 지표",
@@ -1364,6 +1376,24 @@
             "flat": "전 거래일 등락이 크지 않아 방향성이 약합니다. 상승·하락 종목이 엇갈리거나 매크로·뉴스 신호가 혼재된 구간으로 해석할 수 있습니다."
           }
         },
+        "stockFocus": {
+          "past": {
+            "title": "{{name}} — 최근 흐름",
+            "summary": "전일 {{change1d}} · 1주 {{change1w}} · {{event}}",
+            "reasoning": "전일·1주·1개월 수익률, 벤치마크 대비 상대강도, 실적·뉴스 이벤트를 함께 보면 최근 가격대 맥락을 잡을 수 있습니다. 단기 급등·급락은 이미 반영된 재료일 수 있습니다."
+          },
+          "present": {
+            "title": "{{name}} — 지금 이 가격 ({{price}})",
+            "summary": "당일 {{change}} · {{trend}}",
+            "reasoning": "현재가는 당일 수급·차트 추세·시장 레짐(리스크온/오프, 환율 등)이 겹친 결과입니다. 뉴스 톤과 가격이 엇갈리면 이미 알려진 재료가 소화 중이거나 반대 해석이 가능한 구간일 수 있습니다."
+          },
+          "outlook": {
+            "title": "{{name}} — 앞으로 관찰할 포인트",
+            "summary": "{{tag}} 관점 · 핵심 변수 {{factor}}",
+            "summaryEmpty": "데이터 기반 시나리오를 만들기 어렵습니다.",
+            "reasoning": "아래 요인은 추천 엔진이 차트·뉴스·이벤트·시장 레짐을 합산한 관찰 포인트입니다. 미래 가격 예측이 아니며 투자 권유가 아닙니다. 실적 일정·지지/저항·거래량·지수 연동을 함께 확인하세요."
+          }
+        },
         "recommendation": {
           "title": "[{{tag}}] {{name}}",
           "reasoning": {
@@ -1466,7 +1496,36 @@
           "moveReasonYieldDown": "10Y 금리 {{change}} ({{value}}%) — 할인율·성장주 우호",
           "moveReasonYieldUp": "10Y 금리 {{change}} ({{value}}%) — 밸류에이션·금융주 부담",
           "moveReasonNewsTone": "최근 48시간 뉴스 {{count}}건 · 긍정 {{bull}} · 부정 {{bear}}",
-          "moveReasonNewsHeadline": "「{{headline}}」 ({{source}})"
+          "moveReasonNewsHeadline": "「{{headline}}」 ({{source}})",
+          "stockPast1d": "전일(1일) {{change}}",
+          "stockPast1w": "최근 1주 {{change}}",
+          "stockPast1mo": "최근 1개월 {{change}}",
+          "stockPastRs": "1주 RS(벤치마크 대비) {{rs}}",
+          "stockPastEvent": "{{kind}} ({{day}})",
+          "stockPastNews": "뉴스 톤 {{tone}} · {{count}}건 · 「{{headline}}」",
+          "stockPresentPrice": "현재가 {{price}} {{currency}} · 당일 {{change}}",
+          "stockPresentSma": "SMA20 {{sma20}} · SMA200 {{sma200}}",
+          "stockPresentRegime": "시장 레짐: {{regimes}}",
+          "stockPresentDivergence": "뉴스·가격 괴리: {{divergence}}",
+          "stockOutlookTag": "엔진 태그 {{tag}} (score {{score}})",
+          "stockOutlookEmpty": "점수 산출 데이터 부족",
+          "eventKind": {
+            "earnings_beat": "실적 서프라이즈",
+            "earnings_miss": "실적 부진",
+            "earnings_neutral": "실적 발표",
+            "earnings_upcoming": "실적 발표 임박",
+            "dividend": "배당·환원",
+            "buyback": "자사주·매입"
+          },
+          "newsTone": {
+            "bullish": "긍정",
+            "bearish": "부정",
+            "neutral": "중립"
+          },
+          "smaSide": {
+            "above": "상회",
+            "below": "하회"
+          }
         }
       },
       "trends": {

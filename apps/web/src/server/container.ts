@@ -1,5 +1,6 @@
 import { GetFeaturedQuotesUseCase } from './domain/usecases/market/get-featured-quotes.use-case';
 import { GetFxRateUseCase } from './domain/usecases/market/get-fx-rate.use-case';
+import { GetStockAnalysisUseCase } from './domain/usecases/market/get-stock-analysis.use-case';
 import { GetMarketAnalysisUseCase } from './domain/usecases/market/get-market-analysis.use-case';
 import { BuildMarketContextUseCase } from './domain/usecases/market/build-market-context.use-case';
 import { FetchRecommendationQuotesUseCase } from './domain/usecases/market/fetch-recommendation-quotes.use-case';
@@ -113,6 +114,7 @@ export interface ServerServices {
   getStockQuoteUseCase: GetStockQuoteUseCase;
   getMarketStatusUseCase: GetMarketStatusUseCase;
   getMarketAnalysisUseCase: GetMarketAnalysisUseCase;
+  getStockAnalysisUseCase: GetStockAnalysisUseCase;
   buildMarketContextUseCase: BuildMarketContextUseCase;
   fetchRecommendationQuotesUseCase: FetchRecommendationQuotesUseCase;
   fetchRecommendationTechnicalUseCase: FetchRecommendationTechnicalSnapshotsUseCase;
@@ -198,6 +200,7 @@ export function getServerServices(): ServerServices {
     marketData,
     cashRepo,
   );
+  const getStockQuoteUseCase = new GetStockQuoteUseCase(marketData);
 
   cached = {
     tokenService,
@@ -215,7 +218,7 @@ export function getServerServices(): ServerServices {
     ),
     fetchQuotesUseCase,
     getFeaturedQuotesUseCase,
-    getStockQuoteUseCase: new GetStockQuoteUseCase(marketData),
+    getStockQuoteUseCase,
     refreshTokenUseCase: new RefreshTokenUseCase(refreshRepo, tokenService),
     logoutUseCase: new LogoutUseCase(refreshRepo, tokenService),
     createTransactionUseCase: new CreateTransactionUseCase(stockRepo, txRepo, cashRepo),
@@ -244,6 +247,12 @@ export function getServerServices(): ServerServices {
       buildMarketContextUseCase,
       buildStockEnrichmentUseCase,
       marketData,
+    ),
+    getStockAnalysisUseCase: new GetStockAnalysisUseCase(
+      getFeaturedQuotesUseCase,
+      buildMarketContextUseCase,
+      buildStockEnrichmentUseCase,
+      getStockQuoteUseCase,
     ),
     buildMarketContextUseCase,
     fetchRecommendationQuotesUseCase,

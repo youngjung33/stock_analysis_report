@@ -30,6 +30,7 @@ import {
 } from './market-analysis/MarketAnalysisPanels';
 import { RecommendationHistorySection } from './market-analysis/RecommendationHistorySection';
 import { FigurePulseSection } from './market-analysis/FigurePulseSection';
+import { StockFocusSection } from './market-analysis/StockFocusSection';
 
 interface Props {
   compact?: boolean;
@@ -335,6 +336,7 @@ export function MarketAnalysisDetailSection({ compact }: Props) {
         <>
           <SentimentSummary report={data} compact={compact} />
           <MoveReasonSection report={data} compact={compact} />
+          <StockFocusSection />
           <RegimeBadges report={data} />
           <FigurePulseSection
             figureStatements={data.figureStatements}

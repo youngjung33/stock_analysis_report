@@ -155,9 +155,13 @@ function applyRegimeAdjustments(
   return breakdown;
 }
 
-export function scoreKrCandidate(quote: ValidQuote, ctx: MarketContext): EnrichedStockRecommendation | null {
+export function scoreKrCandidate(
+  quote: ValidQuote,
+  ctx: MarketContext,
+  options?: { allowHeld?: boolean },
+): EnrichedStockRecommendation | null {
   if (quote.market !== Market.KR) return null;
-  if (ctx.heldSymbols.has(symbolKey(quote.symbol, quote.market))) return null;
+  if (!options?.allowHeld && ctx.heldSymbols.has(symbolKey(quote.symbol, quote.market))) return null;
 
   const sectorTags = getStockSectorTags(quote.symbol, quote.market);
   const tagScores = baseTagScores(quote.changePercent, ctx, Market.KR);
@@ -257,9 +261,13 @@ export function scoreKrCandidate(quote: ValidQuote, ctx: MarketContext): Enriche
   });
 }
 
-export function scoreUsCandidate(quote: ValidQuote, ctx: MarketContext): EnrichedStockRecommendation | null {
+export function scoreUsCandidate(
+  quote: ValidQuote,
+  ctx: MarketContext,
+  options?: { allowHeld?: boolean },
+): EnrichedStockRecommendation | null {
   if (quote.market !== Market.US) return null;
-  if (ctx.heldSymbols.has(symbolKey(quote.symbol, quote.market))) return null;
+  if (!options?.allowHeld && ctx.heldSymbols.has(symbolKey(quote.symbol, quote.market))) return null;
 
   const sectorTags = getStockSectorTags(quote.symbol, quote.market);
   const tagScores = baseTagScores(quote.changePercent, ctx, Market.US);

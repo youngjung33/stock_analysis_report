@@ -387,6 +387,29 @@ function translateEvidenceItem(item: EvidenceItem, fallback: string, t: TFunctio
     delete params.tagKey;
   }
 
+  if (item.key === 'shared.market.insights.evidence.stockPastEvent' && params.kindKey) {
+    params.kind = t(`shared.market.insights.evidence.eventKind.${params.kindKey}`);
+    delete params.kindKey;
+  }
+  if (item.key === 'shared.market.insights.evidence.stockPastNews' && params.toneKey) {
+    params.tone = t(`shared.market.insights.evidence.newsTone.${params.toneKey}`);
+    delete params.toneKey;
+  }
+  if (item.key === 'shared.market.insights.evidence.stockPresentSma') {
+    if (params.sma20Key) {
+      params.sma20 = t(`shared.market.insights.evidence.smaSide.${params.sma20Key}`);
+      delete params.sma20Key;
+    }
+    if (params.sma200Key) {
+      params.sma200 = t(`shared.market.insights.evidence.smaSide.${params.sma200Key}`);
+      delete params.sma200Key;
+    }
+  }
+  if (item.key === 'shared.market.insights.evidence.stockOutlookTag' && params.tagKey) {
+    params.tag = translateTag(String(params.tagKey) as RecommendationTag, t);
+    delete params.tagKey;
+  }
+
   return t(item.key, { ...params, defaultValue: fallback });
 }
 

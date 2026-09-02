@@ -72,3 +72,17 @@ export class GetFxRateUseCase {
     return this.marketRepo.getFxRate();
   }
 }
+
+/** 단일 종목 가격 해설 (과거·현재·관찰) use case */
+export class GetStockAnalysisUseCase {
+  constructor(private readonly marketRepo: IMarketRepository) {}
+
+  execute(input: {
+    symbol: string;
+    name: string;
+    market: Market;
+    yahooSymbol?: string;
+  }) {
+    return this.marketRepo.getStockAnalysis(input);
+  }
+}

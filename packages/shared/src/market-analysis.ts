@@ -31,6 +31,9 @@ import { buildMarketMoveReasonInsights } from './market-move-reason';
 
 export type AnalysisCategory =
   | 'moveReason'
+  | 'stockPast'
+  | 'stockPresent'
+  | 'stockOutlook'
   | 'breadth'
   | 'index'
   | 'technical'
@@ -151,6 +154,9 @@ export interface MarketAnalysisReport extends MarketInsightsResult {
 
 const CATEGORY_LABEL: Record<AnalysisCategory, string> = {
   moveReason: '전일 움직임',
+  stockPast: '과거·최근',
+  stockPresent: '현재 가격',
+  stockOutlook: '전망·관찰',
   breadth: '시장 폭',
   index: '지수·차트',
   technical: '기술적 지표',

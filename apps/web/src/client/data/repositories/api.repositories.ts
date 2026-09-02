@@ -172,6 +172,19 @@ export class ApiMarketRepository implements IMarketRepository {
     return data;
   }
 
+  async getStockAnalysis(input: {
+    symbol: string;
+    name: string;
+    market: Market;
+    yahooSymbol?: string;
+  }) {
+    const { data } = await apiClient.get<import('@sar/shared').StockPriceExplanationReport>(
+      '/market/stock-analysis',
+      { params: input },
+    );
+    return data;
+  }
+
   async getRecommendationHistory(limit = 30) {
     const { data } = await apiClient.get<import('@sar/shared').RecommendationHistoryResponse>(
       '/market/recommendation-history',

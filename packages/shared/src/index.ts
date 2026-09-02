@@ -415,6 +415,11 @@ export {
   ANALYSIS_CATEGORY_LABEL,
 } from './market-analysis';
 export { buildMarketMoveReasonInsights } from './market-move-reason';
+export {
+  buildStockPriceExplanationReport,
+  pickStockEnrichment,
+} from './stock-price-explanation';
+export type { StockPriceExplanationReport } from './stock-price-explanation';
 export type {
   AnalysisCategory,
   AnalysisInsight,

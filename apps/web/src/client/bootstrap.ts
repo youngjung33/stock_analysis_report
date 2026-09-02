@@ -20,6 +20,7 @@ import {
   GetMarketAnalysisUseCase,
   GetMarketStatusUseCase,
   GetRecommendationHistoryUseCase,
+  GetStockAnalysisUseCase,
   GetStockQuoteUseCase,
   SearchStocksUseCase,
 } from './domain/usecases/market/market.use-cases';
@@ -84,6 +85,7 @@ export function wireAppServices(): AppServices {
     getStockQuoteUseCase: new GetStockQuoteUseCase(marketRepository),
     getMarketStatusUseCase: new GetMarketStatusUseCase(marketRepository),
     getMarketAnalysisUseCase: new GetMarketAnalysisUseCase(marketRepository),
+    getStockAnalysisUseCase: new GetStockAnalysisUseCase(marketRepository),
     getRecommendationHistoryUseCase: new GetRecommendationHistoryUseCase(marketRepository),
     searchStocksUseCase: new SearchStocksUseCase(marketRepository),
     getFxRateUseCase: new GetFxRateUseCase(marketRepository),
