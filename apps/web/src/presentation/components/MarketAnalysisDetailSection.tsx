@@ -192,8 +192,8 @@ function MoveReasonCard({ item, compact }: { item: AnalysisInsight; compact?: bo
       <div className="mt-3 space-y-3 border-t border-slate-800/80 pt-3">
         <p className="text-xs leading-relaxed text-slate-300">{localized.reasoning}</p>
         <ul className="list-inside list-disc space-y-1 text-xs text-slate-400">
-          {localized.evidence.map((line) => (
-            <li key={line}>{line}</li>
+          {localized.evidence.map((line, index) => (
+            <li key={`${item.id}-ev-${index}`}>{line}</li>
           ))}
         </ul>
         <div className="flex flex-wrap gap-2">
@@ -243,8 +243,8 @@ function InsightCard({ item, compact }: { item: AnalysisInsight; compact?: boole
         <div className="mt-3 space-y-3 border-t border-slate-800/80 pt-3">
           <p className="text-xs leading-relaxed text-slate-300">{localized.reasoning}</p>
           <ul className="list-inside list-disc space-y-0.5 text-xs text-slate-400">
-            {localized.evidence.map((line) => (
-              <li key={line}>{line}</li>
+            {localized.evidence.map((line, index) => (
+              <li key={`${item.id}-ev-${index}`}>{line}</li>
             ))}
           </ul>
           <div className="flex flex-wrap gap-2">

@@ -48,10 +48,25 @@ function resolveInsightParams(
   }
 
   if (resolved.trendKey !== undefined) {
-    resolved.trend = t(String(resolved.trendKey), {
-      defaultValue: String(resolved.trendKey),
-    });
+    const tk = String(resolved.trendKey);
+    if (['up', 'down', 'pullback', 'mixed'].includes(tk)) {
+      resolved.trend = t(`shared.market.insights.stockFocus.plainTrend.${tk}`);
+    } else {
+      resolved.trend = t(tk, { defaultValue: tk });
+    }
     delete resolved.trendKey;
+  }
+
+  if (resolved.vsIndexKey !== undefined) {
+    resolved.vsIndex = t(
+      `shared.market.insights.stockFocus.vsIndex.${String(resolved.vsIndexKey)}`,
+    );
+    delete resolved.vsIndexKey;
+  }
+
+  if (resolved.rsKey !== undefined) {
+    resolved.rsLabel = t(`shared.market.insights.stockFocus.rs.${String(resolved.rsKey)}`);
+    delete resolved.rsKey;
   }
 
   if (resolved.labelKey !== undefined) {
@@ -70,8 +85,12 @@ function resolveInsightParams(
 
   if (resolved.zoneKey !== undefined) {
     const zone = String(resolved.zoneKey);
-    resolved.zone = t(`shared.market.rsiZone.${zone}`);
-    resolved.zoneSummary = t(`shared.market.rsiZoneSummary.${zone}`);
+    if (['hot', 'cold', 'firm', 'weak', 'neutral', 'unknown'].includes(zone)) {
+      resolved.zone = t(`shared.market.insights.stockFocus.rsiZone.${zone}`);
+    } else {
+      resolved.zone = t(`shared.market.rsiZone.${zone}`);
+      resolved.zoneSummary = t(`shared.market.rsiZoneSummary.${zone}`);
+    }
     delete resolved.zoneKey;
   }
 
@@ -395,6 +414,63 @@ function translateEvidenceItem(item: EvidenceItem, fallback: string, t: TFunctio
     params.tone = t(`shared.market.insights.evidence.newsTone.${params.toneKey}`);
     delete params.toneKey;
   }
+
+  if (params.vsIndexKey) {
+    params.vsIndex = t(
+      `shared.market.insights.stockFocus.vsIndex.${String(params.vsIndexKey)}`,
+    );
+    delete params.vsIndexKey;
+  }
+  if (params.rsKey) {
+    params.rsLabel = t(`shared.market.insights.stockFocus.rs.${String(params.rsKey)}`);
+    delete params.rsKey;
+  }
+  if (params.trendKey) {
+    const tk = String(params.trendKey);
+    if (['up', 'down', 'pullback', 'mixed'].includes(tk)) {
+      params.trend = t(`shared.market.insights.stockFocus.plainTrend.${tk}`);
+    } else {
+      params.trend = t(tk, { defaultValue: tk });
+    }
+    delete params.trendKey;
+  }
+  if (params.zoneKey) {
+    const zone = String(params.zoneKey);
+    if (['hot', 'cold', 'firm', 'weak', 'neutral', 'unknown'].includes(zone)) {
+      params.zone = t(`shared.market.insights.stockFocus.rsiZone.${zone}`);
+    } else if (
+      item.key === 'shared.market.insights.evidence.stockPresentRange' ||
+      item.key === 'shared.market.insights.evidence.rangePosition'
+    ) {
+      params.zone = t(`shared.market.insights.evidence.rangeZone.${zone}`);
+    }
+    delete params.zoneKey;
+  }
+  if (params.positionKey) {
+    if (item.key === 'shared.market.insights.evidence.stockPresentSma20Detail') {
+      params.positionDetail = t(
+        `shared.market.insights.stockFocus.smaPositionDetail.${params.positionKey === 'above' ? 'above20' : 'below20'}`,
+      );
+    } else if (item.key === 'shared.market.insights.evidence.stockPresentSma200Detail') {
+      params.positionDetail = t(
+        `shared.market.insights.stockFocus.smaPositionDetail.${params.positionKey === 'above' ? 'above200' : 'below200'}`,
+      );
+    } else if (item.key === 'shared.market.insights.evidence.stockStorySma20') {
+      params.position = t(`shared.market.insights.evidence.smaPosition.${params.positionKey}`);
+    } else if (
+      item.key === 'shared.market.insights.evidence.sma20' ||
+      item.key === 'shared.market.insights.evidence.sma200'
+    ) {
+      params.position = t(`shared.market.insights.evidence.smaPosition.${params.positionKey}`);
+    }
+    delete params.positionKey;
+  }
+  if (item.key === 'shared.market.insights.evidence.stockNewsNoteDivergence' && params.divergence) {
+    params.divergence = t(`shared.market.narrativeDivergence.${params.divergence}`, {
+      defaultValue: String(params.divergence),
+    });
+  }
+
   if (item.key === 'shared.market.insights.evidence.stockPresentSma') {
     if (params.sma20Key) {
       params.sma20 = t(`shared.market.insights.evidence.smaSide.${params.sma20Key}`);
@@ -408,6 +484,17 @@ function translateEvidenceItem(item: EvidenceItem, fallback: string, t: TFunctio
   if (item.key === 'shared.market.insights.evidence.stockOutlookTag' && params.tagKey) {
     params.tag = translateTag(String(params.tagKey) as RecommendationTag, t);
     delete params.tagKey;
+  }
+  if (item.key === 'shared.market.insights.evidence.stockOutlookFactor' && params.detailKey) {
+    const detailParams = { ...params };
+    delete detailParams.detailKey;
+    delete detailParams.factor;
+    delete detailParams.delta;
+    params.detail = t(String(params.detailKey), {
+      ...detailParams,
+      defaultValue: String(params.detailKey),
+    });
+    delete params.detailKey;
   }
 
   return t(item.key, { ...params, defaultValue: fallback });

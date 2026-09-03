@@ -31,9 +31,13 @@ import { buildMarketMoveReasonInsights } from './market-move-reason';
 
 export type AnalysisCategory =
   | 'moveReason'
+  | 'stockStory'
   | 'stockPast'
   | 'stockPresent'
+  | 'stockMarket'
   | 'stockOutlook'
+  | 'stockNewsNote'
+  | 'stockAction'
   | 'breadth'
   | 'index'
   | 'technical'
@@ -154,9 +158,13 @@ export interface MarketAnalysisReport extends MarketInsightsResult {
 
 const CATEGORY_LABEL: Record<AnalysisCategory, string> = {
   moveReason: '전일 움직임',
-  stockPast: '과거·최근',
-  stockPresent: '현재 가격',
-  stockOutlook: '전망·관찰',
+  stockStory: '한 줄 요약',
+  stockPast: '최근 흐름',
+  stockPresent: '지금 이 가격',
+  stockMarket: '시장과의 관계',
+  stockOutlook: '앞으로 볼 곳',
+  stockNewsNote: '뉴스 참고 (후행)',
+  stockAction: '참고 의견',
   breadth: '시장 폭',
   index: '지수·차트',
   technical: '기술적 지표',

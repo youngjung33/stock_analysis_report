@@ -621,13 +621,17 @@
     "moveReasonTitle": "Previous session: why up or down?",
     "moveReasonDesc": "Cross-check of index, leaders, sectors, macro, and news (48h) vs the prior session close.",
     "stockFocusTitle": "Stock focus — why this price?",
-    "stockFocusDesc": "Pick a symbol to see recent history, current drivers, and observation points ahead.",
-    "stockFocusLoading": "Analyzing chart, news, events… (up to 25s)",
+    "stockFocusDesc": "We start with chart, index, and sector — then explain in plain language why the price is where it is.",
+    "stockFocusPriceFirst": "Principle: price and chart first. News usually follows. Headlines appear only when they diverge from price.",
+    "stockFocusLoading": "Analyzing chart, market, and events… (up to 25s)",
     "stockFocusToday": "Today {{percent}}",
     "stockFocus1w": "1W {{percent}}",
+    "stockFocus1mo": "1M {{percent}}",
     "stockFocusChartLink": "Chart detail",
-    "stockFocusScoreTitle": "Engine score breakdown",
-    "stockFocusDisclaimer": "Past/present notes and ‘outlook’ are rule-based observation points — not price forecasts or investment advice.",
+    "stockFocusScoreTitle": "Chart & market signals (news excluded)",
+    "stockFocusScoreDesc": "Recommendation engine factors — price, chart, events, regime only.",
+    "stockFocusActionBadge": "Reference only — not advice or a trade order",
+    "stockFocusDisclaimer": "Plain-language notes and ‘reference opinion’ are chart/rule-based observations — not investment advice or trade orders. Price levels are for reference only.",
     "expandAnalysis": "Why this view · rationale ▼",
     "collapseAnalysis": "Collapse analysis ▲",
     "latestHeadlines": "Latest headlines",
@@ -1196,9 +1200,13 @@
     "market": {
       "categories": {
         "moveReason": "Prior session move",
-        "stockPast": "Past & recent",
-        "stockPresent": "Current price",
-        "stockOutlook": "Outlook & watch",
+        "stockStory": "At a glance",
+        "stockPast": "Recent move",
+        "stockPresent": "Why this price",
+        "stockMarket": "Market link",
+        "stockOutlook": "What to watch",
+        "stockNewsNote": "News note (lagging)",
+        "stockAction": "Reference opinion",
         "breadth": "Market breadth",
         "index": "Index & charts",
         "technical": "Technical indicators",
@@ -1377,21 +1385,81 @@
           }
         },
         "stockFocus": {
+          "plainTrend": {
+            "up": "uptrend",
+            "down": "downtrend",
+            "pullback": "pulling back",
+            "mixed": "unclear"
+          },
+          "vsIndex": {
+            "muchStronger": "much stronger than the index",
+            "stronger": "a bit stronger than the index",
+            "inline": "in line with the index",
+            "weaker": "a bit weaker than the index",
+            "muchWeaker": "much weaker than the index",
+            "unknown": "insufficient comparison data"
+          },
+          "rs": {
+            "strong": "far ahead of the market",
+            "slightlyStrong": "slightly ahead of the market",
+            "inline": "in line with the market",
+            "slightlyWeak": "slightly behind the market",
+            "weak": "well behind the market",
+            "unknown": "—"
+          },
+          "rsiZone": {
+            "hot": "may need to cool off after a sharp run",
+            "cold": "may be oversold — bounce zone to watch",
+            "firm": "buyers have an edge",
+            "weak": "selling pressure",
+            "neutral": "neutral",
+            "unknown": "—"
+          },
+          "smaPositionDetail": {
+            "above20": "above 20-day average (short-term buyers in control)",
+            "below20": "below 20-day average (short-term pressure)",
+            "above200": "above 200-day line (long-term uptrend)",
+            "below200": "below 200-day line (long-term downtrend)"
+          },
+          "story": {
+            "title": "{{name}} — plain summary",
+            "summary": "Today {{change1d}} · 1W {{change1w}} · {{vsIndex}} vs {{indexName}} · chart {{trend}}",
+            "reasoning": "Prices usually move **before** headlines catch up. We start with **today/recent price**, **chart trend**, and **index/sector gap**. News below appears only when tone and price **disagree**."
+          },
           "past": {
-            "title": "{{name}} — recent flow",
-            "summary": "1D {{change1d}} · 1W {{change1w}} · {{event}}",
-            "reasoning": "1D/1W/1M returns, relative strength vs the benchmark, and earnings/news events help explain why the stock trades here recently. Sharp moves may already reflect known catalysts."
+            "title": "{{name}} — how it moved recently",
+            "summary": "Today {{change1d}} · 1W {{change1w}} · {{vsIndex}} vs index",
+            "reasoning": "Recent flow uses **actual traded prices** only. 1D/1W/1M returns and KOSPI/S&P comparison tell you if the stock moved on its own or with the market. Check earnings/dividend **dates** before headlines."
           },
           "present": {
-            "title": "{{name}} — price now ({{price}})",
-            "summary": "Today {{change}} · {{trend}}",
-            "reasoning": "The current price blends today’s flow, chart trend, and market regime (risk-on/off, FX, etc.). News–price divergence may mean the narrative is being digested or read the other way."
+            "title": "{{name}} — why {{price}} now",
+            "summary": "20/200-day averages and RSI show where price sits on the chart · {{trend}}",
+            "reasoning": "**Moving averages** are widely watched reference lines. Above 20/200-day lines suggests stronger buying; RSI above 70 is overheated, below 30 oversold — **context**, not buy/sell signals."
+          },
+          "market": {
+            "title": "{{name}} — moving with the market?",
+            "summary": "{{indexName}} · sector · FX · market mood",
+            "reasoning": "Stocks rarely move alone. When the index rises, most names follow; sector strength (e.g. semis, banks) lifts individual names. For Korea, **FX** affects foreigners and exporters."
           },
           "outlook": {
-            "title": "{{name}} — what to watch next",
-            "summary": "{{tag}} lens · key factor {{factor}}",
-            "summaryEmpty": "Not enough data for a structured scenario.",
-            "reasoning": "Factors below combine chart, news, events, and regime from the recommendation engine. This is **not** a price forecast or investment advice. Cross-check earnings dates, support/resistance, volume, and index linkage."
+            "title": "{{name}} — chart & calendar checklist",
+            "summary": "Price, trend, earnings dates — headlines for reference only",
+            "reasoning": "“Ahead” is a **watchlist**, not a forecast. Watch 20/200-day support, volume, earnings dates, and relative strength. **News often attaches reasons after the move** — excluded from scoring here."
+          },
+          "newsNote": {
+            "title": "News note — only when price diverges",
+            "summary": "Headline tone {{toneLabel}} · price {{change}} · divergence {{divergence}}",
+            "reasoning": "**News usually lags price.** Use as after-the-fact context, not a trade trigger."
+          },
+          "action": {
+            "title": "{{name}} — chart-based reference opinion",
+            "reasoning": "Based on chart, trend, and stretch only. Not investment advice or a trade order. Use your own judgment, risk tolerance, and portfolio weight.",
+            "summary": {
+              "avoid": "Do not buy now — extended or chase risk. Revisit if price falls to {{buyBelow}} or below. If holding, consider trimming above {{sellAbove}}.",
+              "watch": "Wait and watch — no rush. If it dips to {{buyBelow}} or below, consider staged buys. Above {{sellAbove}}, partial profit-taking reference.",
+              "dip_buy": "Interest on dips — {{buyBelow}} or below is the first watch zone. Above {{sellAbove}}, consider trimming or taking partial profits.",
+              "take_profit": "Consider taking some profit after the run. Above {{sellAbove}}, trim reference. To add again, wait for a pullback toward {{buyBelow}} or below."
+            }
           }
         },
         "recommendation": {
@@ -1497,18 +1565,40 @@
           "moveReasonYieldUp": "10Y yield {{change}} ({{value}}%) — valuation/financials pressure",
           "moveReasonNewsTone": "News last 48h {{count}} · bullish {{bull}} · bearish {{bear}}",
           "moveReasonNewsHeadline": "「{{headline}}」 ({{source}})",
-          "stockPast1d": "1D {{change}}",
-          "stockPast1w": "1W {{change}}",
-          "stockPast1mo": "1M {{change}}",
-          "stockPastRs": "1W RS vs benchmark {{rs}}",
+          "stockPast1d": "Today (vs prior close) {{change}}",
+          "stockPast1w": "Last week (5 sessions) {{change}}",
+          "stockPast1mo": "Last month (21 sessions) {{change}}",
+          "stockPastRs": "1W relative strength {{rs}} · {{rsLabel}}",
+          "stockPastVsIndex": "{{indexName}} {{indexChange}} — stock is {{vsIndex}}",
           "stockPastEvent": "{{kind}} ({{day}})",
-          "stockPastNews": "News tone {{tone}} · {{count}} articles · 「{{headline}}」",
+          "stockStoryMove": "Today {{change1d}} · 1W {{change1w}}",
+          "stockStoryVsIndex": "{{indexName}} {{indexChange}} — stock is {{vsIndex}}",
+          "stockStorySma20": "20-day line {{sma20}} · close is {{position}}",
+          "stockStoryRsi": "RSI {{rsi}} — {{zone}}",
           "stockPresentPrice": "Price {{price}} {{currency}} · today {{change}}",
+          "stockPresentTrend": "Chart trend: {{trend}}",
+          "stockPresentSma20Detail": "20-day {{sma20}} — {{positionDetail}}",
+          "stockPresentSma200Detail": "200-day {{sma200}} — {{positionDetail}}",
+          "stockPresentRsiPlain": "RSI(14) {{rsi}} — {{zone}}",
+          "stockPresentRange": "Range position {{pct}}% {{zone}}",
+          "stockMarketIndex": "{{indexName}} today {{change}}",
+          "stockMarketSectors": "Leading sectors: {{sectors}}",
+          "stockMarketSectorAlign": "Sector {{sector}} {{change}} · 1W RS {{rs}}",
+          "stockMarketFx": "USD/KRW {{change}} (export/semis link)",
+          "stockOutlookEarnings": "Earnings ahead ({{day}}) — volatility watch",
+          "stockNewsNoteHeadline": "「{{headline}}」 ({{count}} articles)",
+          "stockNewsNoteDivergence": "Divergence: {{divergence}}",
+          "stockActionCurrent": "Current price {{price}} {{currency}}",
+          "stockActionBuyBelow": "{{price}} {{currency}} or below — staged buy watch zone",
+          "stockActionSellAbove": "{{price}} {{currency}} or above — partial profit / trim reference",
+          "stockActionSma20": "20-day line {{sma20}} · RSI {{rsi}}",
           "stockPresentSma": "SMA20 {{sma20}} · SMA200 {{sma200}}",
-          "stockPresentRegime": "Market regime: {{regimes}}",
+          "stockPresentRegime": "Market mood: {{regimes}}",
           "stockPresentDivergence": "News–price divergence: {{divergence}}",
+          "stockPastNews": "News tone {{tone}} · {{count}} articles · 「{{headline}}」",
           "stockOutlookTag": "Engine tag {{tag}} (score {{score}})",
-          "stockOutlookEmpty": "Insufficient data for scoring",
+          "stockOutlookEmpty": "Limited chart/market data — check 20/200-day lines and volume",
+          "stockOutlookFactor": "{{factor}} · {{detail}} ({{delta}})",
           "eventKind": {
             "earnings_beat": "Earnings beat",
             "earnings_miss": "Earnings miss",

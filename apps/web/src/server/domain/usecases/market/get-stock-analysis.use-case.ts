@@ -61,6 +61,8 @@ export class GetStockAnalysisUseCase {
     const report = buildStockPriceExplanationReport({
       quote,
       chartCloses,
+      chartHighs: chartCloses,
+      chartLows: chartCloses,
       technical: pickStockEnrichment(technicalSnapshots, input.symbol, input.market),
       news: pickStockEnrichment(newsSnapshots, input.symbol, input.market),
       event: pickStockEnrichment(eventSnapshots, input.symbol, input.market),

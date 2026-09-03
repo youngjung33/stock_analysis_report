@@ -418,8 +418,9 @@ export { buildMarketMoveReasonInsights } from './market-move-reason';
 export {
   buildStockPriceExplanationReport,
   pickStockEnrichment,
+  filterPriceFirstBreakdown,
 } from './stock-price-explanation';
-export type { StockPriceExplanationReport } from './stock-price-explanation';
+export type { StockPriceExplanationReport, StockActionStance } from './stock-price-explanation';
 export type {
   AnalysisCategory,
   AnalysisInsight,
