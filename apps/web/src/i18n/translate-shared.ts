@@ -471,6 +471,11 @@ function translateEvidenceItem(item: EvidenceItem, fallback: string, t: TFunctio
     });
   }
 
+  if (item.key === 'shared.market.insights.evidence.stockActionRule' && params.ruleId) {
+    params.rule = t(`shared.market.insights.stockFocus.action.rules.${params.ruleId}`);
+    delete params.ruleId;
+  }
+
   if (item.key === 'shared.market.insights.evidence.stockPresentSma') {
     if (params.sma20Key) {
       params.sma20 = t(`shared.market.insights.evidence.smaSide.${params.sma20Key}`);

@@ -1453,12 +1453,22 @@
           },
           "action": {
             "title": "{{name}} — 차트 기준 참고 의견",
-            "reasoning": "아래는 차트·추세·과열 여부만으로 정리한 참고 의견입니다. 투자 권유·매매 지시가 아닙니다. 본인 판단·리스크·포트폴리오 비중을 함께 보세요.",
+            "reasoning": "고정 규칙表(최근 2개월·RSI·이동평균)으로 계산한 참고 의견입니다. 투자 권유·매매 지시가 아니며, 같은 차트면 항상 같은 결론입니다.",
+            "rules": {
+              "earnings_watch": "실적 발표 임박 — 변동성 구간, 관망",
+              "narrative_avoid": "뉴스·가격 괴리 — 추격 매수 자제",
+              "overextended_avoid": "RSI·최근 2개월 고점 대비 과열 — 추격 매수 자제",
+              "weak_below_200_watch": "200일선 아래·하락 추세 — 관망",
+              "dip_zone": "조정·과매도·20일선 눌림 — 분할 매수 관심",
+              "extended_take_profit": "최근 2개월 상단·RSI 양호 — 차익 참고",
+              "uptrend_dip_buy": "상승 추세·20일선 위 — 눌림 매수 관심",
+              "default_watch": "뚜렷한 신호 없음 — 관망(보수적 기본값)"
+            },
             "summary": {
-              "avoid": "지금은 사지 마세요 — 많이 올랐거나 추격 위험 구간. {{buyBelow}} 이하로 내려오면 그때 다시 보기. {{sellAbove}} 이상이면 보유분 일부 정리 참고.",
-              "watch": "관망 — 급하게 들어가지 말 것. {{buyBelow}} 이하로 눌리면 분할 매수 검토. {{sellAbove}} 이상이면 일부 차익 참고.",
-              "dip_buy": "눌릴 때 분할 매수 관심. {{buyBelow}} 이하가 1차 관심 구간. {{sellAbove}} 이상이면 일부 차익·비중 조절 참고.",
-              "take_profit": "올라온 만큼 차익도 고려. {{sellAbove}} 이상이면 일부 매도·비중 축소 참고. 다시 사려면 {{buyBelow}} 이하 조정 후."
+              "avoid": "지금 가격에 추격 매수는 자제 — 단기 과열·고점 근처. 가벼운 조정 {{buyBelow}} 이하에서 다시 보기. {{sellAbove}} 이상이면 보유분 일부 정리 참고.",
+              "watch": "관망 — 급하게 들어가지 말 것. {{buyBelow}} 이하로 가벼운 조정 시 분할 검토. {{sellAbove}} 이상이면 일부 차익 참고.",
+              "dip_buy": "눌림·조정 구간 — 분할 매수 관심. {{buyBelow}} 이하(20일선·근처 지지)가 1차 참고. {{sellAbove}} 이상이면 일부 차익·비중 조절 참고.",
+              "take_profit": "최근 많이 올라온 편 — 차익도 고려. {{sellAbove}} 이상이면 일부 매도·비중 축소 참고. 추가 매수는 {{buyBelow}} 이하 조정 후."
             }
           }
         },
@@ -1589,6 +1599,7 @@
           "stockNewsNoteHeadline": "「{{headline}}」 ({{count}}건)",
           "stockNewsNoteDivergence": "괴리 유형: {{divergence}}",
           "stockActionCurrent": "현재가 {{price}} {{currency}}",
+          "stockActionRule": "적용 규칙: {{rule}} · RSI {{rsi}} · 최근 2개월 위치 {{recentRangePct}}% · 추세 {{trend}}",
           "stockActionBuyBelow": "{{price}} {{currency}} 이하 — 분할·조건부 매수 관심 구간",
           "stockActionSellAbove": "{{price}} {{currency}} 이상 — 일부 차익·비중 축소 참고 구간",
           "stockActionSma20": "20일선 {{sma20}} · RSI {{rsi}}",

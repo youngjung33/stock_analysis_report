@@ -1453,12 +1453,22 @@
           },
           "action": {
             "title": "{{name}} — chart-based reference opinion",
-            "reasoning": "Based on chart, trend, and stretch only. Not investment advice or a trade order. Use your own judgment, risk tolerance, and portfolio weight.",
+            "reasoning": "Fixed rule table (recent 2 months, RSI, moving averages). Not investment advice; same chart always yields the same result.",
+            "rules": {
+              "earnings_watch": "Earnings ahead — volatility, wait",
+              "narrative_avoid": "News–price divergence — avoid chasing",
+              "overextended_avoid": "RSI + top of 2M range — avoid chasing",
+              "weak_below_200_watch": "Below 200-day line, downtrend — wait",
+              "dip_zone": "Pullback / oversold / 20-day test — staged buy interest",
+              "extended_take_profit": "Upper 2M range + RSI firm — trim reference",
+              "uptrend_dip_buy": "Uptrend above 20-day — buy dips",
+              "default_watch": "No clear signal — wait (conservative default)"
+            },
             "summary": {
-              "avoid": "Do not buy now — extended or chase risk. Revisit if price falls to {{buyBelow}} or below. If holding, consider trimming above {{sellAbove}}.",
-              "watch": "Wait and watch — no rush. If it dips to {{buyBelow}} or below, consider staged buys. Above {{sellAbove}}, partial profit-taking reference.",
-              "dip_buy": "Interest on dips — {{buyBelow}} or below is the first watch zone. Above {{sellAbove}}, consider trimming or taking partial profits.",
-              "take_profit": "Consider taking some profit after the run. Above {{sellAbove}}, trim reference. To add again, wait for a pullback toward {{buyBelow}} or below."
+              "avoid": "Avoid chasing at today’s price — short-term stretched. Revisit on a mild dip to {{buyBelow}} or below. If holding, trim reference above {{sellAbove}}.",
+              "watch": "Wait and watch — no rush. On a light dip to {{buyBelow}} or below, consider staged entries. Above {{sellAbove}}, partial profit reference.",
+              "dip_buy": "Pullback zone — staged buy interest. {{buyBelow}} or below (20-day line / nearby support) is the first reference. Above {{sellAbove}}, trim or take partial profits.",
+              "take_profit": "Recent run-up — consider taking some profit. Above {{sellAbove}}, trim reference. To add, wait for a pullback toward {{buyBelow}} or below."
             }
           }
         },
@@ -1589,6 +1599,7 @@
           "stockNewsNoteHeadline": "「{{headline}}」 ({{count}} articles)",
           "stockNewsNoteDivergence": "Divergence: {{divergence}}",
           "stockActionCurrent": "Current price {{price}} {{currency}}",
+          "stockActionRule": "Rule: {{rule}} · RSI {{rsi}} · 2M range position {{recentRangePct}}% · trend {{trend}}",
           "stockActionBuyBelow": "{{price}} {{currency}} or below — staged buy watch zone",
           "stockActionSellAbove": "{{price}} {{currency}} or above — partial profit / trim reference",
           "stockActionSma20": "20-day line {{sma20}} · RSI {{rsi}}",

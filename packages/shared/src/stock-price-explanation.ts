@@ -58,7 +58,11 @@ const CATEGORY_LABEL: Record<FocusCategory, string> = {
   stockAction: '참고 의견 (매매 아님)',
 };
 
-export type StockActionStance = 'avoid' | 'watch' | 'dip_buy' | 'take_profit';
+import {
+  computeStockActionPlan,
+  recentRangeBounds,
+  recentRangePosition,
+} from './stock-action-plan';
 
 interface ChartContext {
   sma20: number | null;
@@ -71,6 +75,8 @@ interface ChartContext {
   /** 최근 ~2개월(42거래일) 구간 — 참고 가격대용 */
   recentRangeLow: number | null;
   recentRangeHigh: number | null;
+  /** 최근 2개월 구간 내 현재 위치 (0~100) */
+  recentRangePct: number | null;
 }
 
 interface MarketLinkContext {
@@ -90,71 +96,9 @@ function formatNum(v: number): string {
   return v.toLocaleString(undefined, { maximumFractionDigits: 2 });
 }
 
-function priceStep(price: number, currency: string): number {
-  if (currency === 'KRW') {
-    if (price >= 500_000) return 5_000;
-    if (price >= 100_000) return 1_000;
-    if (price >= 10_000) return 100;
-    if (price >= 1_000) return 10;
-    return 1;
-  }
-  if (price >= 500) return 5;
-  if (price >= 100) return 1;
-  if (price >= 10) return 0.5;
-  return 0.01;
-}
-
-function roundPriceLevel(price: number, currency: string, direction: 'down' | 'up'): number {
-  const step = priceStep(price, currency);
-  return direction === 'down'
-    ? Math.floor(price / step) * step
-    : Math.ceil(price / step) * step;
-}
-
 function rangeBounds(highs: number[], lows: number[]): { low: number; high: number } | null {
   if (highs.length === 0 || lows.length === 0) return null;
   return { low: Math.min(...lows), high: Math.max(...highs) };
-}
-
-function recentRangeBounds(closes: number[], bars = 42): { low: number; high: number } | null {
-  const slice = closes.slice(-Math.min(bars, closes.length));
-  if (slice.length < 2) return null;
-  return { low: Math.min(...slice), high: Math.max(...slice) };
-}
-
-/** 참고 매수 구간 — 현재가 아래 지지선 우선 */
-function deriveActionSupport(price: number, chart: ChartContext): number {
-  const below: number[] = [];
-  if (chart.sma20 != null && chart.sma20 < price) below.push(chart.sma20);
-  if (chart.sma50 != null && chart.sma50 < price) below.push(chart.sma50);
-  if (chart.sma200 != null && chart.sma200 < price) below.push(chart.sma200);
-  if (chart.recentRangeLow != null && chart.recentRangeLow < price) below.push(chart.recentRangeLow);
-  if (below.length > 0) return Math.max(...below);
-  if (chart.recentRangeLow != null) return Math.min(chart.recentRangeLow, price * 0.97);
-  return price * 0.97;
-}
-
-/** 참고 매도 구간 — 현재가 근처 저항만 (6개월 전 고점 등 먼 과거는 제외) */
-function deriveActionResistance(price: number, chart: ChartContext): number {
-  const above: number[] = [];
-  if (chart.recentRangeHigh != null && chart.recentRangeHigh > price) {
-    above.push(chart.recentRangeHigh);
-  }
-  if (chart.sma20 != null && chart.sma20 > price) above.push(chart.sma20);
-  if (chart.sma50 != null && chart.sma50 > price) above.push(chart.sma50);
-  const near = above.filter((level) => level <= price * 1.2);
-  if (near.length > 0) return Math.min(...near);
-  return price * 1.08;
-}
-
-function clampBuyBelow(price: number, raw: number, currency: string): number {
-  const clamped = Math.min(Math.max(raw, price * 0.9), price * 0.997);
-  return roundPriceLevel(clamped, currency, 'down');
-}
-
-function clampSellAbove(price: number, raw: number, currency: string): number {
-  const clamped = Math.min(Math.max(raw, price * 1.03), price * 1.15);
-  return roundPriceLevel(clamped, currency, 'up');
 }
 
 function ev(key: string, params?: Record<string, string | number>): EvidenceItem {
@@ -188,6 +132,7 @@ function buildChartContext(closes: number[], highs: number[], lows: number[]): C
       rangeHigh: null,
       recentRangeLow: null,
       recentRangeHigh: null,
+      recentRangePct: null,
     };
   }
   const current = closes[closes.length - 1];
@@ -203,6 +148,7 @@ function buildChartContext(closes: number[], highs: number[], lows: number[]): C
     rangeHigh: bounds?.high ?? null,
     recentRangeLow: recent?.low ?? null,
     recentRangeHigh: recent?.high ?? null,
+    recentRangePct: recentRangePosition(current, closes),
   };
 }
 
@@ -713,78 +659,6 @@ function shouldShowNewsNote(divergence: NarrativeDivergenceKind): boolean {
   );
 }
 
-function buildActionPlan(input: {
-  quote: QuoteInsightInput & { currentPrice: number; changePercent: number };
-  chart: ChartContext;
-  technical: StockTechnicalSnapshot | null;
-  event: StockEventSnapshot | null;
-  tag: EnrichedStockRecommendation['tag'];
-  divergence: NarrativeDivergenceKind | null;
-}): { stance: StockActionStance; buyBelow: number | null; sellAbove: number | null } {
-  const { quote, chart, technical, event, tag, divergence } = input;
-  const price = quote.currentPrice;
-  const currency = quote.currency;
-  const trend = trendPlainKey(technical?.trendKey ?? 'mixed');
-  const rsi = chart.rsi14 ?? 50;
-  const rangePct = chart.rangePct ?? 50;
-
-  const support = deriveActionSupport(price, chart);
-  const resistance = deriveActionResistance(price, chart);
-
-  let stance: StockActionStance = 'watch';
-  let buyBelow: number | null = null;
-  let sellAbove: number | null = null;
-
-  if (event?.kind === 'earnings_upcoming') {
-    stance = 'watch';
-    buyBelow = support;
-    sellAbove = resistance;
-  } else if (
-    divergence === 'bullish_news_price_down' ||
-    divergence === 'crowded_bullish_chase' ||
-    rsi >= 72 ||
-    rangePct >= 82
-  ) {
-    stance = 'avoid';
-    buyBelow = Math.min(support, price * 0.95);
-    sellAbove = resistance;
-  } else if (chart.sma200 != null && price < chart.sma200 && (trend === 'down' || tag === 'defensive')) {
-    stance = 'watch';
-    buyBelow = chart.recentRangeLow ?? chart.sma200 * 0.97;
-    sellAbove = chart.sma20 != null && chart.sma20 > price ? chart.sma20 : resistance;
-  } else if (
-    trend === 'pullback' ||
-    tag === 'pullback' ||
-    (chart.sma200 != null && price > chart.sma200 && chart.sma20 != null && price < chart.sma20) ||
-    rsi <= 35
-  ) {
-    stance = 'dip_buy';
-    buyBelow = support;
-    sellAbove = resistance;
-  } else if (trend === 'up' && rangePct >= 68 && rsi >= 58) {
-    stance = 'take_profit';
-    buyBelow = support;
-    sellAbove = resistance;
-  } else if (trend === 'up' && chart.sma20 != null && price >= chart.sma20) {
-    stance = 'dip_buy';
-    buyBelow = chart.sma20 < price ? chart.sma20 : support;
-    sellAbove = resistance;
-  } else {
-    stance = 'watch';
-    buyBelow = support;
-    sellAbove = resistance;
-  }
-
-  if (buyBelow != null) {
-    buyBelow = clampBuyBelow(price, buyBelow, currency);
-  }
-  if (sellAbove != null) {
-    sellAbove = clampSellAbove(price, sellAbove, currency);
-  }
-
-  return { stance, buyBelow, sellAbove };
-}
-
 function buildActionInsight(input: {
   quote: QuoteInsightInput & { currentPrice: number; changePercent: number };
   chart: ChartContext;
@@ -794,12 +668,18 @@ function buildActionInsight(input: {
   divergence: NarrativeDivergenceKind | null;
 }): AnalysisInsight {
   const { quote, chart, technical, event, tag, divergence } = input;
-  const plan = buildActionPlan({ quote, chart, technical, event, tag, divergence });
+  const plan = computeStockActionPlan({
+    price: quote.currentPrice,
+    currency: quote.currency,
+    chart,
+    technical,
+    event,
+    tag,
+    divergence,
+  });
   const priceLabel = `${formatNum(quote.currentPrice)} ${quote.currency}`;
-  const buyLabel =
-    plan.buyBelow != null ? `${formatNum(plan.buyBelow)} ${quote.currency}` : '—';
-  const sellLabel =
-    plan.sellAbove != null ? `${formatNum(plan.sellAbove)} ${quote.currency}` : '—';
+  const buyLabel = `${formatNum(plan.buyBelow)} ${quote.currency}`;
+  const sellLabel = `${formatNum(plan.sellAbove)} ${quote.currency}`;
 
   const evidence: string[] = [`현재가 ${priceLabel}`];
   const evidenceItems: EvidenceItem[] = [
@@ -807,32 +687,36 @@ function buildActionInsight(input: {
       price: formatNum(quote.currentPrice),
       currency: quote.currency,
     }),
+    ev('shared.market.insights.evidence.stockActionRule', {
+      ruleId: plan.ruleId,
+      rsi: plan.rationale.rsi.toFixed(0),
+      recentRangePct: plan.rationale.recentRangePct.toFixed(0),
+      trend: plan.rationale.trend,
+    }),
   ];
 
-  if (plan.buyBelow != null) {
-    evidence.push(`${buyLabel} 이하 — 분할·조건부 매수 관심 구간`);
-    evidenceItems.push(
-      ev('shared.market.insights.evidence.stockActionBuyBelow', {
-        price: formatNum(plan.buyBelow),
-        currency: quote.currency,
-      }),
-    );
-  }
-  if (plan.sellAbove != null) {
-    evidence.push(`${sellLabel} 이상 — 일부 차익·비중 축소 참고 구간`);
-    evidenceItems.push(
-      ev('shared.market.insights.evidence.stockActionSellAbove', {
-        price: formatNum(plan.sellAbove),
-        currency: quote.currency,
-      }),
-    );
-  }
+  evidence.push(`${buyLabel} 이하 — 분할·조건부 매수 관심 구간`);
+  evidenceItems.push(
+    ev('shared.market.insights.evidence.stockActionBuyBelow', {
+      price: formatNum(plan.buyBelow),
+      currency: quote.currency,
+    }),
+  );
+
+  evidence.push(`${sellLabel} 이상 — 일부 차익·비중 축소 참고 구간`);
+  evidenceItems.push(
+    ev('shared.market.insights.evidence.stockActionSellAbove', {
+      price: formatNum(plan.sellAbove),
+      currency: quote.currency,
+    }),
+  );
+
   if (chart.sma20 != null) {
-    evidence.push(`20일선 ${formatNum(chart.sma20)} · RSI ${chart.rsi14?.toFixed(0) ?? '—'}`);
+    evidence.push(`20일선 ${formatNum(chart.sma20)} · RSI ${plan.rationale.rsi.toFixed(0)}`);
     evidenceItems.push(
       ev('shared.market.insights.evidence.stockActionSma20', {
         sma20: formatNum(chart.sma20),
-        rsi: chart.rsi14?.toFixed(0) ?? '—',
+        rsi: plan.rationale.rsi.toFixed(0),
       }),
     );
   }
@@ -850,7 +734,7 @@ function buildActionInsight(input: {
     title: `${quote.name} — 차트 기준 참고 의견`,
     summary: `현재 ${priceLabel}`,
     reasoning:
-      '아래는 **차트·추세·과열 여부**만으로 정리한 참고 의견입니다. **투자 권유·매매 지시가 아니며**, 본인 판단과 리스크 감수 범위 안에서만 참고하세요. 실적·뉴스·포트폴리오 비중은 따로 보셔야 합니다.',
+      '아래는 **고정 규칙表**(최근 2개월·RSI·이동평균)으로 계산한 참고 의견입니다. **투자 권유·매매 지시가 아니며**, 같은 차트면 항상 같은 결론이 나옵니다. 본인 판단과 리스크 감수 범위 안에서만 참고하세요.',
     titleKey: 'shared.market.insights.stockFocus.action.title',
     titleParams: { name: quote.name },
     summaryKey: `shared.market.insights.stockFocus.action.summary.${plan.stance}`,

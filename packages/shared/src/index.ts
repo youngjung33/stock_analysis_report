@@ -420,7 +420,18 @@ export {
   pickStockEnrichment,
   filterPriceFirstBreakdown,
 } from './stock-price-explanation';
-export type { StockPriceExplanationReport, StockActionStance } from './stock-price-explanation';
+export type { StockPriceExplanationReport } from './stock-price-explanation';
+export {
+  computeStockActionPlan,
+  deriveConservativeBuyBelow,
+  deriveConservativeSellAbove,
+  STOCK_ACTION_RULES,
+} from './stock-action-plan';
+export type {
+  StockActionStance,
+  StockActionPlan,
+  StockActionRuleId,
+} from './stock-action-plan';
 export type {
   AnalysisCategory,
   AnalysisInsight,

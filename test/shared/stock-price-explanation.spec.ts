@@ -3,6 +3,7 @@ import {
   Market,
   buildStockPriceExplanationReport,
   filterPriceFirstBreakdown,
+  STOCK_ACTION_RULES,
 } from '@sar/shared';
 
 const closes = Array.from({ length: 60 }, (_, i) => 100 + i * 0.5);
@@ -154,10 +155,58 @@ describe('buildStockPriceExplanationReport', () => {
     const sellEv = action!.evidenceItems!.find((e) =>
       e.key.includes('stockActionSellAbove'),
     );
+    const buyEv = action!.evidenceItems!.find((e) =>
+      e.key.includes('stockActionBuyBelow'),
+    );
     const sellPrice = Number(String(sellEv!.params!.price).replace(/,/g, ''));
-    expect(sellPrice).toBeLessThanOrEqual(1_596_000 * 1.16);
-    expect(sellPrice).toBeGreaterThan(1_596_000 * 1.02);
-    expect(sellPrice).toBeLessThan(2_500_000);
+    const buyPrice = Number(String(buyEv!.params!.price).replace(/,/g, ''));
+    expect(sellPrice).toBeLessThanOrEqual(1_596_000 * 1.11);
+    expect(sellPrice).toBeGreaterThan(1_596_000 * 1.03);
+    expect(buyPrice).toBeGreaterThanOrEqual(1_596_000 * (1 - STOCK_ACTION_RULES.buyDipMaxPct));
+    expect(buyPrice).toBeLessThan(1_596_000);
+    expect(action!.summaryKey).not.toContain('avoid');
+  });
+
+  it('uses near-term buy zone (not distant 6mo low) when price is below sma20', () => {
+    const closes = Array.from({ length: 90 }, (_, i) => {
+      if (i < 30) return 2_800_000 - i * 20_000;
+      return 1_520_000 + (i - 30) * 1_500;
+    });
+    closes[closes.length - 1] = 1_650_000;
+
+    const report = baseReport({
+      quote: {
+        symbol: '000660',
+        name: 'SK하이닉스',
+        market: Market.KR,
+        currency: 'KRW',
+        currentPrice: 1_650_000,
+        changePercent: 0.5,
+      },
+      chartCloses: closes,
+      technical: {
+        symbol: '000660',
+        market: Market.KR,
+        trendKey: 'shared.market.trends.shortTermPullback',
+        rsi14: 45,
+        rsVsBenchmark1w: 0.2,
+        aboveSma20: false,
+        aboveSma200: true,
+      },
+      news: null,
+      krQuotes: [],
+    });
+
+    const action = report!.insights.find((i) => i.category === 'stockAction')!;
+    const buyEv = action.evidenceItems!.find((e) => e.key.includes('stockActionBuyBelow'))!;
+    const buyPrice = Number(String(buyEv.params!.price).replace(/,/g, ''));
+
+    expect(['dip_buy', 'watch']).toContain(
+      action.summaryKey!.replace('shared.market.insights.stockFocus.action.summary.', ''),
+    );
+    expect(buyPrice).toBeGreaterThan(1_500_000);
+    expect(buyPrice).toBeGreaterThanOrEqual(1_650_000 * (1 - STOCK_ACTION_RULES.buyDipMaxPct));
+    expect(buyPrice).toBeLessThan(1_650_000);
   });
 });
 
