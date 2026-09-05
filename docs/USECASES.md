@@ -12,6 +12,19 @@ app/ + presentation/  →  server/domain  ←  server/data
 client/domain  ←  client/data  (axios → /api)
 ```
 
+### Client / Server use case 명명
+
+동일 API를 **클라이언트(thin wrapper)** 와 **서버(실제 로직)** 에서 각각 구현할 때 이름을 구분한다.
+
+| 접두 | 계층 | 역할 | 예 |
+|------|------|------|-----|
+| `Fetch*` | client | repository → HTTP API 위임 | `FetchStockAnalysisUseCase` |
+| `Get*` | client | 단순 조회 위임 | `GetFeaturedQuotesUseCase` |
+| `Build*` | server | enrichment·리포트 **조립** | `BuildStockAnalysisReportUseCase` |
+| `Get*` | server | 데이터 조회·캐시 | `GetStockQuoteUseCase` |
+
+> 종목 집중 분석: client `FetchStockAnalysisUseCase` ↔ server `BuildStockAnalysisReportUseCase` ↔ route `GET /api/market/stock-analysis`
+
 | 계층 | 서버 | 클라이언트 |
 |------|------|------------|
 | **Presentation** | `app/api/**/route.ts` | `app/**/page.tsx`, `presentation/**` |
@@ -78,7 +91,8 @@ test/
 ```
 
 ```bash
-npm run test         # Vitest — see README for current count
+npm run test         # @sar/shared Vitest → @sar/web Vitest
+npm run test -w @sar/shared   # shared only (test/shared/)
 npm run test:e2e     # Playwright (dev server + E2E_USERNAME/PASSWORD for member login)
 ```
 
@@ -151,6 +165,7 @@ npm run test:e2e     # Playwright (dev server + E2E_USERNAME/PASSWORD for member
 | `SearchStocksUseCase` | GET `/api/market/search` | `search-stocks.use-case.spec.ts` |
 | `GetFxRateUseCase` | GET `/api/market/fx` | client `market.use-cases.spec.ts` |
 | `GetMarketAnalysisUseCase` | GET `/api/market/analysis` | `get-market-analysis.use-case.spec.ts` |
+| `BuildStockAnalysisReportUseCase` | GET `/api/market/stock-analysis` | `build-stock-analysis-report.use-case.spec.ts`, `stock-analysis-route.spec.ts` |
 | `RunGlobalRecommendationBatchUseCase` | POST `/api/cron/recommendation-batch` | `global-baseline-recommendations.spec.ts`, cron route |
 | `EvaluateRecommendationOutcomesUseCase` | POST `/api/cron/recommendation-outcomes` | cron route + ledger repository |
 | `ListRecommendationHistoryUseCase` | GET `/api/market/recommendation-history` | `recommendation-ledger.spec.ts`, `recommendation-backtest.spec.ts` |
@@ -174,7 +189,7 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | **Investor profile** | `presentation/hooks/useInvestorProfile.ts`, `client/domain/services/` | shared + hydrate + pending specs |
 | Watchlist | `client/domain/usecases/watchlist/` | `watchlist.use-cases.spec.ts` |
 | Corporate actions | `client/domain/usecases/corporate-actions/` | `corporate-actions.use-cases.spec.ts` |
-| Market | `client/domain/usecases/market/` (+ `GetRecommendationHistoryUseCase`) | `market.use-cases.spec.ts`, `recommendation-backtest.spec.ts` |
+| Market | `client/domain/usecases/market/` (+ `GetRecommendationHistoryUseCase`, `FetchStockAnalysisUseCase`) | `market.use-cases.spec.ts`, `recommendation-backtest.spec.ts` |
 | Guest adapters | `client/data/guest/` | `guest-repositories.spec.ts` |
 
 ---
@@ -200,7 +215,7 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 
 투자 프로필 상세: [investor-profile.md](investor-profile.md)
 
-테스트: `test/shared/`
+테스트: `npm run test -w @sar/shared` (`test/shared/`, `stock-action-plan`, `stock-price-explanation`, …)
 
 ---
 
@@ -212,6 +227,7 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | Portfolio/transactions/watchlist | `portfolio-api-routes.spec.ts` | CRUD smoke |
 | Cash/preferences/simulation | `cash-routes.spec.ts` | capital API |
 | Market rate limit | `market-routes.spec.ts` | 429 |
+| Stock analysis | `stock-analysis-route.spec.ts` | params, auth personalization |
 | Auth rate limit | `auth-routes.spec.ts` | login, check-username |
 | Verify email | `verify-email-route.spec.ts` | 링크 인증 redirect |
 | Route error | `route-error.spec.ts` | DB 에러 마스킹 |

@@ -34,8 +34,8 @@ export async function GET(req: NextRequest) {
       userWatchlist = watchlist.map((w) => ({ symbol: w.symbol, market: w.market }));
     }
 
-    const { getStockAnalysisUseCase } = getServerServices();
-    const result = await getStockAnalysisUseCase.execute({
+    const { buildStockAnalysisReportUseCase } = getServerServices();
+    const result = await buildStockAnalysisReportUseCase.execute({
       symbol,
       name,
       market,

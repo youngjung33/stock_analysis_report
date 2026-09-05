@@ -9,7 +9,7 @@
     "dev": "npm run dev -w @sar/web",
     "build": "npm run build -w @sar/shared && npm run build -w @sar/web",
     "start": "npm run start -w @sar/web",
-    "test": "npm run test -w @sar/web",
+    "test": "npm run test -w @sar/shared && npm run test -w @sar/web",
     "test:e2e": "npm run test:e2e -w @sar/web",
     "test:e2e:production": "npm run build && npm run test:e2e:production -w @sar/web",
     "lint": "npm run lint -w @sar/web",

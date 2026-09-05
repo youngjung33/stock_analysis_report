@@ -8,7 +8,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['../../test/**/*.spec.ts', '../../test/**/*.spec.tsx'],
-    exclude: ['../../test/e2e/**'],
+    exclude: ['../../test/e2e/**', '../../test/shared/**'],
     globals: true,
     env: {
       JWT_ACCESS_SECRET: 'vitest-jwt-access-secret-32-chars-min',

@@ -1,6 +1,8 @@
 import { Market, QuoteChartRange } from '@sar/shared';
 import { IMarketRepository } from '../../repositories';
 
+/** 클라이언트 market use case — API repository 위임 (서버 Build* / Get* 와 이름 분리) */
+
 /** 대표 종목 시세 조회 use case */
 export class GetFeaturedQuotesUseCase {
   constructor(private readonly marketRepo: IMarketRepository) {}
@@ -73,8 +75,8 @@ export class GetFxRateUseCase {
   }
 }
 
-/** 단일 종목 가격 해설 (과거·현재·관찰) use case */
-export class GetStockAnalysisUseCase {
+/** GET /api/market/stock-analysis — 종목 가격 해설 리포트 */
+export class FetchStockAnalysisUseCase {
   constructor(private readonly marketRepo: IMarketRepository) {}
 
   execute(input: {

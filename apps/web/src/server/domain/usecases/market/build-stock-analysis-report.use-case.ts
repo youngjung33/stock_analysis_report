@@ -1,11 +1,17 @@
-import { Market, QuoteChartRange, resolveCurrency, buildStockPriceExplanationReport, pickStockEnrichment } from '@sar/shared';
+import {
+  Market,
+  QuoteChartRange,
+  resolveCurrency,
+  buildStockPriceExplanationReport,
+  pickStockEnrichment,
+} from '@sar/shared';
 import { GetFeaturedQuotesUseCase } from './get-featured-quotes.use-case';
 import { BuildMarketContextUseCase } from './build-market-context.use-case';
 import { BuildStockEnrichmentUseCase } from './build-stock-enrichment.use-case';
 import { GetStockQuoteUseCase } from './get-stock-quote.use-case';
 
-/** 단일 종목 가격 해설 (과거·현재·관찰 전망) */
-export class GetStockAnalysisUseCase {
+/** 서버: 차트·enrichment 수집 후 종목 가격 해설 리포트 조립 */
+export class BuildStockAnalysisReportUseCase {
   constructor(
     private readonly getFeaturedQuotesUseCase: GetFeaturedQuotesUseCase,
     private readonly buildMarketContextUseCase: BuildMarketContextUseCase,

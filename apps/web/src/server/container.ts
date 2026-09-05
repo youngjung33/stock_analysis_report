@@ -1,6 +1,6 @@
 import { GetFeaturedQuotesUseCase } from './domain/usecases/market/get-featured-quotes.use-case';
 import { GetFxRateUseCase } from './domain/usecases/market/get-fx-rate.use-case';
-import { GetStockAnalysisUseCase } from './domain/usecases/market/get-stock-analysis.use-case';
+import { BuildStockAnalysisReportUseCase } from './domain/usecases/market/build-stock-analysis-report.use-case';
 import { GetMarketAnalysisUseCase } from './domain/usecases/market/get-market-analysis.use-case';
 import { BuildMarketContextUseCase } from './domain/usecases/market/build-market-context.use-case';
 import { FetchRecommendationQuotesUseCase } from './domain/usecases/market/fetch-recommendation-quotes.use-case';
@@ -114,7 +114,7 @@ export interface ServerServices {
   getStockQuoteUseCase: GetStockQuoteUseCase;
   getMarketStatusUseCase: GetMarketStatusUseCase;
   getMarketAnalysisUseCase: GetMarketAnalysisUseCase;
-  getStockAnalysisUseCase: GetStockAnalysisUseCase;
+  buildStockAnalysisReportUseCase: BuildStockAnalysisReportUseCase;
   buildMarketContextUseCase: BuildMarketContextUseCase;
   fetchRecommendationQuotesUseCase: FetchRecommendationQuotesUseCase;
   fetchRecommendationTechnicalUseCase: FetchRecommendationTechnicalSnapshotsUseCase;
@@ -248,7 +248,7 @@ export function getServerServices(): ServerServices {
       buildStockEnrichmentUseCase,
       marketData,
     ),
-    getStockAnalysisUseCase: new GetStockAnalysisUseCase(
+    buildStockAnalysisReportUseCase: new BuildStockAnalysisReportUseCase(
       getFeaturedQuotesUseCase,
       buildMarketContextUseCase,
       buildStockEnrichmentUseCase,

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { Market } from '@sar/shared';
-import { GetFeaturedQuotesUseCase, GetRecommendationHistoryUseCase, SearchStocksUseCase } from '@/client/domain/usecases/market/market.use-cases';
+import { GetFeaturedQuotesUseCase, GetRecommendationHistoryUseCase, SearchStocksUseCase, FetchStockAnalysisUseCase } from '@/client/domain/usecases/market/market.use-cases';
 
 describe('client market use cases', () => {
   it('GetFeaturedQuotesUseCase delegates to repository', async () => {
@@ -28,5 +28,24 @@ describe('client market use cases', () => {
     const useCase = new GetRecommendationHistoryUseCase(marketRepo as never);
     await useCase.execute(15);
     expect(marketRepo.getRecommendationHistory).toHaveBeenCalledWith(15);
+  });
+
+  it('FetchStockAnalysisUseCase delegates to repository', async () => {
+    const marketRepo = {
+      getStockAnalysis: vi.fn().mockResolvedValue({ symbol: '000660' }),
+    };
+    const useCase = new FetchStockAnalysisUseCase(marketRepo as never);
+    await useCase.execute({
+      symbol: '000660',
+      name: 'SK하이닉스',
+      market: Market.KR,
+      yahooSymbol: '000660.KS',
+    });
+    expect(marketRepo.getStockAnalysis).toHaveBeenCalledWith({
+      symbol: '000660',
+      name: 'SK하이닉스',
+      market: Market.KR,
+      yahooSymbol: '000660.KS',
+    });
   });
 });

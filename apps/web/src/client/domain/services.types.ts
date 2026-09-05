@@ -31,7 +31,7 @@ import {
   GetMarketAnalysisUseCase,
   GetMarketStatusUseCase,
   GetRecommendationHistoryUseCase,
-  GetStockAnalysisUseCase,
+  FetchStockAnalysisUseCase,
   GetStockQuoteUseCase,
   SearchStocksUseCase,
 } from './usecases/market/market.use-cases';
@@ -71,7 +71,7 @@ export interface AppServices {
   getStockQuoteUseCase: GetStockQuoteUseCase;
   getMarketStatusUseCase: GetMarketStatusUseCase;
   getMarketAnalysisUseCase: GetMarketAnalysisUseCase;
-  getStockAnalysisUseCase: GetStockAnalysisUseCase;
+  fetchStockAnalysisUseCase: FetchStockAnalysisUseCase;
   getRecommendationHistoryUseCase: GetRecommendationHistoryUseCase;
   searchStocksUseCase: SearchStocksUseCase;
   getFxRateUseCase: GetFxRateUseCase;
