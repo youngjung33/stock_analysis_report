@@ -228,6 +228,8 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | Cash/preferences/simulation | `cash-routes.spec.ts` | capital API |
 | Market rate limit | `market-routes.spec.ts` | 429 |
 | Stock analysis | `stock-analysis-route.spec.ts` | params, auth personalization |
+| Recommendation history | `recommendation-routes.spec.ts` | list limit, batch detail, 404 |
+| Cron jobs | `cron-routes.spec.ts` | CRON_SECRET gate, batch/outcomes |
 | Auth rate limit | `auth-routes.spec.ts` | login, check-username |
 | Verify email | `verify-email-route.spec.ts` | 링크 인증 redirect |
 | Route error | `route-error.spec.ts` | DB 에러 마스킹 |
@@ -243,6 +245,7 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | 비회원 대시보드·거래·my-info·세금 | 동일 |
 | 미인증 → `/login` redirect (middleware) | 동일 |
 | 회원 로그인 | 동일 (`E2E_USERNAME` / `E2E_PASSWORD` env) |
+| 종목 집중 분석·차트 상세 | `test/e2e/stock-focus.spec.ts` |
 
 ---
 
