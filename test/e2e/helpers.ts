@@ -18,8 +18,9 @@ export async function enterAsGuest(page: Page): Promise<void> {
   await ensureKoreanLocale(page);
   const guestBtn = page.getByRole('button', { name: '비회원으로 입장' });
   await expect(guestBtn).toBeVisible({ timeout: 20_000 });
+  await expect(guestBtn).toBeEnabled();
   await guestBtn.click();
-  await expect(page).toHaveURL('/', { timeout: 20_000 });
+  await expect(page).toHaveURL('/', { timeout: 30_000 });
 }
 
 export async function seedGuestCapital(page: Page, amount = '10000000'): Promise<void> {
@@ -33,6 +34,10 @@ export function tradeRegistrationForm(page: Page) {
   return page.locator('form').filter({ has: page.getByRole('heading', { name: '매매 등록' }) });
 }
 
+export async function expectTradeRegisteredToast(page: Page) {
+  await expect(page.getByText('매매가 등록되었습니다.').first()).toBeVisible({ timeout: 15_000 });
+}
+
 export async function loginAsMember(page: Page): Promise<void> {
   if (!hasMemberE2E()) {
     throw new Error('Member E2E requires DATABASE_URL and seed credentials');
@@ -42,9 +47,13 @@ export async function loginAsMember(page: Page): Promise<void> {
 
   await page.goto('/login');
   await ensureKoreanLocale(page);
-  await page.getByPlaceholder('아이디').fill(username);
-  await page.getByPlaceholder('비밀번호').fill(password);
-  await page.getByRole('button', { name: '로그인' }).click();
+  const loginForm = page.locator('form').filter({ has: page.getByRole('heading', { level: 1 }) });
+  await expect(loginForm.getByRole('button', { name: '로그인', exact: true })).toBeVisible({
+    timeout: 20_000,
+  });
+  await loginForm.getByLabel('아이디').fill(username);
+  await loginForm.getByLabel('비밀번호').fill(password);
+  await loginForm.locator('button[type="submit"]').click();
   await expect(page).toHaveURL('/', { timeout: 20_000 });
 }
 

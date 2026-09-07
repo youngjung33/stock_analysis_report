@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   enterAsGuest,
+  expectTradeRegisteredToast,
   hasMemberE2E,
   loginAsMember,
   MEMBER_E2E_SKIP_REASON,
@@ -25,7 +26,7 @@ test.describe('guest transactions', () => {
     await form.getByLabel('수수료 (선택)').fill('1000');
     await form.getByRole('button', { name: '등록' }).click();
 
-    await expect(page.getByText('매매가 등록되었습니다.')).toBeVisible({ timeout: 15_000 });
+    await expectTradeRegisteredToast(page);
     await expect(page.locator('table tbody').getByText('005930')).toBeVisible();
     await expect(page.locator('table tbody').getByText('₩1,000')).toBeVisible();
   });
@@ -41,7 +42,7 @@ test.describe('guest transactions', () => {
     await form.locator('input[type="number"]').fill('5');
     await form.getByLabel('단가').fill('70000');
     await form.getByRole('button', { name: '등록' }).click();
-    await expect(page.getByText('매매가 등록되었습니다.')).toBeVisible({ timeout: 15_000 });
+    await expectTradeRegisteredToast(page);
 
     form = tradeRegistrationForm(page);
     await form.getByLabel('매매 구분').selectOption('SELL');
@@ -51,7 +52,7 @@ test.describe('guest transactions', () => {
     await form.getByLabel('단가').fill('75000');
     await form.getByRole('button', { name: '등록' }).click();
 
-    await expect(page.getByText('매매가 등록되었습니다.')).toBeVisible({ timeout: 15_000 });
+    await expectTradeRegisteredToast(page);
     await expect(page.locator('table tbody').getByText('매도')).toBeVisible();
   });
 });
@@ -75,7 +76,7 @@ test.describe('member transactions', () => {
     await form.getByLabel('단가').fill('70000');
     await form.getByRole('button', { name: '등록' }).click();
 
-    await expect(page.getByText('매매가 등록되었습니다.')).toBeVisible({ timeout: 15_000 });
+    await expectTradeRegisteredToast(page);
     await expect(page.locator('table tbody').getByText('005930')).toBeVisible();
   });
 });

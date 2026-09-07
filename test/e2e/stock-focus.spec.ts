@@ -7,7 +7,7 @@ test.describe('stock focus analysis', () => {
   test('guest can open stock detail page with market query', async ({ page }) => {
     await enterAsGuest(page);
     await page.goto('/stocks/005930?market=KR');
-    await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByRole('heading', { name: '삼성전자' })).toBeVisible({ timeout: 30_000 });
     await expect(page.getByRole('img', { name: '종목 가격 차트' })).toBeVisible({ timeout: 30_000 });
   });
 

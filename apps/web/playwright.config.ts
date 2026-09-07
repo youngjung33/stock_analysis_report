@@ -1,4 +1,12 @@
+import path from 'path';
+import { config as loadEnv } from 'dotenv';
 import { defineConfig, devices } from '@playwright/test';
+import { E2E_PLACEHOLDER_DATABASE_URL } from '../../test/e2e/member-e2e-env';
+
+loadEnv({ path: path.resolve(__dirname, '.env') });
+
+const e2eDatabaseUrl =
+  process.env.DATABASE_URL?.trim() || E2E_PLACEHOLDER_DATABASE_URL;
 
 export default defineConfig({
   testDir: '../../test/e2e',
@@ -45,8 +53,7 @@ export default defineConfig({
       ...process.env,
       JWT_ACCESS_SECRET:
         process.env.JWT_ACCESS_SECRET ?? 'e2e-jwt-access-secret-min-32-chars',
-      DATABASE_URL:
-        process.env.DATABASE_URL ?? 'postgresql://test:test@localhost:5432/test',
+      DATABASE_URL: e2eDatabaseUrl,
     },
   },
 });
