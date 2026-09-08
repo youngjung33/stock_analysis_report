@@ -63,8 +63,11 @@ test.describe('smoke', () => {
   test('guest can register initial capital on my-info', async ({ page }) => {
     await enterAsGuest(page);
     await page.goto('/my-info');
-    await page.getByPlaceholder('예: 10,000,000').fill('1000000');
-    await page.getByRole('button', { name: '투자 원금 설정' }).click();
+    const form = page.locator('form').filter({ has: page.getByRole('button', { name: '투자 원금 설정' }) });
+    await expect(form).toBeVisible({ timeout: 30_000 });
+    await form.getByPlaceholder('예: 10,000,000').fill('1000000');
+    await form.getByRole('button', { name: '투자 원금 설정' }).click();
+    await expect(page.getByText('투자 원금이 반영되었습니다.').first()).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText('₩1,000,000').first()).toBeVisible({ timeout: 10_000 });
   });
 

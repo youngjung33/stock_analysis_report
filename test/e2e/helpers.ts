@@ -19,15 +19,33 @@ export async function enterAsGuest(page: Page): Promise<void> {
   const guestBtn = page.getByRole('button', { name: '비회원으로 입장' });
   await expect(guestBtn).toBeVisible({ timeout: 20_000 });
   await expect(guestBtn).toBeEnabled();
+
+  const guestSession = page.waitForResponse(
+    (res) => res.url().includes('/api/auth/guest/session') && res.ok(),
+    { timeout: 30_000 },
+  );
   await guestBtn.click();
+  await guestSession;
   await expect(page).toHaveURL('/', { timeout: 30_000 });
+}
+
+function capitalSetupForm(page: Page) {
+  return page.locator('form').filter({ has: page.getByRole('button', { name: '투자 원금 설정' }) });
 }
 
 export async function seedGuestCapital(page: Page, amount = '10000000'): Promise<void> {
   await page.goto('/my-info');
-  await page.getByPlaceholder('예: 10,000,000').fill(amount);
-  await page.getByRole('button', { name: '투자 원금 설정' }).click();
-  await expect(page.getByText('₩10,000,000').first()).toBeVisible({ timeout: 10_000 });
+
+  const form = capitalSetupForm(page);
+  await expect(form).toBeVisible({ timeout: 30_000 });
+
+  const krwInput = form.getByPlaceholder('예: 10,000,000');
+  await expect(krwInput).toBeEnabled();
+  await krwInput.click();
+  await krwInput.fill(amount);
+
+  await form.getByRole('button', { name: '투자 원금 설정' }).click();
+  await expect(page.getByText('투자 원금이 반영되었습니다.').first()).toBeVisible({ timeout: 15_000 });
 }
 
 export function tradeRegistrationForm(page: Page) {

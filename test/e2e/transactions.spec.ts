@@ -8,6 +8,7 @@ import {
   seedGuestCapital,
   tradeRegistrationForm,
 } from './helpers';
+import { resetMemberE2EUserState } from './reset-member-e2e-user';
 
 test.describe('guest transactions', () => {
   test.setTimeout(90_000);
@@ -60,8 +61,12 @@ test.describe('guest transactions', () => {
 test.describe('member transactions', () => {
   test.setTimeout(90_000);
 
-  test.beforeEach(() => {
-    test.skip(!hasMemberE2E(), MEMBER_E2E_SKIP_REASON);
+  test.beforeEach(async ({}, testInfo) => {
+    if (!hasMemberE2E()) {
+      testInfo.skip(true, MEMBER_E2E_SKIP_REASON);
+      return;
+    }
+    await resetMemberE2EUserState();
   });
 
   test('member can register KR buy', async ({ page }) => {
