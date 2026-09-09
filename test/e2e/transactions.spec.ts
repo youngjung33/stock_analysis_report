@@ -6,6 +6,7 @@ import {
   loginAsMember,
   MEMBER_E2E_SKIP_REASON,
   seedGuestCapital,
+  selectStockInTradeForm,
   tradeRegistrationForm,
 } from './helpers';
 import { resetMemberE2EUserState } from './reset-member-e2e-user';
@@ -19,8 +20,7 @@ test.describe('guest transactions', () => {
 
     await page.goto('/transactions');
     const form = tradeRegistrationForm(page);
-    await form.getByPlaceholder('종목명 또는 코드 (예: 삼성전자, 005930)').fill('005930');
-    await form.getByRole('button', { name: '005930' }).first().click({ timeout: 20_000 });
+    await selectStockInTradeForm(form, '005930', '005930');
 
     await form.locator('input[type="number"]').fill('10');
     await form.getByLabel('단가').fill('70000');
@@ -38,8 +38,7 @@ test.describe('guest transactions', () => {
 
     await page.goto('/transactions');
     let form = tradeRegistrationForm(page);
-    await form.getByPlaceholder('종목명 또는 코드 (예: 삼성전자, 005930)').fill('005930');
-    await form.getByRole('button', { name: '005930' }).first().click({ timeout: 20_000 });
+    await selectStockInTradeForm(form, '005930', '005930');
     await form.locator('input[type="number"]').fill('5');
     await form.getByLabel('단가').fill('70000');
     await form.getByRole('button', { name: '등록' }).click();
@@ -47,8 +46,7 @@ test.describe('guest transactions', () => {
 
     form = tradeRegistrationForm(page);
     await form.getByLabel('매매 구분').selectOption('SELL');
-    await form.getByPlaceholder('종목명 또는 코드 (예: 삼성전자, 005930)').fill('005930');
-    await form.getByRole('button', { name: '005930' }).first().click({ timeout: 20_000 });
+    await selectStockInTradeForm(form, '005930', '005930');
     await form.locator('input[type="number"]').fill('2');
     await form.getByLabel('단가').fill('75000');
     await form.getByRole('button', { name: '등록' }).click();
@@ -75,8 +73,7 @@ test.describe('member transactions', () => {
 
     await page.goto('/transactions');
     const form = tradeRegistrationForm(page);
-    await form.getByPlaceholder('종목명 또는 코드 (예: 삼성전자, 005930)').fill('005930');
-    await form.getByRole('button', { name: '005930' }).first().click({ timeout: 20_000 });
+    await selectStockInTradeForm(form, '005930', '005930');
     await form.locator('input[type="number"]').fill('3');
     await form.getByLabel('단가').fill('70000');
     await form.getByRole('button', { name: '등록' }).click();

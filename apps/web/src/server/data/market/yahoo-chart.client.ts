@@ -3,6 +3,8 @@ import { QuoteChartRange, dailyChangePercentFromCloses } from '@sar/shared';
 export interface StockPricePoint {
   timestamp: string;
   close: number;
+  high?: number;
+  low?: number;
 }
 
 export interface YahooChartQuote {
@@ -79,7 +81,8 @@ function pickBasePrice(closes: number[], lookbackBars: number): number {
 
 function extractPoints(result: YahooChartResult): StockPricePoint[] {
   const timestamps = result.timestamp ?? [];
-  const closes = result.indicators?.quote?.[0]?.close ?? [];
+  const quote = result.indicators?.quote?.[0];
+  const closes = quote?.close ?? [];
   const points: StockPricePoint[] = [];
   const len = Math.min(timestamps.length, closes.length);
 
@@ -87,9 +90,13 @@ function extractPoints(result: YahooChartResult): StockPricePoint[] {
     const close = closes[i];
     const ts = timestamps[i];
     if (close === null || close === undefined || close <= 0 || !ts) continue;
+    const high = quote?.high?.[i];
+    const low = quote?.low?.[i];
     points.push({
       timestamp: new Date(ts * 1000).toISOString(),
       close,
+      high: high != null && high > 0 ? high : close,
+      low: low != null && low > 0 ? low : close,
     });
   }
 

@@ -111,7 +111,7 @@ function insight(
   return { ...partial, categoryLabel: CATEGORY_LABEL[partial.category] };
 }
 
-/** 종목 집중 분석 — 뉴스·서사 채널 제외 (PLAN: 가격·차트 우선) */
+/** 종목 집중 분석 — 뉴스·서사 채널 제외 (investment-strategy §15: price-first) */
 export function filterPriceFirstBreakdown(items: ScoreBreakdownItem[]): ScoreBreakdownItem[] {
   return items.filter((b) => {
     if (b.factor.startsWith('CH_NEWS:') || b.factor.startsWith('CH_NARRATIVE:')) return false;
@@ -555,7 +555,7 @@ function buildMarketInsight(input: {
     evidence.push(`시장 분위기: ${marketLink.regimeIds.join(', ')}`);
     evidenceItems.push(
       ev('shared.market.insights.evidence.stockPresentRegime', {
-        regimes: marketLink.regimeIds.join(', '),
+        regimeKeys: marketLink.regimeIds.join(','),
       }),
     );
   }
@@ -691,7 +691,7 @@ function buildActionInsight(input: {
       ruleId: plan.ruleId,
       rsi: plan.rationale.rsi.toFixed(0),
       recentRangePct: plan.rationale.recentRangePct.toFixed(0),
-      trend: plan.rationale.trend,
+      trendKey: plan.rationale.trend,
     }),
   ];
 
@@ -772,7 +772,7 @@ function buildNewsNoteInsight(input: {
     summaryParams: {
       toneKey: news.tone,
       change: formatPct(quote.changePercent),
-      divergence,
+      divergenceKey: divergence,
     },
     reasoningKey: 'shared.market.insights.stockFocus.newsNote.reasoning',
     evidence: [
@@ -952,7 +952,7 @@ export function buildStockPriceExplanationReport(input: {
     insights,
     scoreBreakdown: priceFirstBreakdown,
     tag: scored?.tag ?? 'watchlist',
-    tagLabel: scored?.tagLabel ?? '관심',
+    tagLabel: scored?.tag ?? 'watchlist',
     score: scored?.score ?? null,
   };
 }

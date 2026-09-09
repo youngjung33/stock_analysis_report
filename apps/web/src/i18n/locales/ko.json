@@ -600,6 +600,11 @@
         "macro_only": "매크로",
         "symbol_direct": "종목 직접",
         "topic_conditional": "업종·주제"
+      },
+      "relativeTime": {
+        "withinHour": "1시간 이내",
+        "hoursAgo": "{{hours}}시간 전",
+        "daysAgo": "{{days}}일 전"
       }
     },
     "scoreBreakdownTitle": "추천 근거",
@@ -1291,6 +1296,15 @@
         "syncBull": "한·미 동반 강세",
         "syncBear": "한·미 동반 약세",
         "diverged": "한·미 온도차"
+      },
+      "narrativeDivergence": {
+        "bullish_news_price_down": "긍정 뉴스 vs 가격 하락",
+        "bearish_news_price_up": "부정 뉴스 vs 가격 상승",
+        "crowded_bullish": "긍정 뉴스 과다·추격",
+        "crowded_bearish": "부정 뉴스 과다",
+        "crowded_bullish_chase": "긍정 뉴스·고점 추격",
+        "aligned": "뉴스·가격 방향 일치",
+        "none": "뚜렷한 괴리 없음"
       },
       "insights": {
         "regions": {

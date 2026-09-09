@@ -182,6 +182,8 @@ export interface FeaturedQuotesResult {
 export interface StockPricePoint {
   timestamp: string;
   close: number;
+  high?: number;
+  low?: number;
 }
 
 export interface StockQuoteSnapshot {

@@ -116,6 +116,22 @@ function resolveInsightParams(
     delete resolved.toneKey;
   }
 
+  if (resolved.divergenceKey !== undefined) {
+    resolved.divergence = t(`shared.market.narrativeDivergence.${String(resolved.divergenceKey)}`, {
+      defaultValue: String(resolved.divergenceKey),
+    });
+    delete resolved.divergenceKey;
+  }
+
+  if (resolved.regimeKeys !== undefined) {
+    const ids = String(resolved.regimeKeys)
+      .split(',')
+      .map((id) => id.trim())
+      .filter(Boolean);
+    resolved.regimes = ids.map((id) => translateRegime(id, t)).join(', ');
+    delete resolved.regimeKeys;
+  }
+
   if (resolved.tagKey !== undefined) {
     resolved.tag = translateTag(resolved.tagKey as RecommendationTag, t);
     delete resolved.tagKey;
@@ -465,10 +481,23 @@ function translateEvidenceItem(item: EvidenceItem, fallback: string, t: TFunctio
     }
     delete params.positionKey;
   }
-  if (item.key === 'shared.market.insights.evidence.stockNewsNoteDivergence' && params.divergence) {
+  if (
+    (item.key === 'shared.market.insights.evidence.stockNewsNoteDivergence' ||
+      item.key === 'shared.market.recommendation.evidence.narrativeDivergence') &&
+    params.divergence
+  ) {
     params.divergence = t(`shared.market.narrativeDivergence.${params.divergence}`, {
       defaultValue: String(params.divergence),
     });
+  }
+
+  if (item.key === 'shared.market.insights.evidence.stockPresentRegime' && params.regimeKeys) {
+    const ids = String(params.regimeKeys)
+      .split(',')
+      .map((id) => id.trim())
+      .filter(Boolean);
+    params.regimes = ids.map((id) => translateRegime(id, t)).join(', ');
+    delete params.regimeKeys;
   }
 
   if (item.key === 'shared.market.insights.evidence.stockActionRule' && params.ruleId) {
@@ -507,6 +536,10 @@ function translateEvidenceItem(item: EvidenceItem, fallback: string, t: TFunctio
 
 export function translateRegime(regimeId: string, t: TFunction): string {
   return t(`shared.market.regime.${regimeId}`, { defaultValue: regimeId });
+}
+
+export function translateNarrativeDivergence(kind: string, t: TFunction): string {
+  return t(`shared.market.narrativeDivergence.${kind}`, { defaultValue: kind });
 }
 
 export function translateRecommendationEvidence(

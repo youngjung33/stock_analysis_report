@@ -5,6 +5,8 @@ import { QuoteResult, StockEntity } from '../entities';
 export interface ChartPricePoint {
   timestamp: string;
   close: number;
+  high?: number;
+  low?: number;
 }
 
 /** 기간별 차트 시세 스냅샷 */

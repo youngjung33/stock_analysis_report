@@ -600,6 +600,11 @@
         "macro_only": "Macro",
         "symbol_direct": "Direct symbol",
         "topic_conditional": "Sector · topic"
+      },
+      "relativeTime": {
+        "withinHour": "<1h ago",
+        "hoursAgo": "{{hours}}h ago",
+        "daysAgo": "{{days}}d ago"
       }
     },
     "scoreBreakdownTitle": "Recommendation rationale",
@@ -1291,6 +1296,15 @@
         "syncBull": "KR–US sync bull",
         "syncBear": "KR–US sync bear",
         "diverged": "KR–US divergence"
+      },
+      "narrativeDivergence": {
+        "bullish_news_price_down": "Bullish news vs price down",
+        "bearish_news_price_up": "Bearish news vs price up",
+        "crowded_bullish": "Crowded bullish headlines",
+        "crowded_bearish": "Crowded bearish headlines",
+        "crowded_bullish_chase": "Crowded bullish chase",
+        "aligned": "News and price aligned",
+        "none": "No clear divergence"
       },
       "insights": {
         "regions": {

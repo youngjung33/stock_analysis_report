@@ -63,12 +63,14 @@ export class BuildStockAnalysisReportUseCase {
       } as const);
 
     const chartCloses = chartQuote.points.map((p) => p.close);
+    const chartHighs = chartQuote.points.map((p) => p.high ?? p.close);
+    const chartLows = chartQuote.points.map((p) => p.low ?? p.close);
 
     const report = buildStockPriceExplanationReport({
       quote,
       chartCloses,
-      chartHighs: chartCloses,
-      chartLows: chartCloses,
+      chartHighs,
+      chartLows,
       technical: pickStockEnrichment(technicalSnapshots, input.symbol, input.market),
       news: pickStockEnrichment(newsSnapshots, input.symbol, input.market),
       event: pickStockEnrichment(eventSnapshots, input.symbol, input.market),

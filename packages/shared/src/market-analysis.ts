@@ -164,7 +164,7 @@ const CATEGORY_LABEL: Record<AnalysisCategory, string> = {
   stockMarket: '시장과의 관계',
   stockOutlook: '앞으로 볼 곳',
   stockNewsNote: '뉴스 참고 (후행)',
-  stockAction: '참고 의견',
+  stockAction: '참고 의견 (매매 아님)',
   breadth: '시장 폭',
   index: '지수·차트',
   technical: '기술적 지표',

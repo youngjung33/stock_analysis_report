@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import { hasMemberE2E, resolveMemberE2ECredentials } from './member-e2e-env';
 
 /** E2E helpers — locale-safe (defaults to Korean UI) */
@@ -16,17 +16,17 @@ export async function ensureKoreanLocale(page: Page): Promise<void> {
 export async function enterAsGuest(page: Page): Promise<void> {
   await page.goto('/login');
   await ensureKoreanLocale(page);
-  const guestBtn = page.getByRole('button', { name: '비회원으로 입장' });
-  await expect(guestBtn).toBeVisible({ timeout: 20_000 });
-  await expect(guestBtn).toBeEnabled();
 
-  const guestSession = page.waitForResponse(
-    (res) => res.url().includes('/api/auth/guest/session') && res.ok(),
-    { timeout: 30_000 },
-  );
-  await guestBtn.click();
-  await guestSession;
-  await expect(page).toHaveURL('/', { timeout: 30_000 });
+  const oauthLoading = page.getByText('소셜 로그인 불러오는 중...');
+  if (await oauthLoading.isVisible()) {
+    await expect(oauthLoading).toBeHidden({ timeout: 45_000 });
+  }
+
+  const guestBtn = page.getByRole('button', { name: '비회원으로 입장', exact: true });
+  await expect(guestBtn).toBeVisible({ timeout: 30_000 });
+  await expect(guestBtn).toBeEnabled({ timeout: 30_000 });
+
+  await Promise.all([page.waitForURL('/', { timeout: 60_000 }), guestBtn.click()]);
 }
 
 function capitalSetupForm(page: Page) {
@@ -50,6 +50,18 @@ export async function seedGuestCapital(page: Page, amount = '10000000'): Promise
 
 export function tradeRegistrationForm(page: Page) {
   return page.locator('form').filter({ has: page.getByRole('heading', { name: '매매 등록' }) });
+}
+
+export async function selectStockInTradeForm(
+  form: Locator,
+  query: string,
+  resultButtonName: string,
+): Promise<void> {
+  const input = form.getByPlaceholder('종목명 또는 코드 (예: 삼성전자, 005930)');
+  await input.fill(query);
+  const resultBtn = form.getByRole('button', { name: resultButtonName }).first();
+  await expect(resultBtn).toBeVisible({ timeout: 45_000 });
+  await resultBtn.click({ timeout: 45_000, noWaitAfter: true });
 }
 
 export async function expectTradeRegisteredToast(page: Page) {

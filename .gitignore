@@ -23,6 +23,7 @@ out/
 # Test / coverage
 coverage/
 apps/web/test-results/
+**/.last-run.json
 test/e2e/.member-e2e-ready
 
 # Logs

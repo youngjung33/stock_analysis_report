@@ -87,13 +87,14 @@ test/
 ├── server/          # domain, http, data/market
 ├── web/             # client use case, guest, middleware, i18n
 ├── shared/          # @sar/shared
-└── e2e/             # Playwright smoke (17 scenarios)
+└── e2e/             # Playwright (27 scenarios; +3 production-smoke)
 ```
 
 ```bash
 npm run test         # @sar/shared Vitest → @sar/web Vitest
 npm run test -w @sar/shared   # shared only (test/shared/)
-npm run test:e2e     # Playwright (dev server + E2E_USERNAME/PASSWORD for member login)
+npm run test:e2e     # Playwright 27 scenarios (production-smoke 제외)
+npm run test:e2e:all # Playwright 30 scenarios (production-smoke 포함)
 ```
 
 ---
@@ -239,13 +240,16 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 
 ## E2E (Playwright)
 
-| 시나리오 | 파일 |
-|----------|------|
-| 로그인·회원가입·비밀번호 찾기 | `test/e2e/smoke.spec.ts` |
-| 비회원 대시보드·거래·my-info·세금 | 동일 |
-| 미인증 → `/login` redirect (middleware) | 동일 |
-| 회원 로그인 | 동일 (`E2E_USERNAME` / `E2E_PASSWORD` env) |
-| 종목 집중 분석·차트 상세 | `test/e2e/stock-focus.spec.ts` |
+| 파일 | tests | 내용 |
+|------|-------|------|
+| `test/e2e/smoke.spec.ts` | 17 | 로그인·비회원·my-info·세금·가이드·middleware redirect·회원 로그인 |
+| `test/e2e/stock-focus.spec.ts` | 5 | 종목 집중 분석 UI·API |
+| `test/e2e/transactions.spec.ts` | 4 | 비회원/회원 매매·Figure Pulse |
+| `test/e2e/catalog-search.spec.ts` | 1 | DB catalog 종목 검색 |
+| `test/e2e/production-smoke.spec.ts` | 3 | 배포 환경 스모크 (`test:e2e:production` / `test:e2e:all`) |
+| **합계** | **30** | `test:e2e` 기본은 production-smoke **제외 27** |
+
+회원 시나리오: `E2E_USERNAME` / `E2E_PASSWORD` + `DATABASE_URL` (member `beforeEach`에서 거래·현금 원장 reset)
 
 ---
 

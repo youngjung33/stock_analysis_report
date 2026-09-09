@@ -51,7 +51,10 @@ const mockReport = {
       reasoning: '차트·규칙表 기준 보수적 스탠스',
       evidence: ['68,600 KRW 이하 — 분할·조건부 매수 관심 구간'],
       evidenceItems: [
-        { key: 'shared.market.stockFocus.evidence.stockActionBuyBelow', params: { price: '68,600', currency: 'KRW' } },
+        {
+          key: 'shared.market.insights.evidence.stockActionBuyBelow',
+          params: { price: '68,600', currency: 'KRW' },
+        },
       ],
       links: [],
       market: Market.KR,

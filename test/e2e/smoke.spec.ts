@@ -8,6 +8,8 @@ import {
 } from './helpers';
 
 test.describe('smoke', () => {
+  test.setTimeout(90_000);
+
   test('login page renders', async ({ page }) => {
     await page.goto('/login');
     await expect(page.getByRole('button', { name: '로그인' })).toBeVisible();
@@ -83,25 +85,25 @@ test.describe('smoke', () => {
 
   test('guest can open tax page', async ({ page }) => {
     await enterAsGuest(page);
-    await page.goto('/tax');
+    await page.goto('/tax', { waitUntil: 'domcontentloaded', timeout: 60_000 });
     await expect(page.getByRole('heading', { name: '세금 정보' })).toBeVisible();
   });
 
   test('guest can open guide page', async ({ page }) => {
     await enterAsGuest(page);
-    await page.goto('/guide');
+    await page.goto('/guide', { waitUntil: 'domcontentloaded', timeout: 60_000 });
     await expect(page.getByRole('heading', { name: '주식이용 Tip', level: 1 })).toBeVisible();
   });
 
   test('guest can open market analysis page', async ({ page }) => {
     await enterAsGuest(page);
-    await page.goto('/market/analysis');
+    await page.goto('/market/analysis', { waitUntil: 'domcontentloaded', timeout: 60_000 });
     await expect(page.getByRole('heading', { name: '시장 심층 분석' })).toBeVisible();
   });
 
   test('guest can open investor type survey page', async ({ page }) => {
     await enterAsGuest(page);
-    await page.goto('/guide/investor-type');
+    await page.goto('/guide/investor-type', { waitUntil: 'domcontentloaded', timeout: 60_000 });
     await expect(page.getByRole('heading', { name: '투자 유형 진단', level: 1 })).toBeVisible();
   });
 

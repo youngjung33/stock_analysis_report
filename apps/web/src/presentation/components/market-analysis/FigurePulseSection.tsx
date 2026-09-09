@@ -19,13 +19,13 @@ function sortStatements(statements: FigureStatementSnapshot[]): FigureStatementS
   });
 }
 
-function formatRelativeTime(iso: string, locale: string): string {
+function formatRelativeTime(iso: string, t: (key: string, opts?: Record<string, unknown>) => string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
   const hours = Math.floor(diffMs / (1000 * 60 * 60));
-  if (hours < 1) return locale.startsWith('ko') ? '1시간 이내' : '<1h ago';
-  if (hours < 48) return locale.startsWith('ko') ? `${hours}시간 전` : `${hours}h ago`;
+  if (hours < 1) return t('market.figurePulse.relativeTime.withinHour');
+  if (hours < 48) return t('market.figurePulse.relativeTime.hoursAgo', { hours });
   const days = Math.floor(hours / 24);
-  return locale.startsWith('ko') ? `${days}일 전` : `${days}d ago`;
+  return t('market.figurePulse.relativeTime.daysAgo', { days });
 }
 
 interface Props {
@@ -35,7 +35,7 @@ interface Props {
 
 /** 영향력 인물 발언 pulse — RSS/SNS 2차 소스 */
 export function FigurePulseSection({ figureStatements, policyUncertainty }: Props) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const sorted = useMemo(() => sortStatements(figureStatements).slice(0, 8), [figureStatements]);
 
   if (sorted.length === 0 && !policyUncertainty) return null;
@@ -73,7 +73,7 @@ export function FigurePulseSection({ figureStatements, policyUncertainty }: Prop
                     : t('market.figurePulse.sourceSns')}
                 </span>
                 <span className="text-[10px] text-slate-600">
-                  {formatRelativeTime(snap.publishedAt, i18n.language)}
+                  {formatRelativeTime(snap.publishedAt, t)}
                 </span>
               </div>
 
