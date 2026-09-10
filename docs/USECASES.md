@@ -175,6 +175,8 @@ npm run test:e2e:all # Playwright 30 scenarios (production-smoke 포함)
 | Watchlist use cases | `/api/watchlist` | domain + `portfolio-api-routes.spec.ts` |
 | Corporate action use cases | `/api/corporate-actions` | `corporate-actions.use-cases.spec.ts` |
 
+HTTP route 전용 spec 14개 + `remaining-api-routes.spec.ts`(22 route) + `api-route-registry.spec.ts`(44 route 매핑 검증).
+
 Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 
 ---

@@ -21,6 +21,21 @@
     "db:import-stocks": "npm run db:import-stocks -w @sar/web"
   },
   "devDependencies": {
+    "brace-expansion": "5.0.9",
     "prettier": "^3.5.3"
+  },
+  "overrides": {
+    "axios": "^1.20.0",
+    "postcss": "8.5.28",
+    "deepmerge-ts": "8.0.2",
+    "next": {
+      "postcss": "8.5.28"
+    },
+    "@prisma/config": {
+      "deepmerge-ts": "8.0.2"
+    },
+    "minimatch": {
+      "brace-expansion": "$brace-expansion"
+    }
   }
 }
