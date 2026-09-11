@@ -22,7 +22,10 @@ out/
 
 # Test / coverage
 coverage/
+test-results/
 apps/web/test-results/
+playwright-report/
+blob-report/
 **/.last-run.json
 test/e2e/.member-e2e-ready
 

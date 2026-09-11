@@ -143,13 +143,13 @@ npm run test:e2e:all # Playwright 30 scenarios (production-smoke 포함)
 |----------|-------|--------|
 | `CreateTransactionUseCase` | POST `/api/transactions` | domain + `portfolio-api-routes.spec.ts` |
 | `ListTransactionsUseCase` | GET `/api/transactions` | domain + HTTP |
+| `UpdateTransactionUseCase` | PATCH `/api/transactions/[id]` | `transactions.use-cases.spec.ts` (server + client) |
 | `DeleteTransactionUseCase` | DELETE `/api/transactions/[id]` | domain |
 | `GetDashboardUseCase` | GET `/api/portfolio/dashboard` | `portfolio.use-cases.spec.ts` + HTTP |
 | `GetPortfolioAnalysisUseCase` | GET `/api/portfolio/analysis` | `get-portfolio-analysis.use-case.spec.ts` |
 | `GetPortfolioPreferencesUseCase` | GET `/api/portfolio/preferences` | `portfolio.use-cases.spec.ts` + `cash-routes.spec.ts` |
 | `UpdatePortfolioPreferencesUseCase` | PUT `/api/portfolio/preferences` | `portfolio-capital.use-cases.spec.ts` + HTTP |
 | `GetPortfolioSimulationUseCase` | GET `/api/portfolio/simulation` (+ `regimes`, `recommendations`) | `portfolio-capital.use-cases.spec.ts`, `cash-routes.spec.ts` |
-| `BuildMarketContextUseCase` | (내부) macro/sector/index for recommendation | `get-market-analysis.use-case.spec.ts` |
 | `FetchRecommendationQuotesUseCase` | (내부) candidate pool quotes + 15m cache | `portfolio-capital.use-cases.spec.ts` |
 | `FetchRecommendationTechnicalSnapshotsUseCase` | (내부) candidate chart snapshots + 15m cache | `technical-enrichment.spec.ts` |
 | `FetchRecommendationNewsSnapshotsUseCase` | (내부) KR Google RSS / US Finnhub company news + 15m cache | `news-enrichment.spec.ts` |
@@ -157,7 +157,10 @@ npm run test:e2e:all # Playwright 30 scenarios (production-smoke 포함)
 | `FetchRecommendationFigureStatementsUseCase` | (내부) global figure **RSS + X/SNS 2차** + 15m cache | `figure-enrichment.spec.ts`, `figure-sns-merge.spec.ts` |
 | `BuildStockEnrichmentUseCase` | (내부) quotes + technical + news + events + figures batch | portfolio + ledger |
 | `GetHoldingBySymbolUseCase` | GET `/api/portfolio/holding` | `get-holding.use-case.spec.ts` |
-| `RecordCashEntryUseCase` | POST `/api/cash` | `cash.use-cases.spec.ts` + HTTP |
+| `RecordCashEntryUseCase` | POST `/api/cash` | `cash.use-cases.spec.ts` + `cash-routes.spec.ts` |
+| `GetCashSummaryUseCase` | GET `/api/cash` | `cash.use-cases.spec.ts` + HTTP |
+| `ListCashLedgerUseCase` | (내부) ledger 조회 | `cash.use-cases.spec.ts` |
+| `SettleCashUseCase` | (내부) 매매·배당 결제 | `transactions.use-cases.spec.ts`, corporate-actions |
 | `RefreshQuotesUseCase` | POST `/api/market/refresh` | `market.use-cases.spec.ts` |
 | `GetFeaturedQuotesUseCase` | GET `/api/market/featured` | `get-featured-quotes.use-case.spec.ts` |
 | `GetStockQuoteUseCase` | GET `/api/market/quote` | provider/chart |
@@ -171,11 +174,11 @@ npm run test:e2e:all # Playwright 30 scenarios (production-smoke 포함)
 | `EvaluateRecommendationOutcomesUseCase` | POST `/api/cron/recommendation-outcomes` | cron route + ledger repository |
 | `ListRecommendationHistoryUseCase` | GET `/api/market/recommendation-history` | `recommendation-ledger.spec.ts`, `recommendation-backtest.spec.ts` |
 | `GetRecommendationBatchUseCase` | GET `/api/market/recommendation-history/[batchId]` | ledger repository |
-| `BuildMarketContextUseCase` | GET `/api/market/recommendation-context` | shared with analysis/simulation |
+| `BuildMarketContextUseCase` | (내부) recommendation · GET `/api/market/recommendation-context` | `get-market-analysis.use-case.spec.ts`, portfolio-capital |
 | Watchlist use cases | `/api/watchlist` | domain + `portfolio-api-routes.spec.ts` |
 | Corporate action use cases | `/api/corporate-actions` | `corporate-actions.use-cases.spec.ts` |
 
-HTTP route 전용 spec 14개 + `remaining-api-routes.spec.ts`(22 route) + `api-route-registry.spec.ts`(44 route 매핑 검증).
+HTTP route 전용 spec **15개** + `remaining-api-routes.spec.ts`(22 route) + `api-route-registry.spec.ts`(44 route 매핑 검증).
 
 Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 
@@ -227,16 +230,21 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | 영역 | 파일 | 내용 |
 |------|------|------|
 | Route utils | `route-utils.spec.ts` | 인증 헬퍼 |
+| Account | `account-routes.spec.ts` | profile, password, email |
 | Portfolio/transactions/watchlist | `portfolio-api-routes.spec.ts` | CRUD smoke |
 | Cash/preferences/simulation | `cash-routes.spec.ts` | capital API |
 | Market rate limit | `market-routes.spec.ts` | 429 |
+| Market analysis | `market-analysis-route.spec.ts` | analysis payload |
 | Stock analysis | `stock-analysis-route.spec.ts` | params, auth personalization |
 | Recommendation history | `recommendation-routes.spec.ts` | list limit, batch detail, 404 |
 | Cron jobs | `cron-routes.spec.ts` | CRON_SECRET gate, batch/outcomes |
 | Auth rate limit | `auth-routes.spec.ts` | login, check-username |
 | Verify email | `verify-email-route.spec.ts` | 링크 인증 redirect |
 | Route error | `route-error.spec.ts` | DB 에러 마스킹 |
-| Middleware | `middleware.spec.ts` | protected route redirect |
+| Rate limit helper | `rate-limit.spec.ts` | Upstash limiter |
+| Remaining routes | `remaining-api-routes.spec.ts` | auth/account/market 등 22 route |
+| Route registry | `api-route-registry.spec.ts` | 44 route ↔ spec 매핑 |
+| Middleware | `middleware.spec.ts` (web) | protected route redirect |
 
 ---
 
