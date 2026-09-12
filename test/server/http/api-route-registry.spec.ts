@@ -64,12 +64,15 @@ const ROUTE_SPEC_COVERAGE: Record<string, string> = {
   'transactions/route.ts': 'portfolio-api-routes.spec.ts',
   'watchlist/[id]/route.ts': 'remaining-api-routes.spec.ts',
   'watchlist/route.ts': 'portfolio-api-routes.spec.ts',
+  'ai/stock-analysis/route.ts': 'ai-routes.spec.ts',
+  'ai/portfolio-analysis/route.ts': 'ai-routes.spec.ts',
+  'account/ai-credential/route.ts': 'ai-routes.spec.ts',
 };
 
 describe('API route registry', () => {
   it('maps every route.ts file to an HTTP spec', () => {
     const routes = collectRouteFiles(API_ROOT);
-    expect(routes).toHaveLength(44);
+    expect(routes).toHaveLength(47);
 
     const missing = routes.filter((route) => !ROUTE_SPEC_COVERAGE[route]);
     expect(missing, `uncovered routes: ${missing.join(', ')}`).toEqual([]);

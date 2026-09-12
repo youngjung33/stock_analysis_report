@@ -70,6 +70,10 @@ vi.mock('@/presentation/hooks/useErrorToast', () => ({
   useErrorToast: vi.fn(),
 }));
 
+vi.mock('@/presentation/features/ai/AiStockInsightPanel', () => ({
+  AiStockInsightPanel: () => <div data-testid="ai-stock-insight-mock" />,
+}));
+
 vi.mock('@/presentation/shared/StockSearchField', () => ({
   StockSearchField: ({
     onSelect,
