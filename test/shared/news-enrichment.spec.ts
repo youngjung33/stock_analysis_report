@@ -43,6 +43,7 @@ describe('news-enrichment (Phase H)', () => {
     });
     expect(snap?.relevanceScore).toBeGreaterThanOrEqual(0.5);
     expect(snap?.articleCount).toBe(2);
+    expect(snap?.recentTitles).toHaveLength(2);
     expect(snap?.tone).toBe('bullish');
   });
 

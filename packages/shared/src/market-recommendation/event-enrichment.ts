@@ -35,10 +35,32 @@ export interface StockEventSnapshot {
 
 const MS_DAY = 24 * 60 * 60 * 1000;
 
+/** Parse YYYY-MM-DD as a local calendar day (avoid UTC midnight drift from `new Date('YYYY-MM-DD')`). */
+function localDayStartFromIsoDate(isoDate: string): number | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(isoDate.trim());
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) return null;
+  return new Date(year, month - 1, day).setHours(0, 0, 0, 0);
+}
+
+function localDayStartFromTimestamp(now: number): number {
+  const d = new Date(now);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).setHours(0, 0, 0, 0);
+}
+
 export function eventDayOffsetFromDate(reportDate: string, now = Date.now()): StockEventDay | null {
-  const target = new Date(reportDate).setHours(0, 0, 0, 0);
-  if (!Number.isFinite(target)) return null;
-  const today = new Date(now).setHours(0, 0, 0, 0);
+  const target =
+    localDayStartFromIsoDate(reportDate) ??
+    (() => {
+      const parsed = new Date(reportDate);
+      if (!Number.isFinite(parsed.getTime())) return null;
+      return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate()).setHours(0, 0, 0, 0);
+    })();
+  if (target == null) return null;
+  const today = localDayStartFromTimestamp(now);
   const diffDays = Math.round((target - today) / MS_DAY);
   if (diffDays === -1) return 'D-1';
   if (diffDays === 0) return 'D0';

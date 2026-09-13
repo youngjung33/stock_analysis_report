@@ -7,6 +7,7 @@ import { TransactionForm } from '../features/transactions/TransactionForm';
 import { TransactionList } from '../features/transactions/TransactionList';
 import { MyTaxSection } from '../features/tax/MyTaxSection';
 import { SummaryCards } from '../features/dashboard/SummaryCards';
+import { AiPortfolioInsightCard } from '../features/ai/AiPortfolioInsightCard';
 import { useMyInfoScreen } from '../hooks/screens/useMyInfoScreen';
 import { AppShell } from '../layout';
 import { PageStack, Surface } from '../design-system';
@@ -35,6 +36,12 @@ export function MyInfoPage() {
         {screen.data && (
           <>
             <SummaryCards summary={screen.data.summary} />
+
+            {!screen.isGuest && (
+              <section id="ai-portfolio" className="scroll-mt-6">
+                <AiPortfolioInsightCard />
+              </section>
+            )}
 
             <section id="investor-profile" className="scroll-mt-6">
               <InvestorProfileSection />

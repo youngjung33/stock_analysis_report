@@ -17,7 +17,11 @@ export function getCachedRecommendationNews(
     cache.delete(cacheKey(symbol, market));
     return null;
   }
-  return entry.snapshot;
+  const snap = entry.snapshot;
+  if (!snap.recentTitles?.length && snap.headlineSample) {
+    return { ...snap, recentTitles: [snap.headlineSample] };
+  }
+  return snap;
 }
 
 export function setCachedRecommendationNews(snapshot: StockNewsSnapshot): void {

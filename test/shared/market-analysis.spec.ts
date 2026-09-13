@@ -145,6 +145,7 @@ describe('buildMarketAnalysisReport', () => {
           symbol: 'AAPL',
           market: Market.US,
           headlineSample: 'Apple stock surges on strong iPhone outlook',
+          recentTitles: ['Apple stock surges on strong iPhone outlook'],
           tone: 'bullish',
           relevanceScore: 0.8,
           articleCount: 1,

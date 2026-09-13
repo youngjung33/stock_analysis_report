@@ -18,6 +18,8 @@ export interface StockNewsSnapshot {
   relevanceScore: number;
   articleCount: number;
   headlineSample: string;
+  /** Recent article titles only (no body/URL) — up to MAX_ARTICLES */
+  recentTitles: string[];
   primarySourceCount: number;
   secondarySourceCount: number;
   dedupeKey: string;
@@ -98,6 +100,7 @@ export function buildStockNewsSnapshot(input: {
     relevanceScore,
     articleCount: recent.length,
     headlineSample,
+    recentTitles: recent.map((a) => a.title.trim()).filter(Boolean).slice(0, MAX_ARTICLES),
     primarySourceCount,
     secondarySourceCount,
     dedupeKey: `news:${input.symbol}:${simpleHeadlineKey(headlineSample)}`,

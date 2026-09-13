@@ -34,7 +34,15 @@ describe('AI schemas', () => {
         technical: { rsi14: 55, macdSignal: 'neutral', trend: 'sideways' },
         marketLink: { regimeIds: ['risk_on'], indexChange1d: 0.3, leadingSectors: ['Tech'] },
         userLink: { isHeld: true, isWatchlisted: false, portfolioWeightPercent: 12.5 },
-        recentNews: [{ title: 'News', source: 'RSS', ageHours: 2 }],
+        recentNewsTitles: ['News headline'],
+        recentEvent: null,
+        derived: {
+          priceTrendBand: 'up',
+          rsiZone: 'neutral',
+          newsTone: null,
+          eventHint: null,
+          ruleTag: 'hold',
+        },
       },
     });
     expect(parsed.kind).toBe('stock');
@@ -89,9 +97,17 @@ describe('AI schemas', () => {
             market: 'KR',
             name: 'Samsung',
             rsi14: 60,
-            newsHeadlines: ['Headline'],
+            newsTitles: ['Headline'],
           },
         ],
+        derived: {
+          allocationDrift: 'balanced',
+          topConcentrationPercent: 20,
+          cashRatioPercent: 10,
+          pnlBand: 'profit',
+          overweightKrPp: 10,
+          overweightUsPp: -10,
+        },
       },
     });
     expect(parsed.kind).toBe('portfolio');
@@ -131,7 +147,15 @@ describe('AI schemas', () => {
         technical: null,
         marketLink: { regimeIds: [], indexChange1d: null, leadingSectors: [] },
         userLink: { isHeld: false, isWatchlisted: true, portfolioWeightPercent: null },
-        recentNews: [],
+        recentNewsTitles: [],
+        recentEvent: null,
+        derived: {
+          priceTrendBand: 'flat',
+          rsiZone: null,
+          newsTone: null,
+          eventHint: null,
+          ruleTag: 'hold',
+        },
       },
     });
     dedicatedAnalyzeRequestSchema.parse({

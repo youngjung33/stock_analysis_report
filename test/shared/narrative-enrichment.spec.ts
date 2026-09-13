@@ -17,6 +17,7 @@ function newsSnap(overrides: Partial<StockNewsSnapshot> & Pick<StockNewsSnapshot
     relevanceScore: 0.5,
     articleCount: 2,
     headlineSample: 'AAPL gains on demand',
+    recentTitles: ['AAPL gains on demand'],
     primarySourceCount: 0,
     secondarySourceCount: 2,
     dedupeKey: 'news:AAPL:sample',

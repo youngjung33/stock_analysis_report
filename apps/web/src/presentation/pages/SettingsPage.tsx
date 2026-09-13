@@ -7,6 +7,7 @@ import { PageStack, Surface } from '../design-system';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { useSettingsScreen } from '../hooks/screens/useSettingsScreen';
+import { AiCredentialSection } from '../features/settings/AiCredentialSection';
 
 export function SettingsPage() {
   const screen = useSettingsScreen();
@@ -138,6 +139,10 @@ export function SettingsPage() {
                 </form>
               </Surface>
             )}
+
+            <Surface variant="section">
+              <AiCredentialSection />
+            </Surface>
 
             <Surface variant="section" className="space-y-3">
               <h2 className="text-base font-semibold">{t('settings.socialAccounts')}</h2>

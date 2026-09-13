@@ -63,6 +63,14 @@ import {
   RecordCashEntryUseCase,
   UpdatePortfolioPreferencesUseCase,
 } from './domain/usecases/portfolio/portfolio-capital.use-cases';
+import {
+  DeleteAiCredentialUseCase,
+  FetchPortfolioAiInsightUseCase,
+  FetchStockAiInsightUseCase,
+  GetAiCredentialStatusUseCase,
+  UpsertAiCredentialUseCase,
+} from './domain/usecases/ai/ai.use-cases';
+import { aiRepository } from './data/repositories/ai.repository';
 
 export function wireAppServices(): AppServices {
   return {
@@ -109,6 +117,11 @@ export function wireAppServices(): AppServices {
     getPortfolioPreferencesUseCase: new GetPortfolioPreferencesUseCase(portfolioCapitalRepository),
     updatePortfolioPreferencesUseCase: new UpdatePortfolioPreferencesUseCase(portfolioCapitalRepository),
     getPortfolioSimulationUseCase: new GetPortfolioSimulationUseCase(portfolioCapitalRepository),
+    fetchStockAiInsightUseCase: new FetchStockAiInsightUseCase(aiRepository),
+    fetchPortfolioAiInsightUseCase: new FetchPortfolioAiInsightUseCase(aiRepository),
+    getAiCredentialStatusUseCase: new GetAiCredentialStatusUseCase(aiRepository),
+    upsertAiCredentialUseCase: new UpsertAiCredentialUseCase(aiRepository),
+    deleteAiCredentialUseCase: new DeleteAiCredentialUseCase(aiRepository),
     authSession: authSessionAdapter,
     guestSession: guestSessionAdapter,
     guestStore: guestStoreAdapter,

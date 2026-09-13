@@ -90,6 +90,14 @@ import {
   RunGlobalRecommendationBatchUseCase,
 } from './domain/usecases/market/recommendation-ledger.use-cases';
 import { PrismaRecommendationLedgerRepository } from './data/persistence/recommendation-ledger.repository';
+import { BuildStockAiContextUseCase } from './domain/usecases/ai/build-stock-ai-context.use-case';
+import { BuildPortfolioAiContextUseCase } from './domain/usecases/ai/build-portfolio-ai-context.use-case';
+import { RunAiAnalysisUseCase } from './domain/usecases/ai/run-ai-analysis.use-case';
+import {
+  DeleteAiCredentialUseCase,
+  GetAiCredentialStatusUseCase,
+  UpsertAiCredentialUseCase,
+} from './domain/usecases/ai/manage-ai-credential.use-case';
 
 export interface ServerServices {
   tokenService: ITokenService;
@@ -146,6 +154,12 @@ export interface ServerServices {
   evaluateRecommendationOutcomesUseCase: EvaluateRecommendationOutcomesUseCase;
   listRecommendationHistoryUseCase: ListRecommendationHistoryUseCase;
   getRecommendationBatchUseCase: GetRecommendationBatchUseCase;
+  buildStockAiContextUseCase: BuildStockAiContextUseCase;
+  buildPortfolioAiContextUseCase: BuildPortfolioAiContextUseCase;
+  runAiAnalysisUseCase: RunAiAnalysisUseCase;
+  getAiCredentialStatusUseCase: GetAiCredentialStatusUseCase;
+  upsertAiCredentialUseCase: UpsertAiCredentialUseCase;
+  deleteAiCredentialUseCase: DeleteAiCredentialUseCase;
 }
 
 let cached: ServerServices | null = null;
@@ -201,6 +215,31 @@ export function getServerServices(): ServerServices {
     cashRepo,
   );
   const getStockQuoteUseCase = new GetStockQuoteUseCase(marketData);
+  const buildStockAnalysisReportUseCase = new BuildStockAnalysisReportUseCase(
+    getFeaturedQuotesUseCase,
+    buildMarketContextUseCase,
+    buildStockEnrichmentUseCase,
+    getStockQuoteUseCase,
+  );
+  const getPortfolioAnalysisUseCase = new GetPortfolioAnalysisUseCase(
+    stockRepo,
+    txRepo,
+    quoteRepo,
+    corpActionRepo,
+    marketData,
+  );
+  const listTransactionsUseCase = new ListTransactionsUseCase(txRepo);
+  const getPortfolioPreferencesUseCase = new GetPortfolioPreferencesUseCase(prefRepo);
+  const getPortfolioSimulationUseCase = new GetPortfolioSimulationUseCase(
+    getDashboardUseCase,
+    getFeaturedQuotesUseCase,
+    cashRepo,
+    prefRepo,
+    watchlistRepo,
+    catalogRepo,
+    buildMarketContextUseCase,
+    buildStockEnrichmentUseCase,
+  );
 
   cached = {
     tokenService,
@@ -222,7 +261,7 @@ export function getServerServices(): ServerServices {
     refreshTokenUseCase: new RefreshTokenUseCase(refreshRepo, tokenService),
     logoutUseCase: new LogoutUseCase(refreshRepo, tokenService),
     createTransactionUseCase: new CreateTransactionUseCase(stockRepo, txRepo, cashRepo),
-    listTransactionsUseCase: new ListTransactionsUseCase(txRepo),
+    listTransactionsUseCase,
     deleteTransactionUseCase: new DeleteTransactionUseCase(txRepo, cashRepo),
     updateTransactionUseCase: new UpdateTransactionUseCase(txRepo, cashRepo),
     getDashboardUseCase,
@@ -233,13 +272,7 @@ export function getServerServices(): ServerServices {
       corpActionRepo,
       marketData,
     ),
-    getPortfolioAnalysisUseCase: new GetPortfolioAnalysisUseCase(
-      stockRepo,
-      txRepo,
-      quoteRepo,
-      corpActionRepo,
-      marketData,
-    ),
+    getPortfolioAnalysisUseCase,
     refreshQuotesUseCase: new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, marketData),
     getMarketStatusUseCase: new GetMarketStatusUseCase(marketData),
     getMarketAnalysisUseCase: new GetMarketAnalysisUseCase(
@@ -248,12 +281,7 @@ export function getServerServices(): ServerServices {
       buildStockEnrichmentUseCase,
       marketData,
     ),
-    buildStockAnalysisReportUseCase: new BuildStockAnalysisReportUseCase(
-      getFeaturedQuotesUseCase,
-      buildMarketContextUseCase,
-      buildStockEnrichmentUseCase,
-      getStockQuoteUseCase,
-    ),
+    buildStockAnalysisReportUseCase,
     buildMarketContextUseCase,
     fetchRecommendationQuotesUseCase,
     fetchRecommendationTechnicalUseCase,
@@ -286,18 +314,9 @@ export function getServerServices(): ServerServices {
     recordCashEntryUseCase: new RecordCashEntryUseCase(cashRepo),
     listCashLedgerUseCase: new ListCashLedgerUseCase(cashRepo),
     getCashSummaryUseCase: new GetCashSummaryUseCase(cashRepo),
-    getPortfolioPreferencesUseCase: new GetPortfolioPreferencesUseCase(prefRepo),
+    getPortfolioPreferencesUseCase,
     updatePortfolioPreferencesUseCase: new UpdatePortfolioPreferencesUseCase(prefRepo),
-    getPortfolioSimulationUseCase: new GetPortfolioSimulationUseCase(
-      getDashboardUseCase,
-      getFeaturedQuotesUseCase,
-      cashRepo,
-      prefRepo,
-      watchlistRepo,
-      catalogRepo,
-      buildMarketContextUseCase,
-      buildStockEnrichmentUseCase,
-    ),
+    getPortfolioSimulationUseCase,
     runGlobalRecommendationBatchUseCase: new RunGlobalRecommendationBatchUseCase(
       recommendationLedgerRepo,
       getFeaturedQuotesUseCase,
@@ -312,6 +331,23 @@ export function getServerServices(): ServerServices {
     ),
     listRecommendationHistoryUseCase: new ListRecommendationHistoryUseCase(recommendationLedgerRepo),
     getRecommendationBatchUseCase: new GetRecommendationBatchUseCase(recommendationLedgerRepo),
+    buildStockAiContextUseCase: new BuildStockAiContextUseCase(
+      buildStockAnalysisReportUseCase,
+      buildMarketContextUseCase,
+      buildStockEnrichmentUseCase,
+      getDashboardUseCase,
+    ),
+    buildPortfolioAiContextUseCase: new BuildPortfolioAiContextUseCase(
+      getDashboardUseCase,
+      getPortfolioAnalysisUseCase,
+      getPortfolioSimulationUseCase,
+      getPortfolioPreferencesUseCase,
+      listTransactionsUseCase,
+    ),
+    runAiAnalysisUseCase: new RunAiAnalysisUseCase(),
+    getAiCredentialStatusUseCase: new GetAiCredentialStatusUseCase(),
+    upsertAiCredentialUseCase: new UpsertAiCredentialUseCase(),
+    deleteAiCredentialUseCase: new DeleteAiCredentialUseCase(),
   };
 
   return cached;

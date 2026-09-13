@@ -95,6 +95,11 @@ export interface AppServices {
   getPortfolioPreferencesUseCase: GetPortfolioPreferencesUseCase;
   updatePortfolioPreferencesUseCase: UpdatePortfolioPreferencesUseCase;
   getPortfolioSimulationUseCase: GetPortfolioSimulationUseCase;
+  fetchStockAiInsightUseCase: import('./usecases/ai/ai.use-cases').FetchStockAiInsightUseCase;
+  fetchPortfolioAiInsightUseCase: import('./usecases/ai/ai.use-cases').FetchPortfolioAiInsightUseCase;
+  getAiCredentialStatusUseCase: import('./usecases/ai/ai.use-cases').GetAiCredentialStatusUseCase;
+  upsertAiCredentialUseCase: import('./usecases/ai/ai.use-cases').UpsertAiCredentialUseCase;
+  deleteAiCredentialUseCase: import('./usecases/ai/ai.use-cases').DeleteAiCredentialUseCase;
   authSession: IAuthSessionPort;
   guestSession: IGuestSessionPort;
   guestStore: IGuestStorePort;

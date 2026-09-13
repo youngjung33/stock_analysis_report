@@ -30,7 +30,18 @@ describe('GetMarketAnalysisUseCase', () => {
       execute: vi.fn().mockResolvedValue({
         candidateQuotes: [],
         technicalSnapshots: [],
-        newsSnapshots: [{ symbol: 'AAPL', market: Market.US, headlineSample: 'Apple beats', tone: 'bullish' }],
+        newsSnapshots: [{
+          symbol: 'AAPL',
+          market: Market.US,
+          headlineSample: 'Apple beats',
+          recentTitles: ['Apple beats'],
+          tone: 'bullish',
+          relevanceScore: 0.5,
+          articleCount: 1,
+          primarySourceCount: 0,
+          secondarySourceCount: 1,
+          dedupeKey: 'news:AAPL:beats',
+        }],
         eventSnapshots: [],
         figureStatements: [
           {

@@ -46,7 +46,15 @@ const baseContext = stockAiContextSchema.parse({
     technical: null,
     marketLink: { regimeIds: [], indexChange1d: null, leadingSectors: [] },
     userLink: { isHeld: false, isWatchlisted: false, portfolioWeightPercent: null },
-    recentNews: [],
+    recentNewsTitles: [],
+    recentEvent: null,
+    derived: {
+      priceTrendBand: 'flat',
+      rsiZone: null,
+      newsTone: null,
+      eventHint: null,
+      ruleTag: 'hold',
+    },
   },
 });
 
@@ -73,6 +81,28 @@ describe('RunAiAnalysisUseCase', () => {
     expect(result.kind).toBe('stock');
     expect(result.sections).toHaveLength(1);
     expect(result.meta.providerId).toBe('gemini');
+  });
+
+  it('retries once then throws when provider keeps failing', async () => {
+    const completeStructured = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('fail'))
+      .mockRejectedValueOnce(new Error('fail'));
+    vi.mocked(resolveAiProviderForUser).mockResolvedValue({
+      id: 'gemini',
+      model: 'gemini-2.0-flash',
+      completeStructured,
+    });
+    const useCase = new RunAiAnalysisUseCase();
+    await expect(
+      useCase.execute({
+        userId: 'user-1',
+        kind: 'stock',
+        context: baseContext,
+        locale: 'ko',
+      }),
+    ).rejects.toMatchObject({ code: AppErrorCode.AI_PROVIDER_ERROR });
+    expect(completeStructured).toHaveBeenCalledTimes(2);
   });
 
   it('throws AI_DISABLED when feature is off', async () => {

@@ -14,6 +14,7 @@ import { useErrorToast } from '../../hooks/useErrorToast';
 import { formatPercent, pnlClass } from '../../shared/formatters';
 import { stockDetailHref } from '../../shared/stock-routes';
 import { StockSearchField } from '../../shared/StockSearchField';
+import { AiStockInsightPanel } from '../../features/ai/AiStockInsightPanel';
 
 const TONE_STYLE: Record<AnalysisTone, string> = {
   bullish: 'border-emerald-500/30 bg-emerald-500/5',
@@ -181,6 +182,8 @@ export function StockFocusSection() {
               </ul>
             </div>
           )}
+
+          <AiStockInsightPanel selected={selected!} />
 
           <p className="text-[11px] leading-relaxed text-slate-600">{t('market.stockFocusDisclaimer')}</p>
         </div>
