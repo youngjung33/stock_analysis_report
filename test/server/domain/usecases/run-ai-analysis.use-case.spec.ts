@@ -1,7 +1,10 @@
 import { vi, beforeEach, describe, expect, it } from 'vitest';
-import { AI_SCHEMA_VERSION, AppErrorCode, stockAiContextSchema } from '@sar/shared';
+import { AI_SCHEMA_VERSION, AI_STOCK_DAILY_LIMIT, AppErrorCode, stockAiContextSchema } from '@sar/shared';
 import { RunAiAnalysisUseCase } from '@/server/domain/usecases/ai/run-ai-analysis.use-case';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
+
+const mockCountToday = vi.fn();
+const mockRecordUsage = vi.fn();
 
 vi.mock('@/server/data/ai/ai-config', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/server/data/ai/ai-config')>();
@@ -18,13 +21,21 @@ vi.mock('@/server/data/ai/resolve-ai-provider', () => ({
 
 vi.mock('@/server/data/persistence/ai.repositories', () => ({
   PrismaAiUsageRepository: vi.fn().mockImplementation(() => ({
-    countToday: vi.fn().mockResolvedValue(0),
-    recordUsage: vi.fn().mockResolvedValue(undefined),
+    countToday: mockCountToday,
+    recordUsage: mockRecordUsage,
   })),
 }));
 
 import { resolveAiProviderForUser } from '@/server/data/ai/resolve-ai-provider';
 import { isAiEnabled } from '@/server/data/ai/ai-config';
+import { clearAiInsightMemoryCacheForTests } from '@/server/data/ai/insight-memory-cache';
+
+const validSection = {
+  id: 'stock.summary',
+  title: '요약',
+  body: '본문',
+  severity: 'info' as const,
+};
 
 const baseContext = stockAiContextSchema.parse({
   schemaVersion: AI_SCHEMA_VERSION,
@@ -58,63 +69,172 @@ const baseContext = stockAiContextSchema.parse({
   },
 });
 
+function mockProvider(
+  completeStructured: ReturnType<typeof vi.fn>,
+  id = 'gemini',
+) {
+  vi.mocked(resolveAiProviderForUser).mockResolvedValue({
+    id,
+    model: 'gemini-2.0-flash',
+    completeStructured,
+  });
+}
+
 describe('RunAiAnalysisUseCase', () => {
   beforeEach(() => {
+    clearAiInsightMemoryCacheForTests();
+    mockCountToday.mockReset();
+    mockRecordUsage.mockReset();
+    mockCountToday.mockResolvedValue(0);
+    mockRecordUsage.mockResolvedValue(undefined);
     vi.mocked(isAiEnabled).mockReturnValue(true);
-    vi.mocked(resolveAiProviderForUser).mockResolvedValue({
-      id: 'gemini',
-      model: 'gemini-2.0-flash',
-      completeStructured: vi.fn().mockResolvedValue({
-        sections: [{ id: 'stock.summary', title: '요약', body: '본문', severity: 'info' }],
-      }),
-    });
+    mockProvider(vi.fn().mockResolvedValue({ sections: [validSection] }));
   });
+
+  const baseInput = {
+    userId: 'user-1',
+    kind: 'stock' as const,
+    context: baseContext,
+    locale: 'ko' as const,
+  };
 
   it('returns validated insight envelope', async () => {
-    const useCase = new RunAiAnalysisUseCase();
-    const result = await useCase.execute({
-      userId: 'user-1',
-      kind: 'stock',
-      context: baseContext,
-      locale: 'ko',
-    });
+    const result = await new RunAiAnalysisUseCase().execute(baseInput);
     expect(result.kind).toBe('stock');
     expect(result.sections).toHaveLength(1);
-    expect(result.meta.providerId).toBe('gemini');
+    expect(result.meta.fromCache).toBe(false);
+    expect(mockRecordUsage).toHaveBeenCalledOnce();
   });
 
-  it('retries once then throws when provider keeps failing', async () => {
+  it('returns cached insight on second call without provider or quota usage', async () => {
+    const completeStructured = vi.fn().mockResolvedValue({ sections: [validSection] });
+    mockProvider(completeStructured);
+    const useCase = new RunAiAnalysisUseCase();
+
+    const first = await useCase.execute(baseInput);
+    expect(first.meta.fromCache).toBe(false);
+
+    mockCountToday.mockResolvedValue(AI_STOCK_DAILY_LIMIT);
+
+    const second = await useCase.execute(baseInput);
+    expect(second.meta.fromCache).toBe(true);
+    expect(completeStructured).toHaveBeenCalledTimes(1);
+    expect(mockRecordUsage).toHaveBeenCalledTimes(1);
+  });
+
+  it('cache miss when contextHash changes', async () => {
+    const completeStructured = vi.fn().mockResolvedValue({ sections: [validSection] });
+    mockProvider(completeStructured);
+    const useCase = new RunAiAnalysisUseCase();
+
+    await useCase.execute(baseInput);
+    await useCase.execute({
+      ...baseInput,
+      context: { ...baseContext, contextHash: 'otherhash99999' },
+    });
+
+    expect(completeStructured).toHaveBeenCalledTimes(2);
+    expect(mockRecordUsage).toHaveBeenCalledTimes(2);
+  });
+
+  it('cache miss when locale changes', async () => {
+    const completeStructured = vi.fn().mockResolvedValue({ sections: [validSection] });
+    mockProvider(completeStructured);
+    const useCase = new RunAiAnalysisUseCase();
+
+    await useCase.execute(baseInput);
+    await useCase.execute({ ...baseInput, locale: 'en' });
+
+    expect(completeStructured).toHaveBeenCalledTimes(2);
+  });
+
+  it('retries once and succeeds on second provider attempt', async () => {
     const completeStructured = vi
       .fn()
-      .mockRejectedValueOnce(new Error('fail'))
-      .mockRejectedValueOnce(new Error('fail'));
-    vi.mocked(resolveAiProviderForUser).mockResolvedValue({
-      id: 'gemini',
-      model: 'gemini-2.0-flash',
-      completeStructured,
-    });
-    const useCase = new RunAiAnalysisUseCase();
-    await expect(
-      useCase.execute({
-        userId: 'user-1',
-        kind: 'stock',
-        context: baseContext,
-        locale: 'ko',
-      }),
-    ).rejects.toMatchObject({ code: AppErrorCode.AI_PROVIDER_ERROR });
+      .mockRejectedValueOnce(new Error('transient'))
+      .mockResolvedValueOnce({ sections: [validSection] });
+    mockProvider(completeStructured);
+
+    const result = await new RunAiAnalysisUseCase().execute(baseInput);
+    expect(result.sections).toHaveLength(1);
     expect(completeStructured).toHaveBeenCalledTimes(2);
+  });
+
+  it('throws AI_PROVIDER_ERROR when provider fails twice', async () => {
+    const completeStructured = vi.fn().mockRejectedValue(new Error('fail'));
+    mockProvider(completeStructured);
+
+    await expect(new RunAiAnalysisUseCase().execute(baseInput)).rejects.toMatchObject({
+      code: AppErrorCode.AI_PROVIDER_ERROR,
+    });
+    expect(completeStructured).toHaveBeenCalledTimes(2);
+    expect(mockRecordUsage).not.toHaveBeenCalled();
+  });
+
+  it('throws AI_PROVIDER_ERROR when provider returns invalid payload', async () => {
+    mockProvider(vi.fn().mockResolvedValue({ sections: [] }));
+
+    await expect(new RunAiAnalysisUseCase().execute(baseInput)).rejects.toMatchObject({
+      code: AppErrorCode.AI_PROVIDER_ERROR,
+    });
+    expect(mockRecordUsage).not.toHaveBeenCalled();
+  });
+
+  it('throws AI_PROVIDER_ERROR when all sections filtered as garbage', async () => {
+    mockProvider(
+      vi.fn().mockResolvedValue({
+        sections: [
+          { id: 'not.a.real.id', title: 'x', body: 'y' },
+          { id: 'stock.summary', title: 'bad', body: 'strong buy now' },
+        ],
+      }),
+    );
+
+    await expect(new RunAiAnalysisUseCase().execute(baseInput)).rejects.toMatchObject({
+      code: AppErrorCode.AI_PROVIDER_ERROR,
+    });
+  });
+
+  it('keeps only valid sections from mixed provider response', async () => {
+    mockProvider(
+      vi.fn().mockResolvedValue({
+        sections: [
+          { id: 'bogus', title: 'x', body: 'y' },
+          { id: 'stock.summary', title: '요약', body: '정상 본문' },
+          { id: 'stock.catalysts', title: '촉매', body: 'must sell now' },
+          { id: 'stock.openQuestions', title: '질문', body: '확인 포인트' },
+        ],
+      }),
+    );
+
+    const result = await new RunAiAnalysisUseCase().execute(baseInput);
+    expect(result.sections.map((s) => s.id)).toEqual(['stock.summary', 'stock.openQuestions']);
+  });
+
+  it('throws AI_QUOTA_EXCEEDED when daily limit reached', async () => {
+    mockCountToday.mockResolvedValue(AI_STOCK_DAILY_LIMIT);
+
+    await expect(new RunAiAnalysisUseCase().execute(baseInput)).rejects.toMatchObject({
+      code: AppErrorCode.AI_QUOTA_EXCEEDED,
+    });
   });
 
   it('throws AI_DISABLED when feature is off', async () => {
     vi.mocked(isAiEnabled).mockReturnValue(false);
-    const useCase = new RunAiAnalysisUseCase();
-    await expect(
-      useCase.execute({
-        userId: 'user-1',
-        kind: 'stock',
-        context: baseContext,
-        locale: 'ko',
-      }),
-    ).rejects.toMatchObject({ code: AppErrorCode.AI_DISABLED } satisfies Partial<ValidationError>);
+    await expect(new RunAiAnalysisUseCase().execute(baseInput)).rejects.toMatchObject({
+      code: AppErrorCode.AI_DISABLED,
+    });
+  });
+
+  it('throws AI_DISABLED when no provider resolved', async () => {
+    vi.mocked(resolveAiProviderForUser).mockResolvedValue(null);
+    await expect(new RunAiAnalysisUseCase().execute(baseInput)).rejects.toMatchObject({
+      code: AppErrorCode.AI_DISABLED,
+    });
+  });
+
+  it('uses English disclaimer for en locale', async () => {
+    const result = await new RunAiAnalysisUseCase().execute({ ...baseInput, locale: 'en' });
+    expect(result.disclaimer).toContain('reference only');
   });
 });

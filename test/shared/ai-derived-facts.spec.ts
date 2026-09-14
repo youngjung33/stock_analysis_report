@@ -57,4 +57,41 @@ describe('AI derived facts', () => {
     );
     expect(titles).toEqual(['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon']);
   });
+
+  it('pickNewsTitlesForAi falls back to headlineSample when titles empty', () => {
+    expect(pickNewsTitlesForAi([], 'Fallback headline')).toEqual(['Fallback headline']);
+  });
+
+  it('pickNewsTitlesForAi returns empty when no titles and no fallback', () => {
+    expect(pickNewsTitlesForAi([], null)).toEqual([]);
+    expect(pickNewsTitlesForAi(undefined, '  ')).toEqual([]);
+  });
+
+  it('buildStockDerivedFacts omits eventHint when partial event data', () => {
+    expect(
+      buildStockDerivedFacts({
+        change1d: 0,
+        rsi14: null,
+        ruleTag: 'hold',
+        eventKind: 'earnings_beat',
+        eventDay: null,
+      }).eventHint,
+    ).toBeNull();
+  });
+
+  it('buildPortfolioDerivedFacts marks loss band', () => {
+    const d = buildPortfolioDerivedFacts({
+      totalValueKrw: 10_000_000,
+      cashKrw: 0,
+      cashUsd: 0,
+      totalPnlKrw: -200_000,
+      targetKrPercent: 50,
+      targetUsPercent: 50,
+      actualKrPercent: 50,
+      actualUsPercent: 50,
+      topHoldings: [],
+    });
+    expect(d.pnlBand).toBe('loss');
+    expect(d.allocationDrift).toBe('balanced');
+  });
 });

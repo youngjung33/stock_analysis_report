@@ -355,6 +355,7 @@
     "quotaExceeded": "You have used all AI insights for today.",
     "membersOnly": "AI insights are available to members only.",
     "disabled": "AI insights are disabled.",
+    "cachedBadge": "Same data — reusing today's insight (quota not charged)",
     "disclaimer": "AI-generated for reference only; not investment advice.",
     "credentialTitle": "AI API key (BYOK)",
     "credentialDesc": "Store your Gemini or other API key; the server calls on your behalf. Keys are encrypted at rest.",

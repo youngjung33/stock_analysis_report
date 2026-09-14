@@ -1,7 +1,8 @@
 import { vi, beforeEach, describe, expect, it } from 'vitest';
 import { NextRequest } from 'next/server';
-import { Market } from '@sar/shared';
+import { AppErrorCode, GUEST_DISPLAY_NAME, Market } from '@sar/shared';
 import { resetRateLimitStoreForTests } from '@server/http/rate-limit';
+import { ValidationError } from '@/server/domain/errors/domain.errors';
 
 vi.mock('@/server/container', () => ({
   getServerServices: vi.fn(),
@@ -12,11 +13,12 @@ vi.mock('@/server/data/ai/ai-config', async (importOriginal) => {
   return {
     ...actual,
     isAiEnabled: vi.fn(),
+    isAiGuestAllowed: vi.fn(),
   };
 });
 
 import { getServerServices } from '@/server/container';
-import { isAiEnabled } from '@/server/data/ai/ai-config';
+import { isAiEnabled, isAiGuestAllowed } from '@/server/data/ai/ai-config';
 import { POST as stockAnalysis } from '@/app/api/ai/stock-analysis/route';
 import { POST as portfolioAnalysis } from '@/app/api/ai/portfolio-analysis/route';
 import {
@@ -83,6 +85,7 @@ describe('AI API routes', () => {
   beforeEach(() => {
     resetRateLimitStoreForTests();
     vi.mocked(isAiEnabled).mockReturnValue(true);
+    vi.mocked(isAiGuestAllowed).mockReturnValue(false);
     mockServices();
   });
 
@@ -125,6 +128,92 @@ describe('AI API routes', () => {
       );
       expect(res.status).toBe(401);
     });
+
+    it('returns 400 when symbol or name missing', async () => {
+      const res = await stockAnalysis(
+        authedRequest('http://localhost/api/ai/stock-analysis', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ symbol: '005930', market: Market.KR }),
+        }),
+      );
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.code).toBe(AppErrorCode.MARKET_QUOTE_PARAMS_REQUIRED);
+    });
+
+    it('returns 400 for invalid market', async () => {
+      const res = await stockAnalysis(
+        authedRequest('http://localhost/api/ai/stock-analysis', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ symbol: '005930', name: 'Samsung', market: 'JP' }),
+        }),
+      );
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.code).toBe(AppErrorCode.MARKET_INVALID);
+    });
+
+    it('returns 400 for guest when guest AI not allowed', async () => {
+      vi.mocked(getServerServices).mockReturnValue({
+        tokenService: {
+          verifyAccessToken: vi.fn().mockReturnValue({
+            sub: 'guest-1',
+            username: GUEST_DISPLAY_NAME,
+          }),
+        },
+      } as never);
+
+      const res = await stockAnalysis(
+        authedRequest('http://localhost/api/ai/stock-analysis', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ symbol: '005930', name: 'Samsung', market: Market.KR }),
+        }),
+      );
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.code).toBe(AppErrorCode.AI_MEMBERS_ONLY);
+    });
+
+    it('returns 400 when quota exceeded', async () => {
+      mockServices({
+        runAiAnalysisUseCase: {
+          execute: vi.fn().mockRejectedValue(new ValidationError(AppErrorCode.AI_QUOTA_EXCEEDED)),
+        },
+      });
+
+      const res = await stockAnalysis(
+        authedRequest('http://localhost/api/ai/stock-analysis', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ symbol: '005930', name: 'Samsung', market: Market.KR }),
+        }),
+      );
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.code).toBe(AppErrorCode.AI_QUOTA_EXCEEDED);
+    });
+
+    it('returns 400 when provider fails', async () => {
+      mockServices({
+        runAiAnalysisUseCase: {
+          execute: vi.fn().mockRejectedValue(new ValidationError(AppErrorCode.AI_PROVIDER_ERROR)),
+        },
+      });
+
+      const res = await stockAnalysis(
+        authedRequest('http://localhost/api/ai/stock-analysis', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ symbol: '005930', name: 'Samsung', market: Market.KR }),
+        }),
+      );
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.code).toBe(AppErrorCode.AI_PROVIDER_ERROR);
+    });
   });
 
   describe('POST /api/ai/portfolio-analysis', () => {
@@ -140,6 +229,24 @@ describe('AI API routes', () => {
       const body = await res.json();
       expect(body.enabled).toBe(true);
       expect(body.insight).toBeTruthy();
+    });
+
+    it('returns disabled when AI off without calling use case', async () => {
+      vi.mocked(isAiEnabled).mockReturnValue(false);
+      const runAiAnalysisUseCase = { execute: vi.fn() };
+      mockServices({ runAiAnalysisUseCase });
+
+      const res = await portfolioAnalysis(
+        authedRequest('http://localhost/api/ai/portfolio-analysis', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ locale: 'ko' }),
+        }),
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.enabled).toBe(false);
+      expect(runAiAnalysisUseCase.execute).not.toHaveBeenCalled();
     });
   });
 
@@ -164,6 +271,19 @@ describe('AI API routes', () => {
       expect(body.success).toBe(true);
     });
 
+    it('PUT returns 400 when provider or apiKey missing', async () => {
+      const res = await putAiCredential(
+        authedRequest('http://localhost/api/account/ai-credential', {
+          method: 'PUT',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ provider: 'gemini' }),
+        }),
+      );
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.code).toBe(AppErrorCode.VALIDATION);
+    });
+
     it('DELETE removes credential', async () => {
       const res = await deleteAiCredential(
         authedRequest('http://localhost/api/account/ai-credential', { method: 'DELETE' }),
@@ -171,6 +291,15 @@ describe('AI API routes', () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.success).toBe(true);
+    });
+
+    it('GET returns 401 without auth', async () => {
+      const res = await getAiCredential(
+        new NextRequest('http://localhost/api/account/ai-credential', {
+          headers: { 'x-forwarded-for': '10.0.0.22' },
+        }),
+      );
+      expect(res.status).toBe(401);
     });
   });
 });

@@ -164,4 +164,114 @@ describe('AI schemas', () => {
       locale: 'en',
     });
   });
+
+  describe('rejects invalid payloads', () => {
+    it('rejects stock context missing derived facts', () => {
+      expect(() =>
+        stockAiContextSchema.parse({
+          ...baseEnvelope,
+          kind: 'stock',
+          facts: {
+            instrument: { symbol: '005930', name: 'Samsung', market: 'KR', currency: 'KRW' },
+            price: { current: 70000, change1d: 1.2, change1w: null, change1mo: null },
+            ruleBasedReport: {
+              tag: 'hold',
+              tagLabel: 'Hold',
+              score: null,
+              insights: [],
+              scoreBreakdown: [],
+            },
+            technical: null,
+            marketLink: { regimeIds: [], indexChange1d: null, leadingSectors: [] },
+            userLink: { isHeld: false, isWatchlisted: false, portfolioWeightPercent: null },
+            recentNewsTitles: [],
+            recentEvent: null,
+          },
+        }),
+      ).toThrow();
+    });
+
+    it('rejects insight envelope with empty sections', () => {
+      expect(() =>
+        aiInsightEnvelopeSchema.parse({
+          schemaVersion: AI_SCHEMA_VERSION,
+          kind: 'stock',
+          locale: 'ko',
+          disclaimer: '참고용',
+          meta: {
+            providerId: 'gemini',
+            model: 'gemini-2.0-flash',
+            promptVersion: 'stock-v1',
+            latencyMs: 0,
+          },
+          sections: [],
+        }),
+      ).toThrow();
+    });
+
+    it('rejects stock context with too many news titles', () => {
+      expect(() =>
+        stockAiContextSchema.parse({
+          ...baseEnvelope,
+          kind: 'stock',
+          facts: {
+            instrument: { symbol: '005930', name: 'Samsung', market: 'KR', currency: 'KRW' },
+            price: { current: 70000, change1d: 1.2, change1w: null, change1mo: null },
+            ruleBasedReport: {
+              tag: 'hold',
+              tagLabel: 'Hold',
+              score: null,
+              insights: [],
+              scoreBreakdown: [],
+            },
+            technical: null,
+            marketLink: { regimeIds: [], indexChange1d: null, leadingSectors: [] },
+            userLink: { isHeld: false, isWatchlisted: false, portfolioWeightPercent: null },
+            recentNewsTitles: ['1', '2', '3', '4', '5', '6'],
+            recentEvent: null,
+            derived: {
+              priceTrendBand: 'flat',
+              rsiZone: null,
+              newsTone: null,
+              eventHint: null,
+              ruleTag: 'hold',
+            },
+          },
+        }),
+      ).toThrow();
+    });
+
+    it('rejects context with noTradeAdvice false', () => {
+      expect(() =>
+        stockAiContextSchema.parse({
+          ...baseEnvelope,
+          kind: 'stock',
+          constraints: { maxSections: 5, tone: 'educational', noTradeAdvice: false },
+          facts: {
+            instrument: { symbol: '005930', name: 'Samsung', market: 'KR', currency: 'KRW' },
+            price: { current: 70000, change1d: 1.2, change1w: null, change1mo: null },
+            ruleBasedReport: {
+              tag: 'hold',
+              tagLabel: 'Hold',
+              score: null,
+              insights: [],
+              scoreBreakdown: [],
+            },
+            technical: null,
+            marketLink: { regimeIds: [], indexChange1d: null, leadingSectors: [] },
+            userLink: { isHeld: false, isWatchlisted: false, portfolioWeightPercent: null },
+            recentNewsTitles: [],
+            recentEvent: null,
+            derived: {
+              priceTrendBand: 'flat',
+              rsiZone: null,
+              newsTone: null,
+              eventHint: null,
+              ruleTag: 'hold',
+            },
+          },
+        }),
+      ).toThrow();
+    });
+  });
 });

@@ -35,3 +35,8 @@ export function readAiTimeoutMs(): number {
   const raw = Number(process.env.AI_CUSTOM_TIMEOUT_MS ?? 30_000);
   return Number.isFinite(raw) && raw > 0 ? raw : 30_000;
 }
+
+/** In-memory insight cache by contextHash — default on; set AI_INSIGHT_CACHE=false to disable */
+export function isAiInsightCacheEnabled(): boolean {
+  return process.env.AI_INSIGHT_CACHE !== 'false';
+}

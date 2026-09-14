@@ -16,6 +16,10 @@ import { ValidationError } from '../../errors/domain.errors';
 import { loadAiPrompt } from '@/server/data/ai/load-prompt';
 import { resolveAiProviderForUser } from '@/server/data/ai/resolve-ai-provider';
 import { isAiEnabled } from '@/server/data/ai/ai-config';
+import {
+  getCachedAiInsight,
+  setCachedAiInsight,
+} from '@/server/data/ai/insight-memory-cache';
 import { CheckAiQuotaUseCase } from './check-ai-quota.use-case';
 
 export class RunAiAnalysisUseCase {
@@ -31,6 +35,19 @@ export class RunAiAnalysisUseCase {
       throw new ValidationError(AppErrorCode.AI_DISABLED);
     }
 
+    const promptVersion = input.kind === 'stock' ? 'stock-v1' : 'portfolio-v1';
+
+    const cached = getCachedAiInsight({
+      userId: input.userId,
+      kind: input.kind,
+      contextHash: input.context.contextHash,
+      locale: input.locale,
+      promptVersion,
+    });
+    if (cached) {
+      return cached;
+    }
+
     await this.checkQuotaUseCase.assertCanUse(input.userId, input.kind);
 
     const provider = await resolveAiProviderForUser(input.userId);
@@ -38,7 +55,6 @@ export class RunAiAnalysisUseCase {
       throw new ValidationError(AppErrorCode.AI_DISABLED);
     }
 
-    const promptVersion = input.kind === 'stock' ? 'stock-v1' : 'portfolio-v1';
     const systemPrompt = loadAiPrompt(promptVersion);
     const started = Date.now();
 
@@ -72,11 +88,24 @@ export class RunAiAnalysisUseCase {
         model: provider.model,
         promptVersion,
         latencyMs: Date.now() - started,
+        fromCache: false,
       },
       sections,
     });
 
     await this.checkQuotaUseCase.recordUsage(input.userId, input.kind);
+
+    setCachedAiInsight(
+      {
+        userId: input.userId,
+        kind: input.kind,
+        contextHash: input.context.contextHash,
+        locale: input.locale,
+        promptVersion,
+      },
+      envelope,
+    );
+
     return envelope;
   }
 

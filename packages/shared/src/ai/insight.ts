@@ -20,6 +20,7 @@ export const aiInsightEnvelopeSchema = z.object({
     model: z.string(),
     promptVersion: z.string(),
     latencyMs: z.number().nonnegative(),
+    fromCache: z.boolean().optional(),
   }),
   sections: z.array(aiInsightSectionSchema).min(1),
 });

@@ -1,6 +1,7 @@
 'use client';
 
 import type { AiInsightEnvelope } from '@sar/shared';
+import { useTranslation } from 'react-i18next';
 
 const SEVERITY_CLASS: Record<string, string> = {
   info: 'border-slate-700 bg-slate-950/40',
@@ -9,8 +10,13 @@ const SEVERITY_CLASS: Record<string, string> = {
 };
 
 export function AiInsightSections({ insight }: { insight: AiInsightEnvelope }) {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-3">
+      {insight.meta.fromCache && (
+        <p className="text-[10px] font-medium text-indigo-300/80">{t('ai.cachedBadge')}</p>
+      )}
       {insight.sections.map((section) => (
         <article
           key={section.id}
