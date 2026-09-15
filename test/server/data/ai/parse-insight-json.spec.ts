@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { parseInsightPayload } from '@/server/data/ai/parse-insight-json';
+import {
+  parseInsightPayload,
+  stripMarkdownJsonFence,
+} from '@/server/data/ai/parse-insight-json';
 
 describe('parseInsightPayload', () => {
   it('parses valid sections JSON', () => {
@@ -35,5 +38,18 @@ describe('parseInsightPayload', () => {
         JSON.stringify({ sections: [{ id: 'stock.summary', title: 't', body: 123 }] }),
       ),
     ).toThrow();
+  });
+
+  it('parses JSON wrapped in markdown code fence', () => {
+    const inner = JSON.stringify({
+      sections: [{ id: 'stock.summary', title: '요약', body: '본문' }],
+    });
+    const result = parseInsightPayload(`\`\`\`json\n${inner}\n\`\`\``);
+    expect(result.sections[0].body).toBe('본문');
+  });
+
+  it('stripMarkdownJsonFence leaves plain JSON unchanged', () => {
+    const plain = '{"sections":[]}';
+    expect(stripMarkdownJsonFence(plain)).toBe(plain);
   });
 });

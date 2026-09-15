@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     await enforceRateLimit(req, 'api:ai-stock', 'apiHeavy');
     const user = requireAiMemberAuth(req);
 
-    const body = (await req.json()) as {
+    const body = (await req.json().catch(() => ({}))) as {
       symbol?: string;
       name?: string;
       market?: string;

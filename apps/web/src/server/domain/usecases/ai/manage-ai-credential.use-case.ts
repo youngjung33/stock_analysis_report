@@ -31,7 +31,13 @@ export class UpsertAiCredentialUseCase {
     if (trimmed.length < 8) {
       throw new ValidationError(AppErrorCode.VALIDATION);
     }
-    const { encryptedKey, keyIv } = encryptApiKey(trimmed);
+    let encryptedKey: string;
+    let keyIv: string;
+    try {
+      ({ encryptedKey, keyIv } = encryptApiKey(trimmed));
+    } catch {
+      throw new ValidationError(AppErrorCode.INTERNAL);
+    }
     await credentialRepo.upsert(userId, provider, encryptedKey, keyIv);
     return { success: true };
   }

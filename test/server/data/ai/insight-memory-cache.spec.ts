@@ -100,4 +100,39 @@ describe('insight-memory-cache', () => {
     mockCacheEnabled.mockReturnValue(true);
     expect(getCachedAiInsight(baseKey)).toBeNull();
   });
+
+  it('returns null for expired entries after KST day rollover', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-09-14T23:00:00+09:00'));
+    setCachedAiInsight(baseKey, envelope);
+    vi.setSystemTime(new Date('2026-09-15T00:00:01+09:00'));
+    expect(getCachedAiInsight(baseKey)).toBeNull();
+    vi.useRealTimers();
+  });
+
+  it('evicts least recently used entry when exceeding 256 entries', () => {
+    setCachedAiInsight({ ...baseKey, contextHash: 'hash-0000' }, envelope);
+    for (let i = 1; i <= 256; i++) {
+      setCachedAiInsight(
+        { ...baseKey, contextHash: `hash-${String(i).padStart(4, '0')}` },
+        envelope,
+      );
+    }
+    expect(getCachedAiInsight({ ...baseKey, contextHash: 'hash-0000' })).toBeNull();
+    expect(getCachedAiInsight({ ...baseKey, contextHash: 'hash-0256' })).not.toBeNull();
+  });
+
+  it('keeps re-accessed entry during LRU eviction', () => {
+    setCachedAiInsight({ ...baseKey, contextHash: 'hash-0000' }, envelope);
+    for (let i = 1; i <= 255; i++) {
+      setCachedAiInsight(
+        { ...baseKey, contextHash: `hash-${String(i).padStart(4, '0')}` },
+        envelope,
+      );
+    }
+    getCachedAiInsight({ ...baseKey, contextHash: 'hash-0000' });
+    setCachedAiInsight({ ...baseKey, contextHash: 'hash-0256' }, envelope);
+    expect(getCachedAiInsight({ ...baseKey, contextHash: 'hash-0000' })).not.toBeNull();
+    expect(getCachedAiInsight({ ...baseKey, contextHash: 'hash-0001' })).toBeNull();
+  });
 });

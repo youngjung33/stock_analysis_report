@@ -48,65 +48,73 @@ export class RunAiAnalysisUseCase {
       return cached;
     }
 
-    await this.checkQuotaUseCase.assertCanUse(input.userId, input.kind);
-
     const provider = await resolveAiProviderForUser(input.userId);
     if (!provider) {
       throw new ValidationError(AppErrorCode.AI_DISABLED);
     }
 
-    const systemPrompt = loadAiPrompt(promptVersion);
-    const started = Date.now();
+    const usageId = await this.checkQuotaUseCase.reserveUsage(input.userId, input.kind);
 
-    const request = {
-      systemPrompt,
-      context: input.context,
-      locale: input.locale,
-      maxTokens: AI_MAX_OUTPUT_TOKENS,
-      temperature: AI_TEMPERATURE,
-    };
-
-    let rawPayload;
     try {
-      rawPayload = await this.callProviderWithRetry(provider, request);
-    } catch {
-      throw new ValidationError(AppErrorCode.AI_PROVIDER_ERROR);
-    }
+      const systemPrompt = loadAiPrompt(promptVersion);
+      const started = Date.now();
 
-    const sections = sanitizeInsightSections(rawPayload.sections, input.kind);
-    if (sections.length === 0) {
-      throw new ValidationError(AppErrorCode.AI_PROVIDER_ERROR);
-    }
-
-    const envelope = aiInsightEnvelopeSchema.parse({
-      schemaVersion: input.context.schemaVersion,
-      kind: input.kind,
-      locale: input.locale,
-      disclaimer: input.locale === 'en' ? AI_DISCLAIMER_EN : AI_DISCLAIMER_KO,
-      meta: {
-        providerId: provider.id,
-        model: provider.model,
-        promptVersion,
-        latencyMs: Date.now() - started,
-        fromCache: false,
-      },
-      sections,
-    });
-
-    await this.checkQuotaUseCase.recordUsage(input.userId, input.kind);
-
-    setCachedAiInsight(
-      {
-        userId: input.userId,
-        kind: input.kind,
-        contextHash: input.context.contextHash,
+      const request = {
+        systemPrompt,
+        context: input.context,
         locale: input.locale,
-        promptVersion,
-      },
-      envelope,
-    );
+        maxTokens: AI_MAX_OUTPUT_TOKENS,
+        temperature: AI_TEMPERATURE,
+      };
 
-    return envelope;
+      let rawPayload;
+      try {
+        rawPayload = await this.callProviderWithRetry(provider, request);
+      } catch {
+        throw new ValidationError(AppErrorCode.AI_PROVIDER_ERROR);
+      }
+
+      const sections = sanitizeInsightSections(rawPayload.sections, input.kind);
+      if (sections.length === 0) {
+        throw new ValidationError(AppErrorCode.AI_PROVIDER_ERROR);
+      }
+
+      let envelope: AiInsightEnvelope;
+      try {
+        envelope = aiInsightEnvelopeSchema.parse({
+          schemaVersion: input.context.schemaVersion,
+          kind: input.kind,
+          locale: input.locale,
+          disclaimer: input.locale === 'en' ? AI_DISCLAIMER_EN : AI_DISCLAIMER_KO,
+          meta: {
+            providerId: provider.id,
+            model: provider.model,
+            promptVersion,
+            latencyMs: Date.now() - started,
+            fromCache: false,
+          },
+          sections,
+        });
+      } catch {
+        throw new ValidationError(AppErrorCode.AI_PROVIDER_ERROR);
+      }
+
+      setCachedAiInsight(
+        {
+          userId: input.userId,
+          kind: input.kind,
+          contextHash: input.context.contextHash,
+          locale: input.locale,
+          promptVersion,
+        },
+        envelope,
+      );
+
+      return envelope;
+    } catch (error) {
+      await this.checkQuotaUseCase.releaseUsage(usageId);
+      throw error;
+    }
   }
 
   private async callProviderWithRetry(

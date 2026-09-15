@@ -1,10 +1,15 @@
 import { vi, beforeEach, describe, expect, it } from 'vitest';
-import { AI_SCHEMA_VERSION, AI_STOCK_DAILY_LIMIT, AppErrorCode, stockAiContextSchema } from '@sar/shared';
+import {
+  AI_SCHEMA_VERSION,
+  aiInsightEnvelopeSchema,
+  AppErrorCode,
+  stockAiContextSchema,
+} from '@sar/shared';
 import { RunAiAnalysisUseCase } from '@/server/domain/usecases/ai/run-ai-analysis.use-case';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 
-const mockCountToday = vi.fn();
-const mockRecordUsage = vi.fn();
+const mockReserveUsage = vi.fn();
+const mockDeleteUsage = vi.fn();
 
 vi.mock('@/server/data/ai/ai-config', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/server/data/ai/ai-config')>();
@@ -21,8 +26,8 @@ vi.mock('@/server/data/ai/resolve-ai-provider', () => ({
 
 vi.mock('@/server/data/persistence/ai.repositories', () => ({
   PrismaAiUsageRepository: vi.fn().mockImplementation(() => ({
-    countToday: mockCountToday,
-    recordUsage: mockRecordUsage,
+    reserveUsage: mockReserveUsage,
+    deleteUsage: mockDeleteUsage,
   })),
 }));
 
@@ -83,10 +88,10 @@ function mockProvider(
 describe('RunAiAnalysisUseCase', () => {
   beforeEach(() => {
     clearAiInsightMemoryCacheForTests();
-    mockCountToday.mockReset();
-    mockRecordUsage.mockReset();
-    mockCountToday.mockResolvedValue(0);
-    mockRecordUsage.mockResolvedValue(undefined);
+    mockReserveUsage.mockReset();
+    mockDeleteUsage.mockReset();
+    mockReserveUsage.mockResolvedValue('usage-1');
+    mockDeleteUsage.mockResolvedValue(undefined);
     vi.mocked(isAiEnabled).mockReturnValue(true);
     mockProvider(vi.fn().mockResolvedValue({ sections: [validSection] }));
   });
@@ -103,7 +108,8 @@ describe('RunAiAnalysisUseCase', () => {
     expect(result.kind).toBe('stock');
     expect(result.sections).toHaveLength(1);
     expect(result.meta.fromCache).toBe(false);
-    expect(mockRecordUsage).toHaveBeenCalledOnce();
+    expect(mockReserveUsage).toHaveBeenCalledOnce();
+    expect(mockDeleteUsage).not.toHaveBeenCalled();
   });
 
   it('returns cached insight on second call without provider or quota usage', async () => {
@@ -114,12 +120,12 @@ describe('RunAiAnalysisUseCase', () => {
     const first = await useCase.execute(baseInput);
     expect(first.meta.fromCache).toBe(false);
 
-    mockCountToday.mockResolvedValue(AI_STOCK_DAILY_LIMIT);
+    mockReserveUsage.mockResolvedValue(null);
 
     const second = await useCase.execute(baseInput);
     expect(second.meta.fromCache).toBe(true);
     expect(completeStructured).toHaveBeenCalledTimes(1);
-    expect(mockRecordUsage).toHaveBeenCalledTimes(1);
+    expect(mockReserveUsage).toHaveBeenCalledTimes(1);
   });
 
   it('cache miss when contextHash changes', async () => {
@@ -134,7 +140,7 @@ describe('RunAiAnalysisUseCase', () => {
     });
 
     expect(completeStructured).toHaveBeenCalledTimes(2);
-    expect(mockRecordUsage).toHaveBeenCalledTimes(2);
+    expect(mockReserveUsage).toHaveBeenCalledTimes(2);
   });
 
   it('cache miss when locale changes', async () => {
@@ -168,7 +174,8 @@ describe('RunAiAnalysisUseCase', () => {
       code: AppErrorCode.AI_PROVIDER_ERROR,
     });
     expect(completeStructured).toHaveBeenCalledTimes(2);
-    expect(mockRecordUsage).not.toHaveBeenCalled();
+    expect(mockReserveUsage).toHaveBeenCalledOnce();
+    expect(mockDeleteUsage).toHaveBeenCalledWith('usage-1');
   });
 
   it('throws AI_PROVIDER_ERROR when provider returns invalid payload', async () => {
@@ -177,7 +184,7 @@ describe('RunAiAnalysisUseCase', () => {
     await expect(new RunAiAnalysisUseCase().execute(baseInput)).rejects.toMatchObject({
       code: AppErrorCode.AI_PROVIDER_ERROR,
     });
-    expect(mockRecordUsage).not.toHaveBeenCalled();
+    expect(mockDeleteUsage).toHaveBeenCalledWith('usage-1');
   });
 
   it('throws AI_PROVIDER_ERROR when all sections filtered as garbage', async () => {
@@ -212,11 +219,23 @@ describe('RunAiAnalysisUseCase', () => {
   });
 
   it('throws AI_QUOTA_EXCEEDED when daily limit reached', async () => {
-    mockCountToday.mockResolvedValue(AI_STOCK_DAILY_LIMIT);
+    mockReserveUsage.mockResolvedValue(null);
 
     await expect(new RunAiAnalysisUseCase().execute(baseInput)).rejects.toMatchObject({
       code: AppErrorCode.AI_QUOTA_EXCEEDED,
     });
+    expect(mockDeleteUsage).not.toHaveBeenCalled();
+  });
+
+  it('releases reserved quota when envelope parse fails', async () => {
+    vi.spyOn(aiInsightEnvelopeSchema, 'parse').mockImplementationOnce(() => {
+      throw new Error('envelope schema mismatch');
+    });
+
+    await expect(new RunAiAnalysisUseCase().execute(baseInput)).rejects.toMatchObject({
+      code: AppErrorCode.AI_PROVIDER_ERROR,
+    });
+    expect(mockDeleteUsage).toHaveBeenCalledWith('usage-1');
   });
 
   it('throws AI_DISABLED when feature is off', async () => {

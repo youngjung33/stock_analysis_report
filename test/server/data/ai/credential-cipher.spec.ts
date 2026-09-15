@@ -24,4 +24,22 @@ describe('credential-cipher', () => {
     process.env.AI_CREDENTIALS_SECRET = 'short';
     expect(() => encryptApiKey('key')).toThrow(/AI_CREDENTIALS_SECRET/);
   });
+
+  it('throws when decrypting with wrong secret', () => {
+    const { encryptedKey, keyIv } = encryptApiKey('my-api-key-12345678');
+    process.env.AI_CREDENTIALS_SECRET = 'wrong-secret-that-is-still-32-chars!!';
+    expect(() => decryptApiKey(encryptedKey, keyIv)).toThrow();
+  });
+
+  it('throws when ciphertext is tampered', () => {
+    const { encryptedKey, keyIv } = encryptApiKey('my-api-key-12345678');
+    const tampered = `${encryptedKey.slice(0, -4)}AAAA`;
+    expect(() => decryptApiKey(tampered, keyIv)).toThrow();
+  });
+
+  it('throws when decrypting with missing secret', () => {
+    const { encryptedKey, keyIv } = encryptApiKey('my-api-key-12345678');
+    delete process.env.AI_CREDENTIALS_SECRET;
+    expect(() => decryptApiKey(encryptedKey, keyIv)).toThrow(/AI_CREDENTIALS_SECRET/);
+  });
 });

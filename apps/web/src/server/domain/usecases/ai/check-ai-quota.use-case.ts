@@ -11,15 +11,28 @@ import { PrismaAiUsageRepository } from '@/server/data/persistence/ai.repositori
 export class CheckAiQuotaUseCase {
   constructor(private readonly usageRepo = new PrismaAiUsageRepository()) {}
 
-  async assertCanUse(userId: string, kind: AiAnalysisKind): Promise<void> {
+  /** Atomically reserves one daily quota slot; throws when limit reached */
+  async reserveUsage(userId: string, kind: AiAnalysisKind): Promise<string> {
     const limit = kind === 'portfolio' ? AI_PORTFOLIO_DAILY_LIMIT : AI_STOCK_DAILY_LIMIT;
     const { start, end } = kstDayBounds();
-    const count = await this.usageRepo.countToday(userId, kind, start, end);
-    if (count >= limit) {
+    const id = await this.usageRepo.reserveUsage(userId, kind, start, end, limit);
+    if (!id) {
       throw new ValidationError(AppErrorCode.AI_QUOTA_EXCEEDED);
     }
+    return id;
   }
 
+  /** Refunds a reserved slot when provider/sanitize fails */
+  async releaseUsage(usageId: string): Promise<void> {
+    await this.usageRepo.deleteUsage(usageId);
+  }
+
+  /** @deprecated use reserveUsage */
+  async assertCanUse(userId: string, kind: AiAnalysisKind): Promise<void> {
+    await this.reserveUsage(userId, kind);
+  }
+
+  /** @deprecated use reserveUsage */
   async recordUsage(userId: string, kind: AiAnalysisKind): Promise<void> {
     await this.usageRepo.recordUsage(userId, kind);
   }
