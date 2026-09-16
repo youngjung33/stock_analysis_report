@@ -24,6 +24,7 @@ import { POST as portfolioAnalysis } from '@/app/api/ai/portfolio-analysis/route
 import {
   GET as getAiCredential,
   PUT as putAiCredential,
+  POST as postAiCredentialValidate,
   DELETE as deleteAiCredential,
 } from '@/app/api/account/ai-credential/route';
 
@@ -72,7 +73,10 @@ function mockServices(overrides: Record<string, unknown> = {}) {
       execute: vi.fn().mockResolvedValue({ configured: false }),
     },
     upsertAiCredentialUseCase: {
-      execute: vi.fn().mockResolvedValue(undefined),
+      execute: vi.fn().mockResolvedValue({ success: true, validated: true }),
+    },
+    validateAiCredentialUseCase: {
+      execute: vi.fn().mockResolvedValue({ ok: true }),
     },
     deleteAiCredentialUseCase: {
       execute: vi.fn().mockResolvedValue(undefined),
@@ -196,6 +200,46 @@ describe('AI API routes', () => {
       expect(body.code).toBe(AppErrorCode.AI_QUOTA_EXCEEDED);
     });
 
+    it('returns 429 when rate limit exceeded', async () => {
+      const ip = '10.0.0.99';
+      const body = JSON.stringify({ symbol: '005930', name: 'Samsung', market: Market.KR });
+      for (let i = 0; i < 15; i++) {
+        await stockAnalysis(
+          authedRequest('http://localhost/api/ai/stock-analysis', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', 'x-forwarded-for': ip },
+            body,
+          }),
+        );
+      }
+
+      const res = await stockAnalysis(
+        authedRequest('http://localhost/api/ai/stock-analysis', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'x-forwarded-for': ip },
+          body,
+        }),
+      );
+      expect(res.status).toBe(429);
+    });
+
+    it('returns 500 when context build fails', async () => {
+      mockServices({
+        buildStockAiContextUseCase: {
+          execute: vi.fn().mockRejectedValue(new Error('STOCK_ANALYSIS_UNAVAILABLE')),
+        },
+      });
+
+      const res = await stockAnalysis(
+        authedRequest('http://localhost/api/ai/stock-analysis', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ symbol: '005930', name: 'Samsung', market: Market.KR }),
+        }),
+      );
+      expect(res.status).toBe(500);
+    });
+
     it('returns 400 when provider fails', async () => {
       mockServices({
         runAiAnalysisUseCase: {
@@ -231,6 +275,23 @@ describe('AI API routes', () => {
       expect(body.insight).toBeTruthy();
     });
 
+    it('returns 500 when portfolio context build fails', async () => {
+      mockServices({
+        buildPortfolioAiContextUseCase: {
+          execute: vi.fn().mockRejectedValue(new Error('DB_UNAVAILABLE')),
+        },
+      });
+
+      const res = await portfolioAnalysis(
+        authedRequest('http://localhost/api/ai/portfolio-analysis', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ locale: 'ko' }),
+        }),
+      );
+      expect(res.status).toBe(500);
+    });
+
     it('returns disabled when AI off without calling use case', async () => {
       vi.mocked(isAiEnabled).mockReturnValue(false);
       const runAiAnalysisUseCase = { execute: vi.fn() };
@@ -258,7 +319,7 @@ describe('AI API routes', () => {
       expect(body.configured).toBe(false);
     });
 
-    it('PUT saves credential', async () => {
+    it('PUT saves credential with validation result', async () => {
       const res = await putAiCredential(
         authedRequest('http://localhost/api/account/ai-credential', {
           method: 'PUT',
@@ -269,6 +330,19 @@ describe('AI API routes', () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.success).toBe(true);
+      expect(body.validated).toBe(true);
+    });
+
+    it('POST validates stored credential', async () => {
+      const res = await postAiCredentialValidate(
+        authedRequest('http://localhost/api/account/ai-credential', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+        }),
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.ok).toBe(true);
     });
 
     it('PUT returns 400 when provider or apiKey missing', async () => {

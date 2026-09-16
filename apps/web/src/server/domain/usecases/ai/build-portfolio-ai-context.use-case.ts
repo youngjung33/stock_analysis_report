@@ -1,6 +1,7 @@
 import {
   AI_SCHEMA_VERSION,
   AI_NEWS_TITLE_MAX,
+  DEFAULT_PORTFOLIO_PREFERENCES,
   sanitizeMemoForAi,
   buildPortfolioDerivedFacts,
   pickNewsTitlesForAi,
@@ -15,6 +16,11 @@ import {
 } from '../portfolio/portfolio-capital.use-cases';
 import { ListTransactionsUseCase } from '../transactions/list-transactions.use-case';
 import { computeContextHash } from '@/server/data/ai/context-hash';
+import {
+  EMPTY_PORTFOLIO_ANALYSIS,
+  EMPTY_PORTFOLIO_SIMULATION_BUNDLE,
+  withContextFallback,
+} from './context-build.helpers';
 
 export class BuildPortfolioAiContextUseCase {
   constructor(
@@ -26,12 +32,23 @@ export class BuildPortfolioAiContextUseCase {
   ) {}
 
   async execute(userId: string, locale: SupportedLocale): Promise<PortfolioAiContext> {
-    const [dashboard, analysis, simulationBundle, preferences, transactions] = await Promise.all([
-      this.getDashboardUseCase.execute(userId),
-      this.getPortfolioAnalysisUseCase.execute(userId),
-      this.getPortfolioSimulationUseCase.execute(userId),
-      this.getPortfolioPreferencesUseCase.execute(userId),
-      this.listTransactionsUseCase.execute(userId),
+    const dashboard = await this.getDashboardUseCase.execute(userId);
+
+    const [analysis, simulationBundle, preferences, transactions] = await Promise.all([
+      withContextFallback('portfolio.analysis', EMPTY_PORTFOLIO_ANALYSIS, () =>
+        this.getPortfolioAnalysisUseCase.execute(userId),
+      ),
+      withContextFallback('portfolio.simulation', EMPTY_PORTFOLIO_SIMULATION_BUNDLE, () =>
+        this.getPortfolioSimulationUseCase.execute(userId),
+      ),
+      withContextFallback(
+        'portfolio.preferences',
+        { userId, ...DEFAULT_PORTFOLIO_PREFERENCES, investorProfile: null },
+        () => this.getPortfolioPreferencesUseCase.execute(userId),
+      ),
+      withContextFallback('portfolio.transactions', [], () =>
+        this.listTransactionsUseCase.execute(userId),
+      ),
     ]);
 
     const summary = dashboard.summary;

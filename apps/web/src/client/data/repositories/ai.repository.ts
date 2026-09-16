@@ -31,17 +31,28 @@ export class ApiAiRepository {
   }
 
   async getCredentialStatus() {
-    const { data } = await apiClient.get<{ configured: boolean; provider?: AiProviderId; updatedAt?: string }>(
-      '/account/ai-credential',
-    );
+    const { data } = await apiClient.get<{
+      configured: boolean;
+      provider?: AiProviderId;
+      updatedAt?: string;
+      decryptFailed?: boolean;
+    }>('/account/ai-credential');
     return data;
   }
 
   async upsertCredential(provider: AiProviderId, apiKey: string) {
-    const { data } = await apiClient.put<{ success: boolean }>('/account/ai-credential', {
-      provider,
-      apiKey,
-    });
+    const { data } = await apiClient.put<{ success: boolean; validated: boolean }>(
+      '/account/ai-credential',
+      {
+        provider,
+        apiKey,
+      },
+    );
+    return data;
+  }
+
+  async validateCredential() {
+    const { data } = await apiClient.post<{ ok: boolean }>('/account/ai-credential');
     return data;
   }
 

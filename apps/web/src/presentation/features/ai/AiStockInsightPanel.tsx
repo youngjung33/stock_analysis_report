@@ -6,6 +6,7 @@ import { Market, type StockSearchResult } from '@sar/shared';
 import { normalizeLocale } from '@sar/shared';
 import { useServices } from '../../hooks/useServices';
 import { useErrorToast } from '../../hooks/useErrorToast';
+import { resolveAiFetchErrorMessage } from './ai-error-message';
 import { AiInsightSections } from './AiInsightSections';
 
 export function AiStockInsightPanel({ selected }: { selected: StockSearchResult }) {
@@ -15,13 +16,13 @@ export function AiStockInsightPanel({ selected }: { selected: StockSearchResult 
   const [insight, setInsight] = useState<Awaited<
     ReturnType<typeof fetchStockAiInsightUseCase.execute>
   > | null>(null);
-  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  useErrorToast(error, t('ai.loadFailed'));
+  useErrorToast(Boolean(errorMessage), errorMessage ?? t('ai.loadFailed'));
 
   async function handleFetch() {
     setLoading(true);
-    setError(false);
+    setErrorMessage(null);
     try {
       const result = await fetchStockAiInsightUseCase.execute({
         symbol: selected.symbol,
@@ -32,10 +33,10 @@ export function AiStockInsightPanel({ selected }: { selected: StockSearchResult 
       });
       setInsight(result);
       if (!result.enabled) {
-        setError(true);
+        setErrorMessage(t('ai.disabled'));
       }
-    } catch {
-      setError(true);
+    } catch (error) {
+      setErrorMessage(resolveAiFetchErrorMessage(error, t));
     } finally {
       setLoading(false);
     }

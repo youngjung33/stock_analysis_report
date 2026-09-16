@@ -13,6 +13,11 @@ import { BuildMarketContextUseCase } from '../market/build-market-context.use-ca
 import { BuildStockEnrichmentUseCase } from '../market/build-stock-enrichment.use-case';
 import { GetDashboardUseCase } from '../portfolio/get-dashboard.use-case';
 import { computeContextHash } from '@/server/data/ai/context-hash';
+import {
+  EMPTY_MARKET_CONTEXT,
+  EMPTY_STOCK_ENRICHMENT,
+  withContextFallback,
+} from './context-build.helpers';
 
 export class BuildStockAiContextUseCase {
   constructor(
@@ -32,16 +37,19 @@ export class BuildStockAiContextUseCase {
     userHoldings?: Array<{ symbol: string; market: Market }>;
     userWatchlist?: Array<{ symbol: string; market: Market }>;
   }): Promise<StockAiContext> {
-    const [report, marketContext, dashboard] = await Promise.all([
-      this.buildStockAnalysisReportUseCase.execute({
-        symbol: input.symbol,
-        name: input.name,
-        market: input.market,
-        yahooSymbol: input.yahooSymbol,
-        userHoldings: input.userHoldings,
-        userWatchlist: input.userWatchlist,
-      }),
-      this.buildMarketContextUseCase.execute(),
+    const report = await this.buildStockAnalysisReportUseCase.execute({
+      symbol: input.symbol,
+      name: input.name,
+      market: input.market,
+      yahooSymbol: input.yahooSymbol,
+      userHoldings: input.userHoldings,
+      userWatchlist: input.userWatchlist,
+    });
+
+    const [marketContext, dashboard] = await Promise.all([
+      withContextFallback('stock.marketContext', EMPTY_MARKET_CONTEXT, () =>
+        this.buildMarketContextUseCase.execute(),
+      ),
       this.getDashboardUseCase.execute(input.userId),
     ]);
 
@@ -53,7 +61,9 @@ export class BuildStockAiContextUseCase {
       currency,
       yahooSymbol: input.yahooSymbol,
     };
-    const enrichment = await this.buildStockEnrichmentUseCase.execute([target]);
+    const enrichment = await withContextFallback('stock.enrichment', EMPTY_STOCK_ENRICHMENT, () =>
+      this.buildStockEnrichmentUseCase.execute([target]),
+    );
     const technical = pickStockEnrichment(enrichment.technicalSnapshots, input.symbol, input.market);
     const news = pickStockEnrichment(enrichment.newsSnapshots, input.symbol, input.market);
     const event = pickStockEnrichment(enrichment.eventSnapshots, input.symbol, input.market);

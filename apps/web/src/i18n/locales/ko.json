@@ -352,6 +352,8 @@
     "fetchButton": "AI 해석 받기",
     "loading": "AI 해석 생성 중...",
     "loadFailed": "AI 해석을 불러오지 못했습니다.",
+    "providerFailed": "AI 서비스 응답에 문제가 있습니다. 잠시 후 다시 시도해 주세요.",
+    "rateLimited": "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
     "quotaExceeded": "오늘 AI 해석 횟수를 모두 사용했습니다.",
     "membersOnly": "회원만 AI 해석을 이용할 수 있습니다.",
     "disabled": "AI 해석 기능이 비활성화되어 있습니다.",
@@ -365,8 +367,14 @@
     "credentialSave": "저장",
     "credentialDelete": "키 삭제",
     "credentialSaved": "API 키가 저장되었습니다.",
+    "credentialSavedValidated": "API 키가 저장되었고 연결 테스트에 성공했습니다.",
+    "credentialSavedNotValidated": "API 키는 저장되었지만 연결 테스트에 실패했습니다. 키를 확인해 주세요.",
     "credentialFailed": "API 키 저장에 실패했습니다.",
-    "credentialRemoved": "저장된 API 키를 삭제했습니다."
+    "credentialRemoved": "저장된 API 키를 삭제했습니다.",
+    "credentialValidate": "연결 테스트",
+    "credentialValidateOk": "API 키 연결 테스트에 성공했습니다.",
+    "credentialValidateFailed": "API 키 연결 테스트에 실패했습니다.",
+    "credentialDecryptFailed": "저장된 API 키를 복호화할 수 없어 서버 기본 키로 대체됩니다. 키를 다시 저장해 주세요."
   },
   "myInfo": {
     "title": "내 정보",

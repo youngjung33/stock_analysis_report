@@ -352,6 +352,8 @@
     "fetchButton": "Get AI insight",
     "loading": "Generating AI insight...",
     "loadFailed": "Could not load AI insight.",
+    "providerFailed": "The AI service returned an error. Please try again later.",
+    "rateLimited": "Too many requests. Please try again later.",
     "quotaExceeded": "You have used all AI insights for today.",
     "membersOnly": "AI insights are available to members only.",
     "disabled": "AI insights are disabled.",
@@ -365,8 +367,14 @@
     "credentialSave": "Save",
     "credentialDelete": "Remove key",
     "credentialSaved": "API key saved.",
+    "credentialSavedValidated": "API key saved and connection test passed.",
+    "credentialSavedNotValidated": "API key saved but connection test failed. Please verify your key.",
     "credentialFailed": "Failed to save API key.",
-    "credentialRemoved": "Stored API key removed."
+    "credentialRemoved": "Stored API key removed.",
+    "credentialValidate": "Test connection",
+    "credentialValidateOk": "API key connection test passed.",
+    "credentialValidateFailed": "API key connection test failed.",
+    "credentialDecryptFailed": "Your stored key could not be decrypted; the server default key is used instead. Please save your key again."
   },
   "myInfo": {
     "title": "My Info",

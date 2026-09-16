@@ -69,6 +69,7 @@ import {
   FetchStockAiInsightUseCase,
   GetAiCredentialStatusUseCase,
   UpsertAiCredentialUseCase,
+  ValidateAiCredentialUseCase,
 } from './domain/usecases/ai/ai.use-cases';
 import { aiRepository } from './data/repositories/ai.repository';
 
@@ -122,6 +123,7 @@ export function wireAppServices(): AppServices {
     getAiCredentialStatusUseCase: new GetAiCredentialStatusUseCase(aiRepository),
     upsertAiCredentialUseCase: new UpsertAiCredentialUseCase(aiRepository),
     deleteAiCredentialUseCase: new DeleteAiCredentialUseCase(aiRepository),
+    validateAiCredentialUseCase: new ValidateAiCredentialUseCase(aiRepository),
     authSession: authSessionAdapter,
     guestSession: guestSessionAdapter,
     guestStore: guestStoreAdapter,

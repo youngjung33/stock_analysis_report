@@ -100,6 +100,7 @@ export interface AppServices {
   getAiCredentialStatusUseCase: import('./usecases/ai/ai.use-cases').GetAiCredentialStatusUseCase;
   upsertAiCredentialUseCase: import('./usecases/ai/ai.use-cases').UpsertAiCredentialUseCase;
   deleteAiCredentialUseCase: import('./usecases/ai/ai.use-cases').DeleteAiCredentialUseCase;
+  validateAiCredentialUseCase: import('./usecases/ai/ai.use-cases').ValidateAiCredentialUseCase;
   authSession: IAuthSessionPort;
   guestSession: IGuestSessionPort;
   guestStore: IGuestStorePort;

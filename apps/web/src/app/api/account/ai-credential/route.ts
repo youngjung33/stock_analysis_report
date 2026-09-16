@@ -26,12 +26,24 @@ export async function PUT(req: NextRequest) {
       throw new ValidationError(AppErrorCode.VALIDATION);
     }
     const { upsertAiCredentialUseCase } = getServerServices();
-    await upsertAiCredentialUseCase.execute(
+    const result = await upsertAiCredentialUseCase.execute(
       user.userId,
       body.provider as AiProviderId,
       body.apiKey,
     );
-    return jsonData({ success: true });
+    return jsonData(result);
+  } catch (error) {
+    return handleRouteError(error);
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    await enforceRateLimit(req, 'api:ai-credential-validate', 'apiWrite');
+    const user = requireAuth(req);
+    const { validateAiCredentialUseCase } = getServerServices();
+    const result = await validateAiCredentialUseCase.execute(user.userId);
+    return jsonData(result);
   } catch (error) {
     return handleRouteError(error);
   }

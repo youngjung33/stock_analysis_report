@@ -1,6 +1,6 @@
 import { AppErrorCode, type AiProviderId } from '@sar/shared';
 import { ValidationError } from '../../errors/domain.errors';
-import { encryptApiKey } from '@/server/data/ai/credential-cipher';
+import { decryptApiKey, encryptApiKey } from '@/server/data/ai/credential-cipher';
 import { PrismaUserAiCredentialRepository } from '@/server/data/persistence/ai.repositories';
 import { resolveAiProviderForUser } from '@/server/data/ai/resolve-ai-provider';
 import { loadAiPrompt } from '@/server/data/ai/load-prompt';
@@ -14,15 +14,28 @@ export class GetAiCredentialStatusUseCase {
   async execute(userId: string) {
     const row = await credentialRepo.findByUserId(userId);
     if (!row) return { configured: false as const };
+
+    let decryptFailed = false;
+    try {
+      decryptApiKey(row.encryptedKey, row.keyIv);
+    } catch {
+      decryptFailed = true;
+    }
+
     return {
       configured: true as const,
       provider: row.provider as AiProviderId,
       updatedAt: row.updatedAt.toISOString(),
+      decryptFailed,
     };
   }
 }
 
 export class UpsertAiCredentialUseCase {
+  constructor(
+    private readonly validateAiCredentialUseCase = new ValidateAiCredentialUseCase(),
+  ) {}
+
   async execute(userId: string, provider: AiProviderId, apiKey: string) {
     if (!VALID_PROVIDERS.has(provider)) {
       throw new ValidationError(AppErrorCode.VALIDATION);
@@ -39,7 +52,8 @@ export class UpsertAiCredentialUseCase {
       throw new ValidationError(AppErrorCode.INTERNAL);
     }
     await credentialRepo.upsert(userId, provider, encryptedKey, keyIv);
-    return { success: true };
+    const validated = await this.validateAiCredentialUseCase.execute(userId);
+    return { success: true, validated: validated.ok };
   }
 }
 

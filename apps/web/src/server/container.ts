@@ -97,6 +97,7 @@ import {
   DeleteAiCredentialUseCase,
   GetAiCredentialStatusUseCase,
   UpsertAiCredentialUseCase,
+  ValidateAiCredentialUseCase,
 } from './domain/usecases/ai/manage-ai-credential.use-case';
 
 export interface ServerServices {
@@ -160,6 +161,7 @@ export interface ServerServices {
   getAiCredentialStatusUseCase: GetAiCredentialStatusUseCase;
   upsertAiCredentialUseCase: UpsertAiCredentialUseCase;
   deleteAiCredentialUseCase: DeleteAiCredentialUseCase;
+  validateAiCredentialUseCase: ValidateAiCredentialUseCase;
 }
 
 let cached: ServerServices | null = null;
@@ -345,8 +347,9 @@ export function getServerServices(): ServerServices {
       listTransactionsUseCase,
     ),
     runAiAnalysisUseCase: new RunAiAnalysisUseCase(),
+    validateAiCredentialUseCase: new ValidateAiCredentialUseCase(),
     getAiCredentialStatusUseCase: new GetAiCredentialStatusUseCase(),
-    upsertAiCredentialUseCase: new UpsertAiCredentialUseCase(),
+    upsertAiCredentialUseCase: new UpsertAiCredentialUseCase(new ValidateAiCredentialUseCase()),
     deleteAiCredentialUseCase: new DeleteAiCredentialUseCase(),
   };
 

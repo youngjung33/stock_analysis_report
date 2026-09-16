@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { normalizeLocale } from '@sar/shared';
 import { useServices } from '../../hooks/useServices';
 import { useErrorToast } from '../../hooks/useErrorToast';
+import { resolveAiFetchErrorMessage } from './ai-error-message';
 import { AiInsightSections } from './AiInsightSections';
 
 export function AiPortfolioInsightCard() {
@@ -14,19 +15,19 @@ export function AiPortfolioInsightCard() {
   const [insight, setInsight] = useState<Awaited<
     ReturnType<typeof fetchPortfolioAiInsightUseCase.execute>
   > | null>(null);
-  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  useErrorToast(error, t('ai.loadFailed'));
+  useErrorToast(Boolean(errorMessage), errorMessage ?? t('ai.loadFailed'));
 
   async function handleFetch() {
     setLoading(true);
-    setError(false);
+    setErrorMessage(null);
     try {
       const result = await fetchPortfolioAiInsightUseCase.execute(normalizeLocale(i18n.language));
       setInsight(result);
-      if (!result.enabled) setError(true);
-    } catch {
-      setError(true);
+      if (!result.enabled) setErrorMessage(t('ai.disabled'));
+    } catch (error) {
+      setErrorMessage(resolveAiFetchErrorMessage(error, t));
     } finally {
       setLoading(false);
     }

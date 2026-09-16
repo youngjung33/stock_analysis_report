@@ -9,11 +9,16 @@ const PROVIDERS: AiProviderId[] = ['gemini', 'openai', 'anthropic', 'custom'];
 
 export function AiCredentialSection() {
   const { t } = useTranslation();
-  const { getAiCredentialStatusUseCase, upsertAiCredentialUseCase, deleteAiCredentialUseCase } =
-    useServices();
+  const {
+    getAiCredentialStatusUseCase,
+    upsertAiCredentialUseCase,
+    deleteAiCredentialUseCase,
+    validateAiCredentialUseCase,
+  } = useServices();
   const [provider, setProvider] = useState<AiProviderId>('gemini');
   const [apiKey, setApiKey] = useState('');
   const [configured, setConfigured] = useState(false);
+  const [decryptFailed, setDecryptFailed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -23,6 +28,7 @@ export function AiCredentialSection() {
       .execute()
       .then((s) => {
         setConfigured(s.configured);
+        setDecryptFailed(Boolean(s.configured && s.decryptFailed));
         if (s.configured && s.provider) setProvider(s.provider);
       })
       .finally(() => setLoading(false));
@@ -33,12 +39,28 @@ export function AiCredentialSection() {
     setSaving(true);
     setMessage(null);
     try {
-      await upsertAiCredentialUseCase.execute(provider, apiKey);
+      const result = await upsertAiCredentialUseCase.execute(provider, apiKey);
       setConfigured(true);
+      setDecryptFailed(false);
       setApiKey('');
-      setMessage(t('ai.credentialSaved'));
+      setMessage(
+        result.validated ? t('ai.credentialSavedValidated') : t('ai.credentialSavedNotValidated'),
+      );
     } catch {
       setMessage(t('ai.credentialFailed'));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleValidate() {
+    setSaving(true);
+    setMessage(null);
+    try {
+      const result = await validateAiCredentialUseCase.execute();
+      setMessage(result.ok ? t('ai.credentialValidateOk') : t('ai.credentialValidateFailed'));
+    } catch {
+      setMessage(t('ai.credentialValidateFailed'));
     } finally {
       setSaving(false);
     }
@@ -64,6 +86,9 @@ export function AiCredentialSection() {
         <p className="mt-1 text-sm text-muted-foreground">{t('ai.credentialDesc')}</p>
         {configured && (
           <p className="mt-2 text-xs text-emerald-400/90">{t('ai.credentialConfigured')}</p>
+        )}
+        {decryptFailed && (
+          <p className="mt-2 text-xs text-amber-400/90">{t('ai.credentialDecryptFailed')}</p>
         )}
       </div>
       <form onSubmit={handleSave} className="flex flex-col gap-3">
@@ -101,14 +126,24 @@ export function AiCredentialSection() {
             {t('ai.credentialSave')}
           </button>
           {configured && (
-            <button
-              type="button"
-              onClick={handleDelete}
-              disabled={saving}
-              className="rounded-lg border border-border-strong px-4 py-2 text-sm text-muted-foreground"
-            >
-              {t('ai.credentialDelete')}
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={handleValidate}
+                disabled={saving}
+                className="rounded-lg border border-border-strong px-4 py-2 text-sm text-muted-foreground"
+              >
+                {t('ai.credentialValidate')}
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={saving}
+                className="rounded-lg border border-border-strong px-4 py-2 text-sm text-muted-foreground"
+              >
+                {t('ai.credentialDelete')}
+              </button>
+            </>
           )}
         </div>
       </form>

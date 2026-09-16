@@ -46,3 +46,11 @@ export class DeleteAiCredentialUseCase {
     return this.repo.deleteCredential();
   }
 }
+
+export class ValidateAiCredentialUseCase {
+  constructor(private readonly repo: ApiAiRepository) {}
+
+  execute() {
+    return this.repo.validateCredential();
+  }
+}

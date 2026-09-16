@@ -20,6 +20,7 @@ import {
   getCachedAiInsight,
   setCachedAiInsight,
 } from '@/server/data/ai/insight-memory-cache';
+import { logWarn } from '@/server/observability/logger';
 import { CheckAiQuotaUseCase } from './check-ai-quota.use-case';
 
 export class RunAiAnalysisUseCase {
@@ -70,7 +71,12 @@ export class RunAiAnalysisUseCase {
       let rawPayload;
       try {
         rawPayload = await this.callProviderWithRetry(provider, request);
-      } catch {
+      } catch (providerError) {
+        logWarn('ai.provider.failed', {
+          kind: input.kind,
+          providerId: provider.id,
+          error: providerError instanceof Error ? providerError.message : String(providerError),
+        });
         throw new ValidationError(AppErrorCode.AI_PROVIDER_ERROR);
       }
 
@@ -130,6 +136,10 @@ export class RunAiAnalysisUseCase {
         lastError = error;
       }
     }
+    logWarn('ai.provider.retry_exhausted', {
+      providerId: provider!.id,
+      error: lastError instanceof Error ? lastError.message : String(lastError),
+    });
     throw lastError;
   }
 }
