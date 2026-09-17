@@ -19,6 +19,7 @@ import { computeContextHash } from '@/server/data/ai/context-hash';
 import {
   EMPTY_PORTFOLIO_ANALYSIS,
   EMPTY_PORTFOLIO_SIMULATION_BUNDLE,
+  rethrowAiContextUnavailable,
   withContextFallback,
 } from './context-build.helpers';
 
@@ -32,7 +33,12 @@ export class BuildPortfolioAiContextUseCase {
   ) {}
 
   async execute(userId: string, locale: SupportedLocale): Promise<PortfolioAiContext> {
-    const dashboard = await this.getDashboardUseCase.execute(userId);
+    let dashboard;
+    try {
+      dashboard = await this.getDashboardUseCase.execute(userId);
+    } catch (error) {
+      rethrowAiContextUnavailable(error);
+    }
 
     const [analysis, simulationBundle, preferences, transactions] = await Promise.all([
       withContextFallback('portfolio.analysis', EMPTY_PORTFOLIO_ANALYSIS, () =>

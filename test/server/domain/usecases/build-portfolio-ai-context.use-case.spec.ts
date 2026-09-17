@@ -1,5 +1,5 @@
 import { vi, describe, expect, it } from 'vitest';
-import { Market, DEFAULT_PORTFOLIO_PREFERENCES } from '@sar/shared';
+import { AppErrorCode, Market, DEFAULT_PORTFOLIO_PREFERENCES } from '@sar/shared';
 import { BuildPortfolioAiContextUseCase } from '@/server/domain/usecases/ai/build-portfolio-ai-context.use-case';
 
 function mockDashboard() {
@@ -134,11 +134,11 @@ describe('BuildPortfolioAiContextUseCase', () => {
     expect(result.facts.holdingsDigest.every((h) => h.memoSample == null)).toBe(true);
   });
 
-  it('propagates dashboard failure', async () => {
+  it('throws AI_CONTEXT_UNAVAILABLE when dashboard fails', async () => {
     await expect(
       createUseCase({
         dashboard: vi.fn().mockRejectedValue(new Error('DB_UNAVAILABLE')),
       }).execute('user-1', 'ko'),
-    ).rejects.toThrow('DB_UNAVAILABLE');
+    ).rejects.toMatchObject({ code: AppErrorCode.AI_CONTEXT_UNAVAILABLE });
   });
 });

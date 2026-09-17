@@ -353,6 +353,7 @@
     "loading": "AI 해석 생성 중...",
     "loadFailed": "AI 해석을 불러오지 못했습니다.",
     "providerFailed": "AI 서비스 응답에 문제가 있습니다. 잠시 후 다시 시도해 주세요.",
+    "contextUnavailable": "AI 분석에 필요한 시세·포트폴리오 데이터를 불러오지 못했습니다.",
     "rateLimited": "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
     "quotaExceeded": "오늘 AI 해석 횟수를 모두 사용했습니다.",
     "membersOnly": "회원만 AI 해석을 이용할 수 있습니다.",

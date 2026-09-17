@@ -13,6 +13,8 @@ export function resolveAiFetchErrorMessage(error: unknown, t: TFunction): string
         return t('ai.disabled');
       case AppErrorCode.AI_PROVIDER_ERROR:
         return t('ai.providerFailed');
+      case AppErrorCode.AI_CONTEXT_UNAVAILABLE:
+        return t('ai.contextUnavailable');
       case AppErrorCode.RATE_LIMIT:
         return t('ai.rateLimited');
       default:

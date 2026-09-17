@@ -30,4 +30,10 @@ describe('resolveAppErrorMessage', () => {
   it('returns generic message for unknown code', () => {
     expect(resolveAppErrorMessage(undefined)).toBe(USER_FACING_SERVER_ERROR_MESSAGE);
   });
+
+  it('includes AI context unavailable message', () => {
+    expect(resolveAppErrorMessage(AppErrorCode.AI_CONTEXT_UNAVAILABLE)).toBe(
+      APP_ERROR_MESSAGES[AppErrorCode.AI_CONTEXT_UNAVAILABLE],
+    );
+  });
 });

@@ -16,6 +16,7 @@ import { computeContextHash } from '@/server/data/ai/context-hash';
 import {
   EMPTY_MARKET_CONTEXT,
   EMPTY_STOCK_ENRICHMENT,
+  rethrowAiContextUnavailable,
   withContextFallback,
 } from './context-build.helpers';
 
@@ -37,20 +38,31 @@ export class BuildStockAiContextUseCase {
     userHoldings?: Array<{ symbol: string; market: Market }>;
     userWatchlist?: Array<{ symbol: string; market: Market }>;
   }): Promise<StockAiContext> {
-    const report = await this.buildStockAnalysisReportUseCase.execute({
-      symbol: input.symbol,
-      name: input.name,
-      market: input.market,
-      yahooSymbol: input.yahooSymbol,
-      userHoldings: input.userHoldings,
-      userWatchlist: input.userWatchlist,
-    });
+    let report;
+    try {
+      report = await this.buildStockAnalysisReportUseCase.execute({
+        symbol: input.symbol,
+        name: input.name,
+        market: input.market,
+        yahooSymbol: input.yahooSymbol,
+        userHoldings: input.userHoldings,
+        userWatchlist: input.userWatchlist,
+      });
+    } catch (error) {
+      rethrowAiContextUnavailable(error);
+    }
 
     const [marketContext, dashboard] = await Promise.all([
       withContextFallback('stock.marketContext', EMPTY_MARKET_CONTEXT, () =>
         this.buildMarketContextUseCase.execute(),
       ),
-      this.getDashboardUseCase.execute(input.userId),
+      (async () => {
+        try {
+          return await this.getDashboardUseCase.execute(input.userId);
+        } catch (error) {
+          rethrowAiContextUnavailable(error);
+        }
+      })(),
     ]);
 
     const currency = resolveCurrency(input.market);

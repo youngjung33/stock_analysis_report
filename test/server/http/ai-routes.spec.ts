@@ -223,10 +223,12 @@ describe('AI API routes', () => {
       expect(res.status).toBe(429);
     });
 
-    it('returns 500 when context build fails', async () => {
+    it('returns 400 AI_CONTEXT_UNAVAILABLE when context build fails', async () => {
       mockServices({
         buildStockAiContextUseCase: {
-          execute: vi.fn().mockRejectedValue(new Error('STOCK_ANALYSIS_UNAVAILABLE')),
+          execute: vi
+            .fn()
+            .mockRejectedValue(new ValidationError(AppErrorCode.AI_CONTEXT_UNAVAILABLE)),
         },
       });
 
@@ -237,7 +239,9 @@ describe('AI API routes', () => {
           body: JSON.stringify({ symbol: '005930', name: 'Samsung', market: Market.KR }),
         }),
       );
-      expect(res.status).toBe(500);
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.code).toBe(AppErrorCode.AI_CONTEXT_UNAVAILABLE);
     });
 
     it('returns 400 when provider fails', async () => {
@@ -275,10 +279,12 @@ describe('AI API routes', () => {
       expect(body.insight).toBeTruthy();
     });
 
-    it('returns 500 when portfolio context build fails', async () => {
+    it('returns 400 AI_CONTEXT_UNAVAILABLE when portfolio context build fails', async () => {
       mockServices({
         buildPortfolioAiContextUseCase: {
-          execute: vi.fn().mockRejectedValue(new Error('DB_UNAVAILABLE')),
+          execute: vi
+            .fn()
+            .mockRejectedValue(new ValidationError(AppErrorCode.AI_CONTEXT_UNAVAILABLE)),
         },
       });
 
@@ -289,7 +295,9 @@ describe('AI API routes', () => {
           body: JSON.stringify({ locale: 'ko' }),
         }),
       );
-      expect(res.status).toBe(500);
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.code).toBe(AppErrorCode.AI_CONTEXT_UNAVAILABLE);
     });
 
     it('returns disabled when AI off without calling use case', async () => {

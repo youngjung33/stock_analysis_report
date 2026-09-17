@@ -57,6 +57,7 @@ export const AppErrorCode = {
   AI_DISABLED: 'AI_DISABLED',
   AI_QUOTA_EXCEEDED: 'AI_QUOTA_EXCEEDED',
   AI_PROVIDER_ERROR: 'AI_PROVIDER_ERROR',
+  AI_CONTEXT_UNAVAILABLE: 'AI_CONTEXT_UNAVAILABLE',
   AI_MEMBERS_ONLY: 'AI_MEMBERS_ONLY',
 } as const;
 
@@ -137,6 +138,8 @@ export const APP_ERROR_MESSAGES: Record<AppErrorCode, string> = {
   [AppErrorCode.AI_DISABLED]: 'AI 분석 기능이 비활성화되어 있습니다.',
   [AppErrorCode.AI_QUOTA_EXCEEDED]: '오늘 AI 분석 사용 한도에 도달했습니다.',
   [AppErrorCode.AI_PROVIDER_ERROR]: 'AI 분석을 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도해 주세요.',
+  [AppErrorCode.AI_CONTEXT_UNAVAILABLE]:
+    'AI 분석에 필요한 시세·포트폴리오 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.',
   [AppErrorCode.AI_MEMBERS_ONLY]: 'AI 분석은 회원만 이용할 수 있습니다.',
 };
 

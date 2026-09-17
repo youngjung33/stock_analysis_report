@@ -353,6 +353,7 @@
     "loading": "Generating AI insight...",
     "loadFailed": "Could not load AI insight.",
     "providerFailed": "The AI service returned an error. Please try again later.",
+    "contextUnavailable": "Could not load market or portfolio data required for AI insight.",
     "rateLimited": "Too many requests. Please try again later.",
     "quotaExceeded": "You have used all AI insights for today.",
     "membersOnly": "AI insights are available to members only.",

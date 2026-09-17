@@ -18,6 +18,12 @@ describe('resolveAiFetchErrorMessage', () => {
     ).toBe('ai.providerFailed');
   });
 
+  it('maps context unavailable error', () => {
+    expect(
+      resolveAiFetchErrorMessage(new AppError('x', AppErrorCode.AI_CONTEXT_UNAVAILABLE), t),
+    ).toBe('ai.contextUnavailable');
+  });
+
   it('falls back for unknown errors', () => {
     expect(resolveAiFetchErrorMessage(new Error('boom'), t)).toBe('ai.loadFailed');
   });

@@ -1,5 +1,6 @@
-import { DEFAULT_PORTFOLIO_PREFERENCES } from '@sar/shared';
+import { AppErrorCode, DEFAULT_PORTFOLIO_PREFERENCES } from '@sar/shared';
 import type { PortfolioAnalysisResult } from '../../entities';
+import { ValidationError } from '../../errors/domain.errors';
 import { logWarn } from '@/server/observability/logger';
 
 export const EMPTY_MARKET_CONTEXT = {
@@ -47,6 +48,17 @@ export const EMPTY_PORTFOLIO_SIMULATION_BUNDLE = {
   recommendations: [],
   regimes: [],
 };
+
+/** Maps critical context dependency failures to AI_CONTEXT_UNAVAILABLE */
+export function rethrowAiContextUnavailable(error: unknown): never {
+  if (error instanceof ValidationError && error.code === AppErrorCode.AI_CONTEXT_UNAVAILABLE) {
+    throw error;
+  }
+  logWarn('ai.context.unavailable', {
+    error: error instanceof Error ? error.message : String(error),
+  });
+  throw new ValidationError(AppErrorCode.AI_CONTEXT_UNAVAILABLE);
+}
 
 export async function withContextFallback<T>(
   label: string,

@@ -1,5 +1,5 @@
 import { vi, describe, expect, it } from 'vitest';
-import { Market } from '@sar/shared';
+import { AppErrorCode, Market } from '@sar/shared';
 import { BuildStockAiContextUseCase } from '@/server/domain/usecases/ai/build-stock-ai-context.use-case';
 
 function mockReport() {
@@ -127,19 +127,19 @@ describe('BuildStockAiContextUseCase', () => {
     expect(result.facts.marketLink.indexChange1d).toBeNull();
   });
 
-  it('propagates report failure', async () => {
+  it('throws AI_CONTEXT_UNAVAILABLE when report fails', async () => {
     await expect(
       createUseCase({
         report: vi.fn().mockRejectedValue(new Error('STOCK_ANALYSIS_UNAVAILABLE')),
       }).execute(baseInput),
-    ).rejects.toThrow('STOCK_ANALYSIS_UNAVAILABLE');
+    ).rejects.toMatchObject({ code: AppErrorCode.AI_CONTEXT_UNAVAILABLE });
   });
 
-  it('propagates dashboard failure', async () => {
+  it('throws AI_CONTEXT_UNAVAILABLE when dashboard fails', async () => {
     await expect(
       createUseCase({
         dashboard: vi.fn().mockRejectedValue(new Error('DB_UNAVAILABLE')),
       }).execute(baseInput),
-    ).rejects.toThrow('DB_UNAVAILABLE');
+    ).rejects.toMatchObject({ code: AppErrorCode.AI_CONTEXT_UNAVAILABLE });
   });
 });
