@@ -37,6 +37,16 @@ test.describe('AI insight API', () => {
 test.describe('AI insight UI', () => {
   test.setTimeout(120_000);
 
+  test('guest sees AI insight panel on stock detail page', async ({ page }) => {
+    await enterAsGuest(page);
+    await page.goto('/stocks/005930?market=KR');
+    await ensureKoreanLocale(page);
+
+    await expect(page.getByRole('heading', { name: '삼성전자' })).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText('AI 종목 해석')).toBeVisible({ timeout: 60_000 });
+    await expect(page.getByRole('button', { name: 'AI 해석 받기' })).toBeVisible();
+  });
+
   test('guest sees AI insight panel after selecting stock on market analysis', async ({ page }) => {
     await enterAsGuest(page);
     await page.goto('/market/analysis');

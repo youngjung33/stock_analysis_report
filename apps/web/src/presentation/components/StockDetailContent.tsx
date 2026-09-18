@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import {
@@ -8,6 +8,8 @@ import {
   QuoteChartRange,
   findFeaturedStock,
   resolveCurrency,
+  resolveYahooSymbol,
+  type StockSearchResult,
 } from '@sar/shared';
 import { translateMarketLabel, translateQuoteRange } from '@/i18n/translate-shared';
 import { useStockQuote } from '../hooks/useStockQuote';
@@ -17,6 +19,7 @@ import { MyHoldingPanel } from '../components/MyHoldingPanel';
 import { StockRangeSelector } from '../components/StockRangeSelector';
 import { StockPriceChart } from '../components/StockPriceChart';
 import { formatNumber, formatPercent, pnlClass } from '../shared/formatters';
+import { AiStockInsightPanel } from '../features/ai/AiStockInsightPanel';
 
 interface Props {
   symbol: string;
@@ -35,6 +38,15 @@ export function StockDetailContent({ symbol, market }: Props) {
   const currency = stock ? resolveCurrency(stock.market) : resolveCurrency(market);
   const title = stock?.name ?? symbol;
   const loading = isLoading || isFetching;
+  const aiSelected = useMemo<StockSearchResult>(
+    () => ({
+      symbol,
+      name: stock?.name ?? symbol,
+      market,
+      yahooSymbol: resolveYahooSymbol(symbol, market) ?? symbol,
+    }),
+    [symbol, market, stock?.name],
+  );
 
   return (
     <div className="space-y-6">
@@ -123,6 +135,8 @@ export function StockDetailContent({ symbol, market }: Props) {
           </p>
         )}
       </section>
+
+      <AiStockInsightPanel selected={aiSelected} />
     </div>
   );
 }
