@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { Market } from '@sar/shared';
-import { buildMarketInsights, computeRegionSentiment } from '@sar/shared';
+import {
+  Market,
+  applyIndexRegionSentiment,
+  buildMarketInsights,
+  computeIndexRegionSentiment,
+  computeRegionSentiment,
+} from '@sar/shared';
 
 const krQuotes = [
   { symbol: '005930', name: '삼성전자', market: Market.KR, currency: 'KRW', currentPrice: 70000, changePercent: 2.1 },
@@ -12,6 +17,28 @@ const usQuotes = [
   { symbol: 'AAPL', name: 'Apple', market: Market.US, currency: 'USD', currentPrice: 190, changePercent: -0.5 },
   { symbol: 'MSFT', name: 'Microsoft', market: Market.US, currency: 'USD', currentPrice: 420, changePercent: -1.2 },
 ];
+
+describe('computeIndexRegionSentiment', () => {
+  it('derives bullish KR sentiment from KOSPI change', () => {
+    const sentiment = computeIndexRegionSentiment(Market.KR, { name: 'KOSPI', changePercent1d: 1.2 });
+    expect(sentiment.label).toBe('bull');
+    expect(sentiment.avgChangePercent).toBe(1.2);
+    expect(sentiment.headlineKey).toBe('shared.market.sentiment.indexHeadline');
+  });
+});
+
+describe('applyIndexRegionSentiment', () => {
+  it('overrides display sentiment with index while keeping quote sentiment', () => {
+    const base = buildMarketInsights(krQuotes, usQuotes);
+    const applied = applyIndexRegionSentiment(base, [
+      { name: 'KOSPI', yahooSymbol: '^KS11', market: Market.KR, changePercent1d: 1.2 },
+      { name: 'NASDAQ', yahooSymbol: '^IXIC', market: Market.US, changePercent1d: -1.0 },
+    ]);
+    expect(applied.quoteKr.label).toBe('bull');
+    expect(applied.kr.avgChangePercent).toBe(1.2);
+    expect(applied.us.label).toBe('bear');
+  });
+});
 
 describe('computeRegionSentiment', () => {
   it('detects bullish KR market from average change', () => {

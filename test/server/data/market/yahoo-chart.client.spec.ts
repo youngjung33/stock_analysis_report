@@ -87,6 +87,7 @@ describe('fetchYahooChartSeries', () => {
     });
 
     const series = await fetchYahooChartSeries('091160.KS');
+    expect(series.currentPrice).toBe(18_650);
     expect(series.changePercent1d).toBeCloseTo(0.219, 2);
   });
 });

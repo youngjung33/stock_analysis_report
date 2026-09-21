@@ -70,7 +70,7 @@ AI Context Pack은 아래 **이미 계산된 데이터**에서만 조립한다.
 | **Context Pack** | AI에 보내는 정형 입력. `schemaVersion`, `kind`, `locale`, `facts`, `constraints` |
 | **Insight Pack** | AI가 반환하는 정형 출력. `schemaVersion`, `kind`, `sections[]`, `disclaimer`, `meta` |
 | **AiProviderPort** | `completeStructured<T>(request): Promise<T>` — provider 무관 인터페이스 |
-| **Analysis Job** | (선택) 비동기·캐시 키. 동일 context hash → TTL 내 재사용 |
+| **Analysis Job** | in-memory cache (KST 당일, LRU 256). 동일 context hash → TTL 내 재사용 |
 
 ---
 
@@ -294,9 +294,9 @@ apps/web/src/server/data/ai/prompts/
 |--------|------|------|------|
 | POST | `/api/ai/portfolio-analysis` | ✅ 회원 (`AI_ALLOW_GUEST=true` 시 테스트용 guest) | Portfolio Context → Insight |
 | POST | `/api/ai/stock-analysis` | ✅ 동일 | body: `{ symbol, name, market }` → Insight |
-| PUT/GET/DELETE | `/api/account/ai-credential` | ✅ 회원 | BYOK provider·key 암호화 저장 |
+| PUT/GET/POST/DELETE | `/api/account/ai-credential` | ✅ 회원 | BYOK CRUD + POST validate (smoke test) |
 
-Handler → quota check (`AiUsageLog`) → Context Builder → Provider → Zod validate → JSON (**insight DB 저장 없음**).
+Handler → quota check (`AiUsageLog`) → Context Builder → in-memory cache lookup → Provider → Zod validate → JSON (**insight DB 저장 없음**).
 
 ### 7.2 Use Case (신규)
 
@@ -305,7 +305,7 @@ Handler → quota check (`AiUsageLog`) → Context Builder → Provider → Zod 
 | `BuildPortfolioAiContextUseCase` | dashboard + analysis + simulation + profile → `PortfolioAiContext` |
 | `BuildStockAiContextUseCase` | stock report + enrichment → `StockAiContext` |
 | `RunAiAnalysisUseCase` | context build → provider → Zod validate → `AiInsightEnvelope` |
-| `GetCachedAiInsightUseCase` | (선택) Redis/DB TTL 조회 |
+| `insight-memory-cache` | in-process cache (`getCachedAiInsight` / `setCachedAiInsight`). Redis/DB TTL은 미구현 |
 
 Client: `FetchPortfolioAiInsightUseCase`, `FetchStockAiInsightUseCase` (thin wrapper).
 
@@ -316,7 +316,7 @@ Client: `FetchPortfolioAiInsightUseCase`, `FetchStockAiInsightUseCase` (thin wra
 | member | portfolio **1/일** · stock **3/일** (KST 기준, `AiUsageLog`) |
 | guest | 기본 **불가** — `AI_ALLOW_GUEST=true` 시 테스트만 |
 
-- Insight **저장·캐시 없음** — 매 요청 1회 LLM 호출
+- Insight **DB 저장 없음** — in-memory cache hit 시 provider/quota **미호출** (`AI_INSIGHT_CACHE=false`로 비활성화 가능)
 - 기존 `apiHeavy` rate limit + DB daily quota 이중 적용
 - Provider timeout 30s, 1 retry
 
@@ -339,13 +339,17 @@ CapitalAndSimulationSection         ← allocation section 연동
 ### 8.2 종목 집중 (`/market/analysis`, `/stocks/[symbol]`)
 
 ```
-StockFocusSection
+StockFocusSection (/market/analysis)
   ├─ 기존 StockPriceExplanationReport (rule-based)
-  └─ [NEW] AiStockInsightPanel       ← 종목 선택 시 POST /api/ai/stock-analysis
+  └─ AiStockInsightPanel             ← 종목 선택 시 POST /api/ai/stock-analysis
+
+StockDetailContent (/stocks/[symbol])
+  └─ AiStockInsightPanel             ← 종목 상세 차트 아래
 ```
 
-- Rule-based insights **위**에 AI summary, **아래**에 openQuestions
+- Guest: 패널 표시 + `membersOnly` 안내 (버튼 숨김). Member: opt-in 버튼
 - 동일 종목·동일 context hash → 캐시 badge 표시
+- Section id별 페이지 영역 연동(profileFit 등)은 **미구현** — `AiInsightSections` flat list
 
 ---
 
@@ -380,17 +384,19 @@ StockFocusSection
 
 ### Phase 1 — Stock (vertical slice)
 
-- [ ] `GeminiProvider` + `BuildStockAiContextUseCase` + `RunAiAnalysisUseCase`
-- [ ] `POST /api/ai/stock-analysis` + `AiStockInsightPanel` (opt-in button)
+- [x] `GeminiProvider` + `BuildStockAiContextUseCase` + `RunAiAnalysisUseCase`
+- [x] `POST /api/ai/stock-analysis` + `AiStockInsightPanel` (opt-in button)
+- [x] `/stocks/[symbol]` 종목 상세에 `AiStockInsightPanel` 노출
 
 ### Phase 2 — Portfolio + BYOK + Quota DB
 
-- [ ] Prisma `AiUsageLog` + `UserAiCredential`
-- [ ] `BuildPortfolioAiContextUseCase` + portfolio API + settings UI
+- [x] Prisma `AiUsageLog` + `UserAiCredential`
+- [x] `BuildPortfolioAiContextUseCase` + portfolio API + settings UI (`AiCredentialSection`)
 
 ### Phase 3 — Multi-provider
 
-- [ ] OpenAI / Anthropic / HttpCustom adapters + `AI_PROVIDER` switch
+- [x] OpenAI / Anthropic / HttpCustom adapters + `AI_PROVIDER` switch
+- [x] in-memory insight cache (KST day, LRU 256)
 
 ---
 
@@ -464,7 +470,7 @@ AI_ALLOW_GUEST=false                    # true = 테스트용 guest AI 허용
 | # | 결정 |
 |---|------|
 | 1 | Custom AI = 전용 POST `{ context, outputSchema, locale } → { insight }` |
-| 2 | Insight **미저장** — quota만 Postgres `AiUsageLog` |
+| 2 | Insight **DB 미저장** — quota는 Postgres `AiUsageLog`, cache는 in-memory only |
 | 3 | UI = **opt-in 버튼** |
 | 4 | 단일 prompt + `locale` 필드 |
 | 5 | Rule-based **유지**, AI는 **보완 section** |
@@ -473,10 +479,10 @@ AI_ALLOW_GUEST=false                    # true = 테스트용 guest AI 허용
 
 ---
 
-## 16. 다음 액션
+## 16. 다음 액션 (2026-09-21 갱신)
 
-1. **Phase 0** — `packages/shared/src/ai/` 스키마 + fixture 테스트 PR
-2. 자체 AI endpoint contract 확정 (15-1)
-3. **Phase 1** stock vertical slice — `/market/analysis`에서 첫 UI 노출
-
-USECASES.md · PLAN.md 구현 상태 표는 Phase 1 merge 시 갱신.
+1. ~~Phase 0~3 구현~~ — 완료
+2. ~~`/stocks/[symbol]` AI 패널~~ — 완료
+3. **선택** — section id별 UI 영역 연동 (`profileFit` → InvestorProfileSection 등)
+4. **선택** — distributed cache (Redis) for multi-instance
+5. USECASES.md · PLAN.md 구현 상태 표 갱신

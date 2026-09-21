@@ -161,6 +161,7 @@ export interface YahooChartSeries {
   volumes: number[];
   highs: number[];
   lows: number[];
+  currentPrice: number | null;
   changePercent1d: number | null;
 }
 
@@ -185,12 +186,19 @@ function seriesFromResult(symbol: string, result: YahooChartResult): YahooChartS
   }
 
   const meta = result.meta;
+  const livePrice = meta?.regularMarketPrice;
+  const currentPrice =
+    livePrice != null && livePrice > 0
+      ? livePrice
+      : closes.length > 0
+        ? closes[closes.length - 1]
+        : null;
   const changePercent1d = dailyChangePercentFromCloses(closes, {
-    livePrice: meta?.regularMarketPrice,
+    livePrice,
     lastBarEpochSec,
   });
 
-  return { symbol, closes, volumes, highs, lows, changePercent1d };
+  return { symbol, closes, volumes, highs, lows, currentPrice, changePercent1d };
 }
 
 /** 지수·종목 일봉 시계열 (기술적 분석용) */

@@ -184,9 +184,18 @@ export interface StockQuoteSnapshot {
   points: StockPricePoint[];
 }
 
+export interface RegionIndexQuote {
+  name: string;
+  yahooSymbol: string;
+  market: import('@sar/shared').Market;
+  currentPrice: number | null;
+  changePercent1d: number | null;
+}
+
 export interface FeaturedQuotesResult {
   kr: FeaturedStockQuote[];
   us: FeaturedStockQuote[];
+  indices: RegionIndexQuote[];
   fetchedAt: string;
 }
 

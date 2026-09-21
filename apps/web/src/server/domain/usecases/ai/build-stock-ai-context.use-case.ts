@@ -5,6 +5,7 @@ import {
   pickNewsTitlesForAi,
   buildStockDerivedFacts,
   resolveCurrency,
+  findRegionSentimentIndex,
   type StockAiContext,
   type SupportedLocale,
 } from '@sar/shared';
@@ -12,6 +13,7 @@ import { BuildStockAnalysisReportUseCase } from '../market/build-stock-analysis-
 import { BuildMarketContextUseCase } from '../market/build-market-context.use-case';
 import { BuildStockEnrichmentUseCase } from '../market/build-stock-enrichment.use-case';
 import { GetDashboardUseCase } from '../portfolio/get-dashboard.use-case';
+import { ListWatchlistUseCase } from '../watchlist/watchlist.use-cases';
 import { computeContextHash } from '@/server/data/ai/context-hash';
 import {
   EMPTY_MARKET_CONTEXT,
@@ -26,6 +28,7 @@ export class BuildStockAiContextUseCase {
     private readonly buildMarketContextUseCase: BuildMarketContextUseCase,
     private readonly buildStockEnrichmentUseCase: BuildStockEnrichmentUseCase,
     private readonly getDashboardUseCase: GetDashboardUseCase,
+    private readonly listWatchlistUseCase: ListWatchlistUseCase,
   ) {}
 
   async execute(input: {
@@ -35,24 +38,8 @@ export class BuildStockAiContextUseCase {
     market: Market;
     yahooSymbol?: string;
     locale: SupportedLocale;
-    userHoldings?: Array<{ symbol: string; market: Market }>;
-    userWatchlist?: Array<{ symbol: string; market: Market }>;
   }): Promise<StockAiContext> {
-    let report;
-    try {
-      report = await this.buildStockAnalysisReportUseCase.execute({
-        symbol: input.symbol,
-        name: input.name,
-        market: input.market,
-        yahooSymbol: input.yahooSymbol,
-        userHoldings: input.userHoldings,
-        userWatchlist: input.userWatchlist,
-      });
-    } catch (error) {
-      rethrowAiContextUnavailable(error);
-    }
-
-    const [marketContext, dashboard] = await Promise.all([
+    const [marketContext, dashboard, userWatchlist] = await Promise.all([
       withContextFallback('stock.marketContext', EMPTY_MARKET_CONTEXT, () =>
         this.buildMarketContextUseCase.execute(),
       ),
@@ -63,7 +50,27 @@ export class BuildStockAiContextUseCase {
           rethrowAiContextUnavailable(error);
         }
       })(),
+      withContextFallback('stock.watchlist', [] as Array<{ symbol: string; market: Market }>, async () => {
+        const items = await this.listWatchlistUseCase.execute(input.userId);
+        return items.map((w) => ({ symbol: w.symbol, market: w.market }));
+      }),
     ]);
+
+    const userHoldings = dashboard.holdings.map((h) => ({ symbol: h.symbol, market: h.market }));
+
+    let report;
+    try {
+      report = await this.buildStockAnalysisReportUseCase.execute({
+        symbol: input.symbol,
+        name: input.name,
+        market: input.market,
+        yahooSymbol: input.yahooSymbol,
+        userHoldings,
+        userWatchlist,
+      });
+    } catch (error) {
+      rethrowAiContextUnavailable(error);
+    }
 
     const currency = resolveCurrency(input.market);
     const target = {
@@ -90,11 +97,10 @@ export class BuildStockAiContextUseCase {
         : null;
 
     const isHeld = Boolean(holding);
-    const isWatchlisted = Boolean(
-      input.userWatchlist?.some(
-        (w) => w.symbol.toUpperCase() === input.symbol.toUpperCase() && w.market === input.market,
-      ),
+    const isWatchlisted = userWatchlist.some(
+      (w) => w.symbol.toUpperCase() === input.symbol.toUpperCase() && w.market === input.market,
     );
+    const primaryIndex = findRegionSentimentIndex(marketContext.indices, input.market);
 
     const recentNewsTitles = pickNewsTitlesForAi(news?.recentTitles, news?.headlineSample);
 
@@ -135,7 +141,7 @@ export class BuildStockAiContextUseCase {
         : null,
       marketLink: {
         regimeIds: marketContext.macro.slice(0, 3).map((m) => m.interpretKey),
-        indexChange1d: marketContext.indices[0]?.changePercent1d ?? null,
+        indexChange1d: primaryIndex?.changePercent1d ?? null,
         leadingSectors: marketContext.sectors.slice(0, 3).map((s) => s.name),
       },
       userLink: {

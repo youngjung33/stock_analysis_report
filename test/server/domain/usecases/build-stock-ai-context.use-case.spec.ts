@@ -40,6 +40,7 @@ function createUseCase(overrides: {
   market?: ReturnType<typeof vi.fn>;
   enrichment?: ReturnType<typeof vi.fn>;
   dashboard?: ReturnType<typeof vi.fn>;
+  watchlist?: ReturnType<typeof vi.fn>;
 } = {}) {
   return new BuildStockAiContextUseCase(
     { execute: overrides.report ?? vi.fn().mockResolvedValue(mockReport()) } as never,
@@ -80,6 +81,11 @@ function createUseCase(overrides: {
         }),
     } as never,
     { execute: overrides.dashboard ?? vi.fn().mockResolvedValue(mockDashboard()) } as never,
+    {
+      execute:
+        overrides.watchlist ??
+        vi.fn().mockResolvedValue([{ symbol: '005930', market: Market.KR, name: 'Samsung' }]),
+    } as never,
   );
 }
 
@@ -89,7 +95,6 @@ const baseInput = {
   name: 'Samsung',
   market: Market.KR,
   locale: 'ko' as const,
-  userWatchlist: [{ symbol: '005930', market: Market.KR }],
 };
 
 describe('BuildStockAiContextUseCase', () => {
@@ -141,5 +146,14 @@ describe('BuildStockAiContextUseCase', () => {
         dashboard: vi.fn().mockRejectedValue(new Error('DB_UNAVAILABLE')),
       }).execute(baseInput),
     ).rejects.toMatchObject({ code: AppErrorCode.AI_CONTEXT_UNAVAILABLE });
+  });
+
+  it('continues without watchlist when watchlist fetch fails', async () => {
+    const result = await createUseCase({
+      watchlist: vi.fn().mockRejectedValue(new Error('watchlist unavailable')),
+    }).execute(baseInput);
+
+    expect(result.facts.userLink.isWatchlisted).toBe(false);
+    expect(result.facts.userLink.isHeld).toBe(true);
   });
 });

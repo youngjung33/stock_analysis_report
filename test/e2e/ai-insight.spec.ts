@@ -44,7 +44,7 @@ test.describe('AI insight UI', () => {
 
     await expect(page.getByRole('heading', { name: '삼성전자' })).toBeVisible({ timeout: 30_000 });
     await expect(page.getByText('AI 종목 해석')).toBeVisible({ timeout: 60_000 });
-    await expect(page.getByRole('button', { name: 'AI 해석 받기' })).toBeVisible();
+    await expect(page.getByText('회원만 AI 해석을 이용할 수 있습니다.')).toBeVisible();
   });
 
   test('guest sees AI insight panel after selecting stock on market analysis', async ({ page }) => {
@@ -59,7 +59,7 @@ test.describe('AI insight UI', () => {
     await page.getByRole('button', { name: /005930/ }).first().click({ timeout: 30_000 });
 
     await expect(page.getByText('AI 종목 해석')).toBeVisible({ timeout: 60_000 });
-    await expect(page.getByRole('button', { name: 'AI 해석 받기' })).toBeVisible();
+    await expect(page.getByText('회원만 AI 해석을 이용할 수 있습니다.')).toBeVisible();
   });
 
   test('member stock AI API returns enabled flag or insight', async ({ page }) => {

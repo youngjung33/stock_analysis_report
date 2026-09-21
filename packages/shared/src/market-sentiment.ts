@@ -1,4 +1,5 @@
 import { Market } from './enums';
+import { findRegionSentimentIndex } from './market-benchmarks';
 
 /** 시세 기반 인사이트 입력 (주요 종목 시세와 동일 shape) */
 export interface QuoteInsightInput {
@@ -83,6 +84,71 @@ function regionDescription(market: Market, label: SentimentLabel, avg: number, u
   }
 }
 
+function indexRegionDescription(
+  indexName: string,
+  label: SentimentLabel,
+  change: number,
+): string {
+  const changeText = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+  switch (label) {
+    case 'strong_bull':
+      return `${indexName} ${changeText} — 단기 강한 상승세.`;
+    case 'bull':
+      return `${indexName} ${changeText} — 완만한 상승 분위기.`;
+    case 'neutral':
+      return `${indexName} ${changeText} — 뚜렷한 방향성 없음.`;
+    case 'bear':
+      return `${indexName} ${changeText} — 조정·약세.`;
+    case 'strong_bear':
+      return `${indexName} ${changeText} — 급락·강한 약세.`;
+  }
+}
+
+/** 코스피·나스닥 등 대표 지수 등락률로 시장 정세 산출 */
+export function computeIndexRegionSentiment(
+  market: Market,
+  index: { name: string; changePercent1d: number | null },
+): RegionSentiment {
+  const marketKey = market === Market.KR ? 'kr' : 'us';
+
+  if (index.changePercent1d === null) {
+    return {
+      market,
+      label: 'neutral',
+      avgChangePercent: null,
+      upCount: 0,
+      downCount: 0,
+      flatCount: 0,
+      headline: `${index.name} · 혼조`,
+      description: '지수 시세가 없어 정세를 판단하기 어렵습니다.',
+      headlineKey: 'shared.market.sentiment.indexHeadline',
+      headlineParams: { indexName: index.name, sentiment: 'neutral', market: marketKey },
+      descriptionKey: 'shared.market.sentiment.indexNoData',
+      descriptionParams: { indexName: index.name },
+    };
+  }
+
+  const change = index.changePercent1d;
+  const label = sentimentFromAvg(change);
+  const changeText = `${change >= 0 ? '+' : ''}${change.toFixed(2)}`;
+
+  return {
+    market,
+    label,
+    avgChangePercent: change,
+    upCount: 0,
+    downCount: 0,
+    flatCount: 0,
+    headline: `${index.name} · ${SENTIMENT_LABEL_KO[label]}`,
+    description: indexRegionDescription(index.name, label, change),
+    headlineKey: 'shared.market.sentiment.indexHeadline',
+    headlineParams: { indexName: index.name, sentiment: label, market: marketKey },
+    descriptionKey: `shared.market.sentiment.indexDescription.${label}`,
+    descriptionParams: { indexName: index.name, change: changeText, market: marketKey },
+  };
+}
+
+/** 대표 종목 평균 기반 정세 — 추천·시장 폭(breadth) 분석용 */
 export function computeRegionSentiment(market: Market, quotes: QuoteInsightInput[]): RegionSentiment {
   const valid = validQuotes(quotes);
 
@@ -128,6 +194,27 @@ export function computeRegionSentiment(market: Market, quotes: QuoteInsightInput
       up: upCount,
       down: downCount,
     },
+  };
+}
+
+export function applyIndexRegionSentiment(
+  base: { kr: RegionSentiment; us: RegionSentiment },
+  indices: Array<{ name: string; yahooSymbol: string; market: Market; changePercent1d: number | null }>,
+): {
+  kr: RegionSentiment;
+  us: RegionSentiment;
+  quoteKr: RegionSentiment;
+  quoteUs: RegionSentiment;
+} {
+  const quoteKr = base.kr;
+  const quoteUs = base.us;
+  const krIndex = findRegionSentimentIndex(indices, Market.KR);
+  const usIndex = findRegionSentimentIndex(indices, Market.US);
+  return {
+    quoteKr,
+    quoteUs,
+    kr: krIndex ? computeIndexRegionSentiment(Market.KR, krIndex) : quoteKr,
+    us: usIndex ? computeIndexRegionSentiment(Market.US, usIndex) : quoteUs,
   };
 }
 

@@ -47,4 +47,18 @@ describe('GeminiProvider', () => {
     const provider = new GeminiProvider('test-key', 'gemini-2.0-flash');
     await expect(provider.completeStructured(minimalAiRequest)).rejects.toThrow('network down');
   });
+
+  it('throws on invalid JSON response', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          candidates: [{ content: { parts: [{ text: 'not-json' }] } }],
+        }),
+      }),
+    );
+    const provider = new GeminiProvider('test-key', 'gemini-2.0-flash');
+    await expect(provider.completeStructured(minimalAiRequest)).rejects.toThrow();
+  });
 });

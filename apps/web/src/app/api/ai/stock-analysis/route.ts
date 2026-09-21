@@ -5,6 +5,7 @@ import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
 import { handleRouteError, jsonData } from '@/server/http/route-utils';
 import { requireAiMemberAuth } from '@/server/http/ai-auth';
+import { runAiAnalysisResponse } from '@/server/http/ai-route-helpers';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 export const maxDuration = 60;
 
@@ -35,17 +36,7 @@ export async function POST(req: NextRequest) {
     const locale = normalizeLocale(body.locale ?? req.headers.get('accept-language') ?? 'ko');
     const market = body.market as Market;
 
-    const {
-      listWatchlistUseCase,
-      getDashboardUseCase,
-      buildStockAiContextUseCase,
-      runAiAnalysisUseCase,
-    } = getServerServices();
-
-    const [dashboard, watchlist] = await Promise.all([
-      getDashboardUseCase.execute(user.userId),
-      listWatchlistUseCase.execute(user.userId),
-    ]);
+    const { buildStockAiContextUseCase, runAiAnalysisUseCase } = getServerServices();
 
     const context = await buildStockAiContextUseCase.execute({
       userId: user.userId,
@@ -54,18 +45,14 @@ export async function POST(req: NextRequest) {
       market,
       yahooSymbol: body.yahooSymbol?.trim(),
       locale,
-      userHoldings: dashboard.holdings.map((h) => ({ symbol: h.symbol, market: h.market })),
-      userWatchlist: watchlist.map((w) => ({ symbol: w.symbol, market: w.market })),
     });
 
-    const insight = await runAiAnalysisUseCase.execute({
+    return await runAiAnalysisResponse(runAiAnalysisUseCase, {
       userId: user.userId,
       kind: 'stock',
       context,
       locale,
     });
-
-    return jsonData({ enabled: true, insight });
   } catch (error) {
     return handleRouteError(error);
   }

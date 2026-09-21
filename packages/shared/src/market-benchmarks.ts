@@ -105,3 +105,33 @@ export const SECTOR_ETFS: Array<
 export function yahooChartUrl(symbol: string): string {
   return `https://finance.yahoo.com/quote/${encodeURIComponent(symbol)}/`;
 }
+
+/** UI 시장 정세·AI 맥락용 — KR 코스피, US 나스닥 */
+export const REGION_SENTIMENT_INDEX_SYMBOL: Record<Market, string> = {
+  [Market.KR]: '^KS11',
+  [Market.US]: '^IXIC',
+};
+
+const PRIMARY_INDEX_SYMBOL: Record<Market, string[]> = {
+  [Market.KR]: ['^KS11'],
+  [Market.US]: ['^GSPC', '^IXIC'],
+};
+
+/** KOSPI / S&P 등 벤치마크·차트용 대표 지수 */
+export function findPrimaryIndexSnapshot<
+  T extends { yahooSymbol: string; market: Market },
+>(indices: T[], market: Market): T | undefined {
+  for (const symbol of PRIMARY_INDEX_SYMBOL[market]) {
+    const hit = indices.find((i) => i.yahooSymbol === symbol && i.market === market);
+    if (hit) return hit;
+  }
+  return indices.find((i) => i.market === market);
+}
+
+/** 시장 정세 카드용 — KR 코스피, US 나스닥 */
+export function findRegionSentimentIndex<
+  T extends { yahooSymbol: string; market: Market },
+>(indices: T[], market: Market): T | undefined {
+  const symbol = REGION_SENTIMENT_INDEX_SYMBOL[market];
+  return indices.find((i) => i.yahooSymbol === symbol && i.market === market);
+}

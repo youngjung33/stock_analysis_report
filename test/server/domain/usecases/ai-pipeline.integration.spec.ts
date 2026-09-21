@@ -90,6 +90,7 @@ describe('AI pipeline integration', () => {
         }),
       } as never,
       { execute: vi.fn().mockResolvedValue(mockDashboard()) } as never,
+      { execute: vi.fn().mockResolvedValue([]) } as never,
     );
 
     const context = await buildContext.execute({
@@ -120,6 +121,7 @@ describe('AI pipeline integration', () => {
       { execute: vi.fn() } as never,
       { execute: vi.fn() } as never,
       { execute: vi.fn().mockResolvedValue(mockDashboard()) } as never,
+      { execute: vi.fn().mockResolvedValue([]) } as never,
     );
 
     await expect(

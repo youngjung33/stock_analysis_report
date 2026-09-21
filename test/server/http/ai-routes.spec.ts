@@ -262,6 +262,25 @@ describe('AI API routes', () => {
       const body = await res.json();
       expect(body.code).toBe(AppErrorCode.AI_PROVIDER_ERROR);
     });
+
+    it('returns disabled when provider key missing (AI_DISABLED)', async () => {
+      mockServices({
+        runAiAnalysisUseCase: {
+          execute: vi.fn().mockRejectedValue(new ValidationError(AppErrorCode.AI_DISABLED)),
+        },
+      });
+
+      const res = await stockAnalysis(
+        authedRequest('http://localhost/api/ai/stock-analysis', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ symbol: '005930', name: 'Samsung', market: Market.KR }),
+        }),
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.enabled).toBe(false);
+    });
   });
 
   describe('POST /api/ai/portfolio-analysis', () => {
@@ -316,6 +335,119 @@ describe('AI API routes', () => {
       const body = await res.json();
       expect(body.enabled).toBe(false);
       expect(runAiAnalysisUseCase.execute).not.toHaveBeenCalled();
+    });
+
+    it('returns 401 without auth', async () => {
+      const res = await portfolioAnalysis(
+        new NextRequest('http://localhost/api/ai/portfolio-analysis', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'x-forwarded-for': '10.0.0.71' },
+          body: JSON.stringify({ locale: 'ko' }),
+        }),
+      );
+      expect(res.status).toBe(401);
+    });
+
+    it('returns 400 for guest when guest AI not allowed', async () => {
+      vi.mocked(getServerServices).mockReturnValue({
+        tokenService: {
+          verifyAccessToken: vi.fn().mockReturnValue({
+            sub: 'guest-1',
+            username: GUEST_DISPLAY_NAME,
+          }),
+        },
+      } as never);
+
+      const res = await portfolioAnalysis(
+        authedRequest('http://localhost/api/ai/portfolio-analysis', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ locale: 'ko' }),
+        }),
+      );
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.code).toBe(AppErrorCode.AI_MEMBERS_ONLY);
+    });
+
+    it('returns 400 when quota exceeded', async () => {
+      mockServices({
+        runAiAnalysisUseCase: {
+          execute: vi.fn().mockRejectedValue(new ValidationError(AppErrorCode.AI_QUOTA_EXCEEDED)),
+        },
+      });
+
+      const res = await portfolioAnalysis(
+        authedRequest('http://localhost/api/ai/portfolio-analysis', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ locale: 'ko' }),
+        }),
+      );
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.code).toBe(AppErrorCode.AI_QUOTA_EXCEEDED);
+    });
+
+    it('returns 429 when rate limit exceeded', async () => {
+      const ip = '10.0.0.98';
+      const body = JSON.stringify({ locale: 'ko' });
+      for (let i = 0; i < 15; i++) {
+        await portfolioAnalysis(
+          authedRequest('http://localhost/api/ai/portfolio-analysis', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', 'x-forwarded-for': ip },
+            body,
+          }),
+        );
+      }
+
+      const res = await portfolioAnalysis(
+        authedRequest('http://localhost/api/ai/portfolio-analysis', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'x-forwarded-for': ip },
+          body,
+        }),
+      );
+      expect(res.status).toBe(429);
+    });
+
+    it('returns 400 when provider fails', async () => {
+      mockServices({
+        runAiAnalysisUseCase: {
+          execute: vi.fn().mockRejectedValue(new ValidationError(AppErrorCode.AI_PROVIDER_ERROR)),
+        },
+      });
+
+      const res = await portfolioAnalysis(
+        authedRequest('http://localhost/api/ai/portfolio-analysis', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ locale: 'ko' }),
+        }),
+      );
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.code).toBe(AppErrorCode.AI_PROVIDER_ERROR);
+    });
+
+    it('returns disabled when provider key missing (AI_DISABLED)', async () => {
+      mockServices({
+        runAiAnalysisUseCase: {
+          execute: vi.fn().mockRejectedValue(new ValidationError(AppErrorCode.AI_DISABLED)),
+        },
+      });
+
+      const res = await portfolioAnalysis(
+        authedRequest('http://localhost/api/ai/portfolio-analysis', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ locale: 'ko' }),
+        }),
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.enabled).toBe(false);
     });
   });
 

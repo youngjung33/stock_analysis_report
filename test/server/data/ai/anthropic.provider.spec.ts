@@ -29,6 +29,12 @@ describe('AnthropicProvider', () => {
     );
   });
 
+  it('throws on network failure', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network down')));
+    const provider = new AnthropicProvider('test-key', 'claude-3-5-haiku-latest');
+    await expect(provider.completeStructured(minimalAiRequest)).rejects.toThrow('network down');
+  });
+
   it('parses markdown-fenced JSON response', async () => {
     vi.stubGlobal(
       'fetch',

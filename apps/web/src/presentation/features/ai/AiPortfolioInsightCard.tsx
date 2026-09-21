@@ -56,8 +56,12 @@ export function AiPortfolioInsightCard() {
         </div>
       )}
 
-      {insight && !insight.enabled && (
-        <p className="mt-3 text-xs text-slate-500">{t('ai.disabled')}</p>
+      {errorMessage && (
+        <p
+          className={`mt-3 text-xs ${insight && !insight.enabled ? 'text-slate-500' : 'text-rose-400'}`}
+        >
+          {errorMessage}
+        </p>
       )}
     </div>
   );

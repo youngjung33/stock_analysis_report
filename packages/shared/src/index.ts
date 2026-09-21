@@ -280,6 +280,8 @@ export type { FeaturedStock } from './featured-stocks';
 export {
   buildMarketInsights,
   computeRegionSentiment,
+  computeIndexRegionSentiment,
+  applyIndexRegionSentiment,
   sentimentBadgeClass,
   SENTIMENT_LABEL_KO,
   TAG_LABEL_KO,
@@ -403,6 +405,9 @@ export {
   US_SECTOR_BENCHMARK,
   KR_SECTOR_BENCHMARK,
   yahooChartUrl,
+  findPrimaryIndexSnapshot,
+  findRegionSentimentIndex,
+  REGION_SENTIMENT_INDEX_SYMBOL,
 } from './market-benchmarks';
 export type { BenchmarkDefinition, MacroKind } from './market-benchmarks';
 export { buildMacroSnapshot } from './market-macro';

@@ -642,13 +642,15 @@
     },
     "scoreBreakdownTitle": "Recommendation rationale",
     "narrativeDivergenceBadge": "Narrative–price divergence · {{divergence}}",
-    "sentimentDesc": "Featured stocks today · See volatility, sectors, and chart indicators on the detail page",
+    "sentimentDesc": "KOSPI & NASDAQ index change · sectors and featured-stock breadth on the detail page",
     "detailAnalysisLink": "Detailed analysis →",
     "loadingQuotes": "Loading quotes...",
     "regionKr": "🇰🇷 Korea",
     "regionUs": "🇺🇸 United States",
     "avgChange": "Avg {{percent}}",
     "avgChangeDetail": "Avg change {{percent}}",
+    "indexChange": "Index {{percent}}",
+    "indexChangeDetail": "Index change {{percent}}",
     "upDownCount": "↑{{up}} ↓{{down}}",
     "deepAnalysisDesc": "VIX · FX · Treasuries · Sector RS · SMA/RSI/MACD/Bollinger/Stochastic · News",
     "disclaimer": "Reference analysis based on Yahoo Finance, Google News, and Finnhub (optional). Not investment advice.",
@@ -1255,6 +1257,15 @@
       },
       "sentiment": {
         "headline": "{{market}} featured stocks · {{sentiment}}",
+        "indexHeadline": "{{indexName}} · {{sentiment}}",
+        "indexNoData": "No {{indexName}} quote — cannot assess sentiment.",
+        "indexDescription": {
+          "strong_bull": "{{indexName}} {{change}}% — strong short-term uptrend.",
+          "bull": "{{indexName}} {{change}}% — mild bullish tone.",
+          "neutral": "{{indexName}} {{change}}% — no clear direction.",
+          "bear": "{{indexName}} {{change}}% — correction/weakness.",
+          "strong_bear": "{{indexName}} {{change}}% — sharp selloff."
+        },
         "noData": "Insufficient quote data to assess sentiment.",
         "description": {
           "strong_bull": "Featured stocks avg {{avg}}%. Up {{up}} · Down {{down}} — strong short-term uptrend.",

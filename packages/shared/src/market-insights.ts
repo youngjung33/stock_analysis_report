@@ -5,6 +5,8 @@ export type {
   SentimentLabel,
 } from './market-sentiment';
 export {
+  applyIndexRegionSentiment,
+  computeIndexRegionSentiment,
   computeRegionSentiment,
   sentimentBadgeClass,
   SENTIMENT_LABEL_KO,

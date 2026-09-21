@@ -3,10 +3,10 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { buildMarketInsights, sentimentBadgeClass } from '@sar/shared';
+import { applyIndexRegionSentiment, buildMarketInsights, sentimentBadgeClass } from '@sar/shared';
 import { translateRegionSentiment, translateSentiment, translateTag, translateRegime } from '@/i18n/translate-shared';
 import { useFeaturedQuotes } from '../hooks/useFeaturedQuotes';
-import { formatPercent, pnlClass } from '../shared/formatters';
+import { formatNumber, formatPercent, pnlClass } from '../shared/formatters';
 import { marketAnalysisHref } from '../shared/stock-routes';
 
 interface Props {
@@ -19,7 +19,10 @@ export function MarketSentimentSummarySection({ compact }: Props) {
 
   const insights = useMemo(() => {
     if (!data) return null;
-    return buildMarketInsights(data.kr, data.us);
+    const base = buildMarketInsights(data.kr, data.us);
+    if (!data.indices?.length) return base;
+    const { kr, us } = applyIndexRegionSentiment(base, data.indices);
+    return { ...base, kr, us };
   }, [data]);
 
   return (
@@ -55,35 +58,48 @@ export function MarketSentimentSummarySection({ compact }: Props) {
         </div>
       )}
 
-      {insights && (
+      {insights && data?.indices && data.indices.length > 0 && (
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {[insights.kr, insights.us].map((sentiment) => {
+          {data.indices.map((index) => {
+            const sentiment = index.market === 'KR' ? insights.kr : insights.us;
             const localized = translateRegionSentiment(sentiment, t);
             return (
-            <div
-              key={sentiment.market}
-              className="rounded-lg border border-slate-800/80 bg-slate-900/40 p-3"
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={`font-medium text-slate-200 ${compact ? 'text-sm' : ''}`}>
-                  {sentiment.market === 'KR' ? t('market.regionKr') : t('market.regionUs')}
-                </span>
-                <span
-                  className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ring-inset ${sentimentBadgeClass(sentiment.label)}`}
-                >
-                  {translateSentiment(sentiment.label, t)}
-                </span>
-              </div>
-              <p className="mt-2 text-xs leading-relaxed text-slate-400">{localized.description}</p>
-              {sentiment.avgChangePercent !== null && (
-                <p className={`mt-2 text-sm font-medium ${pnlClass(sentiment.avgChangePercent)}`}>
-                  {t('market.avgChange', { percent: formatPercent(sentiment.avgChangePercent) })}
-                  <span className="ml-2 text-xs font-normal text-slate-500">
-                    {t('market.upDownCount', { up: sentiment.upCount, down: sentiment.downCount })}
+              <div
+                key={index.yahooSymbol}
+                className="rounded-lg border border-slate-800/80 bg-slate-900/40 p-3"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className={`font-semibold text-white ${compact ? 'text-sm' : 'text-base'}`}>
+                    {index.name}
                   </span>
-                </p>
-              )}
-            </div>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ring-inset ${sentimentBadgeClass(sentiment.label)}`}
+                  >
+                    {translateSentiment(sentiment.label, t)}
+                  </span>
+                </div>
+                <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                  {index.currentPrice !== null && (
+                    <span
+                      className={`font-semibold text-white ${compact ? 'text-lg' : 'text-xl'}`}
+                    >
+                      {formatNumber(index.currentPrice)}
+                    </span>
+                  )}
+                  {index.changePercent1d !== null ? (
+                    <span
+                      className={`font-semibold ${compact ? 'text-base' : 'text-lg'} ${pnlClass(index.changePercent1d)}`}
+                    >
+                      {formatPercent(index.changePercent1d)}
+                    </span>
+                  ) : (
+                    index.currentPrice === null && (
+                      <span className="text-sm text-slate-500">{t('common.dash')}</span>
+                    )
+                  )}
+                </div>
+                <p className="mt-2 text-xs leading-relaxed text-slate-400">{localized.description}</p>
+              </div>
             );
           })}
         </div>

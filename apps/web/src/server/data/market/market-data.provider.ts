@@ -74,6 +74,7 @@ export class MarketDataProvider implements IMarketDataProvider {
       volumes: series.volumes,
       highs: series.highs,
       lows: series.lows,
+      currentPrice: series.currentPrice,
       changePercent1d: series.changePercent1d,
     };
   }

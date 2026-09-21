@@ -24,6 +24,24 @@ describe('resolveAiFetchErrorMessage', () => {
     ).toBe('ai.contextUnavailable');
   });
 
+  it('maps disabled error', () => {
+    expect(
+      resolveAiFetchErrorMessage(new AppError('x', AppErrorCode.AI_DISABLED), t),
+    ).toBe('ai.disabled');
+  });
+
+  it('maps members only error', () => {
+    expect(
+      resolveAiFetchErrorMessage(new AppError('x', AppErrorCode.AI_MEMBERS_ONLY), t),
+    ).toBe('ai.membersOnly');
+  });
+
+  it('maps rate limit error', () => {
+    expect(
+      resolveAiFetchErrorMessage(new AppError('x', AppErrorCode.RATE_LIMIT), t),
+    ).toBe('ai.rateLimited');
+  });
+
   it('falls back for unknown errors', () => {
     expect(resolveAiFetchErrorMessage(new Error('boom'), t)).toBe('ai.loadFailed');
   });

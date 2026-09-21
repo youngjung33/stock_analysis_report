@@ -642,13 +642,15 @@
     },
     "scoreBreakdownTitle": "추천 근거",
     "narrativeDivergenceBadge": "서사–가격 괴리 · {{divergence}}",
-    "sentimentDesc": "대표 종목 오늘 시세 기준 · 변동성·업종·차트 지표는 상세 페이지",
+    "sentimentDesc": "코스피·나스닥 지수 등락 · 상세 분석에서 업종·대표주 폭 확인",
     "detailAnalysisLink": "상세 분석 →",
     "loadingQuotes": "시세 불러오는 중...",
     "regionKr": "🇰🇷 한국",
     "regionUs": "🇺🇸 미국",
     "avgChange": "평균 {{percent}}",
     "avgChangeDetail": "평균 등락 {{percent}}",
+    "indexChange": "지수 {{percent}}",
+    "indexChangeDetail": "지수 등락 {{percent}}",
     "upDownCount": "↑{{up}} ↓{{down}}",
     "deepAnalysisDesc": "VIX · 환율 · 국채 · 섹터 RS · SMA/RSI/MACD/볼린저/스토캐스틱 · 뉴스",
     "disclaimer": "Yahoo Finance·Google News·Finnhub(선택) 기반 참고용 분석이며 투자 권유가 아닙니다.",
@@ -1255,6 +1257,15 @@
       },
       "sentiment": {
         "headline": "{{market}} 대표 종목 · {{sentiment}}",
+        "indexHeadline": "{{indexName}} · {{sentiment}}",
+        "indexNoData": "{{indexName}} 시세가 없어 정세를 판단하기 어렵습니다.",
+        "indexDescription": {
+          "strong_bull": "{{indexName}} {{change}}% — 단기 강한 상승세.",
+          "bull": "{{indexName}} {{change}}% — 완만한 상승 분위기.",
+          "neutral": "{{indexName}} {{change}}% — 뚜렷한 방향성 없음.",
+          "bear": "{{indexName}} {{change}}% — 조정·약세.",
+          "strong_bear": "{{indexName}} {{change}}% — 급락·강한 약세."
+        },
         "noData": "시세 데이터가 부족해 정세를 판단하기 어렵습니다.",
         "description": {
           "strong_bull": "대표주 평균 {{avg}}%. 상승 {{up}} · 하락 {{down}} — 단기 상승세 우세.",

@@ -5,6 +5,7 @@ import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
 import { handleRouteError, jsonData } from '@/server/http/route-utils';
 import { requireAiMemberAuth } from '@/server/http/ai-auth';
+import { runAiAnalysisResponse } from '@/server/http/ai-route-helpers';
 
 export const maxDuration = 60;
 
@@ -23,14 +24,13 @@ export async function POST(req: NextRequest) {
     const { buildPortfolioAiContextUseCase, runAiAnalysisUseCase } = getServerServices();
 
     const context = await buildPortfolioAiContextUseCase.execute(user.userId, locale);
-    const insight = await runAiAnalysisUseCase.execute({
+
+    return await runAiAnalysisResponse(runAiAnalysisUseCase, {
       userId: user.userId,
       kind: 'portfolio',
       context,
       locale,
     });
-
-    return jsonData({ enabled: true, insight });
   } catch (error) {
     return handleRouteError(error);
   }

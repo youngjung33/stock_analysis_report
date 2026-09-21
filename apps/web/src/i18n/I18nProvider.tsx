@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { usePathname } from 'next/navigation';
-import { normalizeLocale, type SupportedLocale } from '@sar/shared';
-import i18n, { getAppLocale, syncI18nLocale, syncLocaleFromCookie } from './config';
+import type { SupportedLocale } from '@sar/shared';
+import i18n, { getAppLocale, syncLocaleFromCookie } from './config';
 import { pathnameToSeoRoute } from './seo-routes';
 import { syncDocumentSeo } from './sync-document-seo';
 
@@ -20,14 +20,14 @@ function syncSeoForCurrentRoute(): void {
 }
 
 /** Syncs html lang, locale storage/cookie, and document SEO on mount + language change */
-export function I18nProvider({ children, initialLocale }: Props) {
+export function I18nProvider({ children, initialLocale: _initialLocale }: Props) {
   const pathname = usePathname();
-  const serverLocale = normalizeLocale(initialLocale);
 
-  syncI18nLocale(serverLocale);
+  useLayoutEffect(() => {
+    syncLocaleFromCookie();
+  }, []);
 
   useEffect(() => {
-    syncLocaleFromCookie();
     syncSeoForCurrentRoute();
 
     const onLanguageChanged = () => syncSeoForCurrentRoute();

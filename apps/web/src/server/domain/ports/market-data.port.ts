@@ -23,6 +23,7 @@ export interface ChartSeriesData {
   volumes: number[];
   highs: number[];
   lows: number[];
+  currentPrice: number | null;
   changePercent1d: number | null;
 }
 

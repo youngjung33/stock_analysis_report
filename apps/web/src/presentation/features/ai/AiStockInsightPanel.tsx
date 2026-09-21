@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Market, type StockSearchResult } from '@sar/shared';
 import { normalizeLocale } from '@sar/shared';
+import { useAuth } from '../../hooks/useAuth';
 import { useServices } from '../../hooks/useServices';
 import { useErrorToast } from '../../hooks/useErrorToast';
 import { resolveAiFetchErrorMessage } from './ai-error-message';
@@ -11,6 +12,7 @@ import { AiInsightSections } from './AiInsightSections';
 
 export function AiStockInsightPanel({ selected }: { selected: StockSearchResult }) {
   const { t, i18n } = useTranslation();
+  const { isGuest } = useAuth();
   const { fetchStockAiInsightUseCase } = useServices();
   const [loading, setLoading] = useState(false);
   const [insight, setInsight] = useState<Awaited<
@@ -49,15 +51,21 @@ export function AiStockInsightPanel({ selected }: { selected: StockSearchResult 
           <h4 className="text-sm font-semibold text-indigo-100">{t('ai.stockTitle')}</h4>
           <p className="mt-1 text-xs text-indigo-200/70">{t('ai.stockDesc')}</p>
         </div>
-        <button
-          type="button"
-          onClick={handleFetch}
-          disabled={loading}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-xs font-medium text-white disabled:opacity-50"
-        >
-          {loading ? t('ai.loading') : t('ai.fetchButton')}
-        </button>
+        {!isGuest && (
+          <button
+            type="button"
+            onClick={handleFetch}
+            disabled={loading}
+            className="rounded-lg bg-indigo-600 px-4 py-2 text-xs font-medium text-white disabled:opacity-50"
+          >
+            {loading ? t('ai.loading') : t('ai.fetchButton')}
+          </button>
+        )}
       </div>
+
+      {isGuest && (
+        <p className="mt-3 text-xs text-amber-200/80">{t('ai.membersOnly')}</p>
+      )}
 
       {insight?.enabled && insight.insight && (
         <div className="mt-4">
@@ -65,8 +73,12 @@ export function AiStockInsightPanel({ selected }: { selected: StockSearchResult 
         </div>
       )}
 
-      {insight && !insight.enabled && (
-        <p className="mt-3 text-xs text-slate-500">{t('ai.disabled')}</p>
+      {errorMessage && (
+        <p
+          className={`mt-3 text-xs ${insight && !insight.enabled ? 'text-slate-500' : 'text-rose-400'}`}
+        >
+          {errorMessage}
+        </p>
       )}
     </div>
   );

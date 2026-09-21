@@ -173,9 +173,18 @@ export interface FeaturedStockQuote {
   unavailableReasonCode: QuoteUnavailableReasonCode | null;
 }
 
+export interface RegionIndexQuote {
+  name: string;
+  yahooSymbol: string;
+  market: Market;
+  currentPrice: number | null;
+  changePercent1d: number | null;
+}
+
 export interface FeaturedQuotesResult {
   kr: FeaturedStockQuote[];
   us: FeaturedStockQuote[];
+  indices: RegionIndexQuote[];
   fetchedAt: string;
 }
 

@@ -190,7 +190,7 @@ export function getServerServices(): ServerServices {
   const marketData = new MarketDataProvider();
 
   const fetchQuotesUseCase = new FetchQuotesUseCase(marketData);
-  const getFeaturedQuotesUseCase = new GetFeaturedQuotesUseCase(fetchQuotesUseCase);
+  const getFeaturedQuotesUseCase = new GetFeaturedQuotesUseCase(fetchQuotesUseCase, marketData);
   const buildMarketContextUseCase = new BuildMarketContextUseCase(marketData);
   const fetchRecommendationQuotesUseCase = new FetchRecommendationQuotesUseCase(marketData);
   const fetchRecommendationTechnicalUseCase = new FetchRecommendationTechnicalSnapshotsUseCase(marketData);
@@ -242,6 +242,7 @@ export function getServerServices(): ServerServices {
     buildMarketContextUseCase,
     buildStockEnrichmentUseCase,
   );
+  const listWatchlistUseCase = new ListWatchlistUseCase(watchlistRepo);
 
   cached = {
     tokenService,
@@ -293,7 +294,7 @@ export function getServerServices(): ServerServices {
     listCorporateActionsUseCase: new ListCorporateActionsUseCase(corpActionRepo),
     createCorporateActionUseCase: new CreateCorporateActionUseCase(stockRepo, corpActionRepo, cashRepo),
     deleteCorporateActionUseCase: new DeleteCorporateActionUseCase(corpActionRepo),
-    listWatchlistUseCase: new ListWatchlistUseCase(watchlistRepo),
+    listWatchlistUseCase,
     addWatchlistUseCase: new AddWatchlistUseCase(watchlistRepo),
     deleteWatchlistUseCase: new DeleteWatchlistUseCase(watchlistRepo),
     getAccountUseCase: new GetAccountUseCase(userRepo, oauthAccountRepo),
@@ -338,6 +339,7 @@ export function getServerServices(): ServerServices {
       buildMarketContextUseCase,
       buildStockEnrichmentUseCase,
       getDashboardUseCase,
+      listWatchlistUseCase,
     ),
     buildPortfolioAiContextUseCase: new BuildPortfolioAiContextUseCase(
       getDashboardUseCase,

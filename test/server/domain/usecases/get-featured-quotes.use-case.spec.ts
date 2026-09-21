@@ -33,11 +33,25 @@ describe('GetFeaturedQuotesUseCase', () => {
       }),
     };
 
-    const useCase = new GetFeaturedQuotesUseCase(fetchQuotesUseCase as never);
+    const marketData = {
+      fetchChartSeries: vi.fn().mockImplementation((symbol: string) =>
+        Promise.resolve({
+          currentPrice: symbol === '^KS11' ? 2650.12 : 17834.56,
+          changePercent1d: symbol === '^KS11' ? 0.8 : -0.3,
+        }),
+      ),
+    };
+
+    const useCase = new GetFeaturedQuotesUseCase(fetchQuotesUseCase as never, marketData as never);
     const result = await useCase.execute();
 
     expect(result.kr.length).toBeGreaterThan(0);
     expect(result.us.length).toBeGreaterThan(0);
+    expect(result.indices).toHaveLength(2);
+    expect(result.indices.find((i) => i.yahooSymbol === '^KS11')?.currentPrice).toBe(2650.12);
+    expect(result.indices.find((i) => i.yahooSymbol === '^KS11')?.changePercent1d).toBe(0.8);
+    expect(result.indices.find((i) => i.yahooSymbol === '^IXIC')?.currentPrice).toBe(17834.56);
+    expect(result.indices.find((i) => i.yahooSymbol === '^IXIC')?.changePercent1d).toBe(-0.3);
     expect(result.kr.find((s) => s.symbol === '005930')?.currentPrice).toBe(70000);
     expect(result.us.find((s) => s.symbol === 'AAPL')?.currentPrice).toBe(180);
     expect(result.us.find((s) => s.symbol === 'NVDA')?.unavailableReasonCode).toBe('not_configured');

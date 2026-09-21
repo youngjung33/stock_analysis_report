@@ -24,6 +24,7 @@ import {
   RegionSentiment,
   StockRecommendation,
   buildMarketInsights,
+  applyIndexRegionSentiment,
   computeRegionSentiment,
 } from './market-insights';
 import { hasPolicyUncertaintyPulse } from './market-recommendation/figure-enrichment';
@@ -849,13 +850,13 @@ function macroInsight(kr: RegionSentiment, us: RegionSentiment): AnalysisInsight
   return insight({
     id: 'macro-global',
     category: 'macro',
-    title: diverge ? '한·미 시장 온도차' : '한·미 동조/혼조',
+    title: diverge ? '한·미 지수 온도차' : '한·미 지수 동조/혼조',
     summary: diverge
-      ? `한국 ${formatPct(kr.avgChangePercent)} · 미국 ${formatPct(us.avgChangePercent)} — 지역별 온도차`
-      : `한국 ${formatPct(kr.avgChangePercent)} · 미국 ${formatPct(us.avgChangePercent)}`,
+      ? `한국 지수 ${formatPct(kr.avgChangePercent)} · 미국 지수 ${formatPct(us.avgChangePercent)} — 지역별 온도차`
+      : `한국 지수 ${formatPct(kr.avgChangePercent)} · 미국 지수 ${formatPct(us.avgChangePercent)}`,
     reasoning: diverge
-      ? '한국과 미국 대표주 평균 등락이 크게 다르면 환율·금리·업종 이슈 등 지역 요인이 작용 중일 수 있습니다. 환율(KRW/USD)과 함께 보는 것이 일반적입니다.'
-      : '양 시장이 비슷한 방향이면 글로벌 투자 심리가 공통 변수일 가능성이 큽니다. 연준·원화·유가 등 경제 헤드라인과 교차 확인하세요.',
+      ? '코스피·나스닥 등 지수 등락이 크게 다르면 환율·금리·업종 이슈 등 지역 요인이 작용 중일 수 있습니다. 환율(KRW/USD)과 함께 보는 것이 일반적입니다.'
+      : '양국 지수가 비슷한 방향이면 글로벌 투자 심리가 공통 변수일 가능성이 큽니다. 연준·원화·유가 등 경제 헤드라인과 교차 확인하세요.',
     titleKey: diverge
       ? 'shared.market.insights.macroGlobal.titleDiverge'
       : 'shared.market.insights.macroGlobal.titleSync',
@@ -996,6 +997,12 @@ export function buildMarketAnalysisReport(input: {
   );
 
   const fxMacro = macro.find((m) => m.kind === 'fx');
+  const indexSummaries = indices.map((i) => ({
+    yahooSymbol: i.yahooSymbol,
+    name: i.name,
+    market: i.market,
+    changePercent1d: i.changePercent1d,
+  }));
   const base = buildMarketInsights(input.krQuotes, input.usQuotes, 6, {
     macro,
     sectors,
@@ -1015,18 +1022,20 @@ export function buildMarketAnalysisReport(input: {
     figureStatements: input.figureStatements,
   });
 
+  const { kr, us, quoteKr, quoteUs } = applyIndexRegionSentiment(base, indexSummaries);
+
   const insights: AnalysisInsight[] = [
     ...buildMarketMoveReasonInsights({
-      kr: base.kr,
-      us: base.us,
+      kr: quoteKr,
+      us: quoteUs,
       indices,
       sectors,
       macro,
       news: input.news,
     }),
     ...macroPanelInsights(macro),
-    macroInsight(base.kr, base.us),
-    ...breadthInsights(base.kr, base.us, input.krQuotes, input.usQuotes),
+    macroInsight(kr, us),
+    ...breadthInsights(quoteKr, quoteUs, input.krQuotes, input.usQuotes),
     ...indexInsights(indices),
     ...sectorInsights(sectors),
     ...newsInsights(input.news),
@@ -1035,6 +1044,8 @@ export function buildMarketAnalysisReport(input: {
 
   return {
     ...base,
+    kr,
+    us,
     fetchedAt: input.fetchedAt ?? new Date().toISOString(),
     krQuotes: input.krQuotes,
     usQuotes: input.usQuotes,

@@ -37,6 +37,12 @@ describe('HttpCustomProvider', () => {
     expect(result.sections[0].id).toBe('stock.summary');
   });
 
+  it('throws on network failure', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network down')));
+    const provider = new HttpCustomProvider('https://custom.example/analyze', 'key', 'custom-v1');
+    await expect(provider.completeStructured(minimalAiRequest)).rejects.toThrow('network down');
+  });
+
   it('parses dedicated analyze response shape', async () => {
     vi.stubGlobal(
       'fetch',

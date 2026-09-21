@@ -8,7 +8,9 @@ import {
   AnalysisInsight,
   AnalysisTone,
   extractNarrativeDivergence,
+  Market,
   MarketAnalysisReport,
+  findRegionSentimentIndex,
   sentimentBadgeClass,
 } from '@sar/shared';
 import {
@@ -22,7 +24,7 @@ import {
 } from '@/i18n/translate-shared';
 import { useMarketAnalysis } from '../hooks/useMarketAnalysis';
 import { useErrorToast } from '../hooks/useErrorToast';
-import { formatPercent, pnlClass } from '../shared/formatters';
+import { formatNumber, formatPercent, pnlClass } from '../shared/formatters';
 import { stockDetailHref } from '../shared/stock-routes';
 import {
   IndexTechnicalPanel,
@@ -63,30 +65,49 @@ function SentimentSummary({
 }) {
   const { t } = useTranslation();
 
+  const indexCards = ([Market.KR, Market.US] as const)
+    .map((market) => ({
+      index: findRegionSentimentIndex(report.indices, market),
+      sentiment: market === Market.KR ? report.kr : report.us,
+    }))
+    .filter((item) => item.index);
+
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-      {[report.kr, report.us].map((sentiment) => {
+      {indexCards.map(({ index, sentiment }) => {
         const localized = translateRegionSentiment(sentiment, t);
         return (
-        <div key={sentiment.market} className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className={`font-semibold text-white ${compact ? 'text-sm' : ''}`}>{localized.headline}</h3>
-            <span
-              className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ring-inset ${sentimentBadgeClass(sentiment.label)}`}
-            >
-              {translateSentiment(sentiment.label, t)}
-            </span>
-          </div>
-          <p className="mt-2 text-xs leading-relaxed text-slate-400">{localized.description}</p>
-          {sentiment.avgChangePercent !== null && (
-            <p className={`mt-2 text-sm font-medium ${pnlClass(sentiment.avgChangePercent)}`}>
-              {t('market.avgChangeDetail', { percent: formatPercent(sentiment.avgChangePercent) })}
-              <span className="ml-2 text-xs font-normal text-slate-500">
-                {t('market.upDownCount', { up: sentiment.upCount, down: sentiment.downCount })}
+          <div key={index!.yahooSymbol} className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className={`font-semibold text-white ${compact ? 'text-sm' : 'text-base'}`}>
+                {index!.name}
+              </h3>
+              <span
+                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ring-inset ${sentimentBadgeClass(sentiment.label)}`}
+              >
+                {translateSentiment(sentiment.label, t)}
               </span>
-            </p>
-          )}
-        </div>
+            </div>
+            <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+              {index!.currentPrice > 0 && (
+                <span className={`font-semibold text-white ${compact ? 'text-lg' : 'text-xl'}`}>
+                  {formatNumber(index!.currentPrice)}
+                </span>
+              )}
+              {index!.changePercent1d !== null ? (
+                <span
+                  className={`font-semibold ${compact ? 'text-base' : 'text-lg'} ${pnlClass(index!.changePercent1d)}`}
+                >
+                  {formatPercent(index!.changePercent1d)}
+                </span>
+              ) : (
+                !(index!.currentPrice > 0) && (
+                  <span className="text-sm text-slate-500">{t('common.dash')}</span>
+                )
+              )}
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-slate-400">{localized.description}</p>
+          </div>
         );
       })}
     </div>
