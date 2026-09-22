@@ -21,16 +21,16 @@ function krIndexInput(changePercent1d: number) {
 
 function usIndexInput(changePercent1d: number) {
   return {
-    yahooSymbol: '^GSPC',
-    name: 'S&P 500',
+    yahooSymbol: '^IXIC',
+    name: 'NASDAQ',
     market: Market.US,
     closes: flatCloses,
     volumes: Array.from({ length: 220 }, () => 2_000_000),
     highs: flatCloses.map((c) => c + 5),
     lows: flatCloses.map((c) => c - 5),
     changePercent1d,
-    chartUrl: 'https://finance.yahoo.com/quote/%5EGSPC/',
-    tradingViewUrl: 'https://www.tradingview.com/symbols/SP-SPX/',
+    chartUrl: 'https://finance.yahoo.com/quote/%5EIXIC/',
+    tradingViewUrl: 'https://www.tradingview.com/symbols/NASDAQ-NDX/',
   };
 }
 
@@ -58,11 +58,31 @@ describe('buildMarketMoveReasonInsights', () => {
         tradingViewUrl: 'https://www.tradingview.com/symbols/KRX-KOSPI/',
       },
       {
+        yahooSymbol: '^IXIC',
+        name: 'NASDAQ',
+        market: Market.US,
+        currentPrice: 17800,
+        changePercent1d: -0.8,
+        sma20: 5250,
+        sma50: 5300,
+        sma200: 5000,
+        rsi14: 45,
+        macd: -0.5,
+        bollinger: null,
+        stochastic: null,
+        rangePositionPct: 40,
+        volumeRatio: 0.9,
+        trendLabel: '단기 조정',
+        trendKey: 'shared.market.trends.shortTermPullback',
+        chartUrl: 'https://finance.yahoo.com/quote/%5EIXIC/',
+        tradingViewUrl: 'https://www.tradingview.com/symbols/NASDAQ-NDX/',
+      },
+      {
         yahooSymbol: '^GSPC',
         name: 'S&P 500',
         market: Market.US,
         currentPrice: 5200,
-        changePercent1d: -0.8,
+        changePercent1d: -0.4,
         sma20: 5250,
         sma50: 5300,
         sma200: 5000,
@@ -80,30 +100,6 @@ describe('buildMarketMoveReasonInsights', () => {
     ];
 
     const insights = buildMarketMoveReasonInsights({
-      kr: {
-        market: Market.KR,
-        label: 'bull',
-        avgChangePercent: 0.9,
-        upCount: 4,
-        downCount: 2,
-        flatCount: 0,
-        headline: '',
-        description: '',
-        headlineKey: '',
-        descriptionKey: '',
-      },
-      us: {
-        market: Market.US,
-        label: 'bear',
-        avgChangePercent: -0.6,
-        upCount: 1,
-        downCount: 5,
-        flatCount: 0,
-        headline: '',
-        description: '',
-        headlineKey: '',
-        descriptionKey: '',
-      },
       indices,
       sectors: [
         {
@@ -187,7 +183,10 @@ describe('buildMarketMoveReasonInsights', () => {
     expect(kr?.tone).toBe('bullish');
     expect(us?.tone).toBe('bearish');
     expect(kr?.evidence.some((e) => e.includes('KOSPI'))).toBe(true);
-    expect(us?.evidence.some((e) => e.includes('VIX') || e.includes('S&P'))).toBe(true);
+    expect(kr?.evidence.some((e) => e.includes('반도체'))).toBe(true);
+    expect(kr?.evidence.some((e) => e.includes('대표주'))).toBe(false);
+    expect(us?.evidence.some((e) => e.includes('VIX') || e.includes('NASDAQ'))).toBe(true);
+    expect(us?.evidence.some((e) => e.includes('기술'))).toBe(true);
     expect(kr?.titleKey).toBe('shared.market.insights.moveReason.title');
   });
 

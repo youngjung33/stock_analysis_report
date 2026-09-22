@@ -37,6 +37,7 @@ describe('applyIndexRegionSentiment', () => {
     expect(applied.quoteKr.label).toBe('bull');
     expect(applied.kr.avgChangePercent).toBe(1.2);
     expect(applied.us.label).toBe('bear');
+    expect(applied.regimes?.some((r) => r.id === 'diverged' || r.id === 'usLeadingKr')).toBe(true);
   });
 });
 

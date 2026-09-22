@@ -13,7 +13,6 @@ import {
   rangePosition,
   rsi,
   sma,
-  stdDev,
   stochastic,
   volumeRatio,
 } from './technical-analysis';
@@ -27,6 +26,7 @@ import {
   applyIndexRegionSentiment,
   computeRegionSentiment,
 } from './market-insights';
+import { findRegionSentimentIndex } from './market-benchmarks';
 import { hasPolicyUncertaintyPulse } from './market-recommendation/figure-enrichment';
 import { buildMarketMoveReasonInsights } from './market-move-reason';
 
@@ -269,30 +269,31 @@ function ev(key: string, params?: Record<string, string | number>): EvidenceItem
   return { key, params };
 }
 
-function breadthInsights(
+function indexRegionOverviewInsights(
   kr: RegionSentiment,
   us: RegionSentiment,
-  krQuotes: QuoteInsightInput[],
-  usQuotes: QuoteInsightInput[],
+  indices: IndexTechnicalSnapshot[],
+  sectors: SectorEtfSnapshot[],
 ): AnalysisInsight[] {
   const items: AnalysisInsight[] = [];
-  const regions: Array<{ sentiment: RegionSentiment; quotes: QuoteInsightInput[]; market: Market }> = [
-    { sentiment: kr, quotes: krQuotes, market: Market.KR },
-    { sentiment: us, quotes: usQuotes, market: Market.US },
+  const grouped = groupSectorsByMarket(sectors);
+  const regions: Array<{ market: Market; sentiment: RegionSentiment }> = [
+    { market: Market.KR, sentiment: kr },
+    { market: Market.US, sentiment: us },
   ];
 
-  for (const { sentiment, quotes, market } of regions) {
-    const valid = quotes.filter((q) => q.changePercent !== null);
-    if (valid.length === 0) continue;
+  for (const { market, sentiment } of regions) {
+    const idx = findRegionSentimentIndex(indices, market);
+    if (!idx) continue;
 
-    const changes = valid.map((q) => q.changePercent as number);
-    const dispersion = stdDev(changes);
-    const adRatio = sentiment.downCount > 0 ? sentiment.upCount / sentiment.downCount : sentiment.upCount;
-    const leader = [...valid].sort((a, b) => (b.changePercent ?? 0) - (a.changePercent ?? 0))[0];
-    const laggard = [...valid].sort((a, b) => (a.changePercent ?? 0) - (b.changePercent ?? 0))[0];
-    const region = market === Market.KR ? '한국' : '미국';
-    const regionKey = market === Market.KR ? 'kr' : 'us';
-    const biasKey = adRatio >= 1 ? 'up' : 'down';
+    const marketSectors = market === Market.KR ? grouped.kr : grouped.us;
+    const sortedSectors = [...marketSectors].sort(
+      (a, b) => (b.changePercent1d ?? 0) - (a.changePercent1d ?? 0),
+    );
+    const risers = sortedSectors.filter((s) => (s.changePercent1d ?? 0) > 0.05);
+    const fallers = sortedSectors.filter((s) => (s.changePercent1d ?? 0) < -0.05);
+    const leader = sortedSectors[0];
+    const laggard = sortedSectors[sortedSectors.length - 1];
 
     const tone: AnalysisTone =
       sentiment.label === 'strong_bull' || sentiment.label === 'bull'
@@ -301,75 +302,90 @@ function breadthInsights(
           ? 'bearish'
           : 'neutral';
 
+    const sectorSummary =
+      risers.length > 0 && fallers.length > 0
+        ? `상승 ${risers.map((s) => s.sectorLabel).join('·')} / 하락 ${fallers.map((s) => s.sectorLabel).join('·')}`
+        : risers.length > 0
+          ? `상승 테마 ${risers.map((s) => s.sectorLabel).join('·')}`
+          : fallers.length > 0
+            ? `하락 테마 ${fallers.map((s) => s.sectorLabel).join('·')}`
+            : leader
+              ? `업종 혼조 · 주도 ${leader.sectorLabel}`
+              : '';
+
+    const evidence: string[] = [
+      `${idx.name} ${formatNum(idx.currentPrice)} · 1일 ${formatPct(idx.changePercent1d)}`,
+      `추세 ${idx.trendLabel}`,
+    ];
+    const evidenceItems: EvidenceItem[] = [
+      ev('shared.market.insights.evidence.indexLevel', {
+        name: idx.name,
+        price: formatNum(idx.currentPrice),
+        change: formatPct(idx.changePercent1d),
+      }),
+      ev('shared.market.insights.evidence.indexTrend', { trendKey: idx.trendKey }),
+    ];
+
+    if (idx.rsi14 !== null) {
+      evidence.push(`RSI(14) ${idx.rsi14.toFixed(1)}`);
+      evidenceItems.push(ev('shared.market.insights.evidence.indexRsi', { rsi: idx.rsi14.toFixed(1) }));
+    }
+
+    if (leader) {
+      evidence.push(`주도 업종 ${leader.sectorLabel} ${formatPct(leader.changePercent1d)}`);
+      evidenceItems.push(
+        ev('shared.market.insights.evidence.sectorLeader', {
+          sector: leader.sectorLabel,
+          change: formatPct(leader.changePercent1d),
+        }),
+      );
+    }
+    if (laggard && laggard !== leader) {
+      evidence.push(`부진 업종 ${laggard.sectorLabel} ${formatPct(laggard.changePercent1d)}`);
+      evidenceItems.push(
+        ev('shared.market.insights.evidence.sectorLaggard', {
+          sector: laggard.sectorLabel,
+          change: formatPct(laggard.changePercent1d),
+        }),
+      );
+    }
+
     items.push(
       insight({
-        id: `breadth-${market}`,
+        id: `index-overview-${market}`,
         category: 'breadth',
-        title: `${region} 대표주 ${sentiment.upCount}↑ ${sentiment.downCount}↓ — ${adRatio >= 1 ? '상승 우위' : '하락 우위'}`,
-        summary: `${region} 대표 ${valid.length}종 평균 ${formatPct(sentiment.avgChangePercent)}. 상승·하락 비율 ${adRatio.toFixed(2)}.`,
+        title: `${idx.name} ${formatPct(idx.changePercent1d)} — ${idx.trendLabel}`,
+        summary: sectorSummary
+          ? `${idx.name} ${formatPct(idx.changePercent1d)} · ${sectorSummary}`
+          : `${idx.name} ${formatNum(idx.currentPrice)} · 1일 ${formatPct(idx.changePercent1d)} · ${idx.trendLabel}`,
         reasoning:
-          adRatio > 1.5
-            ? '상승 종목 수가 하락 종목보다 확실히 많으면 위험 선호 심리가 강한 편입니다. 소수 대형주만 오르는 것보다 전반적으로 오르는 편이 건강합니다.'
-            : adRatio < 0.7
-              ? '하락 종목이 우세하면 단기적으로 매도 압력·위험 회피 심리가 강합니다. 지수만 버티는지, 대표주 전반이 약한지 함께 확인하는 것이 좋습니다.'
-              : '상승·하락이 엇갈리면 방향성이 분명하지 않습니다. 추세 추종보다 개별 종목·업종 차별화가 큰 장세로 해석합니다.',
+          '코스피·나스닥 지수 움직임은 업종·테마별 차별화로 설명되는 경우가 많습니다. 반도체·금융·기술 등 섹터 ETF 등락을 함께 보면 지수가 왜 움직였는지 파악하는 데 도움이 됩니다.',
         titleKey: 'shared.market.insights.breadth.title',
         titleParams: {
-          regionKey,
-          up: sentiment.upCount,
-          down: sentiment.downCount,
-          biasKey,
+          name: idx.name,
+          change: formatPct(idx.changePercent1d),
+          trendKey: idx.trendKey,
         },
         summaryKey: 'shared.market.insights.breadth.summary',
         summaryParams: {
-          regionKey,
-          count: valid.length,
-          avg: formatPct(sentiment.avgChangePercent),
-          ratio: adRatio.toFixed(2),
+          name: idx.name,
+          price: formatNum(idx.currentPrice),
+          change: formatPct(idx.changePercent1d),
+          trendKey: idx.trendKey,
+          sectors: sectorSummary,
         },
-        reasoningKey:
-          adRatio > 1.5
-            ? 'shared.market.insights.breadth.reasoning.bullish'
-            : adRatio < 0.7
-              ? 'shared.market.insights.breadth.reasoning.bearish'
-              : 'shared.market.insights.breadth.reasoning.neutral',
-        evidence: [
-          `평균 등락 ${formatPct(sentiment.avgChangePercent)}`,
-          `상승 ${sentiment.upCount} · 하락 ${sentiment.downCount} · 보합 ${sentiment.flatCount}`,
-          `등락률 표준편차 ${dispersion !== null ? dispersion.toFixed(2) : '-'}% (분산 ${dispersion !== null && dispersion > 1.5 ? '큼' : '보통'})`,
-          `주도 ${leader.name} ${formatPct(leader.changePercent)} · 부진 ${laggard.name} ${formatPct(laggard.changePercent)}`,
-        ],
-        evidenceItems: [
-          ev('shared.market.insights.evidence.avgChange', { avg: formatPct(sentiment.avgChangePercent) }),
-          ev('shared.market.insights.evidence.upDownFlat', {
-            up: sentiment.upCount,
-            down: sentiment.downCount,
-            flat: sentiment.flatCount,
-          }),
-          ev('shared.market.insights.evidence.dispersion', {
-            value: dispersion !== null ? dispersion.toFixed(2) : '-',
-            levelKey: dispersion !== null && dispersion > 1.5 ? 'high' : 'normal',
-          }),
-          ev('shared.market.insights.evidence.leaderLaggard', {
-            leaderName: leader.name,
-            leaderPct: formatPct(leader.changePercent),
-            laggardName: laggard.name,
-            laggardPct: formatPct(laggard.changePercent),
-          }),
-        ],
+        reasoningKey: 'shared.market.insights.breadth.reasoning.index',
+        evidence,
+        evidenceItems,
         links: [
           {
-            label: market === Market.KR ? '네이버 금융 코스피' : 'Yahoo S&P 500',
-            labelKey:
-              market === Market.KR
-                ? 'shared.market.insights.links.naverFinanceKospi'
-                : 'shared.market.insights.links.yahooSp500',
-            url: market === Market.KR ? 'https://finance.naver.com/sise/' : 'https://finance.yahoo.com/quote/%5EGSPC/',
+            label: idx.name,
+            url: idx.chartUrl,
           },
           {
             label: 'TradingView',
             labelKey: 'shared.market.insights.links.tradingView',
-            url: market === Market.KR ? 'https://www.tradingview.com/symbols/KRX-KOSPI/' : 'https://www.tradingview.com/symbols/SP-SPX/',
+            url: idx.tradingViewUrl,
           },
         ],
         tone,
@@ -1022,12 +1038,13 @@ export function buildMarketAnalysisReport(input: {
     figureStatements: input.figureStatements,
   });
 
-  const { kr, us, quoteKr, quoteUs } = applyIndexRegionSentiment(base, indexSummaries);
+  const { kr, us, regimes } = applyIndexRegionSentiment(base, indexSummaries, {
+    macro,
+    usdKrwChange1d: fxMacro?.changePercent1d ?? null,
+  });
 
   const insights: AnalysisInsight[] = [
     ...buildMarketMoveReasonInsights({
-      kr: quoteKr,
-      us: quoteUs,
       indices,
       sectors,
       macro,
@@ -1035,7 +1052,7 @@ export function buildMarketAnalysisReport(input: {
     }),
     ...macroPanelInsights(macro),
     macroInsight(kr, us),
-    ...breadthInsights(quoteKr, quoteUs, input.krQuotes, input.usQuotes),
+    ...indexRegionOverviewInsights(kr, us, indices, sectors),
     ...indexInsights(indices),
     ...sectorInsights(sectors),
     ...newsInsights(input.news),
@@ -1046,6 +1063,7 @@ export function buildMarketAnalysisReport(input: {
     ...base,
     kr,
     us,
+    regimes,
     fetchedAt: input.fetchedAt ?? new Date().toISOString(),
     krQuotes: input.krQuotes,
     usQuotes: input.usQuotes,

@@ -10,16 +10,11 @@ import type {
   IndexTechnicalSnapshot,
   NewsAnalysisInput,
 } from './market-analysis';
-import type { RegionSentiment } from './market-sentiment';
 import type { SectorEtfSnapshot } from './market-sector';
+import { findRegionSentimentIndex } from './market-benchmarks';
 import { groupSectorsByMarket } from './market-sector';
 
 const CATEGORY_LABEL = '전일 움직임';
-
-const PRIORITY_INDEX: Record<Market, string[]> = {
-  [Market.KR]: ['^KS11'],
-  [Market.US]: ['^GSPC', '^IXIC'],
-};
 
 const MAX_NEWS_AGE_MS = 48 * 60 * 60 * 1000;
 
@@ -54,14 +49,6 @@ function insight(
   return { ...partial, categoryLabel: CATEGORY_LABEL };
 }
 
-function findPrimaryIndex(indices: IndexTechnicalSnapshot[], market: Market): IndexTechnicalSnapshot | null {
-  for (const symbol of PRIORITY_INDEX[market]) {
-    const hit = indices.find((i) => i.yahooSymbol === symbol && i.market === market);
-    if (hit) return hit;
-  }
-  return indices.find((i) => i.market === market) ?? null;
-}
-
 function filterRecentNews(news: NewsAnalysisInput[], market: Market): NewsAnalysisInput[] {
   const now = Date.now();
   return news
@@ -73,8 +60,93 @@ function filterRecentNews(news: NewsAnalysisInput[], market: Market): NewsAnalys
     .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
 }
 
-function adRatio(sentiment: RegionSentiment): number {
-  return sentiment.downCount > 0 ? sentiment.upCount / sentiment.downCount : sentiment.upCount;
+function formatSectorList(sectors: SectorEtfSnapshot[]): string {
+  return sectors
+    .map((s) => `${s.sectorLabel} ${formatPct(s.changePercent1d)}`)
+    .join(', ');
+}
+
+function collectSectorThemeFactors(
+  market: Market,
+  sectors: SectorEtfSnapshot[],
+  direction: MoveDirection,
+): MoveFactor[] {
+  const factors: MoveFactor[] = [];
+  const grouped = groupSectorsByMarket(sectors);
+  const marketSectors = market === Market.KR ? grouped.kr : grouped.us;
+  if (marketSectors.length === 0) return factors;
+
+  const sorted = [...marketSectors].sort(
+    (a, b) => (b.changePercent1d ?? 0) - (a.changePercent1d ?? 0),
+  );
+  const risers = sorted.filter((s) => (s.changePercent1d ?? 0) > 0.05);
+  const fallers = sorted.filter((s) => (s.changePercent1d ?? 0) < -0.05);
+
+  if (risers.length > 0) {
+    const top = risers.slice(0, 3);
+    const list = formatSectorList(top);
+    factors.push({
+      evidenceKey: 'shared.market.insights.evidence.moveReasonSectorRise',
+      evidenceParams: { list, count: risers.length },
+      fallback:
+        risers.length > top.length
+          ? `상승 업종 ${list} 외 ${risers.length - top.length}개`
+          : `상승 업종 ${list}`,
+      weight: direction === 'up' ? 8 : 5,
+    });
+  }
+
+  if (fallers.length > 0) {
+    const bottom = fallers.slice(-3).reverse();
+    const list = formatSectorList(bottom);
+    factors.push({
+      evidenceKey: 'shared.market.insights.evidence.moveReasonSectorFall',
+      evidenceParams: { list, count: fallers.length },
+      fallback:
+        fallers.length > bottom.length
+          ? `하락 업종 ${list} 외 ${fallers.length - bottom.length}개`
+          : `하락 업종 ${list}`,
+      weight: direction === 'down' ? 8 : 5,
+    });
+  }
+
+  const leader = sorted[0];
+  const laggard = sorted[sorted.length - 1];
+  if (leader && (leader.changePercent1d ?? 0) > 0 && direction !== 'down') {
+    factors.push({
+      evidenceKey: 'shared.market.insights.evidence.moveReasonSectorLead',
+      evidenceParams: {
+        sector: leader.sectorLabel,
+        change: formatPct(leader.changePercent1d),
+        rs: formatPct(leader.rsBenchmark1w),
+      },
+      fallback: `주도 테마 ${leader.sectorLabel} ${formatPct(leader.changePercent1d)} (RS1w ${formatPct(leader.rsBenchmark1w)})`,
+      weight: 7,
+    });
+  }
+  if (laggard && laggard !== leader && (laggard.changePercent1d ?? 0) < 0 && direction !== 'up') {
+    factors.push({
+      evidenceKey: 'shared.market.insights.evidence.moveReasonSectorLag',
+      evidenceParams: {
+        sector: laggard.sectorLabel,
+        change: formatPct(laggard.changePercent1d),
+        rs: formatPct(laggard.rsBenchmark1w),
+      },
+      fallback: `부진 테마 ${laggard.sectorLabel} ${formatPct(laggard.changePercent1d)} (RS1w ${formatPct(laggard.rsBenchmark1w)})`,
+      weight: 7,
+    });
+  }
+
+  if (direction === 'flat' && risers.length === 0 && fallers.length === 0) {
+    factors.push({
+      evidenceKey: 'shared.market.insights.evidence.moveReasonSectorMixed',
+      evidenceParams: { list: formatSectorList(sorted.slice(0, 3)) },
+      fallback: `업종 혼조 ${formatSectorList(sorted.slice(0, 3))}`,
+      weight: 6,
+    });
+  }
+
+  return factors;
 }
 
 function collectNewsFactors(
@@ -117,7 +189,6 @@ function collectNewsFactors(
 
 function collectKrFactors(input: {
   primary: IndexTechnicalSnapshot;
-  sentiment: RegionSentiment;
   sectors: SectorEtfSnapshot[];
   macro: MacroIndicatorSnapshot[];
   usPrimary: IndexTechnicalSnapshot | null;
@@ -125,7 +196,7 @@ function collectKrFactors(input: {
   direction: MoveDirection;
 }): MoveFactor[] {
   const factors: MoveFactor[] = [];
-  const { primary, sentiment, sectors, macro, usPrimary, news, direction } = input;
+  const { primary, sectors, macro, usPrimary, news, direction } = input;
 
   factors.push({
     evidenceKey: 'shared.market.insights.evidence.moveReasonIndex',
@@ -134,58 +205,7 @@ function collectKrFactors(input: {
     weight: 10,
   });
 
-  const ratio = adRatio(sentiment);
-  if (direction === 'up' && ratio >= 1.1) {
-    factors.push({
-      evidenceKey: 'shared.market.insights.evidence.moveReasonBreadthUp',
-      evidenceParams: { up: sentiment.upCount, down: sentiment.downCount, ratio: ratio.toFixed(2) },
-      fallback: `대표주 상승 우위 (${sentiment.upCount}↑ ${sentiment.downCount}↓, 비율 ${ratio.toFixed(2)})`,
-      weight: 7,
-    });
-  } else if (direction === 'down' && ratio <= 0.9) {
-    factors.push({
-      evidenceKey: 'shared.market.insights.evidence.moveReasonBreadthDown',
-      evidenceParams: { up: sentiment.upCount, down: sentiment.downCount, ratio: ratio.toFixed(2) },
-      fallback: `대표주 하락 우위 (${sentiment.upCount}↑ ${sentiment.downCount}↓, 비율 ${ratio.toFixed(2)})`,
-      weight: 7,
-    });
-  } else if (direction === 'flat') {
-    factors.push({
-      evidenceKey: 'shared.market.insights.evidence.moveReasonBreadthMixed',
-      evidenceParams: { up: sentiment.upCount, down: sentiment.downCount },
-      fallback: `대표주 혼조 (${sentiment.upCount}↑ ${sentiment.downCount}↓)`,
-      weight: 5,
-    });
-  }
-
-  const { kr } = groupSectorsByMarket(sectors);
-  if (kr.length > 0) {
-    const leader = kr[0];
-    const laggard = kr[kr.length - 1];
-    if (direction === 'up' && (leader.changePercent1d ?? 0) > 0) {
-      factors.push({
-        evidenceKey: 'shared.market.insights.evidence.moveReasonSectorLead',
-        evidenceParams: {
-          sector: leader.sectorLabel,
-          change: formatPct(leader.changePercent1d),
-          rs: formatPct(leader.rsBenchmark1w),
-        },
-        fallback: `주도 업종 ${leader.sectorLabel} ${formatPct(leader.changePercent1d)} (RS1w ${formatPct(leader.rsBenchmark1w)})`,
-        weight: 6,
-      });
-    } else if (direction === 'down' && (laggard.changePercent1d ?? 0) < 0) {
-      factors.push({
-        evidenceKey: 'shared.market.insights.evidence.moveReasonSectorLag',
-        evidenceParams: {
-          sector: laggard.sectorLabel,
-          change: formatPct(laggard.changePercent1d),
-          rs: formatPct(laggard.rsBenchmark1w),
-        },
-        fallback: `부진 업종 ${laggard.sectorLabel} ${formatPct(laggard.changePercent1d)} (RS1w ${formatPct(laggard.rsBenchmark1w)})`,
-        weight: 6,
-      });
-    }
-  }
+  factors.push(...collectSectorThemeFactors(Market.KR, sectors, direction));
 
   const fx = macro.find((m) => m.kind === 'fx');
   if (fx?.changePercent1d != null) {
@@ -233,15 +253,14 @@ function collectKrFactors(input: {
 
 function collectUsFactors(input: {
   primary: IndexTechnicalSnapshot;
-  nasdaq: IndexTechnicalSnapshot | null;
-  sentiment: RegionSentiment;
+  secondaryIndex: IndexTechnicalSnapshot | null;
   sectors: SectorEtfSnapshot[];
   macro: MacroIndicatorSnapshot[];
   news: NewsAnalysisInput[];
   direction: MoveDirection;
 }): MoveFactor[] {
   const factors: MoveFactor[] = [];
-  const { primary, nasdaq, sentiment, sectors, macro, news, direction } = input;
+  const { primary, secondaryIndex, sectors, macro, news, direction } = input;
 
   factors.push({
     evidenceKey: 'shared.market.insights.evidence.moveReasonIndex',
@@ -250,70 +269,36 @@ function collectUsFactors(input: {
     weight: 10,
   });
 
-  if (nasdaq && nasdaq.yahooSymbol !== primary.yahooSymbol && nasdaq.changePercent1d != null) {
-    const nasDir = moveDirection(nasdaq.changePercent1d);
-    if (nasDir === direction && direction !== 'flat') {
+  if (
+    secondaryIndex &&
+    secondaryIndex.yahooSymbol !== primary.yahooSymbol &&
+    secondaryIndex.changePercent1d != null
+  ) {
+    const secondaryDir = moveDirection(secondaryIndex.changePercent1d);
+    if (secondaryDir === direction && direction !== 'flat') {
       factors.push({
-        evidenceKey: 'shared.market.insights.evidence.moveReasonNasdaqSync',
-        evidenceParams: { change: formatPct(nasdaq.changePercent1d) },
-        fallback: `NASDAQ 동반 ${formatPct(nasdaq.changePercent1d)} — 성장주 동조`,
+        evidenceKey: 'shared.market.insights.evidence.moveReasonSecondaryIndexSync',
+        evidenceParams: {
+          name: secondaryIndex.name,
+          change: formatPct(secondaryIndex.changePercent1d),
+        },
+        fallback: `${secondaryIndex.name} 동반 ${formatPct(secondaryIndex.changePercent1d)} — 지수 동조`,
         weight: 5,
       });
-    } else if (nasDir !== direction && nasDir !== 'flat') {
+    } else if (secondaryDir !== direction && secondaryDir !== 'flat') {
       factors.push({
-        evidenceKey: 'shared.market.insights.evidence.moveReasonNasdaqDiverge',
-        evidenceParams: { change: formatPct(nasdaq.changePercent1d) },
-        fallback: `NASDAQ ${formatPct(nasdaq.changePercent1d)} — 대형주·성장주 온도차`,
+        evidenceKey: 'shared.market.insights.evidence.moveReasonSecondaryIndexDiverge',
+        evidenceParams: {
+          name: secondaryIndex.name,
+          change: formatPct(secondaryIndex.changePercent1d),
+        },
+        fallback: `${secondaryIndex.name} ${formatPct(secondaryIndex.changePercent1d)} — 지수 간 온도차`,
         weight: 5,
       });
     }
   }
 
-  const ratio = adRatio(sentiment);
-  if (direction === 'up' && ratio >= 1.1) {
-    factors.push({
-      evidenceKey: 'shared.market.insights.evidence.moveReasonBreadthUp',
-      evidenceParams: { up: sentiment.upCount, down: sentiment.downCount, ratio: ratio.toFixed(2) },
-      fallback: `대표주 상승 우위 (${sentiment.upCount}↑ ${sentiment.downCount}↓)`,
-      weight: 7,
-    });
-  } else if (direction === 'down' && ratio <= 0.9) {
-    factors.push({
-      evidenceKey: 'shared.market.insights.evidence.moveReasonBreadthDown',
-      evidenceParams: { up: sentiment.upCount, down: sentiment.downCount, ratio: ratio.toFixed(2) },
-      fallback: `대표주 하락 우위 (${sentiment.upCount}↑ ${sentiment.downCount}↓)`,
-      weight: 7,
-    });
-  }
-
-  const { us } = groupSectorsByMarket(sectors);
-  if (us.length > 0) {
-    const leader = us[0];
-    if (direction === 'up' && (leader.changePercent1d ?? 0) > 0) {
-      factors.push({
-        evidenceKey: 'shared.market.insights.evidence.moveReasonSectorLead',
-        evidenceParams: {
-          sector: leader.sectorLabel,
-          change: formatPct(leader.changePercent1d),
-          rs: formatPct(leader.rsBenchmark1w),
-        },
-        fallback: `주도 섹터 ${leader.sectorLabel} ${formatPct(leader.changePercent1d)} (RS1w ${formatPct(leader.rsBenchmark1w)})`,
-        weight: 6,
-      });
-    } else if (direction === 'down') {
-      const laggard = us[us.length - 1];
-      factors.push({
-        evidenceKey: 'shared.market.insights.evidence.moveReasonSectorLag',
-        evidenceParams: {
-          sector: laggard.sectorLabel,
-          change: formatPct(laggard.changePercent1d),
-          rs: formatPct(laggard.rsBenchmark1w),
-        },
-        fallback: `부진 섹터 ${laggard.sectorLabel} ${formatPct(laggard.changePercent1d)}`,
-        weight: 6,
-      });
-    }
-  }
+  factors.push(...collectSectorThemeFactors(Market.US, sectors, direction));
 
   const vix = macro.find((m) => m.kind === 'vix');
   if (vix?.changePercent1d != null) {
@@ -377,11 +362,11 @@ function buildMoveReasonInsight(
 
   const links: AnalysisLink[] = [
     {
-      label: market === Market.KR ? '네이버 금융 코스피' : 'Yahoo S&P 500',
+      label: market === Market.KR ? '네이버 금융 코스피' : 'Yahoo NASDAQ',
       labelKey:
         market === Market.KR
           ? 'shared.market.insights.links.naverFinanceKospi'
-          : 'shared.market.insights.links.yahooSp500',
+          : 'shared.market.insights.links.yahooNasdaq',
       url: primary.chartUrl,
     },
     {
@@ -398,10 +383,10 @@ function buildMoveReasonInsight(
     summary: summaryText,
     reasoning:
       direction === 'up'
-        ? '전 거래일 종가 기준 지수·대표주·업종·매크로·뉴스를 교차해 상승 요인을 정리했습니다. 단일 변수보다 여러 신호가 같은 방향일 때 설명력이 높습니다. 이미 가격에 반영된 뉴스일 수 있습니다.'
+        ? '전 거래일 종가 기준 지수·업종 테마·매크로·뉴스를 교차해 상승 요인을 정리했습니다. 어떤 업종이 지수를 끌었는지 함께 보는 것이 핵심입니다.'
         : direction === 'down'
-          ? '전 거래일 종가 기준 지수·대표주·업종·매크로·뉴스를 교차해 하락 요인을 정리했습니다. 지수만 빠지고 폭은 좁은지, 대표주 전반이 약한지 함께 보는 것이 좋습니다.'
-          : '전 거래일 등락이 크지 않아 방향성이 약합니다. 상승·하락 종목이 엇갈리거나 매크로·뉴스 신호가 혼재된 구간으로 해석할 수 있습니다.',
+          ? '전 거래일 종가 기준 지수·업종 테마·매크로·뉴스를 교차해 하락 요인을 정리했습니다. 지수 하락 시 어떤 업종이 끌었는지 확인하는 것이 중요합니다.'
+          : '전 거래일 등락이 크지 않아 방향성이 약합니다. 업종별 등락이 엇갈리거나 매크로·뉴스 신호가 혼재된 구간으로 해석할 수 있습니다.',
     titleKey: 'shared.market.insights.moveReason.title',
     titleParams: { regionKey, directionKey: direction, change },
     summaryKey: 'shared.market.insights.moveReason.summary',
@@ -428,23 +413,23 @@ function attachNewsLinks(insight: AnalysisInsight, news: NewsAnalysisInput[], ma
 }
 
 export function buildMarketMoveReasonInsights(input: {
-  kr: RegionSentiment;
-  us: RegionSentiment;
   indices: IndexTechnicalSnapshot[];
   sectors: SectorEtfSnapshot[];
   macro: MacroIndicatorSnapshot[];
   news: NewsAnalysisInput[];
 }): AnalysisInsight[] {
   const items: AnalysisInsight[] = [];
-  const krPrimary = findPrimaryIndex(input.indices, Market.KR);
-  const usPrimary = findPrimaryIndex(input.indices, Market.US);
-  const nasdaq = input.indices.find((i) => i.yahooSymbol === '^IXIC') ?? null;
+  const krPrimary = findRegionSentimentIndex(input.indices, Market.KR);
+  const usPrimary = findRegionSentimentIndex(input.indices, Market.US);
+  const usSecondary =
+    input.indices.find(
+      (i) => i.market === Market.US && i.yahooSymbol === '^GSPC' && i.yahooSymbol !== usPrimary?.yahooSymbol,
+    ) ?? null;
 
   if (krPrimary) {
     const direction = moveDirection(krPrimary.changePercent1d);
     const factors = collectKrFactors({
       primary: krPrimary,
-      sentiment: input.kr,
       sectors: input.sectors,
       macro: input.macro,
       usPrimary,
@@ -458,8 +443,7 @@ export function buildMarketMoveReasonInsights(input: {
     const direction = moveDirection(usPrimary.changePercent1d);
     const factors = collectUsFactors({
       primary: usPrimary,
-      nasdaq,
-      sentiment: input.us,
+      secondaryIndex: usSecondary,
       sectors: input.sectors,
       macro: input.macro,
       news: input.news,

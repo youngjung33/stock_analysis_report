@@ -642,7 +642,7 @@
     },
     "scoreBreakdownTitle": "Recommendation rationale",
     "narrativeDivergenceBadge": "Narrative–price divergence · {{divergence}}",
-    "sentimentDesc": "KOSPI & NASDAQ index change · sectors and featured-stock breadth on the detail page",
+    "sentimentDesc": "KOSPI & NASDAQ index change · sector and theme flow on the detail page",
     "detailAnalysisLink": "Detailed analysis →",
     "loadingQuotes": "Loading quotes...",
     "regionKr": "🇰🇷 Korea",
@@ -659,7 +659,7 @@
     "deepAnalysisTitle": "Market outlook · deep analysis",
     "deepAnalysisLoading": "Analyzing economy, indices, sectors, news… (up to 25s)",
     "moveReasonTitle": "Previous session: why up or down?",
-    "moveReasonDesc": "Cross-check of index, leaders, sectors, macro, and news (48h) vs the prior session close.",
+    "moveReasonDesc": "Cross-check of KOSPI/NASDAQ, sectors, macro, and news (48h) vs the prior session close.",
     "stockFocusTitle": "Stock focus — why this price?",
     "stockFocusDesc": "We start with chart, index, and sector — then explain in plain language why the price is where it is.",
     "stockFocusPriceFirst": "Principle: price and chart first. News usually follows. Headlines appear only when they diverge from price.",
@@ -1247,7 +1247,7 @@
         "stockOutlook": "What to watch",
         "stockNewsNote": "News note (lagging)",
         "stockAction": "Reference opinion",
-        "breadth": "Market breadth",
+        "breadth": "Index overview",
         "index": "Index & charts",
         "technical": "Technical indicators",
         "news": "News & issues",
@@ -1355,16 +1355,10 @@
           "usGlobal": "US & global"
         },
         "breadth": {
-          "title": "{{region}} leaders {{up}}↑ {{down}}↓ — {{bias}}",
-          "summary": "{{region}} {{count}} featured stocks avg {{avg}}. Up/down ratio {{ratio}}.",
-          "bias": {
-            "up": "Upside bias",
-            "down": "Downside bias"
-          },
+          "title": "{{name}} {{change}} — {{trend}}",
+          "summary": "{{sectors}}",
           "reasoning": {
-            "bullish": "When rising names clearly outnumber fallers, risk appetite tends to be strong. Broad participation is healthier than a few large caps alone.",
-            "bearish": "When fallers dominate, short-term selling and risk-off sentiment may be elevated. Check whether the index holds while leaders weaken.",
-            "neutral": "Mixed up/down moves suggest no clear direction — stock and sector differentiation matters more than trend-following."
+            "index": "Index moves are often explained by sector and theme differentiation. Sector ETF performance (semis, financials, tech, etc.) helps explain why the index moved."
           }
         },
         "indexTrend": {
@@ -1425,7 +1419,7 @@
           "titleSync": "Korea–US in sync / mixed",
           "summaryDiverge": "Korea {{krAvg}} · US {{usAvg}} — regional divergence",
           "summarySync": "Korea {{krAvg}} · US {{usAvg}}",
-          "reasoningDiverge": "Large gaps in featured-stock averages may reflect FX, rates, or regional themes — often read alongside USD/KRW.",
+          "reasoningDiverge": "Large gaps in KR/US index moves may reflect FX, rates, or regional themes — often read alongside USD/KRW.",
           "reasoningSync": "Similar direction in both markets suggests a common global driver — cross-check Fed, FX, and macro headlines."
         },
         "moveReason": {
@@ -1437,9 +1431,9 @@
             "flat": "flat"
           },
           "reasoning": {
-            "up": "We cross-checked index, leaders, sectors, macro, and news for the prior session close. Multiple aligned signals are more informative than a single driver; news may already be priced in.",
-            "down": "We cross-checked index, leaders, sectors, macro, and news for the prior session close. Check whether only the index fell or breadth was weak as well.",
-            "flat": "The prior session move was small — mixed leaders or conflicting macro/news may explain the lack of direction."
+            "up": "We cross-checked index, sector themes, macro, and news for the prior session close. Which sectors led the move matters most.",
+            "down": "We cross-checked index, sector themes, macro, and news for the prior session close. Check which sectors dragged the index down.",
+            "flat": "The prior session move was small — mixed sector moves or conflicting macro/news may explain the lack of direction."
           }
         },
         "stockFocus": {
@@ -1545,6 +1539,7 @@
           "yahooFinance": "Yahoo Finance",
           "naverFinanceKospi": "Naver Finance KOSPI",
           "yahooSp500": "Yahoo S&P 500",
+          "yahooNasdaq": "Yahoo NASDAQ",
           "naverFinance": "Naver Finance",
           "investopediaRsi": "Investopedia RSI",
           "investopediaMacd": "Investopedia MACD",
@@ -1616,17 +1611,24 @@
           "recChange": "Day change {{change}}",
           "recTag": "Tag: {{tag}}",
           "moveReasonIndex": "{{name}} prior session {{change}}",
-          "moveReasonBreadthUp": "Featured stocks upside bias ({{up}}↑ {{down}}↓, ratio {{ratio}})",
-          "moveReasonBreadthDown": "Featured stocks downside bias ({{up}}↑ {{down}}↓, ratio {{ratio}})",
-          "moveReasonBreadthMixed": "Featured stocks mixed ({{up}}↑ {{down}}↓)",
-          "moveReasonSectorLead": "Leading sector {{sector}} {{change}} (1W RS {{rs}})",
-          "moveReasonSectorLag": "Lagging sector {{sector}} {{change}} (1W RS {{rs}})",
+          "moveReasonSectorRise": "Rising sectors {{list}}",
+          "moveReasonSectorFall": "Falling sectors {{list}}",
+          "moveReasonSectorMixed": "Mixed sectors {{list}}",
+          "sectorLeader": "Leading sector {{sector}} {{change}}",
+          "sectorLaggard": "Lagging sector {{sector}} {{change}}",
+          "moveReasonSectorLead": "Leading theme {{sector}} {{change}} (1W RS {{rs}})",
+          "moveReasonSectorLag": "Lagging theme {{sector}} {{change}} (1W RS {{rs}})",
           "moveReasonFxWeak": "KRW weakness USD/KRW {{change}} ({{value}}) — export/semiconductor friendly",
           "moveReasonFxStrong": "KRW strength USD/KRW {{change}} ({{value}}) — foreign/outflow pressure",
           "moveReasonUsSync": "US {{name}} {{change}} — prior-session global sync",
           "moveReasonUsDiverge": "US {{name}} {{change}} — prior-session KR–US gap",
           "moveReasonNasdaqSync": "NASDAQ {{change}} — growth in sync",
           "moveReasonNasdaqDiverge": "NASDAQ {{change}} — large-cap vs growth gap",
+          "moveReasonSecondaryIndexSync": "{{name}} {{change}} — index in sync",
+          "moveReasonSecondaryIndexDiverge": "{{name}} {{change}} — index temperature gap",
+          "indexLevel": "{{name}} {{price}} · 1D {{change}}",
+          "indexTrend": "Trend {{trend}}",
+          "indexRsi": "RSI(14) {{rsi}}",
           "moveReasonVixDown": "VIX {{change}} ({{value}}) — risk-on",
           "moveReasonVixUp": "VIX {{change}} ({{value}}) — fear/hedging demand",
           "moveReasonYieldDown": "10Y yield {{change}} ({{value}}%) — growth/multiple friendly",

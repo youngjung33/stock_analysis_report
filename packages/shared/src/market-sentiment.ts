@@ -1,5 +1,8 @@
 import { Market } from './enums';
 import { findRegionSentimentIndex } from './market-benchmarks';
+import { detectMarketRegimes } from './market-recommendation/regime';
+import type { MacroIndicatorSnapshot } from './market-macro';
+import type { MarketInsightsResult } from './market-insights.types';
 
 /** 시세 기반 인사이트 입력 (주요 종목 시세와 동일 shape) */
 export interface QuoteInsightInput {
@@ -198,11 +201,13 @@ export function computeRegionSentiment(market: Market, quotes: QuoteInsightInput
 }
 
 export function applyIndexRegionSentiment(
-  base: { kr: RegionSentiment; us: RegionSentiment },
+  base: MarketInsightsResult,
   indices: Array<{ name: string; yahooSymbol: string; market: Market; changePercent1d: number | null }>,
-): {
-  kr: RegionSentiment;
-  us: RegionSentiment;
+  options?: {
+    macro?: MacroIndicatorSnapshot[];
+    usdKrwChange1d?: number | null;
+  },
+): MarketInsightsResult & {
   quoteKr: RegionSentiment;
   quoteUs: RegionSentiment;
 } {
@@ -210,11 +215,21 @@ export function applyIndexRegionSentiment(
   const quoteUs = base.us;
   const krIndex = findRegionSentimentIndex(indices, Market.KR);
   const usIndex = findRegionSentimentIndex(indices, Market.US);
+  const kr = krIndex ? computeIndexRegionSentiment(Market.KR, krIndex) : quoteKr;
+  const us = usIndex ? computeIndexRegionSentiment(Market.US, usIndex) : quoteUs;
+  const regimes = detectMarketRegimes({
+    krSentiment: kr,
+    usSentiment: us,
+    macro: options?.macro ?? [],
+    usdKrwChange1d: options?.usdKrwChange1d ?? null,
+  });
   return {
+    ...base,
     quoteKr,
     quoteUs,
-    kr: krIndex ? computeIndexRegionSentiment(Market.KR, krIndex) : quoteKr,
-    us: usIndex ? computeIndexRegionSentiment(Market.US, usIndex) : quoteUs,
+    kr,
+    us,
+    regimes,
   };
 }
 

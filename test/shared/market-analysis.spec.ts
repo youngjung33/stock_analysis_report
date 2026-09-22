@@ -26,6 +26,30 @@ describe('buildMarketAnalysisReport', () => {
       ],
       indexInputs: [
         {
+          yahooSymbol: '^KS11',
+          name: 'KOSPI',
+          market: Market.KR,
+          closes: Array.from({ length: 220 }, (_, i) => 2500 + i * 2),
+          volumes: Array.from({ length: 220 }, () => 1_000_000),
+          highs: Array.from({ length: 220 }, (_, i) => 2510 + i * 2),
+          lows: Array.from({ length: 220 }, (_, i) => 2490 + i * 2),
+          changePercent1d: 0.8,
+          chartUrl: 'https://finance.yahoo.com/quote/%5EKS11/',
+          tradingViewUrl: 'https://www.tradingview.com/symbols/KRX-KOSPI/',
+        },
+        {
+          yahooSymbol: '^IXIC',
+          name: 'NASDAQ',
+          market: Market.US,
+          closes: Array.from({ length: 220 }, (_, i) => 17000 + i * 3),
+          volumes: Array.from({ length: 220 }, () => 2_000_000),
+          highs: Array.from({ length: 220 }, (_, i) => 17010 + i * 3),
+          lows: Array.from({ length: 220 }, (_, i) => 16990 + i * 3),
+          changePercent1d: 0.5,
+          chartUrl: 'https://finance.yahoo.com/quote/%5EIXIC/',
+          tradingViewUrl: 'https://www.tradingview.com/symbols/NASDAQ-NDX/',
+        },
+        {
           yahooSymbol: '^GSPC',
           name: 'S&P 500',
           market: Market.US,
@@ -73,13 +97,16 @@ describe('buildMarketAnalysisReport', () => {
     });
 
     expect(report.insights.length).toBeGreaterThan(3);
-    expect(report.indices).toHaveLength(1);
+    expect(report.indices.length).toBeGreaterThanOrEqual(2);
     expect(report.macro).toHaveLength(1);
     expect(report.sectors).toHaveLength(1);
     expect(report.krQuotes).toHaveLength(1);
-    const breadth = report.insights.find((i) => i.category === 'breadth');
-    expect(breadth?.reasoning.length).toBeGreaterThan(10);
-    expect(breadth?.links.length).toBeGreaterThan(0);
+    const breadth = report.insights.filter((i) => i.category === 'breadth');
+    expect(breadth.length).toBeGreaterThan(0);
+    expect(breadth[0]?.title).toContain('KOSPI');
+    expect(breadth[0]?.reasoning.length).toBeGreaterThan(10);
+    expect(breadth[0]?.links.length).toBeGreaterThan(0);
+    expect(report.kr.avgChangePercent).toBe(0.8);
     expect(report.figureStatements).toEqual([]);
     expect(report.policyUncertainty).toBe(false);
   });

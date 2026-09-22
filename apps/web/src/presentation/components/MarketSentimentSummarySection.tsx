@@ -21,8 +21,8 @@ export function MarketSentimentSummarySection({ compact }: Props) {
     if (!data) return null;
     const base = buildMarketInsights(data.kr, data.us);
     if (!data.indices?.length) return base;
-    const { kr, us } = applyIndexRegionSentiment(base, data.indices);
-    return { ...base, kr, us };
+    const applied = applyIndexRegionSentiment(base, data.indices);
+    return { ...applied };
   }, [data]);
 
   return (
