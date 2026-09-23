@@ -3,7 +3,7 @@ import {
   CreateTransactionInput,
   UpdateTransactionInput,
   Dashboard,
-  FeaturedQuotesResult,
+  MarketIndicesResult,
   LoginResult,
   RegisterResult,
   MarketProviderStatus,
@@ -75,7 +75,7 @@ export interface IPortfolioRepository {
 }
 
 export interface IMarketRepository {
-  getFeaturedQuotes(): Promise<FeaturedQuotesResult>;
+  getMarketIndices(): Promise<MarketIndicesResult>;
   getStockQuote(symbol: string, market: Market, range: QuoteChartRange): Promise<StockQuoteSnapshot>;
   getMarketStatus(): Promise<MarketProviderStatus[]>;
   getMarketAnalysis(options?: {

@@ -1,5 +1,4 @@
 import { Market } from '../enums';
-import { FEATURED_KR_STOCKS, FEATURED_US_STOCKS } from '../featured-stocks';
 import type { StockSectorTag } from './types';
 
 /** Featured + sector-leader symbols → sector tags for scoring */
@@ -43,12 +42,6 @@ export function getStockSectorTags(symbol: string, market: Market): StockSectorT
 
 export function collectSectorLeaderSymbols(): Array<{ symbol: string; market: Market; tags: StockSectorTag[] }> {
   const out: Array<{ symbol: string; market: Market; tags: StockSectorTag[] }> = [];
-  for (const stock of [...FEATURED_KR_STOCKS, ...FEATURED_US_STOCKS]) {
-    const tags = getStockSectorTags(stock.symbol, stock.market);
-    if (tags.length > 0) {
-      out.push({ symbol: stock.symbol, market: stock.market, tags });
-    }
-  }
   for (const [marketKey, sectors] of Object.entries(SECTOR_LEADER_SYMBOLS)) {
     const market = marketKey as Market;
     for (const entry of Object.values(sectors)) {

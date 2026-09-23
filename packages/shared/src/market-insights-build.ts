@@ -1,21 +1,13 @@
 import { buildStockRecommendations } from './market-recommendation/engine';
-import type { MarketContextInput } from './market-recommendation/types';
-import type {
-  MarketInsightsResult,
-  QuoteInsightInput,
-  StockRecommendation,
-} from './market-insights.types';
+import type { IndexContextSnapshot, MarketContextInput } from './market-recommendation/types';
+import type { MarketInsightsResult, StockRecommendation } from './market-insights.types';
 
 export function buildMarketInsights(
-  krQuotes: QuoteInsightInput[],
-  usQuotes: QuoteInsightInput[],
+  indices: IndexContextSnapshot[],
   maxRecommendations = 4,
-  options?: Omit<MarketContextInput, 'krQuotes' | 'usQuotes'>,
+  options?: Omit<MarketContextInput, 'indices'>,
 ): MarketInsightsResult {
-  const result = buildStockRecommendations(
-    { krQuotes, usQuotes, ...options },
-    maxRecommendations,
-  );
+  const result = buildStockRecommendations({ indices, ...options }, maxRecommendations);
   return {
     kr: result.kr,
     us: result.us,

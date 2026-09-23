@@ -8,51 +8,53 @@ vi.mock('@/server/container', () => ({
 }));
 
 import { getServerServices } from '@/server/container';
-import { GET as getFeatured } from '@/app/api/market/featured/route';
+import { GET as getIndices } from '@/app/api/market/indices/route';
 import { GET as getAnalysis } from '@/app/api/market/analysis/route';
 
 describe('market API rate limit', () => {
   beforeEach(() => {
     resetRateLimitStoreForTests();
     vi.mocked(getServerServices).mockReturnValue({
-      getFeaturedQuotesUseCase: { execute: vi.fn().mockResolvedValue({ kr: [], us: [], fetchedAt: '' }) },
-      getMarketAnalysisUseCase: { execute: vi.fn().mockResolvedValue({ krQuotes: [], usQuotes: [], fetchedAt: '' }) },
+      getMarketIndicesUseCase: {
+        execute: vi.fn().mockResolvedValue({ indices: [], fetchedAt: '' }),
+      },
+      getMarketAnalysisUseCase: { execute: vi.fn().mockResolvedValue({ fetchedAt: '' }) },
     } as never);
   });
 
   it('allows requests under limit', async () => {
-    const req = new NextRequest('http://localhost/api/market/featured', {
+    const req = new NextRequest('http://localhost/api/market/indices', {
       headers: { 'x-forwarded-for': '1.2.3.4' },
     });
-    await expect(enforceRateLimit(req, 'market:featured', 'standard')).resolves.toBeUndefined();
+    await expect(enforceRateLimit(req, 'market:indices', 'standard')).resolves.toBeUndefined();
   });
 
   it('returns 429 when limit exceeded', async () => {
     const ip = '9.9.9.9';
     for (let i = 0; i < 60; i++) {
       await enforceRateLimit(
-        new NextRequest('http://localhost/api/market/featured', {
+        new NextRequest('http://localhost/api/market/indices', {
           headers: { 'x-forwarded-for': ip },
         }),
-        'market:featured',
+        'market:indices',
         'standard',
       );
     }
 
     await expect(
       enforceRateLimit(
-        new NextRequest('http://localhost/api/market/featured', {
+        new NextRequest('http://localhost/api/market/indices', {
           headers: { 'x-forwarded-for': ip },
         }),
-        'market:featured',
+        'market:indices',
         'standard',
       ),
     ).rejects.toThrow(HttpError);
 
-    const req = new NextRequest('http://localhost/api/market/featured', {
+    const req = new NextRequest('http://localhost/api/market/indices', {
       headers: { 'x-forwarded-for': ip },
     });
-    const res = await getFeatured(req);
+    const res = await getIndices(req);
     expect(res.status).toBe(429);
   });
 

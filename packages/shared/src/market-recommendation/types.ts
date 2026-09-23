@@ -58,12 +58,10 @@ export interface CandidateStockInput {
   market: Market;
   currency: string;
   yahooSymbol?: string;
-  source?: 'featured' | 'watchlist' | 'holding' | 'sector' | 'catalog';
+  source?: 'watchlist' | 'holding' | 'sector' | 'catalog';
 }
 
 export interface MarketContextInput {
-  krQuotes: QuoteInsightInput[];
-  usQuotes: QuoteInsightInput[];
   candidateQuotes?: QuoteInsightInput[];
   macro?: MacroIndicatorSnapshot[];
   sectors?: SectorEtfSnapshot[];

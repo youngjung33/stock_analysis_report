@@ -1256,7 +1256,7 @@
         "recommendation": "Stock watchlist"
       },
       "sentiment": {
-        "headline": "{{market}} featured stocks · {{sentiment}}",
+        "headline": "{{market}} market · {{sentiment}}",
         "indexHeadline": "{{indexName}} · {{sentiment}}",
         "indexNoData": "No {{indexName}} quote — cannot assess sentiment.",
         "indexDescription": {
@@ -1268,11 +1268,11 @@
         },
         "noData": "Insufficient quote data to assess sentiment.",
         "description": {
-          "strong_bull": "Featured stocks avg {{avg}}%. Up {{up}} · Down {{down}} — strong short-term uptrend.",
-          "bull": "Featured stocks avg {{avg}}%. Up {{up}} · Down {{down}} — mild bullish tone.",
-          "neutral": "Featured stocks avg {{avg}}%. Up {{up}} · Down {{down}} — no clear direction.",
-          "bear": "Featured stocks avg {{avg}}%. Up {{up}} · Down {{down}} — correction/selling pressure.",
-          "strong_bear": "Featured stocks avg {{avg}}%. Up {{up}} · Down {{down}} — broad weakness."
+          "strong_bull": "Watchlist avg {{avg}}%. Up {{up}} · Down {{down}} — strong short-term uptrend.",
+          "bull": "Watchlist avg {{avg}}%. Up {{up}} · Down {{down}} — mild bullish tone.",
+          "neutral": "Watchlist avg {{avg}}%. Up {{up}} · Down {{down}} — no clear direction.",
+          "bear": "Watchlist avg {{avg}}%. Up {{up}} · Down {{down}} — correction/selling pressure.",
+          "strong_bear": "Watchlist avg {{avg}}%. Up {{up}} · Down {{down}} — broad weakness."
         },
         "marketLabel": {
           "kr": "Korea",
@@ -1280,9 +1280,9 @@
         }
       },
       "recommendation": {
-        "momentumStrong": "Strongest mover among {{market}} featured stocks today — check trend continuation.",
+        "momentumStrong": "Strongest mover among {{market}} watchlist today — check trend continuation.",
         "bullWatchlist": "In bull market, {{name}} — watch relative strength.",
-        "bearPullback": "Large pullback among {{market}} featured stocks — watch oversold signals.",
+        "bearPullback": "Large pullback among {{market}} watchlist — watch oversold signals.",
         "bearDefensive": "Relatively resilient {{name}} in bear market — defensive interest.",
         "neutralMomentum": "Relative strength for {{name}} in mixed market — confirm direction.",
         "neutralWatchlist": "{{name}} pulling back in mixed market — watch support.",

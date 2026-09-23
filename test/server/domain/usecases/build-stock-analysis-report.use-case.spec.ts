@@ -4,23 +4,6 @@ import { BuildStockAnalysisReportUseCase } from '@server/domain/usecases/market/
 
 describe('BuildStockAnalysisReportUseCase', () => {
   it('assembles stock price explanation report from chart and enrichment', async () => {
-    const getFeaturedQuotesUseCase = {
-      execute: vi.fn().mockResolvedValue({
-        kr: [
-          {
-            symbol: '005930',
-            name: '삼성전자',
-            market: Market.KR,
-            currency: 'KRW',
-            currentPrice: 70000,
-            changePercent: 1,
-          },
-        ],
-        us: [],
-        fetchedAt: new Date().toISOString(),
-      }),
-    };
-
     const buildMarketContextUseCase = {
       execute: vi.fn().mockResolvedValue({
         macro: [],
@@ -77,7 +60,6 @@ describe('BuildStockAnalysisReportUseCase', () => {
     };
 
     const useCase = new BuildStockAnalysisReportUseCase(
-      getFeaturedQuotesUseCase as never,
       buildMarketContextUseCase as never,
       buildStockEnrichmentUseCase as never,
       getStockQuoteUseCase as never,
@@ -98,7 +80,6 @@ describe('BuildStockAnalysisReportUseCase', () => {
   });
 
   it('throws STOCK_ANALYSIS_UNAVAILABLE when quote data is insufficient', async () => {
-    const getFeaturedQuotesUseCase = { execute: vi.fn().mockResolvedValue({ kr: [], us: [], fetchedAt: '' }) };
     const buildMarketContextUseCase = {
       execute: vi.fn().mockResolvedValue({
         macro: [],
@@ -126,7 +107,6 @@ describe('BuildStockAnalysisReportUseCase', () => {
     };
 
     const useCase = new BuildStockAnalysisReportUseCase(
-      getFeaturedQuotesUseCase as never,
       buildMarketContextUseCase as never,
       buildStockEnrichmentUseCase as never,
       getStockQuoteUseCase as never,

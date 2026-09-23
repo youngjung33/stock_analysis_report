@@ -39,7 +39,7 @@ test.describe('AI insight UI', () => {
 
   test('guest sees AI insight panel on stock detail page', async ({ page }) => {
     await enterAsGuest(page);
-    await page.goto('/stocks/005930?market=KR');
+    await page.goto('/stocks/005930?market=KR&name=%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90');
     await ensureKoreanLocale(page);
 
     await expect(page.getByRole('heading', { name: '삼성전자' })).toBeVisible({ timeout: 30_000 });

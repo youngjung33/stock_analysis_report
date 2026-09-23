@@ -155,14 +155,8 @@ export {
   extractNarrativeDivergence,
 } from './simulation-ranking';
 export type { SimulationAddPriority, SimulationAddPriorityResult } from './simulation-ranking';
-export {
-  buildRankedPortfolioSimulation,
-  toFeaturedQuoteInputs,
-} from './portfolio-capital-simulation';
-export type {
-  FeaturedQuoteInput,
-  RankedPortfolioSimulationResult,
-} from './portfolio-capital-simulation';
+export { buildRankedPortfolioSimulation } from './portfolio-capital-simulation';
+export type { RankedPortfolioSimulationResult } from './portfolio-capital-simulation';
 export {
   buildDashboardFromRawHoldings,
   normalizeDashboardSummary,
@@ -257,7 +251,6 @@ export { resolveCurrency, resolveYahooSymbol } from './stock-symbol';
 export {
   dedupeSearchResults,
   parseYahooSearchQuote,
-  searchFeaturedStocks,
 } from './stock-search';
 export type { StockSearchResult, YahooSearchQuote } from './stock-search';
 export {
@@ -270,18 +263,12 @@ export {
 } from './stock-catalog';
 export type { StockCatalogEntry } from './stock-catalog';
 export {
-  FEATURED_KR_STOCKS,
-  FEATURED_US_STOCKS,
-  FEATURED_STOCKS,
-  featuredStockId,
-  findFeaturedStock,
-} from './featured-stocks';
-export type { FeaturedStock } from './featured-stocks';
-export {
   buildMarketInsights,
   computeRegionSentiment,
   computeIndexRegionSentiment,
   applyIndexRegionSentiment,
+  resolveRegionSentimentsFromIndices,
+  neutralRegionSentiment,
   sentimentBadgeClass,
   SENTIMENT_LABEL_KO,
   TAG_LABEL_KO,

@@ -26,7 +26,7 @@ import {
   RemoveWatchlistUseCase,
 } from './usecases/watchlist/watchlist.use-cases';
 import {
-  GetFeaturedQuotesUseCase,
+  GetMarketIndicesUseCase,
   GetFxRateUseCase,
   GetMarketAnalysisUseCase,
   GetMarketStatusUseCase,
@@ -67,7 +67,7 @@ export interface AppServices {
   getHoldingBySymbolUseCase: GetHoldingBySymbolUseCase;
   getPortfolioAnalysisUseCase: GetPortfolioAnalysisUseCase;
   refreshQuotesUseCase: RefreshQuotesUseCase;
-  getFeaturedQuotesUseCase: GetFeaturedQuotesUseCase;
+  getMarketIndicesUseCase: GetMarketIndicesUseCase;
   getStockQuoteUseCase: GetStockQuoteUseCase;
   getMarketStatusUseCase: GetMarketStatusUseCase;
   getMarketAnalysisUseCase: GetMarketAnalysisUseCase;

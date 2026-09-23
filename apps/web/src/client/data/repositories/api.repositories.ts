@@ -4,7 +4,7 @@ import {
   CorporateAction,
   CreateTransactionInput,
   UpdateTransactionInput,
-  FeaturedQuotesResult,
+  MarketIndicesResult,
   LoginResult,
   RegisterResult,
   MarketProviderStatus,
@@ -140,8 +140,8 @@ export class ApiPortfolioRepository implements IPortfolioRepository {
 }
 
 export class ApiMarketRepository implements IMarketRepository {
-  async getFeaturedQuotes() {
-    const { data } = await apiClient.get<FeaturedQuotesResult>('/market/featured');
+  async getMarketIndices() {
+    const { data } = await apiClient.get<MarketIndicesResult>('/market/indices');
     return data;
   }
 

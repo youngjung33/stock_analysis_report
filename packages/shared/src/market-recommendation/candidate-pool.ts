@@ -1,5 +1,4 @@
 import { Market } from '../enums';
-import { FEATURED_KR_STOCKS, FEATURED_US_STOCKS } from '../featured-stocks';
 import { resolveCurrency } from '../stock-symbol';
 import { SECTOR_LEADER_SYMBOLS } from './sector-tags';
 import type { CandidateStockInput } from './types';
@@ -15,13 +14,7 @@ function addCandidate(
   input: CandidateStockInput,
 ): void {
   const key = symbolKey(input.symbol, input.market);
-  const existing = map.get(key);
-  if (!existing) {
-    map.set(key, input);
-    return;
-  }
-  if (existing.source === 'featured') return;
-  if (input.source === 'featured') {
+  if (!map.has(key)) {
     map.set(key, input);
   }
 }
@@ -32,25 +25,6 @@ export function buildCandidatePool(input: {
   catalogSymbols?: Array<{ symbol: string; market: Market; name: string; yahooSymbol?: string }>;
 }): CandidateStockInput[] {
   const map = new Map<string, CandidateStockInput>();
-
-  for (const stock of FEATURED_KR_STOCKS) {
-    addCandidate(map, {
-      symbol: stock.symbol,
-      name: stock.name,
-      market: stock.market,
-      currency: resolveCurrency(stock.market),
-      source: 'featured',
-    });
-  }
-  for (const stock of FEATURED_US_STOCKS) {
-    addCandidate(map, {
-      symbol: stock.symbol,
-      name: stock.name,
-      market: stock.market,
-      currency: resolveCurrency(stock.market),
-      source: 'featured',
-    });
-  }
 
   for (const [marketKey, sectors] of Object.entries(SECTOR_LEADER_SYMBOLS)) {
     const market = marketKey as Market;

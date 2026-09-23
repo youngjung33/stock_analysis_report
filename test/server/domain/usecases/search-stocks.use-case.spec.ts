@@ -22,7 +22,7 @@ describe('SearchStocksUseCase', () => {
     expect(catalog.search).toHaveBeenCalledWith('삼성', Market.KR, 15);
   });
 
-  it('falls back to featured and remote when catalog empty', async () => {
+  it('falls back to remote when catalog empty', async () => {
     const catalog = createMockCatalogRepo();
     const marketData = createMockMarketData();
     marketData.searchRemoteStocks.mockResolvedValue([
@@ -36,16 +36,16 @@ describe('SearchStocksUseCase', () => {
     expect(marketData.searchRemoteStocks).toHaveBeenCalled();
   });
 
-  it('falls back when catalog count fails', async () => {
+  it('returns empty when catalog count fails and remote fails', async () => {
     const catalog = createMockCatalogRepo();
     catalog.countByMarket.mockRejectedValue(new Error('db down'));
     const marketData = createMockMarketData();
-    marketData.searchRemoteStocks.mockResolvedValue([]);
+    marketData.searchRemoteStocks.mockRejectedValue(new Error('remote down'));
 
     const useCase = new SearchStocksUseCase(catalog, marketData);
     const results = await useCase.execute('005930', Market.KR);
 
-    expect(results.some((r) => r.symbol === '005930')).toBe(true);
+    expect(results).toEqual([]);
     expect(catalog.search).not.toHaveBeenCalled();
   });
 });

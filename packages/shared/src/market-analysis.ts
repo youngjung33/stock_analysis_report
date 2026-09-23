@@ -146,8 +146,6 @@ export interface NewsAnalysisInput {
 
 export interface MarketAnalysisReport extends MarketInsightsResult {
   fetchedAt: string;
-  krQuotes: QuoteInsightInput[];
-  usQuotes: QuoteInsightInput[];
   macro: MacroIndicatorSnapshot[];
   indices: IndexTechnicalSnapshot[];
   sectors: SectorEtfSnapshot[];
@@ -986,9 +984,8 @@ function formatNum(v: number): string {
 }
 
 export function buildMarketAnalysisReport(input: {
-  krQuotes: QuoteInsightInput[];
-  usQuotes: QuoteInsightInput[];
   indexInputs: IndexTechnicalInput[];
+  candidateQuotes?: QuoteInsightInput[];
   macroInputs: MacroSeriesInput[];
   sectorInputs: SectorSeriesInput[];
   news: NewsAnalysisInput[];
@@ -1019,15 +1016,18 @@ export function buildMarketAnalysisReport(input: {
     market: i.market,
     changePercent1d: i.changePercent1d,
   }));
-  const base = buildMarketInsights(input.krQuotes, input.usQuotes, 6, {
+  const indexCtx = indices.map((i) => ({
+    yahooSymbol: i.yahooSymbol,
+    name: i.name,
+    market: i.market,
+    changePercent1d: i.changePercent1d,
+  }));
+
+  const base = buildMarketInsights(indexCtx, 6, {
     macro,
     sectors,
-    indices: indices.map((i) => ({
-      yahooSymbol: i.yahooSymbol,
-      name: i.name,
-      market: i.market,
-      changePercent1d: i.changePercent1d,
-    })),
+    indices: indexCtx,
+    candidateQuotes: input.candidateQuotes,
     usdKrwRate: fxMacro?.value ?? null,
     usdKrwChange1d: fxMacro?.changePercent1d ?? null,
     userHoldings: input.userHoldings,
@@ -1038,10 +1038,11 @@ export function buildMarketAnalysisReport(input: {
     figureStatements: input.figureStatements,
   });
 
-  const { kr, us, regimes } = applyIndexRegionSentiment(base, indexSummaries, {
+  const aligned = applyIndexRegionSentiment(base, indexSummaries, {
     macro,
     usdKrwChange1d: fxMacro?.changePercent1d ?? null,
   });
+  const { kr, us, regimes } = aligned;
 
   const insights: AnalysisInsight[] = [
     ...buildMarketMoveReasonInsights({
@@ -1065,8 +1066,6 @@ export function buildMarketAnalysisReport(input: {
     us,
     regimes,
     fetchedAt: input.fetchedAt ?? new Date().toISOString(),
-    krQuotes: input.krQuotes,
-    usQuotes: input.usQuotes,
     macro,
     indices,
     sectors,

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { Market } from '@sar/shared';
 import { buildGlobalBaselineRecommendations } from '@sar/shared';
 
-const krQuotes = [
+const candidateQuotes = [
   {
     symbol: '005930',
     name: 'Samsung',
@@ -11,9 +11,6 @@ const krQuotes = [
     currentPrice: 70000,
     changePercent: 1.2,
   },
-];
-
-const usQuotes = [
   {
     symbol: 'AAPL',
     name: 'Apple',
@@ -27,12 +24,14 @@ const usQuotes = [
 describe('buildGlobalBaselineRecommendations', () => {
   it('returns recommendations without user holdings', () => {
     const result = buildGlobalBaselineRecommendations({
-      featuredKr: krQuotes,
-      featuredUs: usQuotes,
+      candidateQuotes,
       marketContext: {
         macro: [],
         sectors: [],
-        indices: [],
+        indices: [
+          { name: 'KOSPI', yahooSymbol: '^KS11', market: Market.KR, changePercent1d: 1.2 },
+          { name: 'NASDAQ', yahooSymbol: '^IXIC', market: Market.US, changePercent1d: 0.5 },
+        ],
         usdKrwRate: 1300,
         usdKrwChange1d: 0.1,
       },

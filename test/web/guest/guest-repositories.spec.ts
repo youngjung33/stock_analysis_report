@@ -18,7 +18,7 @@ import { IMarketRepository } from '@/client/domain/repositories';
 function createFakeMarketRepo(): IMarketRepository {
   return {
     getStatus: vi.fn(),
-    getFeaturedQuotes: vi.fn(),
+    getMarketIndices: vi.fn(),
     getStockQuote: vi.fn(),
     searchStocks: vi.fn(),
     getFxRate: vi.fn().mockResolvedValue({ usdKrwRate: 1300 }),

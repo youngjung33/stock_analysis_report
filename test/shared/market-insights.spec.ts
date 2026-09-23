@@ -7,15 +7,17 @@ import {
   computeRegionSentiment,
 } from '@sar/shared';
 
-const krQuotes = [
+const candidateQuotes = [
   { symbol: '005930', name: '삼성전자', market: Market.KR, currency: 'KRW', currentPrice: 70000, changePercent: 2.1 },
   { symbol: '000660', name: 'SK하이닉스', market: Market.KR, currency: 'KRW', currentPrice: 180000, changePercent: 1.5 },
   { symbol: '035420', name: 'NAVER', market: Market.KR, currency: 'KRW', currentPrice: 200000, changePercent: 0.8 },
-];
-
-const usQuotes = [
   { symbol: 'AAPL', name: 'Apple', market: Market.US, currency: 'USD', currentPrice: 190, changePercent: -0.5 },
   { symbol: 'MSFT', name: 'Microsoft', market: Market.US, currency: 'USD', currentPrice: 420, changePercent: -1.2 },
+];
+
+const indices = [
+  { name: 'KOSPI', yahooSymbol: '^KS11', market: Market.KR, changePercent1d: 1.47 },
+  { name: 'NASDAQ', yahooSymbol: '^IXIC', market: Market.US, changePercent1d: -1.35 },
 ];
 
 describe('computeIndexRegionSentiment', () => {
@@ -28,13 +30,12 @@ describe('computeIndexRegionSentiment', () => {
 });
 
 describe('applyIndexRegionSentiment', () => {
-  it('overrides display sentiment with index while keeping quote sentiment', () => {
-    const base = buildMarketInsights(krQuotes, usQuotes);
+  it('overrides display sentiment with index data', () => {
+    const base = buildMarketInsights(indices, 4, { candidateQuotes });
     const applied = applyIndexRegionSentiment(base, [
       { name: 'KOSPI', yahooSymbol: '^KS11', market: Market.KR, changePercent1d: 1.2 },
       { name: 'NASDAQ', yahooSymbol: '^IXIC', market: Market.US, changePercent1d: -1.0 },
     ]);
-    expect(applied.quoteKr.label).toBe('bull');
     expect(applied.kr.avgChangePercent).toBe(1.2);
     expect(applied.us.label).toBe('bear');
     expect(applied.regimes?.some((r) => r.id === 'diverged' || r.id === 'usLeadingKr')).toBe(true);
@@ -43,6 +44,7 @@ describe('applyIndexRegionSentiment', () => {
 
 describe('computeRegionSentiment', () => {
   it('detects bullish KR market from average change', () => {
+    const krQuotes = candidateQuotes.filter((q) => q.market === Market.KR);
     const sentiment = computeRegionSentiment(Market.KR, krQuotes);
     expect(sentiment.label).toBe('bull');
     expect(sentiment.upCount).toBe(3);
@@ -60,7 +62,7 @@ describe('computeRegionSentiment', () => {
 
 describe('buildMarketInsights', () => {
   it('returns KR momentum and US pullback picks in mixed conditions', () => {
-    const insights = buildMarketInsights(krQuotes, usQuotes);
+    const insights = buildMarketInsights(indices, 4, { candidateQuotes });
     expect(insights.recommendations.length).toBeGreaterThan(0);
     expect(insights.recommendations.some((r) => r.market === Market.KR)).toBe(true);
     expect(insights.recommendations.some((r) => r.market === Market.US)).toBe(true);

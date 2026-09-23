@@ -18,11 +18,11 @@ describe('enforceRateLimit store selection', () => {
     delete process.env.UPSTASH_REDIS_REST_URL;
     delete process.env.UPSTASH_REDIS_REST_TOKEN;
 
-    const req = new NextRequest('http://localhost/api/market/featured', {
+    const req = new NextRequest('http://localhost/api/market/indices', {
       headers: { 'x-forwarded-for': '1.1.1.1' },
     });
 
-    await expect(enforceRateLimit(req, 'market:featured', 'standard')).resolves.toBeUndefined();
+    await expect(enforceRateLimit(req, 'market:indices', 'standard')).resolves.toBeUndefined();
   });
 
   it('rejects requests in production without Upstash', async () => {
@@ -30,11 +30,11 @@ describe('enforceRateLimit store selection', () => {
     delete process.env.UPSTASH_REDIS_REST_URL;
     delete process.env.UPSTASH_REDIS_REST_TOKEN;
 
-    const req = new NextRequest('http://localhost/api/market/featured', {
+    const req = new NextRequest('http://localhost/api/market/indices', {
       headers: { 'x-forwarded-for': '2.2.2.2' },
     });
 
-    await expect(enforceRateLimit(req, 'market:featured', 'standard')).rejects.toMatchObject({
+    await expect(enforceRateLimit(req, 'market:indices', 'standard')).rejects.toMatchObject({
       statusCode: 503,
       code: AppErrorCode.INTERNAL,
     });

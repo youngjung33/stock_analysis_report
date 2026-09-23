@@ -1,5 +1,4 @@
 import { Market } from './enums';
-import { FEATURED_KR_STOCKS, FEATURED_US_STOCKS } from './featured-stocks';
 import { resolveYahooSymbol } from './stock-symbol';
 
 export interface StockSearchResult {
@@ -20,23 +19,6 @@ export interface YahooSearchQuote {
 
 const KR_SUFFIX = /\.(KS|KQ)$/i;
 const US_EXCLUDED_TYPES = new Set(['MUTUALFUND', 'CRYPTOCURRENCY', 'FUTURE', 'INDEX']);
-
-export function searchFeaturedStocks(query: string, market: Market): StockSearchResult[] {
-  const q = query.trim().toLowerCase();
-  if (!q) return [];
-
-  const list = market === Market.KR ? FEATURED_KR_STOCKS : FEATURED_US_STOCKS;
-  return list
-    .filter(
-      (s) => s.symbol.toLowerCase().includes(q) || s.name.toLowerCase().includes(q),
-    )
-    .map((s) => ({
-      symbol: s.symbol,
-      name: s.name,
-      market: s.market,
-      yahooSymbol: resolveYahooSymbol(s.symbol, s.market) ?? s.symbol,
-    }));
-}
 
 export function parseYahooSearchQuote(
   quote: YahooSearchQuote,

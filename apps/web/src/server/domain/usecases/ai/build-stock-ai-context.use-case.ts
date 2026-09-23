@@ -5,7 +5,9 @@ import {
   pickNewsTitlesForAi,
   buildStockDerivedFacts,
   resolveCurrency,
+  detectMarketRegimes,
   findRegionSentimentIndex,
+  resolveRegionSentimentsFromIndices,
   type StockAiContext,
   type SupportedLocale,
 } from '@sar/shared';
@@ -101,6 +103,15 @@ export class BuildStockAiContextUseCase {
       (w) => w.symbol.toUpperCase() === input.symbol.toUpperCase() && w.market === input.market,
     );
     const primaryIndex = findRegionSentimentIndex(marketContext.indices, input.market);
+    const { kr: krSentiment, us: usSentiment } = resolveRegionSentimentsFromIndices(
+      marketContext.indices,
+    );
+    const detectedRegimes = detectMarketRegimes({
+      krSentiment,
+      usSentiment,
+      macro: marketContext.macro,
+      usdKrwChange1d: marketContext.usdKrwChange1d ?? null,
+    });
 
     const recentNewsTitles = pickNewsTitlesForAi(news?.recentTitles, news?.headlineSample);
 
@@ -140,7 +151,7 @@ export class BuildStockAiContextUseCase {
           }
         : null,
       marketLink: {
-        regimeIds: marketContext.macro.slice(0, 3).map((m) => m.interpretKey),
+        regimeIds: detectedRegimes.map((r) => r.id),
         indexChange1d: primaryIndex?.changePercent1d ?? null,
         leadingSectors: marketContext.sectors.slice(0, 3).map((s) => s.name),
       },

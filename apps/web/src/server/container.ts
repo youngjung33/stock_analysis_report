@@ -1,4 +1,4 @@
-import { GetFeaturedQuotesUseCase } from './domain/usecases/market/get-featured-quotes.use-case';
+import { GetMarketIndicesUseCase } from './domain/usecases/market/get-market-indices.use-case';
 import { GetFxRateUseCase } from './domain/usecases/market/get-fx-rate.use-case';
 import { BuildStockAnalysisReportUseCase } from './domain/usecases/market/build-stock-analysis-report.use-case';
 import { GetMarketAnalysisUseCase } from './domain/usecases/market/get-market-analysis.use-case';
@@ -119,7 +119,7 @@ export interface ServerServices {
   getPortfolioAnalysisUseCase: GetPortfolioAnalysisUseCase;
   refreshQuotesUseCase: RefreshQuotesUseCase;
   fetchQuotesUseCase: FetchQuotesUseCase;
-  getFeaturedQuotesUseCase: GetFeaturedQuotesUseCase;
+  getMarketIndicesUseCase: GetMarketIndicesUseCase;
   getStockQuoteUseCase: GetStockQuoteUseCase;
   getMarketStatusUseCase: GetMarketStatusUseCase;
   getMarketAnalysisUseCase: GetMarketAnalysisUseCase;
@@ -190,7 +190,7 @@ export function getServerServices(): ServerServices {
   const marketData = new MarketDataProvider();
 
   const fetchQuotesUseCase = new FetchQuotesUseCase(marketData);
-  const getFeaturedQuotesUseCase = new GetFeaturedQuotesUseCase(fetchQuotesUseCase, marketData);
+  const getMarketIndicesUseCase = new GetMarketIndicesUseCase(marketData);
   const buildMarketContextUseCase = new BuildMarketContextUseCase(marketData);
   const fetchRecommendationQuotesUseCase = new FetchRecommendationQuotesUseCase(marketData);
   const fetchRecommendationTechnicalUseCase = new FetchRecommendationTechnicalSnapshotsUseCase(marketData);
@@ -218,7 +218,6 @@ export function getServerServices(): ServerServices {
   );
   const getStockQuoteUseCase = new GetStockQuoteUseCase(marketData);
   const buildStockAnalysisReportUseCase = new BuildStockAnalysisReportUseCase(
-    getFeaturedQuotesUseCase,
     buildMarketContextUseCase,
     buildStockEnrichmentUseCase,
     getStockQuoteUseCase,
@@ -234,7 +233,6 @@ export function getServerServices(): ServerServices {
   const getPortfolioPreferencesUseCase = new GetPortfolioPreferencesUseCase(prefRepo);
   const getPortfolioSimulationUseCase = new GetPortfolioSimulationUseCase(
     getDashboardUseCase,
-    getFeaturedQuotesUseCase,
     cashRepo,
     prefRepo,
     watchlistRepo,
@@ -259,7 +257,7 @@ export function getServerServices(): ServerServices {
       authSession,
     ),
     fetchQuotesUseCase,
-    getFeaturedQuotesUseCase,
+    getMarketIndicesUseCase,
     getStockQuoteUseCase,
     refreshTokenUseCase: new RefreshTokenUseCase(refreshRepo, tokenService),
     logoutUseCase: new LogoutUseCase(refreshRepo, tokenService),
@@ -279,7 +277,6 @@ export function getServerServices(): ServerServices {
     refreshQuotesUseCase: new RefreshQuotesUseCase(stockRepo, txRepo, quoteRepo, marketData),
     getMarketStatusUseCase: new GetMarketStatusUseCase(marketData),
     getMarketAnalysisUseCase: new GetMarketAnalysisUseCase(
-      getFeaturedQuotesUseCase,
       buildMarketContextUseCase,
       buildStockEnrichmentUseCase,
       marketData,
@@ -322,7 +319,6 @@ export function getServerServices(): ServerServices {
     getPortfolioSimulationUseCase,
     runGlobalRecommendationBatchUseCase: new RunGlobalRecommendationBatchUseCase(
       recommendationLedgerRepo,
-      getFeaturedQuotesUseCase,
       buildMarketContextUseCase,
       buildStockEnrichmentUseCase,
       catalogRepo,

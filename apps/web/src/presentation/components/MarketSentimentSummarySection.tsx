@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { applyIndexRegionSentiment, buildMarketInsights, sentimentBadgeClass } from '@sar/shared';
 import { translateRegionSentiment, translateSentiment, translateTag, translateRegime } from '@/i18n/translate-shared';
-import { useFeaturedQuotes } from '../hooks/useFeaturedQuotes';
+import { useMarketIndices } from '../hooks/useMarketIndices';
 import { formatNumber, formatPercent, pnlClass } from '../shared/formatters';
 import { marketAnalysisHref } from '../shared/stock-routes';
 
@@ -15,14 +15,12 @@ interface Props {
 
 export function MarketSentimentSummarySection({ compact }: Props) {
   const { t } = useTranslation();
-  const { data, isLoading } = useFeaturedQuotes();
+  const { data, isLoading } = useMarketIndices();
 
   const insights = useMemo(() => {
-    if (!data) return null;
-    const base = buildMarketInsights(data.kr, data.us);
-    if (!data.indices?.length) return base;
-    const applied = applyIndexRegionSentiment(base, data.indices);
-    return { ...applied };
+    if (!data?.indices?.length) return null;
+    const base = buildMarketInsights(data.indices);
+    return applyIndexRegionSentiment(base, data.indices);
   }, [data]);
 
   return (

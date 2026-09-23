@@ -15,7 +15,7 @@ import {
   RemoveWatchlistUseCase,
 } from './domain/usecases/watchlist/watchlist.use-cases';
 import {
-  GetFeaturedQuotesUseCase,
+  GetMarketIndicesUseCase,
   GetFxRateUseCase,
   GetMarketAnalysisUseCase,
   GetMarketStatusUseCase,
@@ -90,7 +90,7 @@ export function wireAppServices(): AppServices {
     getHoldingBySymbolUseCase: new GetHoldingBySymbolUseCase(portfolioRepository),
     getPortfolioAnalysisUseCase: new GetPortfolioAnalysisUseCase(portfolioRepository),
     refreshQuotesUseCase: new RefreshQuotesUseCase(portfolioRepository),
-    getFeaturedQuotesUseCase: new GetFeaturedQuotesUseCase(marketRepository),
+    getMarketIndicesUseCase: new GetMarketIndicesUseCase(marketRepository),
     getStockQuoteUseCase: new GetStockQuoteUseCase(marketRepository),
     getMarketStatusUseCase: new GetMarketStatusUseCase(marketRepository),
     getMarketAnalysisUseCase: new GetMarketAnalysisUseCase(marketRepository),

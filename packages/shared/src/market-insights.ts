@@ -8,6 +8,8 @@ export {
   applyIndexRegionSentiment,
   computeIndexRegionSentiment,
   computeRegionSentiment,
+  resolveRegionSentimentsFromIndices,
+  neutralRegionSentiment,
   sentimentBadgeClass,
   SENTIMENT_LABEL_KO,
   TAG_LABEL_KO,

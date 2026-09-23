@@ -1256,7 +1256,7 @@
         "recommendation": "종목 관찰"
       },
       "sentiment": {
-        "headline": "{{market}} 대표 종목 · {{sentiment}}",
+        "headline": "{{market}} 시장 · {{sentiment}}",
         "indexHeadline": "{{indexName}} · {{sentiment}}",
         "indexNoData": "{{indexName}} 시세가 없어 정세를 판단하기 어렵습니다.",
         "indexDescription": {
@@ -1268,11 +1268,11 @@
         },
         "noData": "시세 데이터가 부족해 정세를 판단하기 어렵습니다.",
         "description": {
-          "strong_bull": "대표주 평균 {{avg}}%. 상승 {{up}} · 하락 {{down}} — 단기 상승세 우세.",
-          "bull": "대표주 평균 {{avg}}%. 상승 {{up}} · 하락 {{down}} — 완만한 상승 분위기.",
-          "neutral": "대표주 평균 {{avg}}%. 상승 {{up}} · 하락 {{down}} — 뚜렷한 방향성 없음.",
-          "bear": "대표주 평균 {{avg}}%. 상승 {{up}} · 하락 {{down}} — 조정·매도 우위.",
-          "strong_bear": "대표주 평균 {{avg}}%. 상승 {{up}} · 하락 {{down}} — 전반적 약세."
+          "strong_bull": "관찰 종목 평균 {{avg}}%. 상승 {{up}} · 하락 {{down}} — 단기 상승세 우세.",
+          "bull": "관찰 종목 평균 {{avg}}%. 상승 {{up}} · 하락 {{down}} — 완만한 상승 분위기.",
+          "neutral": "관찰 종목 평균 {{avg}}%. 상승 {{up}} · 하락 {{down}} — 뚜렷한 방향성 없음.",
+          "bear": "관찰 종목 평균 {{avg}}%. 상승 {{up}} · 하락 {{down}} — 조정·매도 우위.",
+          "strong_bear": "관찰 종목 평균 {{avg}}%. 상승 {{up}} · 하락 {{down}} — 전반적 약세."
         },
         "marketLabel": {
           "kr": "한국",
@@ -1280,9 +1280,9 @@
         }
       },
       "recommendation": {
-        "momentumStrong": "대표주 중 오늘 가장 강한 흐름. 추세 지속 여부 확인.",
+        "momentumStrong": "관찰 종목 중 오늘 가장 강한 흐름. 추세 지속 여부 확인.",
         "bullWatchlist": "강세장 속 {{name}} — 동반 상승·상대 강도 관찰.",
-        "bearPullback": "대표주 조정폭 큼. 과매도·반등 신호 여부 관찰.",
+        "bearPullback": "관찰 종목 조정폭 큼. 과매도·반등 신호 여부 관찰.",
         "bearDefensive": "약세장에서 상대적으로 견조한 {{name}} — 방어적 관심.",
         "neutralMomentum": "혼조장 속 {{name}} 상대 강세 — 방향성 확인.",
         "neutralWatchlist": "혼조장에서 조정 받는 {{name}} — 지지선·반등 관찰.",

@@ -4,7 +4,7 @@ import { Market, buildMarketAnalysisReport } from '@sar/shared';
 describe('buildMarketAnalysisReport', () => {
   it('produces insights with reasoning and links', () => {
     const report = buildMarketAnalysisReport({
-      krQuotes: [
+      candidateQuotes: [
         {
           symbol: '005930',
           name: '삼성전자',
@@ -13,8 +13,6 @@ describe('buildMarketAnalysisReport', () => {
           currentPrice: 70000,
           changePercent: 1.2,
         },
-      ],
-      usQuotes: [
         {
           symbol: 'AAPL',
           name: 'Apple',
@@ -100,7 +98,7 @@ describe('buildMarketAnalysisReport', () => {
     expect(report.indices.length).toBeGreaterThanOrEqual(2);
     expect(report.macro).toHaveLength(1);
     expect(report.sectors).toHaveLength(1);
-    expect(report.krQuotes).toHaveLength(1);
+    expect(report.recommendations.length).toBeGreaterThan(0);
     const breadth = report.insights.filter((i) => i.category === 'breadth');
     expect(breadth.length).toBeGreaterThan(0);
     expect(breadth[0]?.title).toContain('KOSPI');
@@ -113,8 +111,7 @@ describe('buildMarketAnalysisReport', () => {
 
   it('sets policyUncertainty when tier-1 macro bearish figure present', () => {
     const report = buildMarketAnalysisReport({
-      krQuotes: [],
-      usQuotes: [],
+      candidateQuotes: [],
       indexInputs: [],
       macroInputs: [],
       sectorInputs: [],
@@ -143,7 +140,7 @@ describe('buildMarketAnalysisReport', () => {
 
   it('passes news and figure enrichment into recommendation scoreBreakdown', () => {
     const report = buildMarketAnalysisReport({
-      krQuotes: [
+      candidateQuotes: [
         {
           symbol: '005930',
           name: '삼성전자',
@@ -152,8 +149,6 @@ describe('buildMarketAnalysisReport', () => {
           currentPrice: 70000,
           changePercent: 2.1,
         },
-      ],
-      usQuotes: [
         {
           symbol: 'AAPL',
           name: 'Apple',

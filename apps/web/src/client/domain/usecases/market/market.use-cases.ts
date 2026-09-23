@@ -3,13 +3,12 @@ import { IMarketRepository } from '../../repositories';
 
 /** 클라이언트 market use case — API repository 위임 (서버 Build* / Get* 와 이름 분리) */
 
-/** 대표 종목 시세 조회 use case */
-export class GetFeaturedQuotesUseCase {
+/** 코스피·나스닥 지수 시세 조회 use case */
+export class GetMarketIndicesUseCase {
   constructor(private readonly marketRepo: IMarketRepository) {}
 
-  /** marketRepo.getFeaturedQuotes — kr/us 대표 시세 */
   execute() {
-    return this.marketRepo.getFeaturedQuotes();
+    return this.marketRepo.getMarketIndices();
   }
 }
 

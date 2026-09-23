@@ -1,26 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Market } from '@sar/shared';
-import {
-  dedupeSearchResults,
-  parseYahooSearchQuote,
-  searchFeaturedStocks,
-} from '@sar/shared';
-
-describe('searchFeaturedStocks', () => {
-  it('matches KR featured stocks by name or symbol', () => {
-    const byName = searchFeaturedStocks('삼성', Market.KR);
-    expect(byName.some((s) => s.symbol === '005930')).toBe(true);
-
-    const bySymbol = searchFeaturedStocks('005930', Market.KR);
-    expect(bySymbol).toHaveLength(1);
-    expect(bySymbol[0].yahooSymbol).toBe('005930.KS');
-  });
-
-  it('matches US featured stocks', () => {
-    const results = searchFeaturedStocks('nvda', Market.US);
-    expect(results.some((s) => s.symbol === 'NVDA')).toBe(true);
-  });
-});
+import { dedupeSearchResults, parseYahooSearchQuote } from '@sar/shared';
 
 describe('parseYahooSearchQuote', () => {
   it('parses KR equity with .KS suffix', () => {

@@ -8,14 +8,15 @@ import { AppShell } from '../layout';
 interface Props {
   symbol: string;
   market: Market;
+  name?: string | null;
 }
 
-export function StockDetailPage({ symbol, market }: Props) {
+export function StockDetailPage({ symbol, market, name }: Props) {
   const { t } = useTranslation();
 
   return (
-    <AppShell title={t('pages.stockDetail.title')} subtitle={symbol} maxWidth="3xl">
-      <StockDetailContent symbol={symbol} market={market} />
+    <AppShell title={t('pages.stockDetail.title')} subtitle={name ?? symbol} maxWidth="3xl">
+      <StockDetailContent symbol={symbol} market={market} name={name} />
     </AppShell>
   );
 }

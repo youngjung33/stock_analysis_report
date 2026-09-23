@@ -1,9 +1,4 @@
-import {
-  Market,
-  StockSearchResult,
-  dedupeSearchResults,
-  searchFeaturedStocks,
-} from '@sar/shared';
+import { Market, StockSearchResult } from '@sar/shared';
 import { IStockCatalogRepository } from '../../repositories';
 import { IMarketDataProvider } from '../../ports/market-data.port';
 
@@ -30,15 +25,10 @@ export class SearchStocksUseCase {
       return this.catalogRepo.search(trimmed, market, 15);
     }
 
-    const featured = searchFeaturedStocks(trimmed, market);
-    let remote: StockSearchResult[] = [];
-
     try {
-      remote = await this.marketData.searchRemoteStocks(trimmed, market);
+      return await this.marketData.searchRemoteStocks(trimmed, market);
     } catch {
-      // DB 마스터 없을 때 Yahoo fallback 실패 시 featured만 반환
+      return [];
     }
-
-    return dedupeSearchResults([...featured, ...remote]).slice(0, 15);
   }
 }

@@ -1,6 +1,6 @@
 import { Market } from '../enums';
 import { buildInvestorProfile, createDefaultStoredProfile } from '../investor-survey/profile';
-import { computeRegionSentiment } from '../market-sentiment';
+import { resolveRegionSentimentsFromIndices } from '../market-sentiment';
 import { buildMacroSnapshot } from '../market-macro';
 import { buildCandidatePool, mergeQuotesIntoCandidates } from './candidate-pool';
 import { buildMarketContext } from './regime';
@@ -11,8 +11,9 @@ export function buildStockRecommendations(
   input: MarketContextInput,
   maxRecommendations = 6,
 ): StockRecommendationsResult {
-  const krSentiment = computeRegionSentiment(Market.KR, input.krQuotes);
-  const usSentiment = computeRegionSentiment(Market.US, input.usQuotes);
+  const { kr: krSentiment, us: usSentiment } = resolveRegionSentimentsFromIndices(
+    input.indices ?? [],
+  );
 
   const storedProfile = input.investorProfile ?? buildInvestorProfile(createDefaultStoredProfile());
   const preferredTags = input.preferredTags ?? storedProfile.preferredTags;
@@ -40,11 +41,7 @@ export function buildStockRecommendations(
     catalogSymbols: input.catalogSymbols,
   });
 
-  const allQuotes = mergeQuotesIntoCandidates(pool, [
-    ...input.krQuotes,
-    ...input.usQuotes,
-    ...(input.candidateQuotes ?? []),
-  ]);
+  const allQuotes = mergeQuotesIntoCandidates(pool, input.candidateQuotes ?? []);
 
   const scored = scoreCandidates(allQuotes, ctx);
 

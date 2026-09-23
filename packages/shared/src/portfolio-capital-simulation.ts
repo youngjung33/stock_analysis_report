@@ -17,15 +17,6 @@ import {
 } from './portfolio-simulation';
 import { hasPolicyUncertaintyPulse } from './market-recommendation/figure-enrichment';
 
-export interface FeaturedQuoteInput {
-  symbol: string;
-  name: string;
-  market: Market;
-  currency: string;
-  currentPrice: number;
-  changePercent: number | null;
-}
-
 export interface RankedPortfolioSimulationResult {
   simulation: PortfolioSimulationResult;
   builtProfile: BuiltInvestorProfile;
@@ -35,47 +26,21 @@ export interface RankedPortfolioSimulationResult {
   regimes: MarketInsightsResult['regimes'];
 }
 
-export function toFeaturedQuoteInputs(
-  quotes: {
-    symbol: string;
-    name: string;
-    market: Market;
-    currency: string;
-    currentPrice: number | null;
-    changePercent: number | null;
-  }[],
-): FeaturedQuoteInput[] {
-  return quotes
-    .filter((q): q is typeof q & { currentPrice: number } => q.currentPrice != null)
-    .map((q) => ({
-      symbol: q.symbol,
-      name: q.name,
-      market: q.market,
-      currency: q.currency,
-      currentPrice: q.currentPrice,
-      changePercent: q.changePercent,
-    }));
-}
-
 /** Market context + holdings → ranked recommendations → portfolio simulation */
 export function buildRankedPortfolioSimulation(input: {
   cash: CashBalances;
   holdings: SimulationHoldingInput[];
   preferences: PortfolioPreferences;
-  featuredKr: FeaturedQuoteInput[];
-  featuredUs: FeaturedQuoteInput[];
   storedProfile?: StoredInvestorProfile | null;
   usdKrwRate: number | null;
   insightCount?: number;
-  marketContext?: Omit<MarketContextInput, 'krQuotes' | 'usQuotes' | 'investorProfile' | 'preferredTags'>;
+  marketContext?: Omit<MarketContextInput, 'investorProfile' | 'preferredTags'>;
   candidateQuotes?: MarketContextInput['candidateQuotes'];
 }): RankedPortfolioSimulationResult {
   const storedProfile = input.storedProfile ?? createDefaultStoredProfile();
   const builtProfile = buildInvestorProfile(storedProfile);
 
   const contextInput: MarketContextInput = {
-    krQuotes: input.featuredKr,
-    usQuotes: input.featuredUs,
     candidateQuotes: input.candidateQuotes,
     usdKrwRate: input.usdKrwRate,
     investorProfile: builtProfile,

@@ -181,9 +181,7 @@ export interface RegionIndexQuote {
   changePercent1d: number | null;
 }
 
-export interface FeaturedQuotesResult {
-  kr: FeaturedStockQuote[];
-  us: FeaturedStockQuote[];
+export interface MarketIndicesResult {
   indices: RegionIndexQuote[];
   fetchedAt: string;
 }

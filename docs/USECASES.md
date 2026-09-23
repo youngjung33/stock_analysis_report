@@ -19,7 +19,7 @@ client/domain  ←  client/data  (axios → /api)
 | 접두 | 계층 | 역할 | 예 |
 |------|------|------|-----|
 | `Fetch*` | client | repository → HTTP API 위임 | `FetchStockAnalysisUseCase` |
-| `Get*` | client | 단순 조회 위임 | `GetFeaturedQuotesUseCase` |
+| `Get*` | client | 단순 조회 위임 | `GetMarketIndicesUseCase` |
 | `Build*` | server | enrichment·리포트 **조립** | `BuildStockAnalysisReportUseCase` |
 | `Get*` | server | 데이터 조회·캐시 | `GetStockQuoteUseCase` |
 
@@ -162,7 +162,7 @@ npm run test:e2e:all # Playwright 30 scenarios (production-smoke 포함)
 | `ListCashLedgerUseCase` | (내부) ledger 조회 | `cash.use-cases.spec.ts` |
 | `SettleCashUseCase` | (내부) 매매·배당 결제 | `transactions.use-cases.spec.ts`, corporate-actions |
 | `RefreshQuotesUseCase` | POST `/api/market/refresh` | `market.use-cases.spec.ts` |
-| `GetFeaturedQuotesUseCase` | GET `/api/market/featured` | `get-featured-quotes.use-case.spec.ts` |
+| `GetMarketIndicesUseCase` | GET `/api/market/indices` | `get-market-indices.use-case.spec.ts` |
 | `GetStockQuoteUseCase` | GET `/api/market/quote` | provider/chart |
 | `FetchQuotesUseCase` | POST `/api/market/quotes` | `market.use-cases.spec.ts` |
 | `GetMarketStatusUseCase` | GET `/api/market/status` | `get-market-status.use-case.spec.ts` |

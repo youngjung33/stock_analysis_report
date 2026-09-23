@@ -3,7 +3,6 @@ import {
   Market,
   buildCandidatePool,
   buildRankedPortfolioSimulation,
-  toFeaturedQuoteInputs,
   type StoredInvestorProfile,
 } from '@sar/shared';
 import { PortfolioPreferenceEntity } from '../../entities';
@@ -14,13 +13,8 @@ import {
   IWatchlistRepository,
 } from '../../repositories';
 import { GetDashboardUseCase } from '../portfolio/get-dashboard.use-case';
-import { GetFeaturedQuotesUseCase } from '../market/get-featured-quotes.use-case';
 import { BuildMarketContextUseCase } from '../market/build-market-context.use-case';
 import { BuildStockEnrichmentUseCase } from '../market/build-stock-enrichment.use-case';
-
-function symbolKey(symbol: string, market: Market): string {
-  return `${market}:${symbol.toUpperCase()}`;
-}
 
 export interface PortfolioSimulationSnapshot {
   cash: { krw: number; usd: number };
@@ -74,7 +68,6 @@ export class UpdatePortfolioPreferencesUseCase {
 export class GetPortfolioSimulationUseCase {
   constructor(
     private readonly dashboardUseCase: GetDashboardUseCase,
-    private readonly featuredQuotesUseCase: GetFeaturedQuotesUseCase,
     private readonly cashRepo: ICashLedgerRepository,
     private readonly prefRepo: IPortfolioPreferenceRepository,
     private readonly watchlistRepo: IWatchlistRepository,
@@ -126,10 +119,7 @@ export class GetPortfolioSimulationUseCase {
 
   /** Guest/client snapshot — full server enrichment pipeline */
   async executeFromSnapshot(snapshot: PortfolioSimulationSnapshot) {
-    const [featured, marketContext] = await Promise.all([
-      this.featuredQuotesUseCase.execute(),
-      this.buildMarketContextUseCase.execute(),
-    ]);
+    const marketContext = await this.buildMarketContextUseCase.execute();
 
     const userHoldings = snapshot.holdings.map((h) => ({
       symbol: h.symbol,
@@ -139,14 +129,8 @@ export class GetPortfolioSimulationUseCase {
     const userWatchlist = snapshot.watchlist;
 
     const pool = buildCandidatePool({ userHoldings, userWatchlist });
-    const featuredKeys = new Set([
-      ...featured.kr.map((q) => symbolKey(q.symbol, q.market)),
-      ...featured.us.map((q) => symbolKey(q.symbol, q.market)),
-    ]);
-    const extraCandidates = pool.filter((c) => !featuredKeys.has(symbolKey(c.symbol, c.market)));
-
-    const krExtraSymbols = extraCandidates.filter((c) => c.market === Market.KR).map((c) => c.symbol);
-    const usExtraSymbols = extraCandidates.filter((c) => c.market === Market.US).map((c) => c.symbol);
+    const krExtraSymbols = pool.filter((c) => c.market === Market.KR).map((c) => c.symbol);
+    const usExtraSymbols = pool.filter((c) => c.market === Market.US).map((c) => c.symbol);
     const [krCatalog, usCatalog] = await Promise.all([
       this.catalogRepo.findBySymbols(krExtraSymbols, Market.KR),
       this.catalogRepo.findBySymbols(usExtraSymbols, Market.US),
@@ -163,11 +147,8 @@ export class GetPortfolioSimulationUseCase {
       userWatchlist,
       catalogSymbols,
     });
-    const quoteTargets = poolWithCatalog.filter(
-      (c) => !featuredKeys.has(symbolKey(c.symbol, c.market)),
-    );
 
-    const enrichmentTargets = quoteTargets.map((c) => ({
+    const enrichmentTargets = poolWithCatalog.map((c) => ({
       symbol: c.symbol,
       name: c.name,
       market: c.market,
@@ -175,30 +156,16 @@ export class GetPortfolioSimulationUseCase {
       yahooSymbol: c.yahooSymbol,
     }));
 
-    const featuredTargets = [
-      ...featured.kr.map((q) => ({
-        symbol: q.symbol,
-        name: q.name,
-        market: q.market,
-        currency: q.currency,
-        yahooSymbol: undefined as string | undefined,
-      })),
-      ...featured.us.map((q) => ({
-        symbol: q.symbol,
-        name: q.name,
-        market: q.market,
-        currency: q.currency,
-        yahooSymbol: undefined as string | undefined,
-      })),
-    ];
-
     const { candidateQuotes, technicalSnapshots, newsSnapshots, eventSnapshots, figureStatements } =
-      await this.buildStockEnrichmentUseCase.execute([
-        ...enrichmentTargets,
-        ...featuredTargets.filter(
-          (f) => !enrichmentTargets.some((t) => t.symbol === f.symbol && t.market === f.market),
-        ),
-      ]);
+      enrichmentTargets.length > 0
+        ? await this.buildStockEnrichmentUseCase.execute(enrichmentTargets)
+        : {
+            candidateQuotes: [],
+            technicalSnapshots: [],
+            newsSnapshots: [],
+            eventSnapshots: [],
+            figureStatements: [],
+          };
 
     const {
       simulation,
@@ -213,8 +180,6 @@ export class GetPortfolioSimulationUseCase {
         targetUsPercent: snapshot.preferences.targetUsPercent,
         maxSingleWeightPercent: snapshot.preferences.maxSingleWeightPercent,
       },
-      featuredKr: toFeaturedQuoteInputs(featured.kr),
-      featuredUs: toFeaturedQuoteInputs(featured.us),
       storedProfile: snapshot.preferences.investorProfile ?? null,
       usdKrwRate: snapshot.usdKrwRate ?? marketContext.usdKrwRate,
       marketContext: {
@@ -243,7 +208,7 @@ export class GetPortfolioSimulationUseCase {
       },
       simulation,
       ledgerEntryCount: snapshot.ledgerEntryCount ?? 0,
-      asOf: featured.fetchedAt,
+      asOf: new Date().toISOString(),
       investorProfile: builtProfile,
       recommendations,
       regimes,

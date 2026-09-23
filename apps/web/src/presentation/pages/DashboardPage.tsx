@@ -9,7 +9,6 @@ import { CapitalAndSimulationSection } from '../components/CapitalAndSimulationS
 import { MarketStatusBanner } from '../components/MarketStatusBanner';
 import { QuoteRefreshNoticeBox } from '../components/QuoteRefreshNoticeBox';
 import { MarketSentimentSummarySection } from '../components/MarketSentimentSummarySection';
-import { FeaturedQuotesSection } from '../components/FeaturedQuotesSection';
 import { SummaryCards } from '../features/dashboard/SummaryCards';
 import { HoldingsSection } from '../features/dashboard/HoldingsSection';
 import { AllocationSection } from '../components/AllocationSection';
@@ -104,7 +103,6 @@ export function DashboardPage() {
         )}
 
         <MarketSentimentSummarySection compact />
-        <FeaturedQuotesSection compact />
       </PageStack>
     </AppShell>
   );

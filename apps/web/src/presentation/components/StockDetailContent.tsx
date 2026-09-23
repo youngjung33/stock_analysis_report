@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Market,
   QuoteChartRange,
-  findFeaturedStock,
   resolveCurrency,
   resolveYahooSymbol,
   type StockSearchResult,
@@ -24,28 +23,28 @@ import { AiStockInsightPanel } from '../features/ai/AiStockInsightPanel';
 interface Props {
   symbol: string;
   market: Market;
+  name?: string | null;
 }
 
-export function StockDetailContent({ symbol, market }: Props) {
+export function StockDetailContent({ symbol, market, name }: Props) {
   const { t, i18n } = useTranslation();
-  const stock = findFeaturedStock(symbol, market);
   const [range, setRange] = useState<QuoteChartRange>('1d');
   const { data, isLoading, isError, isFetching } = useStockQuote(symbol, market, range);
   const { data: holding, isLoading: holdingLoading } = usePortfolioHolding(symbol, market);
 
   useErrorToast(isError, t('errors.stockQuoteLoadFailed'));
 
-  const currency = stock ? resolveCurrency(stock.market) : resolveCurrency(market);
-  const title = stock?.name ?? symbol;
+  const currency = resolveCurrency(market);
+  const title = name ?? symbol;
   const loading = isLoading || isFetching;
   const aiSelected = useMemo<StockSearchResult>(
     () => ({
       symbol,
-      name: stock?.name ?? symbol,
+      name: name ?? symbol,
       market,
       yahooSymbol: resolveYahooSymbol(symbol, market) ?? symbol,
     }),
-    [symbol, market, stock?.name],
+    [symbol, market, name],
   );
 
   return (

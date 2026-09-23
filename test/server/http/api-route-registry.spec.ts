@@ -44,7 +44,7 @@ const ROUTE_SPEC_COVERAGE: Record<string, string> = {
   'cron/recommendation-batch/route.ts': 'cron-routes.spec.ts',
   'cron/recommendation-outcomes/route.ts': 'cron-routes.spec.ts',
   'market/analysis/route.ts': 'market-routes.spec.ts',
-  'market/featured/route.ts': 'market-routes.spec.ts',
+  'market/indices/route.ts': 'market-routes.spec.ts',
   'market/fx/route.ts': 'remaining-api-routes.spec.ts',
   'market/quote/route.ts': 'remaining-api-routes.spec.ts',
   'market/quotes/route.ts': 'remaining-api-routes.spec.ts',

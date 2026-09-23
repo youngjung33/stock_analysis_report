@@ -5,7 +5,6 @@ import {
   buildStockPriceExplanationReport,
   pickStockEnrichment,
 } from '@sar/shared';
-import { GetFeaturedQuotesUseCase } from './get-featured-quotes.use-case';
 import { BuildMarketContextUseCase } from './build-market-context.use-case';
 import { BuildStockEnrichmentUseCase } from './build-stock-enrichment.use-case';
 import { GetStockQuoteUseCase } from './get-stock-quote.use-case';
@@ -13,7 +12,6 @@ import { GetStockQuoteUseCase } from './get-stock-quote.use-case';
 /** 서버: 차트·enrichment 수집 후 종목 가격 해설 리포트 조립 */
 export class BuildStockAnalysisReportUseCase {
   constructor(
-    private readonly getFeaturedQuotesUseCase: GetFeaturedQuotesUseCase,
     private readonly buildMarketContextUseCase: BuildMarketContextUseCase,
     private readonly buildStockEnrichmentUseCase: BuildStockEnrichmentUseCase,
     private readonly getStockQuoteUseCase: GetStockQuoteUseCase,
@@ -27,8 +25,7 @@ export class BuildStockAnalysisReportUseCase {
     userHoldings?: Array<{ symbol: string; market: Market }>;
     userWatchlist?: Array<{ symbol: string; market: Market }>;
   }) {
-    const [featured, marketContext, chartQuote] = await Promise.all([
-      this.getFeaturedQuotesUseCase.execute(),
+    const [marketContext, chartQuote] = await Promise.all([
       this.buildMarketContextUseCase.execute(),
       this.getStockQuoteUseCase.execute({
         symbol: input.symbol,
@@ -74,8 +71,6 @@ export class BuildStockAnalysisReportUseCase {
       technical: pickStockEnrichment(technicalSnapshots, input.symbol, input.market),
       news: pickStockEnrichment(newsSnapshots, input.symbol, input.market),
       event: pickStockEnrichment(eventSnapshots, input.symbol, input.market),
-      krQuotes: featured.kr,
-      usQuotes: featured.us,
       macro: marketContext.macro,
       sectors: marketContext.sectors,
       indices: marketContext.indices,

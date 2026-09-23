@@ -1,5 +1,5 @@
 import { Market } from './enums';
-import { computeRegionSentiment } from './market-sentiment';
+import { resolveRegionSentimentsFromIndices } from './market-sentiment';
 import type { AnalysisInsight, AnalysisTone, EvidenceItem } from './market-analysis';
 import { changePercentOverBars, rangePosition, rsi, sma } from './technical-analysis';
 import { buildMarketContext, detectMarketRegimes } from './market-recommendation/regime';
@@ -800,8 +800,6 @@ export function buildStockPriceExplanationReport(input: {
   technical: StockTechnicalSnapshot | null;
   news: StockNewsSnapshot | null;
   event: StockEventSnapshot | null;
-  krQuotes: QuoteInsightInput[];
-  usQuotes: QuoteInsightInput[];
   macro: MacroIndicatorSnapshot[];
   sectors: SectorEtfSnapshot[];
   indices: MarketContextInput['indices'];
@@ -837,8 +835,9 @@ export function buildStockPriceExplanationReport(input: {
   const change1w = changePercentOverBars(input.chartCloses, 5);
   const change1mo = changePercentOverBars(input.chartCloses, 21);
 
-  const krSentiment = computeRegionSentiment(Market.KR, input.krQuotes);
-  const usSentiment = computeRegionSentiment(Market.US, input.usQuotes);
+  const { kr: krSentiment, us: usSentiment } = resolveRegionSentimentsFromIndices(
+    input.indices ?? [],
+  );
 
   const ctx = buildMarketContext({
     krSentiment,

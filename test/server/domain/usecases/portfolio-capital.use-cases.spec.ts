@@ -29,7 +29,7 @@ describe('UpdatePortfolioPreferencesUseCase', () => {
 });
 
 describe('GetPortfolioSimulationUseCase', () => {
-  it('combines dashboard, featured quotes, cash, and preferences', async () => {
+  it('combines dashboard, market context, cash, and preferences', async () => {
     const dashboardUseCase = {
       execute: vi.fn().mockResolvedValue({
         summary: { cashKrw: 1_000_000, cashUsd: 0, usdKrwRate: 1300, holdingsCount: 1 },
@@ -46,13 +46,6 @@ describe('GetPortfolioSimulationUseCase', () => {
           },
         ],
         lastRefreshedAt: null,
-      }),
-    };
-    const featuredQuotesUseCase = {
-      execute: vi.fn().mockResolvedValue({
-        kr: [{ symbol: '000660', name: 'SK하이닉스', market: Market.KR, currency: 'KRW', currentPrice: 200000, changePercent: 1 }],
-        us: [],
-        fetchedAt: '2026-01-01T00:00:00.000Z',
       }),
     };
     const cashRepo = { findByUser: vi.fn().mockResolvedValue([{ id: 'c1' }]) };
@@ -77,7 +70,6 @@ describe('GetPortfolioSimulationUseCase', () => {
 
     const useCase = new GetPortfolioSimulationUseCase(
       dashboardUseCase as never,
-      featuredQuotesUseCase as never,
       cashRepo as never,
       prefRepo as never,
       watchlistRepo as never,
@@ -89,7 +81,7 @@ describe('GetPortfolioSimulationUseCase', () => {
     const result = await useCase.execute('user-1');
 
     expect(result.ledgerEntryCount).toBe(1);
-    expect(result.asOf).toBe('2026-01-01T00:00:00.000Z');
+    expect(result.asOf).toBeTruthy();
     expect(result.simulation).toBeDefined();
     expect(result.preferences.targetKrPercent).toBe(70);
     expect(dashboardUseCase.execute).toHaveBeenCalledWith('user-1');

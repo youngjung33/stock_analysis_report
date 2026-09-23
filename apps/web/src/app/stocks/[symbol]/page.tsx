@@ -23,7 +23,9 @@ function StockDetailRouteInner() {
     );
   }
 
-  return <StockDetailPage symbol={symbol} market={market} />;
+  const name = searchParams.get('name');
+
+  return <StockDetailPage symbol={symbol} market={market} name={name} />;
 }
 
 export default function StockDetailRoutePage() {

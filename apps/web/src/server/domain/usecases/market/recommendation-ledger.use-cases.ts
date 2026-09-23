@@ -9,7 +9,6 @@ import {
   computeReturnPercent,
   horizonReady,
   kstTradingDate,
-  toFeaturedQuoteInputs,
   type RecommendationBatchMacroSnapshot,
   type RecommendationOutcomeHorizon,
 } from '@sar/shared';
@@ -20,12 +19,6 @@ import { IRecommendationLedgerRepository } from '../../../data/persistence/recom
 import type { RecommendationBatchEntity } from '../../entities/recommendation-ledger.entities';
 import { BuildMarketContextUseCase } from './build-market-context.use-case';
 import { BuildStockEnrichmentUseCase } from './build-stock-enrichment.use-case';
-import { GetFeaturedQuotesUseCase } from './get-featured-quotes.use-case';
-
-function symbolKey(symbol: string, market: Market): string {
-  return `${market}:${symbol.toUpperCase()}`;
-}
-
 async function fetchBenchmarkPrices(
   marketData: IMarketDataProvider,
 ): Promise<RecommendationBatchMacroSnapshot['benchmarks']> {
@@ -65,7 +58,6 @@ function benchmarkPriceAtRun(
 export class RunGlobalRecommendationBatchUseCase {
   constructor(
     private readonly ledgerRepo: IRecommendationLedgerRepository,
-    private readonly featuredQuotesUseCase: GetFeaturedQuotesUseCase,
     private readonly buildMarketContextUseCase: BuildMarketContextUseCase,
     private readonly buildStockEnrichmentUseCase: BuildStockEnrichmentUseCase,
     private readonly catalogRepo: IStockCatalogRepository,
@@ -88,23 +80,11 @@ export class RunGlobalRecommendationBatchUseCase {
       }
     }
 
-    const [featured, marketContext] = await Promise.all([
-      this.featuredQuotesUseCase.execute(),
-      this.buildMarketContextUseCase.execute(),
-    ]);
-
-    const featuredKr = toFeaturedQuoteInputs(featured.kr);
-    const featuredUs = toFeaturedQuoteInputs(featured.us);
+    const marketContext = await this.buildMarketContextUseCase.execute();
 
     const pool = buildCandidatePool({});
-    const featuredKeys = new Set([
-      ...featured.kr.map((q) => symbolKey(q.symbol, q.market)),
-      ...featured.us.map((q) => symbolKey(q.symbol, q.market)),
-    ]);
-    const extraCandidates = pool.filter((c) => !featuredKeys.has(symbolKey(c.symbol, c.market)));
-
-    const krSymbols = extraCandidates.filter((c) => c.market === Market.KR).map((c) => c.symbol);
-    const usSymbols = extraCandidates.filter((c) => c.market === Market.US).map((c) => c.symbol);
+    const krSymbols = pool.filter((c) => c.market === Market.KR).map((c) => c.symbol);
+    const usSymbols = pool.filter((c) => c.market === Market.US).map((c) => c.symbol);
     const [krCatalog, usCatalog] = await Promise.all([
       this.catalogRepo.findBySymbols(krSymbols, Market.KR),
       this.catalogRepo.findBySymbols(usSymbols, Market.US),
@@ -117,28 +97,26 @@ export class RunGlobalRecommendationBatchUseCase {
     }));
 
     const poolWithCatalog = buildCandidatePool({ catalogSymbols });
-    const quoteTargets = poolWithCatalog.filter(
-      (c) => !featuredKeys.has(symbolKey(c.symbol, c.market)),
-    );
-
-    const enrichmentTargets = [
-      ...quoteTargets.map((c) => ({
-        symbol: c.symbol,
-        name: c.name,
-        market: c.market,
-        currency: c.currency,
-        yahooSymbol: c.yahooSymbol,
-      })),
-      ...featured.kr.map((q) => ({ symbol: q.symbol, name: q.name, market: q.market, currency: q.currency })),
-      ...featured.us.map((q) => ({ symbol: q.symbol, name: q.name, market: q.market, currency: q.currency })),
-    ];
+    const enrichmentTargets = poolWithCatalog.map((c) => ({
+      symbol: c.symbol,
+      name: c.name,
+      market: c.market,
+      currency: c.currency,
+      yahooSymbol: c.yahooSymbol,
+    }));
 
     const { candidateQuotes, technicalSnapshots, newsSnapshots, eventSnapshots, figureStatements } =
-      await this.buildStockEnrichmentUseCase.execute(enrichmentTargets);
+      enrichmentTargets.length > 0
+        ? await this.buildStockEnrichmentUseCase.execute(enrichmentTargets)
+        : {
+            candidateQuotes: [],
+            technicalSnapshots: [],
+            newsSnapshots: [],
+            eventSnapshots: [],
+            figureStatements: [],
+          };
 
     const recResult = buildGlobalBaselineRecommendations({
-      featuredKr,
-      featuredUs,
       candidateQuotes,
       marketContext: {
         macro: marketContext.macro,

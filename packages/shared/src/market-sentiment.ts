@@ -151,7 +151,37 @@ export function computeIndexRegionSentiment(
   };
 }
 
-/** 대표 종목 평균 기반 정세 — 추천·시장 폭(breadth) 분석용 */
+export function neutralRegionSentiment(market: Market): RegionSentiment {
+  const marketKey = market === Market.KR ? 'kr' : 'us';
+  return {
+    market,
+    label: 'neutral',
+    avgChangePercent: null,
+    upCount: 0,
+    downCount: 0,
+    flatCount: 0,
+    headline: regionHeadline(market, 'neutral'),
+    description: '지수 시세가 없어 정세를 판단하기 어렵습니다.',
+    headlineKey: 'shared.market.sentiment.indexHeadline',
+    headlineParams: { indexName: market === Market.KR ? 'KOSPI' : 'NASDAQ', sentiment: 'neutral', market: marketKey },
+    descriptionKey: 'shared.market.sentiment.indexNoData',
+    descriptionParams: { indexName: market === Market.KR ? 'KOSPI' : 'NASDAQ' },
+  };
+}
+
+/** 코스피·나스닥 지수 스냅샷으로 KR/US 정세 산출 */
+export function resolveRegionSentimentsFromIndices(
+  indices: Array<{ name: string; yahooSymbol: string; market: Market; changePercent1d: number | null }>,
+): { kr: RegionSentiment; us: RegionSentiment } {
+  const krIndex = findRegionSentimentIndex(indices, Market.KR);
+  const usIndex = findRegionSentimentIndex(indices, Market.US);
+  return {
+    kr: krIndex ? computeIndexRegionSentiment(Market.KR, krIndex) : neutralRegionSentiment(Market.KR),
+    us: usIndex ? computeIndexRegionSentiment(Market.US, usIndex) : neutralRegionSentiment(Market.US),
+  };
+}
+
+/** @deprecated quote 평균 기반 — 테스트·레거시 호환용 */
 export function computeRegionSentiment(market: Market, quotes: QuoteInsightInput[]): RegionSentiment {
   const valid = validQuotes(quotes);
 
@@ -200,6 +230,7 @@ export function computeRegionSentiment(market: Market, quotes: QuoteInsightInput
   };
 }
 
+/** 지수 기반 정세·레짐으로 insights 결과 정렬 (엔진이 이미 index면 no-op에 가깝게 동작) */
 export function applyIndexRegionSentiment(
   base: MarketInsightsResult,
   indices: Array<{ name: string; yahooSymbol: string; market: Market; changePercent1d: number | null }>,
@@ -207,30 +238,15 @@ export function applyIndexRegionSentiment(
     macro?: MacroIndicatorSnapshot[];
     usdKrwChange1d?: number | null;
   },
-): MarketInsightsResult & {
-  quoteKr: RegionSentiment;
-  quoteUs: RegionSentiment;
-} {
-  const quoteKr = base.kr;
-  const quoteUs = base.us;
-  const krIndex = findRegionSentimentIndex(indices, Market.KR);
-  const usIndex = findRegionSentimentIndex(indices, Market.US);
-  const kr = krIndex ? computeIndexRegionSentiment(Market.KR, krIndex) : quoteKr;
-  const us = usIndex ? computeIndexRegionSentiment(Market.US, usIndex) : quoteUs;
+): MarketInsightsResult {
+  const { kr, us } = resolveRegionSentimentsFromIndices(indices);
   const regimes = detectMarketRegimes({
     krSentiment: kr,
     usSentiment: us,
     macro: options?.macro ?? [],
     usdKrwChange1d: options?.usdKrwChange1d ?? null,
   });
-  return {
-    ...base,
-    quoteKr,
-    quoteUs,
-    kr,
-    us,
-    regimes,
-  };
+  return { ...base, kr, us, regimes };
 }
 
 export function sentimentBadgeClass(label: SentimentLabel): string {
