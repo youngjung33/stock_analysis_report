@@ -806,18 +806,6 @@
     "max": "Max"
   },
   "quotes": {
-    "featured": {
-      "title": "Featured quotes",
-      "subtitle": "Representative KR/US stocks · loads today's quotes on entry",
-      "tableHint": "Click a stock for detail and historical quotes",
-      "krTitle": "🇰🇷 Korean stocks",
-      "usTitle": "🇺🇸 US stocks",
-      "loading": "Loading quotes...",
-      "querying": "Loading...",
-      "unavailable": "Unavailable",
-      "todayChangeTitle": "Today's change",
-      "loadFailed": "Failed to load featured quotes."
-    },
     "refresh": {
       "successTitle": "Quotes refreshed",
       "warningTitle": "Partially refreshed",

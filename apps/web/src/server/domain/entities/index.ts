@@ -163,16 +163,6 @@ export interface RefreshQuoteResult {
   }[];
 }
 
-export interface FeaturedStockQuote {
-  symbol: string;
-  name: string;
-  market: Market;
-  currency: string;
-  currentPrice: number | null;
-  changePercent: number | null;
-  unavailableReasonCode: QuoteUnavailableReasonCode | null;
-}
-
 export interface RegionIndexQuote {
   name: string;
   yahooSymbol: string;

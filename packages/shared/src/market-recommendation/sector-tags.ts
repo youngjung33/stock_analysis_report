@@ -1,7 +1,7 @@
 import { Market } from '../enums';
 import type { StockSectorTag } from './types';
 
-/** Featured + sector-leader symbols → sector tags for scoring */
+/** Sector-leader symbols → sector tags for scoring */
 export const STOCK_SECTOR_TAGS: Record<string, Partial<Record<Market, StockSectorTag[]>>> = {
   '005930': { [Market.KR]: ['semiconductor', 'export'] },
   '000660': { [Market.KR]: ['semiconductor', 'export'] },

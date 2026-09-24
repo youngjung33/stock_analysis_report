@@ -407,7 +407,7 @@ export function MarketAnalysisDetailSection({ compact }: Props) {
                 {data.recommendations.map((rec) => (
                   <Link
                     key={`${rec.market}-${rec.symbol}`}
-                    href={stockDetailHref(rec.symbol, rec.market)}
+                    href={stockDetailHref(rec.symbol, rec.market, rec.name)}
                     className="rounded-lg border border-slate-800 px-3 py-2 text-xs text-slate-300 hover:border-indigo-500/40"
                   >
                     {translateTag(rec.tag, t)} · {rec.name} ({formatPercent(rec.changePercent)})

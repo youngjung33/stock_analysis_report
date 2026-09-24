@@ -806,18 +806,6 @@
     "max": "최대"
   },
   "quotes": {
-    "featured": {
-      "title": "주요 종목 시세",
-      "subtitle": "대표 한국·미국 종목 · 진입 시 오늘 시세를 일괄 조회합니다",
-      "tableHint": "종목을 클릭하면 상세·기간별 시세를 볼 수 있습니다",
-      "krTitle": "🇰🇷 한국 주식",
-      "usTitle": "🇺🇸 미국 주식",
-      "loading": "시세 불러오는 중...",
-      "querying": "조회 중...",
-      "unavailable": "조회 불가",
-      "todayChangeTitle": "오늘 기준 등락",
-      "loadFailed": "주요 종목 시세를 불러오지 못했습니다."
-    },
     "refresh": {
       "successTitle": "시세 갱신 완료",
       "warningTitle": "일부 종목만 갱신됨",

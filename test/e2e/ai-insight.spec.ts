@@ -98,10 +98,11 @@ test.describe('AI insight UI', () => {
 
     if (res.status() === 200) {
       expect(typeof body.enabled).toBe('boolean');
+      if (!body.enabled) {
+        expect(body.code).toBeUndefined();
+      }
     } else {
-      expect(['AI_QUOTA_EXCEEDED', 'AI_CONTEXT_UNAVAILABLE', 'AI_PROVIDER_ERROR', 'AI_DISABLED']).toContain(
-        body.code,
-      );
+      expect(['AI_QUOTA_EXCEEDED', 'AI_CONTEXT_UNAVAILABLE', 'AI_PROVIDER_ERROR']).toContain(body.code);
     }
   });
 });

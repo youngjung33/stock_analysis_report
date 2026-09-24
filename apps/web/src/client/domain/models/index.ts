@@ -155,17 +155,6 @@ export interface MarketProviderStatus {
   setupHintCode: import('@sar/shared').QuoteSetupHintCode | null;
 }
 
-export interface FeaturedStockQuote {
-  symbol: string;
-  name: string;
-  market: Market;
-  currency: string;
-  currentPrice: number | null;
-  changePercent: number | null;
-  unavailableReasonCode: import('@sar/shared').QuoteUnavailableReasonCode | null;
-  range?: import('@sar/shared').QuoteChartRange;
-}
-
 export interface StockPricePoint {
   timestamp: string;
   close: number;

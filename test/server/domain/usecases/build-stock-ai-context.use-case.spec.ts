@@ -122,6 +122,32 @@ describe('BuildStockAiContextUseCase', () => {
     expect(result.facts.derived.rsiZone).toBeNull();
   });
 
+  it('maps market regimes from index sentiment (not macro interpretKey)', async () => {
+    const result = await createUseCase({
+      market: vi.fn().mockResolvedValue({
+        macro: [
+          {
+            kind: 'vix',
+            value: 22,
+            changePercent1d: 5,
+            interpretKey: 'should_not_use',
+          },
+        ],
+        indices: [
+          { name: 'KOSPI', yahooSymbol: '^KS11', market: Market.KR, changePercent1d: 0.2 },
+          { name: 'NASDAQ', yahooSymbol: '^IXIC', market: Market.US, changePercent1d: 2.5 },
+        ],
+        sectors: [{ name: 'Tech' }],
+        usdKrwChange1d: 0.35,
+      }),
+    }).execute(baseInput);
+
+    expect(result.facts.marketLink.regimeIds).toContain('globalRiskOff');
+    expect(result.facts.marketLink.regimeIds).toContain('fxKrwWeak');
+    expect(result.facts.marketLink.regimeIds).not.toContain('should_not_use');
+    expect(result.facts.marketLink.indexChange1d).toBe(0.2);
+  });
+
   it('uses empty market link when market context fails', async () => {
     const result = await createUseCase({
       market: vi.fn().mockRejectedValue(new Error('fx unavailable')),

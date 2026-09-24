@@ -23,7 +23,7 @@ function normalizeKrSymbol(symbol: string): string {
   return trimmed.toUpperCase();
 }
 
-/** Catalog DB map first, then static fallback (featured / major names) */
+/** Catalog DB map first, then static fallback (major symbols) */
 export function resolveKrCorpCode(
   symbol: string,
   catalog?: Record<string, string | null | undefined>,

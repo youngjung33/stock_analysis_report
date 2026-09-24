@@ -58,6 +58,17 @@ describe('market API rate limit', () => {
     expect(res.status).toBe(429);
   });
 
+  it('GET /api/market/indices returns 200 with indices payload', async () => {
+    const req = new NextRequest('http://localhost/api/market/indices', {
+      headers: { 'x-forwarded-for': '3.3.3.3' },
+    });
+    const res = await getIndices(req);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.indices).toEqual([]);
+    expect(body.fetchedAt).toBe('');
+  });
+
   it('GET /api/market/analysis returns 200 under heavy limit', async () => {
     const req = new NextRequest('http://localhost/api/market/analysis', {
       headers: { 'x-forwarded-for': '5.5.5.5' },

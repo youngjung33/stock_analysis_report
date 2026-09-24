@@ -29,7 +29,7 @@ packages/shared/      # 공통 도메인·포맷·시뮬레이션
 - **세금** (`/tax`) — 실현·배당 기반 세금 추정 · 규칙 참고
 - **주식이용 Tip** (`/guide`) — FAQ·Figure·**나의 유형분석** (종합 + 미니 3종)
 - **투자 성향 추천** — 테스트 ledger → tag 우선 simulation · **enrichment-aware 엔진 (G–N+)**
-- **시장 분석** — 매크로·섹터·지수 + **일별 추천 ledger·백테스트 요약**
+- **시장 분석** — 매크로·섹터·지수(KOSPI/NASDAQ 정세) + **일별 추천 ledger·백테스트 요약**
 - **온보딩** — 자본·종목 미등록 시 대시보드 시작 안내
 - **시세 캐시** — React Query staleTime, 갱신 버튼으로만 외부 API 재호출
 
@@ -90,6 +90,7 @@ npm run build          # 프로덕션 빌드
 | [docs/investment-strategy.md](docs/investment-strategy.md) | 추천 엔진 · enrichment · ledger · 백테스트 |
 | [docs/investor-profile.md](docs/investor-profile.md) | 투자 성향 프로필·ledger·추천·저장 정책 |
 | [docs/stock-catalog-import.md](docs/stock-catalog-import.md) | 종목 마스터 import |
+| [docs/market-index-policy.md](docs/market-index-policy.md) | 지수 역할 (정세=나스닥, 벤치=S&P 등) |
 
 ## 클린 아키텍처
 

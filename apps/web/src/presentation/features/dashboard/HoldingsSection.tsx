@@ -65,7 +65,7 @@ function HoldingsTable({ holdings, useKrw }: { holdings: DashboardHolding[]; use
           {holdings.map((h) => (
             <tr key={h.stockId} className="border-t border-border bg-card/30">
               <td className="px-5 py-4">
-                <Link href={stockDetailHref(h.symbol, h.market)} className="group block">
+                <Link href={stockDetailHref(h.symbol, h.market, h.name)} className="group block">
                   <div className="font-medium text-foreground group-hover:text-primary">{h.symbol}</div>
                   <div className="text-xs text-muted-foreground">{h.name}</div>
                 </Link>
@@ -108,7 +108,7 @@ function HoldingsCardList({ holdings, useKrw }: { holdings: DashboardHolding[]; 
       {holdings.map((h) => (
         <li key={h.stockId} className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
           <div className="flex items-start justify-between gap-2">
-            <Link href={stockDetailHref(h.symbol, h.market)} className="group min-w-0 flex-1">
+            <Link href={stockDetailHref(h.symbol, h.market, h.name)} className="group min-w-0 flex-1">
               <p className="font-semibold text-white group-hover:text-indigo-300">{h.symbol}</p>
               <p className="text-xs text-slate-500 group-hover:text-slate-400">{h.name}</p>
             </Link>

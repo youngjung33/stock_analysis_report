@@ -11,7 +11,20 @@ import { getServerServices } from '@/server/container';
 import { GET as getAnalysis, POST as postAnalysis } from '@/app/api/market/analysis/route';
 
 const authUser = { userId: 'user-1', username: 'admin' };
-const analysisReport = { krQuotes: [], usQuotes: [], fetchedAt: '2026-01-01T00:00:00.000Z' };
+const analysisReport = {
+  fetchedAt: '2026-01-01T00:00:00.000Z',
+  kr: { label: 'neutral' },
+  us: { label: 'neutral' },
+  recommendations: [],
+  regimes: [],
+  insights: [],
+  macro: [],
+  indices: [],
+  sectors: [],
+  news: [],
+  figureStatements: [],
+  policyUncertainty: false,
+};
 
 function authedRequest(url: string, init?: ConstructorParameters<typeof NextRequest>[1]) {
   return new NextRequest(url, {

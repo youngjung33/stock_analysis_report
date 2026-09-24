@@ -51,7 +51,7 @@ export function WatchlistSection({ holdingSymbols }: Props) {
             >
               <div className="min-w-0">
                 <Link
-                  href={stockDetailHref(item.symbol, item.market)}
+                  href={stockDetailHref(item.symbol, item.market, item.name)}
                   className="font-medium text-indigo-400 hover:text-indigo-300"
                 >
                   {item.symbol}

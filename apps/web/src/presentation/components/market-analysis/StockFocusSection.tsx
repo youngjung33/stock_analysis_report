@@ -147,7 +147,7 @@ export function StockFocusSection() {
               {translateTag(data.tag, t)}
             </span>
             <Link
-              href={stockDetailHref(data.symbol, data.market)}
+              href={stockDetailHref(data.symbol, data.market, data.name)}
               className="text-xs text-indigo-400 hover:text-indigo-300"
             >
               {t('market.stockFocusChartLink')} →

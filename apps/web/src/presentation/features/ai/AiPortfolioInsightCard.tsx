@@ -15,19 +15,23 @@ export function AiPortfolioInsightCard() {
   const [insight, setInsight] = useState<Awaited<
     ReturnType<typeof fetchPortfolioAiInsightUseCase.execute>
   > | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [disabledNotice, setDisabledNotice] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
-  useErrorToast(Boolean(errorMessage), errorMessage ?? t('ai.loadFailed'));
+  useErrorToast(Boolean(fetchError), fetchError ?? t('ai.loadFailed'));
 
   async function handleFetch() {
     setLoading(true);
-    setErrorMessage(null);
+    setDisabledNotice(null);
+    setFetchError(null);
     try {
       const result = await fetchPortfolioAiInsightUseCase.execute(normalizeLocale(i18n.language));
       setInsight(result);
-      if (!result.enabled) setErrorMessage(t('ai.disabled'));
+      if (!result.enabled) {
+        setDisabledNotice(t('ai.disabled'));
+      }
     } catch (error) {
-      setErrorMessage(resolveAiFetchErrorMessage(error, t));
+      setFetchError(resolveAiFetchErrorMessage(error, t));
     } finally {
       setLoading(false);
     }
@@ -56,12 +60,8 @@ export function AiPortfolioInsightCard() {
         </div>
       )}
 
-      {errorMessage && (
-        <p
-          className={`mt-3 text-xs ${insight && !insight.enabled ? 'text-slate-500' : 'text-rose-400'}`}
-        >
-          {errorMessage}
-        </p>
+      {disabledNotice && (
+        <p className="mt-3 text-xs text-slate-500">{disabledNotice}</p>
       )}
     </div>
   );

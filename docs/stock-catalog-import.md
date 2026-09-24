@@ -101,7 +101,7 @@ JSON 배열을 읽어 `StockCatalog`에 insert/upsert.
 | 조건 | 동작 |
 |------|------|
 | `StockCatalog`에 해당 시장 **1건 이상** | **DB 검색** (`catalog.search`) |
-| 카탈로그 비어 있음 | Yahoo API fallback + `@sar/shared` featured 종목 |
+| 카탈로그 비어 있음 | Yahoo API remote 검색 fallback |
 
 DB에 넣은 뒤 `/transactions` 거래 등록·종목 검색 UI가 DB 기준으로 동작합니다.
 

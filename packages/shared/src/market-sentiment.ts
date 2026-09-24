@@ -65,7 +65,7 @@ function sentimentFromAvg(avg: number): SentimentLabel {
 
 function regionHeadline(market: Market, label: SentimentLabel): string {
   const region = market === Market.KR ? '한국' : '미국';
-  return `${region} 대표 종목 · ${SENTIMENT_LABEL_KO[label]}`;
+  return `${region} 관찰 종목 · ${SENTIMENT_LABEL_KO[label]}`;
 }
 
 function regionDescription(market: Market, label: SentimentLabel, avg: number, up: number, down: number): string {
@@ -75,15 +75,15 @@ function regionDescription(market: Market, label: SentimentLabel, avg: number, u
 
   switch (label) {
     case 'strong_bull':
-      return `${region} 대표주 평균 ${avgText}. ${breadth} — 단기 상승세 우세.`;
+      return `${region} 관찰 종목 평균 ${avgText}. ${breadth} — 단기 상승세 우세.`;
     case 'bull':
-      return `${region} 대표주 평균 ${avgText}. ${breadth} — 완만한 상승 분위기.`;
+      return `${region} 관찰 종목 평균 ${avgText}. ${breadth} — 완만한 상승 분위기.`;
     case 'neutral':
-      return `${region} 대표주 평균 ${avgText}. ${breadth} — 뚜렷한 방향성 없음.`;
+      return `${region} 관찰 종목 평균 ${avgText}. ${breadth} — 뚜렷한 방향성 없음.`;
     case 'bear':
-      return `${region} 대표주 평균 ${avgText}. ${breadth} — 조정·매도 우위.`;
+      return `${region} 관찰 종목 평균 ${avgText}. ${breadth} — 조정·매도 우위.`;
     case 'strong_bear':
-      return `${region} 대표주 평균 ${avgText}. ${breadth} — 전반적 약세.`;
+      return `${region} 관찰 종목 평균 ${avgText}. ${breadth} — 전반적 약세.`;
   }
 }
 

@@ -58,3 +58,4 @@ packages/shared/src/*.d.ts
 packages/shared/src/*.js.map
 
 investment-strategy.md
+market-index-policy.md

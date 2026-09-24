@@ -136,7 +136,7 @@ Handler → `getServerServices()` → Domain Use Case
 |--------|------|------|
 | POST | `/api/market/refresh` | ✅ |
 | POST | `/api/market/quotes` | — (게스트) |
-| GET | `/api/market/featured` | — |
+| GET | `/api/market/indices` | — |
 | GET | `/api/market/quote` | — |
 | GET | `/api/market/search` | — |
 | GET | `/api/market/status` | — |
@@ -282,7 +282,7 @@ npm run test:e2e              # Playwright (선택)
 - 4종 테스트 → ledger → 가중 composite → adjustment → 10유형 + `preferredTags`
 - **비회원**: 프로필 `sessionStorage` / **회원**: `PortfolioPreference.investorProfile`
 - **`buildStockRecommendations`**: VIX·환율·섹터 RS·한·미 레짐 + **enrichment (G–N+)** KR/US 분리 스코oring
-- 후보 풀: Featured + 섹터 대표주 + 관심종목 + 보유 + Catalog (`findBySymbols`)
+- 후보 풀: 섹터 리더 + 관심종목 + 보유 + Catalog (`findBySymbols`, cap 20/시장)
 - 시뮬레이션: enrichment-aware rank (K), `globalRiskOff` deploy 15% cap
 - API: `recommendation-context` · `recommendation-history` · simulation `regimes`·`recommendations`
 

@@ -47,7 +47,7 @@ export interface IMarketDataProvider {
   /** @deprecated use unavailableReasonCode — kept for internal logging */
   unavailableReason(market: Market): string | null;
   unavailableReasonCode(market: Market): QuoteSetupHintCode | null;
-  /** 보유·Featured 종목 현재가 (KR=Yahoo, US=Finnhub) */
+  /** 보유·추천 후보 종목 현재가 (KR=Yahoo, US=Finnhub) */
   fetchStockQuote(stock: StockEntity): Promise<QuoteResult>;
   /** USD/KRW 환율 (Yahoo KRW=X) */
   fetchUsdKrwRate(): Promise<number | null>;
