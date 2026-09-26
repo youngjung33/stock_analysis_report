@@ -35,6 +35,7 @@ apiClient.interceptors.response.use(
       original.url?.includes('/market/quotes') ||
       original.url?.includes('/market/status') ||
       original.url?.includes('/market/indices') ||
+      original.url?.includes('/market/sentiment-summary') ||
       original.url?.includes('/market/quote') ||
       original.url?.includes('/market/search') ||
       original.url?.includes('/portfolio/analysis') ||

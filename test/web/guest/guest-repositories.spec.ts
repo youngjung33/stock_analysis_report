@@ -19,6 +19,7 @@ function createFakeMarketRepo(): IMarketRepository {
   return {
     getStatus: vi.fn(),
     getMarketIndices: vi.fn(),
+    getMarketSentimentSummary: vi.fn(),
     getStockQuote: vi.fn(),
     searchStocks: vi.fn(),
     getFxRate: vi.fn().mockResolvedValue({ usdKrwRate: 1300 }),

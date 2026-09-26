@@ -4,6 +4,7 @@ import {
   UpdateTransactionInput,
   Dashboard,
   MarketIndicesResult,
+  MarketSentimentSummaryResult,
   LoginResult,
   RegisterResult,
   MarketProviderStatus,
@@ -76,6 +77,7 @@ export interface IPortfolioRepository {
 
 export interface IMarketRepository {
   getMarketIndices(): Promise<MarketIndicesResult>;
+  getMarketSentimentSummary(): Promise<MarketSentimentSummaryResult>;
   getStockQuote(symbol: string, market: Market, range: QuoteChartRange): Promise<StockQuoteSnapshot>;
   getMarketStatus(): Promise<MarketProviderStatus[]>;
   getMarketAnalysis(options?: {

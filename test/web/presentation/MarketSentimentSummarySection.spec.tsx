@@ -6,8 +6,8 @@ import { Market } from '@sar/shared';
 import '@/i18n/config';
 import { MarketSentimentSummarySection } from '@/presentation/components/MarketSentimentSummarySection';
 
-vi.mock('@/presentation/hooks/useMarketIndices', () => ({
-  useMarketIndices: vi.fn(),
+vi.mock('@/presentation/hooks/useMarketSentimentSummary', () => ({
+  useMarketSentimentSummary: vi.fn(),
 }));
 
 vi.mock('next/link', () => ({
@@ -16,11 +16,11 @@ vi.mock('next/link', () => ({
   ),
 }));
 
-import { useMarketIndices } from '@/presentation/hooks/useMarketIndices';
+import { useMarketSentimentSummary } from '@/presentation/hooks/useMarketSentimentSummary';
 
 describe('MarketSentimentSummarySection', () => {
-  it('renders KOSPI and NASDAQ index cards from indices API', () => {
-    vi.mocked(useMarketIndices).mockReturnValue({
+  it('renders KOSPI and NASDAQ index cards from sentiment summary API', () => {
+    vi.mocked(useMarketSentimentSummary).mockReturnValue({
       data: {
         fetchedAt: '2026-01-01T00:00:00.000Z',
         indices: [
@@ -39,6 +39,30 @@ describe('MarketSentimentSummarySection', () => {
             changePercent1d: -0.3,
           },
         ],
+        insights: {
+          kr: {
+            market: Market.KR,
+            label: 'bull',
+            avgChangePercent: 0.8,
+            upCount: 0,
+            downCount: 0,
+            flatCount: 0,
+            headline: '',
+            description: '',
+          },
+          us: {
+            market: Market.US,
+            label: 'bear',
+            avgChangePercent: -0.3,
+            upCount: 0,
+            downCount: 0,
+            flatCount: 0,
+            headline: '',
+            description: '',
+          },
+          recommendations: [],
+          regimes: [],
+        },
       },
       isLoading: false,
       isError: false,

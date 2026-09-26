@@ -163,6 +163,7 @@ npm run test:e2e:all # Playwright 30 scenarios (production-smoke 포함)
 | `SettleCashUseCase` | (내부) 매매·배당 결제 | `transactions.use-cases.spec.ts`, corporate-actions |
 | `RefreshQuotesUseCase` | POST `/api/market/refresh` | `market.use-cases.spec.ts` |
 | `GetMarketIndicesUseCase` | GET `/api/market/indices` | `get-market-indices.use-case.spec.ts` |
+| `GetMarketSentimentSummaryUseCase` | GET `/api/market/sentiment-summary` | `get-market-sentiment-summary.use-case.spec.ts` |
 | `GetStockQuoteUseCase` | GET `/api/market/quote` | provider/chart |
 | `FetchQuotesUseCase` | POST `/api/market/quotes` | `market.use-cases.spec.ts` |
 | `GetMarketStatusUseCase` | GET `/api/market/status` | `get-market-status.use-case.spec.ts` |

@@ -16,6 +16,7 @@ import {
 } from './domain/usecases/watchlist/watchlist.use-cases';
 import {
   GetMarketIndicesUseCase,
+  GetMarketSentimentSummaryUseCase,
   GetFxRateUseCase,
   GetMarketAnalysisUseCase,
   GetMarketStatusUseCase,
@@ -91,6 +92,7 @@ export function wireAppServices(): AppServices {
     getPortfolioAnalysisUseCase: new GetPortfolioAnalysisUseCase(portfolioRepository),
     refreshQuotesUseCase: new RefreshQuotesUseCase(portfolioRepository),
     getMarketIndicesUseCase: new GetMarketIndicesUseCase(marketRepository),
+    getMarketSentimentSummaryUseCase: new GetMarketSentimentSummaryUseCase(marketRepository),
     getStockQuoteUseCase: new GetStockQuoteUseCase(marketRepository),
     getMarketStatusUseCase: new GetMarketStatusUseCase(marketRepository),
     getMarketAnalysisUseCase: new GetMarketAnalysisUseCase(marketRepository),

@@ -9,6 +9,7 @@ vi.mock('@/server/container', () => ({
 
 import { getServerServices } from '@/server/container';
 import { GET as getIndices } from '@/app/api/market/indices/route';
+import { GET as getSentimentSummary } from '@/app/api/market/sentiment-summary/route';
 import { GET as getAnalysis } from '@/app/api/market/analysis/route';
 
 describe('market API rate limit', () => {
@@ -17,6 +18,13 @@ describe('market API rate limit', () => {
     vi.mocked(getServerServices).mockReturnValue({
       getMarketIndicesUseCase: {
         execute: vi.fn().mockResolvedValue({ indices: [], fetchedAt: '' }),
+      },
+      getMarketSentimentSummaryUseCase: {
+        execute: vi.fn().mockResolvedValue({
+          indices: [],
+          insights: { kr: { label: 'neutral' }, us: { label: 'neutral' }, recommendations: [], regimes: [] },
+          fetchedAt: '',
+        }),
       },
       getMarketAnalysisUseCase: { execute: vi.fn().mockResolvedValue({ fetchedAt: '' }) },
     } as never);
@@ -56,6 +64,17 @@ describe('market API rate limit', () => {
     });
     const res = await getIndices(req);
     expect(res.status).toBe(429);
+  });
+
+  it('GET /api/market/sentiment-summary returns 200', async () => {
+    const req = new NextRequest('http://localhost/api/market/sentiment-summary', {
+      headers: { 'x-forwarded-for': '4.4.4.4' },
+    });
+    const res = await getSentimentSummary(req);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.insights).toBeDefined();
+    expect(body.indices).toEqual([]);
   });
 
   it('GET /api/market/indices returns 200 with indices payload', async () => {

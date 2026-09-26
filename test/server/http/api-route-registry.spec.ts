@@ -45,6 +45,7 @@ const ROUTE_SPEC_COVERAGE: Record<string, string> = {
   'cron/recommendation-outcomes/route.ts': 'cron-routes.spec.ts',
   'market/analysis/route.ts': 'market-routes.spec.ts',
   'market/indices/route.ts': 'market-routes.spec.ts',
+  'market/sentiment-summary/route.ts': 'market-routes.spec.ts',
   'market/fx/route.ts': 'remaining-api-routes.spec.ts',
   'market/quote/route.ts': 'remaining-api-routes.spec.ts',
   'market/quotes/route.ts': 'remaining-api-routes.spec.ts',
@@ -72,7 +73,7 @@ const ROUTE_SPEC_COVERAGE: Record<string, string> = {
 describe('API route registry', () => {
   it('maps every route.ts file to an HTTP spec', () => {
     const routes = collectRouteFiles(API_ROOT);
-    expect(routes).toHaveLength(47);
+    expect(routes).toHaveLength(48);
 
     const missing = routes.filter((route) => !ROUTE_SPEC_COVERAGE[route]);
     expect(missing, `uncovered routes: ${missing.join(', ')}`).toEqual([]);

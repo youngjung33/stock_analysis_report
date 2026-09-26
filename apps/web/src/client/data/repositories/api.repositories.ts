@@ -5,6 +5,7 @@ import {
   CreateTransactionInput,
   UpdateTransactionInput,
   MarketIndicesResult,
+  MarketSentimentSummaryResult,
   LoginResult,
   RegisterResult,
   MarketProviderStatus,
@@ -142,6 +143,11 @@ export class ApiPortfolioRepository implements IPortfolioRepository {
 export class ApiMarketRepository implements IMarketRepository {
   async getMarketIndices() {
     const { data } = await apiClient.get<MarketIndicesResult>('/market/indices');
+    return data;
+  }
+
+  async getMarketSentimentSummary() {
+    const { data } = await apiClient.get<MarketSentimentSummaryResult>('/market/sentiment-summary');
     return data;
   }
 

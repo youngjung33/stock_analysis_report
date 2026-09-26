@@ -186,6 +186,12 @@ export interface MarketIndicesResult {
   fetchedAt: string;
 }
 
+export interface MarketSentimentSummaryResult {
+  indices: RegionIndexQuote[];
+  insights: import('@sar/shared').MarketInsightsResult;
+  fetchedAt: string;
+}
+
 export interface LoginResult {
   username: string;
 }

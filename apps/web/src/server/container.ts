@@ -1,4 +1,5 @@
 import { GetMarketIndicesUseCase } from './domain/usecases/market/get-market-indices.use-case';
+import { GetMarketSentimentSummaryUseCase } from './domain/usecases/market/get-market-sentiment-summary.use-case';
 import { GetFxRateUseCase } from './domain/usecases/market/get-fx-rate.use-case';
 import { BuildStockAnalysisReportUseCase } from './domain/usecases/market/build-stock-analysis-report.use-case';
 import { GetMarketAnalysisUseCase } from './domain/usecases/market/get-market-analysis.use-case';
@@ -120,6 +121,7 @@ export interface ServerServices {
   refreshQuotesUseCase: RefreshQuotesUseCase;
   fetchQuotesUseCase: FetchQuotesUseCase;
   getMarketIndicesUseCase: GetMarketIndicesUseCase;
+  getMarketSentimentSummaryUseCase: GetMarketSentimentSummaryUseCase;
   getStockQuoteUseCase: GetStockQuoteUseCase;
   getMarketStatusUseCase: GetMarketStatusUseCase;
   getMarketAnalysisUseCase: GetMarketAnalysisUseCase;
@@ -207,6 +209,11 @@ export function getServerServices(): ServerServices {
     fetchRecommendationEventsUseCase,
     fetchRecommendationFiguresUseCase,
   );
+  const getMarketSentimentSummaryUseCase = new GetMarketSentimentSummaryUseCase(
+    getMarketIndicesUseCase,
+    buildMarketContextUseCase,
+    fetchRecommendationQuotesUseCase,
+  );
   const recommendationLedgerRepo = new PrismaRecommendationLedgerRepository();
   const getDashboardUseCase = new GetDashboardUseCase(
     stockRepo,
@@ -258,6 +265,7 @@ export function getServerServices(): ServerServices {
     ),
     fetchQuotesUseCase,
     getMarketIndicesUseCase,
+    getMarketSentimentSummaryUseCase,
     getStockQuoteUseCase,
     refreshTokenUseCase: new RefreshTokenUseCase(refreshRepo, tokenService),
     logoutUseCase: new LogoutUseCase(refreshRepo, tokenService),

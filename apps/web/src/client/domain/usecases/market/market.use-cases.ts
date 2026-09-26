@@ -12,6 +12,15 @@ export class GetMarketIndicesUseCase {
   }
 }
 
+/** 대시보드 시장 정세 — 지수 + 추천·레짐 (섹터 후보 시세 enrichment) */
+export class GetMarketSentimentSummaryUseCase {
+  constructor(private readonly marketRepo: IMarketRepository) {}
+
+  execute() {
+    return this.marketRepo.getMarketSentimentSummary();
+  }
+}
+
 /** 종목 시세·차트 조회 use case */
 export class GetStockQuoteUseCase {
   constructor(private readonly marketRepo: IMarketRepository) {}

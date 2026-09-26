@@ -1,11 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { applyIndexRegionSentiment, buildMarketInsights, sentimentBadgeClass } from '@sar/shared';
+import { sentimentBadgeClass } from '@sar/shared';
 import { translateRegionSentiment, translateSentiment, translateTag, translateRegime } from '@/i18n/translate-shared';
-import { useMarketIndices } from '../hooks/useMarketIndices';
+import { useMarketSentimentSummary } from '../hooks/useMarketSentimentSummary';
 import { formatNumber, formatPercent, pnlClass } from '../shared/formatters';
 import { marketAnalysisHref } from '../shared/stock-routes';
 
@@ -15,13 +14,9 @@ interface Props {
 
 export function MarketSentimentSummarySection({ compact }: Props) {
   const { t } = useTranslation();
-  const { data, isLoading } = useMarketIndices();
+  const { data, isLoading } = useMarketSentimentSummary();
 
-  const insights = useMemo(() => {
-    if (!data?.indices?.length) return null;
-    const base = buildMarketInsights(data.indices);
-    return applyIndexRegionSentiment(base, data.indices);
-  }, [data]);
+  const insights = data?.insights ?? null;
 
   return (
     <section className="rounded-xl border border-slate-800 bg-slate-950/40 p-4 sm:p-5">

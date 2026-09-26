@@ -27,6 +27,7 @@ import {
 } from './usecases/watchlist/watchlist.use-cases';
 import {
   GetMarketIndicesUseCase,
+  GetMarketSentimentSummaryUseCase,
   GetFxRateUseCase,
   GetMarketAnalysisUseCase,
   GetMarketStatusUseCase,
@@ -68,6 +69,7 @@ export interface AppServices {
   getPortfolioAnalysisUseCase: GetPortfolioAnalysisUseCase;
   refreshQuotesUseCase: RefreshQuotesUseCase;
   getMarketIndicesUseCase: GetMarketIndicesUseCase;
+  getMarketSentimentSummaryUseCase: GetMarketSentimentSummaryUseCase;
   getStockQuoteUseCase: GetStockQuoteUseCase;
   getMarketStatusUseCase: GetMarketStatusUseCase;
   getMarketAnalysisUseCase: GetMarketAnalysisUseCase;
