@@ -16,8 +16,11 @@ export class GetMarketIndicesUseCase {
 export class GetMarketSentimentSummaryUseCase {
   constructor(private readonly marketRepo: IMarketRepository) {}
 
-  execute() {
-    return this.marketRepo.getMarketSentimentSummary();
+  execute(options?: {
+    userHoldings?: Array<{ symbol: string; market: import('@sar/shared').Market; name?: string }>;
+    userWatchlist?: Array<{ symbol: string; market: import('@sar/shared').Market; name?: string }>;
+  }) {
+    return this.marketRepo.getMarketSentimentSummary(options);
   }
 }
 

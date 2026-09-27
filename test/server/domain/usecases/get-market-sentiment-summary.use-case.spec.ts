@@ -73,4 +73,44 @@ describe('GetMarketSentimentSummaryUseCase', () => {
     expect(result.insights.recommendations.length).toBeGreaterThan(0);
     expect(fetchRecommendationQuotesUseCase.execute).toHaveBeenCalled();
   });
+
+  it('includes watchlist symbols in candidate quote fetch', async () => {
+    const getMarketIndicesUseCase = {
+      execute: vi.fn().mockResolvedValue({
+        indices: [
+          { name: 'KOSPI', yahooSymbol: '^KS11', market: Market.KR, changePercent1d: 0 },
+        ],
+        fetchedAt: '2026-01-01T00:00:00.000Z',
+      }),
+    };
+
+    const buildMarketContextUseCase = {
+      execute: vi.fn().mockResolvedValue({
+        macro: [],
+        sectors: [],
+        indices: [],
+        usdKrwRate: 1300,
+        usdKrwChange1d: 0,
+      }),
+    };
+
+    const fetchRecommendationQuotesUseCase = {
+      execute: vi.fn().mockResolvedValue([]),
+    };
+
+    const useCase = new GetMarketSentimentSummaryUseCase(
+      getMarketIndicesUseCase as never,
+      buildMarketContextUseCase as never,
+      fetchRecommendationQuotesUseCase as never,
+    );
+
+    await useCase.execute({
+      userWatchlist: [{ symbol: 'GUESTONLY', market: Market.KR, name: '게스트종목' }],
+    });
+
+    const targets = fetchRecommendationQuotesUseCase.execute.mock.calls[0]?.[0] as Array<{
+      symbol: string;
+    }>;
+    expect(targets.some((t) => t.symbol === 'GUESTONLY')).toBe(true);
+  });
 });

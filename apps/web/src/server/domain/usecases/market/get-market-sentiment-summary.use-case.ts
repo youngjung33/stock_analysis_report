@@ -2,6 +2,7 @@ import {
   applyIndexRegionSentiment,
   buildCandidatePool,
   buildMarketInsights,
+  Market,
   type MarketInsightsResult,
 } from '@sar/shared';
 import { MarketSentimentSummaryResult } from '../../entities';
@@ -17,13 +18,19 @@ export class GetMarketSentimentSummaryUseCase {
     private readonly fetchRecommendationQuotesUseCase: FetchRecommendationQuotesUseCase,
   ) {}
 
-  async execute(): Promise<MarketSentimentSummaryResult> {
+  async execute(options?: {
+    userHoldings?: Array<{ symbol: string; market: Market; name?: string }>;
+    userWatchlist?: Array<{ symbol: string; market: Market; name?: string }>;
+  }): Promise<MarketSentimentSummaryResult> {
     const [indicesResult, marketContext] = await Promise.all([
       this.getMarketIndicesUseCase.execute(),
       this.buildMarketContextUseCase.execute(),
     ]);
 
-    const pool = buildCandidatePool({});
+    const pool = buildCandidatePool({
+      userHoldings: options?.userHoldings,
+      userWatchlist: options?.userWatchlist,
+    });
     const quoteTargets = pool.map((c) => ({
       symbol: c.symbol,
       name: c.name,

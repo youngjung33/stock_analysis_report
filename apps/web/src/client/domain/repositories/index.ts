@@ -77,7 +77,10 @@ export interface IPortfolioRepository {
 
 export interface IMarketRepository {
   getMarketIndices(): Promise<MarketIndicesResult>;
-  getMarketSentimentSummary(): Promise<MarketSentimentSummaryResult>;
+  getMarketSentimentSummary(options?: {
+    userHoldings?: Array<{ symbol: string; market: Market; name?: string }>;
+    userWatchlist?: Array<{ symbol: string; market: Market; name?: string }>;
+  }): Promise<MarketSentimentSummaryResult>;
   getStockQuote(symbol: string, market: Market, range: QuoteChartRange): Promise<StockQuoteSnapshot>;
   getMarketStatus(): Promise<MarketProviderStatus[]>;
   getMarketAnalysis(options?: {

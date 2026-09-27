@@ -19,8 +19,8 @@ export class GetMarketAnalysisUseCase {
 
   /** 지수·매크로·섹터·뉴스·종목 enrichment 집계 후 MarketAnalysisReport 반환 */
   async execute(options?: {
-    userHoldings?: Array<{ symbol: string; market: Market }>;
-    userWatchlist?: Array<{ symbol: string; market: Market }>;
+    userHoldings?: Array<{ symbol: string; market: Market; name?: string }>;
+    userWatchlist?: Array<{ symbol: string; market: Market; name?: string }>;
   }): Promise<MarketAnalysisReport> {
     const [marketContext, krNews, usNewsGoogle, finnhubNews] = await Promise.all([
       this.buildMarketContextUseCase.execute(),

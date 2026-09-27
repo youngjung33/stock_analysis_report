@@ -20,7 +20,6 @@ export const QUERY_GC_TIME = 30 * 60_000;
 
 export const MARKET_QUERY_KEYS = {
   dashboard: ['dashboard'] as const,
-  marketIndices: ['market-indices'] as const,
   marketSentimentSummary: ['market-sentiment-summary'] as const,
   marketAnalysis: ['market-analysis'] as const,
   stockAnalysisRoot: ['stock-analysis'] as const,
@@ -53,7 +52,6 @@ export function createAppQueryClient() {
 export function invalidateAfterQuoteRefresh(queryClient: QueryClient) {
   return Promise.all([
     queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.dashboard }),
-    queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.marketIndices }),
     queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.marketSentimentSummary }),
     queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.portfolioAnalysis }),
     queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.portfolioSimulation }),

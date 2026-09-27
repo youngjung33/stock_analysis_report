@@ -20,8 +20,16 @@ export function useMarketAnalysis() {
       ]);
 
       return getMarketAnalysisUseCase.execute({
-        userHoldings: dashboard.holdings.map((h) => ({ symbol: h.symbol, market: h.market })),
-        userWatchlist: watchlist.map((w) => ({ symbol: w.symbol, market: w.market })),
+        userHoldings: dashboard.holdings.map((h) => ({
+          symbol: h.symbol,
+          market: h.market,
+          name: h.name,
+        })),
+        userWatchlist: watchlist.map((w) => ({
+          symbol: w.symbol,
+          market: w.market,
+          name: w.name,
+        })),
       });
     },
     staleTime: QUERY_STALE.marketReport,

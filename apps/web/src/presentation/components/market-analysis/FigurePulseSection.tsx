@@ -91,7 +91,7 @@ export function FigurePulseSection({ figureStatements, policyUncertainty }: Prop
                     return (
                     <Link
                       key={`${snap.dedupeKey}-${symbol}`}
-                      href={stockDetailHref(symbol, market)}
+                      href={stockDetailHref(symbol, market, symbol)}
                       className="rounded border border-indigo-900/60 px-1.5 py-0.5 text-[10px] text-indigo-300 hover:text-indigo-200"
                     >
                       {symbol}

@@ -82,8 +82,8 @@ describe('market analysis route personalization', () => {
     expect(getDashboardUseCase.execute).toHaveBeenCalledWith(authUser.userId);
     expect(listWatchlistUseCase.execute).toHaveBeenCalledWith(authUser.userId);
     expect(getMarketAnalysisUseCase.execute).toHaveBeenCalledWith({
-      userHoldings: [{ symbol: '005930', market: Market.KR }],
-      userWatchlist: [{ symbol: 'AAPL', market: Market.US }],
+      userHoldings: [{ symbol: '005930', market: Market.KR, name: '삼성전자' }],
+      userWatchlist: [{ symbol: 'AAPL', market: Market.US, name: 'Apple' }],
     });
   });
 
@@ -146,8 +146,8 @@ describe('market analysis route personalization', () => {
 
     expect(res.status).toBe(200);
     expect(getMarketAnalysisUseCase.execute).toHaveBeenCalledWith({
-      userHoldings: [{ symbol: '005930', market: Market.KR }],
-      userWatchlist: [{ symbol: 'AAPL', market: Market.US }],
+      userHoldings: [{ symbol: '005930', market: Market.KR, name: '삼성전자' }],
+      userWatchlist: [{ symbol: 'AAPL', market: Market.US, name: 'Apple' }],
     });
   });
 });

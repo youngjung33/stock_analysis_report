@@ -146,7 +146,17 @@ export class ApiMarketRepository implements IMarketRepository {
     return data;
   }
 
-  async getMarketSentimentSummary() {
+  async getMarketSentimentSummary(options?: {
+    userHoldings?: Array<{ symbol: string; market: Market; name?: string }>;
+    userWatchlist?: Array<{ symbol: string; market: Market; name?: string }>;
+  }) {
+    if (options?.userHoldings?.length || options?.userWatchlist?.length) {
+      const { data } = await apiClient.post<MarketSentimentSummaryResult>(
+        '/market/sentiment-summary',
+        options,
+      );
+      return data;
+    }
     const { data } = await apiClient.get<MarketSentimentSummaryResult>('/market/sentiment-summary');
     return data;
   }

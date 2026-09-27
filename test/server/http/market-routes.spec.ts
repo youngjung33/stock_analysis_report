@@ -9,22 +9,26 @@ vi.mock('@/server/container', () => ({
 
 import { getServerServices } from '@/server/container';
 import { GET as getIndices } from '@/app/api/market/indices/route';
-import { GET as getSentimentSummary } from '@/app/api/market/sentiment-summary/route';
+import { GET as getSentimentSummary, POST as postSentimentSummary } from '@/app/api/market/sentiment-summary/route';
 import { GET as getAnalysis } from '@/app/api/market/analysis/route';
+
+const sentimentSummaryExecute = vi.fn();
 
 describe('market API rate limit', () => {
   beforeEach(() => {
     resetRateLimitStoreForTests();
+    sentimentSummaryExecute.mockReset();
+    sentimentSummaryExecute.mockResolvedValue({
+      indices: [],
+      insights: { kr: { label: 'neutral' }, us: { label: 'neutral' }, recommendations: [], regimes: [] },
+      fetchedAt: '',
+    });
     vi.mocked(getServerServices).mockReturnValue({
       getMarketIndicesUseCase: {
         execute: vi.fn().mockResolvedValue({ indices: [], fetchedAt: '' }),
       },
       getMarketSentimentSummaryUseCase: {
-        execute: vi.fn().mockResolvedValue({
-          indices: [],
-          insights: { kr: { label: 'neutral' }, us: { label: 'neutral' }, recommendations: [], regimes: [] },
-          fetchedAt: '',
-        }),
+        execute: sentimentSummaryExecute,
       },
       getMarketAnalysisUseCase: { execute: vi.fn().mockResolvedValue({ fetchedAt: '' }) },
     } as never);
@@ -75,6 +79,22 @@ describe('market API rate limit', () => {
     const body = await res.json();
     expect(body.insights).toBeDefined();
     expect(body.indices).toEqual([]);
+    expect(sentimentSummaryExecute).toHaveBeenCalledWith(undefined);
+  });
+
+  it('POST /api/market/sentiment-summary passes guest watchlist to use case', async () => {
+    const req = new NextRequest('http://localhost/api/market/sentiment-summary', {
+      method: 'POST',
+      headers: { 'x-forwarded-for': '4.4.4.5', 'content-type': 'application/json' },
+      body: JSON.stringify({
+        userWatchlist: [{ symbol: 'AAPL', market: 'US' }],
+      }),
+    });
+    const res = await postSentimentSummary(req);
+    expect(res.status).toBe(200);
+    expect(sentimentSummaryExecute).toHaveBeenCalledWith({
+      userWatchlist: [{ symbol: 'AAPL', market: 'US' }],
+    });
   });
 
   it('GET /api/market/indices returns 200 with indices payload', async () => {

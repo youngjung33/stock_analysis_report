@@ -241,7 +241,7 @@ function BatchCard({ batch }: { batch: RecommendationBatchView }) {
                   <td className="py-2 pr-2 text-slate-500">{item.rank}</td>
                   <td className="py-2 pr-2">
                     <Link
-                      href={stockDetailHref(item.symbol, item.market)}
+                      href={stockDetailHref(item.symbol, item.market, item.symbol)}
                       className="font-medium text-indigo-300 hover:text-indigo-200"
                     >
                       {item.symbol}

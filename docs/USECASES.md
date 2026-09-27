@@ -163,7 +163,7 @@ npm run test:e2e:all # Playwright 30 scenarios (production-smoke 포함)
 | `SettleCashUseCase` | (내부) 매매·배당 결제 | `transactions.use-cases.spec.ts`, corporate-actions |
 | `RefreshQuotesUseCase` | POST `/api/market/refresh` | `market.use-cases.spec.ts` |
 | `GetMarketIndicesUseCase` | GET `/api/market/indices` | `get-market-indices.use-case.spec.ts` |
-| `GetMarketSentimentSummaryUseCase` | GET `/api/market/sentiment-summary` | `get-market-sentiment-summary.use-case.spec.ts` |
+| `GetMarketSentimentSummaryUseCase` | GET/POST `/api/market/sentiment-summary` (보유·관심 개인화) | `get-market-sentiment-summary.use-case.spec.ts` |
 | `GetStockQuoteUseCase` | GET `/api/market/quote` | provider/chart |
 | `FetchQuotesUseCase` | POST `/api/market/quotes` | `market.use-cases.spec.ts` |
 | `GetMarketStatusUseCase` | GET `/api/market/status` | `get-market-status.use-case.spec.ts` |
@@ -179,7 +179,7 @@ npm run test:e2e:all # Playwright 30 scenarios (production-smoke 포함)
 | Watchlist use cases | `/api/watchlist` | domain + `portfolio-api-routes.spec.ts` |
 | Corporate action use cases | `/api/corporate-actions` | `corporate-actions.use-cases.spec.ts` |
 
-HTTP route 전용 spec **15개** + `remaining-api-routes.spec.ts`(22 route) + `api-route-registry.spec.ts`(44 route 매핑 검증).
+HTTP route 전용 spec **15개** + `remaining-api-routes.spec.ts`(22 route) + `api-route-registry.spec.ts`(**48** route 매핑 검증).
 
 Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 
@@ -244,7 +244,7 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | Route error | `route-error.spec.ts` | DB 에러 마스킹 |
 | Rate limit helper | `rate-limit.spec.ts` | Upstash limiter |
 | Remaining routes | `remaining-api-routes.spec.ts` | auth/account/market 등 22 route |
-| Route registry | `api-route-registry.spec.ts` | 44 route ↔ spec 매핑 |
+| Route registry | `api-route-registry.spec.ts` | 48 route ↔ spec 매핑 |
 | Middleware | `middleware.spec.ts` (web) | protected route redirect |
 
 ---

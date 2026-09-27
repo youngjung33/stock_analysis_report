@@ -137,7 +137,7 @@ Handler → `getServerServices()` → Domain Use Case
 | POST | `/api/market/refresh` | ✅ |
 | POST | `/api/market/quotes` | — (게스트) |
 | GET | `/api/market/indices` | — |
-| GET | `/api/market/sentiment-summary` | — (대시보드 정세·추천 티저) |
+| GET/POST | `/api/market/sentiment-summary` | — (대시보드 정세·추천 티저; POST=게스트 보유·관심 개인화) |
 | GET | `/api/market/quote` | — |
 | GET | `/api/market/search` | — |
 | GET | `/api/market/status` | — |
