@@ -9,6 +9,7 @@ import {
   computeReturnPercent,
   horizonReady,
   kstTradingDate,
+  mapRecommendationBatchToView,
   type RecommendationBatchMacroSnapshot,
   type RecommendationOutcomeHorizon,
 } from '@sar/shared';
@@ -154,6 +155,7 @@ export class RunGlobalRecommendationBatchUseCase {
         symbol: c.symbol,
         market: c.market,
         source: c.source,
+        name: c.name,
       })),
       items: recResult.recommendations.map((rec, index) => ({
         rank: index + 1,
@@ -272,19 +274,22 @@ export class EvaluateRecommendationOutcomesUseCase {
 export class ListRecommendationHistoryUseCase {
   constructor(private readonly ledgerRepo: IRecommendationLedgerRepository) {}
 
-  execute(input?: { limit?: number; profileKey?: string }) {
-    return this.ledgerRepo.listBatches({
+  async execute(input?: { limit?: number; profileKey?: string }) {
+    const batches = await this.ledgerRepo.listBatches({
       limit: input?.limit ?? 30,
       profileKey: input?.profileKey ?? GLOBAL_RECOMMENDATION_PROFILE_KEY,
     });
+    return batches.map((batch) => mapRecommendationBatchToView(batch));
   }
 }
 
 export class GetRecommendationBatchUseCase {
   constructor(private readonly ledgerRepo: IRecommendationLedgerRepository) {}
 
-  execute(batchId: string) {
-    return this.ledgerRepo.findById(batchId);
+  async execute(batchId: string) {
+    const batch = await this.ledgerRepo.findById(batchId);
+    if (!batch) return null;
+    return mapRecommendationBatchToView(batch);
   }
 }
 

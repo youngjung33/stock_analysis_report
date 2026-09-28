@@ -43,7 +43,8 @@ AI Context Pack은 아래 **이미 계산된 데이터**에서만 조립한다.
 | 종목 리포트 | `BuildStockAnalysisReportUseCase` → `StockPriceExplanationReport` | 가격·변동률·score·tag·insights·scoreBreakdown |
 | Enrichment | `BuildStockEnrichmentUseCase` | technical · news · event · figure (이미 pick된 snapshot) |
 | 시장 맥락 | `BuildMarketContextUseCase` | macro · sector · index · regime |
-| 보유/관심 | route input | userHoldings · userWatchlist (symbol+market만) |
+| 대시보드 정세·티저 | `GetMarketSentimentSummaryUseCase` · GET/POST `/api/market/sentiment-summary` | indices · insights · recommendations (섹터 pool + 보유·관심) |
+| 보유/관심 | `resolveMarketPersonalization` (analysis·sentiment routes) | userHoldings · userWatchlist (symbol·market·name) |
 
 ### 2.3 하지 않을 것 (1차)
 

@@ -48,11 +48,20 @@ export function createAppQueryClient() {
   });
 }
 
+/** 보유·관심 기반 시장 리포트 (sentiment-summary, market/analysis) */
+export function invalidateMarketPersonalizedReports(queryClient: QueryClient) {
+  return Promise.all([
+    queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.marketSentimentSummary }),
+    queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.marketAnalysis }),
+  ]);
+}
+
 /** 시세 갱신 버튼 — 외부 API 호출 후 관련 캐시 무효화 */
 export function invalidateAfterQuoteRefresh(queryClient: QueryClient) {
   return Promise.all([
     queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.dashboard }),
     queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.marketSentimentSummary }),
+    queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.marketAnalysis }),
     queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.portfolioAnalysis }),
     queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.portfolioSimulation }),
     queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.stockQuoteRoot }),
@@ -69,5 +78,6 @@ export function invalidatePortfolioLocal(queryClient: QueryClient) {
     queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.transactions }),
     queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.corporateActions }),
     queryClient.invalidateQueries({ queryKey: MARKET_QUERY_KEYS.portfolioAnalysis }),
+    invalidateMarketPersonalizedReports(queryClient),
   ]);
 }

@@ -173,24 +173,11 @@ export interface StockQuoteSnapshot {
   points: StockPricePoint[];
 }
 
-export interface RegionIndexQuote {
-  name: string;
-  yahooSymbol: string;
-  market: import('@sar/shared').Market;
-  currentPrice: number | null;
-  changePercent1d: number | null;
-}
-
-export interface MarketIndicesResult {
-  indices: RegionIndexQuote[];
-  fetchedAt: string;
-}
-
-export interface MarketSentimentSummaryResult {
-  indices: RegionIndexQuote[];
-  insights: import('@sar/shared').MarketInsightsResult;
-  fetchedAt: string;
-}
+export type {
+  RegionIndexQuote,
+  MarketIndicesResult,
+  MarketSentimentSummaryResult,
+} from '@sar/shared';
 
 export interface LoginResult {
   username: string;

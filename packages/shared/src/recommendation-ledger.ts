@@ -57,6 +57,8 @@ export interface RecommendationItemView {
   id: string;
   rank: number;
   symbol: string;
+  /** Display name from batch candidate pool snapshot, else symbol */
+  name: string;
   market: import('./enums').Market;
   tag: string;
   score: number;

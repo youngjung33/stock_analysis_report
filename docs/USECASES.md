@@ -196,7 +196,7 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | **Investor profile** | `presentation/hooks/useInvestorProfile.ts`, `client/domain/services/` | shared + hydrate + pending specs |
 | Watchlist | `client/domain/usecases/watchlist/` | `watchlist.use-cases.spec.ts` |
 | Corporate actions | `client/domain/usecases/corporate-actions/` | `corporate-actions.use-cases.spec.ts` |
-| Market | `client/domain/usecases/market/` (+ `GetRecommendationHistoryUseCase`, `FetchStockAnalysisUseCase`) | `market.use-cases.spec.ts`, `recommendation-backtest.spec.ts` |
+| Market | `client/domain/usecases/market/` (+ `GetMarketSentimentSummaryUseCase`, `GetRecommendationHistoryUseCase`, `FetchStockAnalysisUseCase`) | `market.use-cases.spec.ts`, `recommendation-backtest.spec.ts` |
 | Guest adapters | `client/data/guest/` | `guest-repositories.spec.ts` |
 
 ---
@@ -257,8 +257,9 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | `test/e2e/stock-focus.spec.ts` | 5 | 종목 집중 분석 UI·API |
 | `test/e2e/transactions.spec.ts` | 4 | 비회원/회원 매매·Figure Pulse |
 | `test/e2e/catalog-search.spec.ts` | 1 | DB catalog 종목 검색 |
+| `test/e2e/market-sentiment.spec.ts` | 1 | 비회원 대시보드 시장 정세(KOSPI/NASDAQ) |
 | `test/e2e/production-smoke.spec.ts` | 3 | 배포 환경 스모크 (`test:e2e:production` / `test:e2e:all`) |
-| **합계** | **30** | `test:e2e` 기본은 production-smoke **제외 27** |
+| **합계** | **31** | `test:e2e` 기본은 production-smoke **제외 28** |
 
 회원 시나리오: `E2E_USERNAME` / `E2E_PASSWORD` + `DATABASE_URL` (member `beforeEach`에서 거래·현금 원장 reset)
 

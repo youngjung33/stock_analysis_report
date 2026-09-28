@@ -281,6 +281,24 @@ export type {
   SentimentLabel,
   StockRecommendation,
 } from './market-insights';
+export type {
+  RegionIndexQuote,
+  MarketIndicesResult,
+  MarketSentimentSummaryResult,
+} from './market-summary-api';
+export {
+  buildMarketPersonalizationScopeKey,
+} from './market-personalization-scope';
+export type { MarketPersonalizationScope } from './market-personalization-scope';
+export {
+  lookupCandidatePoolName,
+  mapRecommendationBatchToView,
+  mapRecommendationItemToView,
+} from './recommendation-ledger-view';
+export type {
+  RecommendationBatchEntityLike,
+  RecommendationItemEntityLike,
+} from './recommendation-ledger-view';
 export {
   buildStockRecommendations,
   buildMarketContext,

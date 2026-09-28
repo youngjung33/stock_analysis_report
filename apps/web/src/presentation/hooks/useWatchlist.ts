@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Market } from '@sar/shared';
 import { getErrorMessage } from '@/client/domain/errors/app-error';
 import { useToast } from '../components/Toast';
+import { invalidateMarketPersonalizedReports } from '../lib/query-config';
 import { useServices } from './useServices';
 
 export function useWatchlist(holdingSymbols: { symbol: string; market: Market }[] = []) {
@@ -21,12 +22,18 @@ export function useWatchlist(holdingSymbols: { symbol: string; market: Market }[
   const addMutation = useMutation({
     mutationFn: (input: { symbol: string; name: string; market: Market }) =>
       addWatchlistUseCase.execute(input),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['watchlist'] }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['watchlist'] });
+      await invalidateMarketPersonalizedReports(queryClient);
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => removeWatchlistUseCase.execute(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['watchlist'] }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['watchlist'] });
+      await invalidateMarketPersonalizedReports(queryClient);
+    },
   });
 
   const holdingSet = new Set(holdingSymbols.map((h) => `${h.symbol}:${h.market}`));
