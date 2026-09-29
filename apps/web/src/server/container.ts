@@ -213,6 +213,7 @@ export function getServerServices(): ServerServices {
     getMarketIndicesUseCase,
     buildMarketContextUseCase,
     fetchRecommendationQuotesUseCase,
+    catalogRepo,
   );
   const recommendationLedgerRepo = new PrismaRecommendationLedgerRepository();
   const getDashboardUseCase = new GetDashboardUseCase(
@@ -288,6 +289,7 @@ export function getServerServices(): ServerServices {
       buildMarketContextUseCase,
       buildStockEnrichmentUseCase,
       marketData,
+      catalogRepo,
     ),
     buildStockAnalysisReportUseCase,
     buildMarketContextUseCase,

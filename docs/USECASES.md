@@ -76,7 +76,7 @@ apps/web/src/
 | ViewModel | `presentation/hooks/screens/*`, `useInvestorProfile`, … |
 | Model | `server/domain`, `client/domain` |
 
-상세(AppShell 패턴·ESLint·JSDoc): [`docs/PRESENTATION.md`](PRESENTATION.md)
+상세(AppShell 패턴·ESLint·JSDoc): 위 **MVVM** 절 및 `presentation/` 디렉터리
 
 ---
 
@@ -87,14 +87,14 @@ test/
 ├── server/          # domain, http, data/market
 ├── web/             # client use case, guest, middleware, i18n
 ├── shared/          # @sar/shared
-└── e2e/             # Playwright (27 scenarios; +3 production-smoke)
+└── e2e/             # Playwright (35 scenarios; +3 production-smoke)
 ```
 
 ```bash
-npm run test         # @sar/shared Vitest → @sar/web Vitest
+npm run test         # @sar/shared (261) → @sar/web (469) Vitest
 npm run test -w @sar/shared   # shared only (test/shared/)
-npm run test:e2e     # Playwright 27 scenarios (production-smoke 제외)
-npm run test:e2e:all # Playwright 30 scenarios (production-smoke 포함)
+npm run test:e2e     # Playwright 35 scenarios (production-smoke 제외)
+npm run test:e2e:all # Playwright 38 scenarios (production-smoke 포함)
 ```
 
 ---
@@ -258,8 +258,9 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | `test/e2e/transactions.spec.ts` | 4 | 비회원/회원 매매·Figure Pulse |
 | `test/e2e/catalog-search.spec.ts` | 1 | DB catalog 종목 검색 |
 | `test/e2e/market-sentiment.spec.ts` | 1 | 비회원 대시보드 시장 정세(KOSPI/NASDAQ) |
+| `test/e2e/ai-insight.spec.ts` | 7 | AI 인사이트 패널·API |
 | `test/e2e/production-smoke.spec.ts` | 3 | 배포 환경 스모크 (`test:e2e:production` / `test:e2e:all`) |
-| **합계** | **31** | `test:e2e` 기본은 production-smoke **제외 28** |
+| **합계** | **38** | `test:e2e` 기본은 production-smoke **제외 35** |
 
 회원 시나리오: `E2E_USERNAME` / `E2E_PASSWORD` + `DATABASE_URL` (member `beforeEach`에서 거래·현금 원장 reset)
 
@@ -271,4 +272,4 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 - **server/data** → server/domain
 - **app/api** → server/container
 - **client/** → client/domain
-- **presentation/** → client/domain, hooks (ESLint: `@/client/data`, `@/server` import 금지 — `components/` 포함, [`PRESENTATION.md`](PRESENTATION.md))
+- **presentation/** → client/domain, hooks (ESLint: `@/client/data`, `@/server` import 금지 — `components/` 포함, 위 MVVM 절)

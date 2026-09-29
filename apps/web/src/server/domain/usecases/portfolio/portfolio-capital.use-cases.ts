@@ -1,7 +1,6 @@
 import {
   DEFAULT_PORTFOLIO_PREFERENCES,
   Market,
-  buildCandidatePool,
   buildRankedPortfolioSimulation,
   type StoredInvestorProfile,
 } from '@sar/shared';
@@ -13,6 +12,7 @@ import {
   IWatchlistRepository,
 } from '../../repositories';
 import { GetDashboardUseCase } from '../portfolio/get-dashboard.use-case';
+import { buildCandidatePoolWithCatalog } from '../market/build-candidate-pool-with-catalog';
 import { BuildMarketContextUseCase } from '../market/build-market-context.use-case';
 import { BuildStockEnrichmentUseCase } from '../market/build-stock-enrichment.use-case';
 
@@ -128,25 +128,19 @@ export class GetPortfolioSimulationUseCase {
     }));
     const userWatchlist = snapshot.watchlist;
 
-    const pool = buildCandidatePool({ userHoldings, userWatchlist });
-    const krExtraSymbols = pool.filter((c) => c.market === Market.KR).map((c) => c.symbol);
-    const usExtraSymbols = pool.filter((c) => c.market === Market.US).map((c) => c.symbol);
-    const [krCatalog, usCatalog] = await Promise.all([
-      this.catalogRepo.findBySymbols(krExtraSymbols, Market.KR),
-      this.catalogRepo.findBySymbols(usExtraSymbols, Market.US),
-    ]);
-    const catalogSymbols = [...krCatalog, ...usCatalog].map((c) => ({
-      symbol: c.symbol,
-      market: c.market,
-      name: c.name,
-      yahooSymbol: c.yahooSymbol,
-    }));
-
-    const poolWithCatalog = buildCandidatePool({
+    const poolWithCatalog = await buildCandidatePoolWithCatalog(this.catalogRepo, {
       userHoldings,
       userWatchlist,
-      catalogSymbols,
     });
+
+    const catalogSymbols = poolWithCatalog
+      .filter((c) => c.yahooSymbol)
+      .map((c) => ({
+        symbol: c.symbol,
+        market: c.market,
+        name: c.name,
+        yahooSymbol: c.yahooSymbol,
+      }));
 
     const enrichmentTargets = poolWithCatalog.map((c) => ({
       symbol: c.symbol,

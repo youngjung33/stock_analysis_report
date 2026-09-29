@@ -2,9 +2,10 @@ import {
   Market,
   MarketAnalysisReport,
   NewsAnalysisInput,
-  buildCandidatePool,
   buildMarketAnalysisReport,
 } from '@sar/shared';
+import { IStockCatalogRepository } from '../../repositories';
+import { buildCandidatePoolWithCatalog } from './build-candidate-pool-with-catalog';
 import { BuildMarketContextUseCase } from './build-market-context.use-case';
 import { BuildStockEnrichmentUseCase } from './build-stock-enrichment.use-case';
 import { IMarketDataProvider } from '../../ports/market-data.port';
@@ -15,6 +16,7 @@ export class GetMarketAnalysisUseCase {
     private readonly buildMarketContextUseCase: BuildMarketContextUseCase,
     private readonly buildStockEnrichmentUseCase: BuildStockEnrichmentUseCase,
     private readonly marketData: IMarketDataProvider,
+    private readonly catalogRepo: IStockCatalogRepository,
   ) {}
 
   /** 지수·매크로·섹터·뉴스·종목 enrichment 집계 후 MarketAnalysisReport 반환 */
@@ -29,7 +31,7 @@ export class GetMarketAnalysisUseCase {
       this.marketData.fetchFinnhubMarketNews('general', 6).catch(() => []),
     ]);
 
-    const pool = buildCandidatePool({
+    const pool = await buildCandidatePoolWithCatalog(this.catalogRepo, {
       userHoldings: options?.userHoldings,
       userWatchlist: options?.userWatchlist,
     });

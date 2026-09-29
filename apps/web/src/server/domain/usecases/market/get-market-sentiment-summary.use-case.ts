@@ -1,11 +1,12 @@
 import {
   applyIndexRegionSentiment,
-  buildCandidatePool,
   buildMarketInsights,
   Market,
   type MarketInsightsResult,
 } from '@sar/shared';
 import { MarketSentimentSummaryResult } from '../../entities';
+import { IStockCatalogRepository } from '../../repositories';
+import { buildCandidatePoolWithCatalog } from './build-candidate-pool-with-catalog';
 import { BuildMarketContextUseCase } from './build-market-context.use-case';
 import { FetchRecommendationQuotesUseCase } from './fetch-recommendation-quotes.use-case';
 import { GetMarketIndicesUseCase } from './get-market-indices.use-case';
@@ -16,6 +17,7 @@ export class GetMarketSentimentSummaryUseCase {
     private readonly getMarketIndicesUseCase: GetMarketIndicesUseCase,
     private readonly buildMarketContextUseCase: BuildMarketContextUseCase,
     private readonly fetchRecommendationQuotesUseCase: FetchRecommendationQuotesUseCase,
+    private readonly catalogRepo: IStockCatalogRepository,
   ) {}
 
   async execute(options?: {
@@ -27,7 +29,7 @@ export class GetMarketSentimentSummaryUseCase {
       this.buildMarketContextUseCase.execute(),
     ]);
 
-    const pool = buildCandidatePool({
+    const pool = await buildCandidatePoolWithCatalog(this.catalogRepo, {
       userHoldings: options?.userHoldings,
       userWatchlist: options?.userWatchlist,
     });

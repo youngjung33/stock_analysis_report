@@ -60,10 +60,15 @@ describe('GetMarketSentimentSummaryUseCase', () => {
       ]),
     };
 
+    const catalogRepo = {
+      findBySymbols: vi.fn().mockResolvedValue([]),
+    };
+
     const useCase = new GetMarketSentimentSummaryUseCase(
       getMarketIndicesUseCase as never,
       buildMarketContextUseCase as never,
       fetchRecommendationQuotesUseCase as never,
+      catalogRepo as never,
     );
 
     const result = await useCase.execute();
@@ -98,10 +103,15 @@ describe('GetMarketSentimentSummaryUseCase', () => {
       execute: vi.fn().mockResolvedValue([]),
     };
 
+    const catalogRepo = {
+      findBySymbols: vi.fn().mockResolvedValue([]),
+    };
+
     const useCase = new GetMarketSentimentSummaryUseCase(
       getMarketIndicesUseCase as never,
       buildMarketContextUseCase as never,
       fetchRecommendationQuotesUseCase as never,
+      catalogRepo as never,
     );
 
     await useCase.execute({

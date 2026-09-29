@@ -56,10 +56,15 @@ describe('GetMarketAnalysisUseCase', () => {
 
     const marketData = createMockMarketData();
 
+    const catalogRepo = {
+      findBySymbols: vi.fn().mockResolvedValue([]),
+    };
+
     const useCase = new GetMarketAnalysisUseCase(
       buildMarketContextUseCase as never,
       buildStockEnrichmentUseCase as never,
       marketData,
+      catalogRepo as never,
     );
     const report = await useCase.execute({
       userHoldings: [{ symbol: '005930', market: Market.KR }],

@@ -79,7 +79,7 @@ http://localhost:3000
 ```bash
 npm run test           # Vitest (see USECASES.md for count)
 npm run lint           # ESLint (flat config)
-npm run test:e2e       # Playwright smoke (17 scenarios)
+npm run test:e2e       # Playwright 35 scenarios (production-smoke 제외)
 npm run build          # 프로덕션 빌드
 ```
 
@@ -87,12 +87,11 @@ npm run build          # 프로덕션 빌드
 
 | 문서 | 내용 |
 |------|------|
-| [docs/PLAN.md](docs/PLAN.md) | 아키텍처·API·구현 상태 |
-| [docs/USECASES.md](docs/USECASES.md) | Use Case·테스트 매핑 |
-| [docs/investment-strategy.md](docs/investment-strategy.md) | 추천 엔진 · enrichment · ledger · 백테스트 |
+| [docs/PLAN.md](docs/PLAN.md) | 아키텍처·API·지수 정책·구현 상태 |
+| [docs/USECASES.md](docs/USECASES.md) | Use Case·테스트·E2E 매핑 |
+| [docs/AI_INTEGRATION_PLAN.md](docs/AI_INTEGRATION_PLAN.md) | AI Context/Insight Pack 설계 |
 | [docs/investor-profile.md](docs/investor-profile.md) | 투자 성향 프로필·ledger·추천·저장 정책 |
 | [docs/stock-catalog-import.md](docs/stock-catalog-import.md) | 종목 마스터 import |
-| [docs/market-index-policy.md](docs/market-index-policy.md) | 지수 역할 (정세=나스닥, 벤치=S&P 등) |
 
 ## 클린 아키텍처
 
