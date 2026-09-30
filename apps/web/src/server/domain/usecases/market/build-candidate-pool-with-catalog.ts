@@ -35,13 +35,30 @@ export async function buildCandidatePoolWithCatalog(
     catalogSymbols,
   });
 
-  return merged.map((c) => {
-    const cat = catalogByKey.get(`${c.market}:${c.symbol.toUpperCase()}`);
-    if (!cat) return c;
-    return {
-      ...c,
-      name: cat.name || c.name,
-      yahooSymbol: cat.yahooSymbol ?? c.yahooSymbol,
-    };
-  });
+  return merged.map((c) => enrichCandidateFromCatalog(c, catalogByKey));
+}
+
+function enrichCandidateFromCatalog(
+  c: ReturnType<typeof buildCandidatePool>[number],
+  catalogByKey: Map<string, { name: string; yahooSymbol?: string }>,
+) {
+  const cat = catalogByKey.get(`${c.market}:${c.symbol.toUpperCase()}`);
+  if (!cat) return c;
+  return {
+    ...c,
+    name: cat.name || c.name,
+    yahooSymbol: cat.yahooSymbol ?? c.yahooSymbol,
+  };
+}
+
+/** Pool rows → engine/catalogSymbols payload (simulation·ledger 공통) */
+export function catalogSymbolsFromCandidatePool(
+  pool: ReturnType<typeof buildCandidatePool>,
+) {
+  return pool.map((c) => ({
+    symbol: c.symbol,
+    market: c.market,
+    name: c.name,
+    yahooSymbol: c.yahooSymbol,
+  }));
 }

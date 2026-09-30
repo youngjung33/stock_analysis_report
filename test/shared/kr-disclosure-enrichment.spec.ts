@@ -16,7 +16,7 @@ function isoDayOffset(offset: number): string {
 }
 
 describe('kr-disclosure-enrichment (Phase L)', () => {
-  it('resolveKrCorpCode maps featured symbols', () => {
+  it('resolveKrCorpCode maps known KR symbols', () => {
     expect(resolveKrCorpCode('005930')).toBe('00126380');
     expect(resolveKrCorpCode('999999')).toBeNull();
   });

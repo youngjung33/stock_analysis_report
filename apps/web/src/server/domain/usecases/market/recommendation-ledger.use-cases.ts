@@ -4,7 +4,6 @@ import {
   Market,
   RECOMMENDATION_ENGINE_VERSION,
   RECOMMENDATION_OUTCOME_HORIZONS,
-  buildCandidatePool,
   buildGlobalBaselineRecommendations,
   computeReturnPercent,
   horizonReady,
@@ -18,6 +17,10 @@ import { IMarketDataProvider } from '../../ports/market-data.port';
 import { IStockCatalogRepository } from '../../repositories';
 import { IRecommendationLedgerRepository } from '../../../data/persistence/recommendation-ledger.repository';
 import type { RecommendationBatchEntity } from '../../entities/recommendation-ledger.entities';
+import {
+  buildCandidatePoolWithCatalog,
+  catalogSymbolsFromCandidatePool,
+} from './build-candidate-pool-with-catalog';
 import { BuildMarketContextUseCase } from './build-market-context.use-case';
 import { BuildStockEnrichmentUseCase } from './build-stock-enrichment.use-case';
 async function fetchBenchmarkPrices(
@@ -83,21 +86,8 @@ export class RunGlobalRecommendationBatchUseCase {
 
     const marketContext = await this.buildMarketContextUseCase.execute();
 
-    const pool = buildCandidatePool({});
-    const krSymbols = pool.filter((c) => c.market === Market.KR).map((c) => c.symbol);
-    const usSymbols = pool.filter((c) => c.market === Market.US).map((c) => c.symbol);
-    const [krCatalog, usCatalog] = await Promise.all([
-      this.catalogRepo.findBySymbols(krSymbols, Market.KR),
-      this.catalogRepo.findBySymbols(usSymbols, Market.US),
-    ]);
-    const catalogSymbols = [...krCatalog, ...usCatalog].map((c) => ({
-      symbol: c.symbol,
-      market: c.market,
-      name: c.name,
-      yahooSymbol: c.yahooSymbol,
-    }));
-
-    const poolWithCatalog = buildCandidatePool({ catalogSymbols });
+    const poolWithCatalog = await buildCandidatePoolWithCatalog(this.catalogRepo, {});
+    const catalogSymbols = catalogSymbolsFromCandidatePool(poolWithCatalog);
     const enrichmentTargets = poolWithCatalog.map((c) => ({
       symbol: c.symbol,
       name: c.name,

@@ -12,7 +12,10 @@ import {
   IWatchlistRepository,
 } from '../../repositories';
 import { GetDashboardUseCase } from '../portfolio/get-dashboard.use-case';
-import { buildCandidatePoolWithCatalog } from '../market/build-candidate-pool-with-catalog';
+import {
+  buildCandidatePoolWithCatalog,
+  catalogSymbolsFromCandidatePool,
+} from '../market/build-candidate-pool-with-catalog';
 import { BuildMarketContextUseCase } from '../market/build-market-context.use-case';
 import { BuildStockEnrichmentUseCase } from '../market/build-stock-enrichment.use-case';
 
@@ -133,14 +136,7 @@ export class GetPortfolioSimulationUseCase {
       userWatchlist,
     });
 
-    const catalogSymbols = poolWithCatalog
-      .filter((c) => c.yahooSymbol)
-      .map((c) => ({
-        symbol: c.symbol,
-        market: c.market,
-        name: c.name,
-        yahooSymbol: c.yahooSymbol,
-      }));
+    const catalogSymbols = catalogSymbolsFromCandidatePool(poolWithCatalog);
 
     const enrichmentTargets = poolWithCatalog.map((c) => ({
       symbol: c.symbol,

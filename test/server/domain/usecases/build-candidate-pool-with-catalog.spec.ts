@@ -23,4 +23,23 @@ describe('buildCandidatePoolWithCatalog', () => {
     expect(kakao?.yahooSymbol).toBe('035720.KS');
     expect(kakao?.name).toBe('Catalog Name');
   });
+
+  it('enriches sector leaders for empty personalization (global ledger batch)', async () => {
+    const catalogRepo = {
+      findBySymbols: vi.fn(async (symbols: string[]) =>
+        symbols.map((symbol) => ({
+          symbol,
+          market: Market.KR,
+          name: `Name ${symbol}`,
+          yahooSymbol: `${symbol}.KS`,
+        })),
+      ),
+    };
+
+    const pool = await buildCandidatePoolWithCatalog(catalogRepo as never, {});
+    expect(pool.length).toBeGreaterThan(0);
+    expect(catalogRepo.findBySymbols).toHaveBeenCalled();
+    const withYahoo = pool.filter((c) => c.yahooSymbol);
+    expect(withYahoo.length).toBeGreaterThan(0);
+  });
 });

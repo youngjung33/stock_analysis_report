@@ -195,7 +195,7 @@ Use Case 상세: [USECASES.md](USECASES.md)
 | 종목 가격 해설 지수 대비 | KOSPI | S&P 500 `^GSPC` |
 | 포트폴리오 혼합 벤치·추천 ledger 벤치 | KOSPI | S&P 500 |
 
-후보 종목 pool: 섹터 리더 + (로그인/게스트) 보유·관심 + **StockCatalog** merge — `sentiment-summary`, `market/analysis`, simulation, cron ledger.
+후보 종목 pool: 섹터 리더 + (로그인/게스트) 보유·관심 + **StockCatalog** merge — `buildCandidatePoolWithCatalog`로 `sentiment-summary`, `market/analysis`, simulation, **cron ledger** 공통.
 
 ---
 
@@ -269,7 +269,7 @@ npm run test:e2e              # Playwright (선택)
 | 10 | Rate limit + 보안 헤더 | ✅ |
 | 11 | Toast · 에러 마스킹 | ✅ |
 | 12 | 계정 설정·탈퇴·비밀번호 재설정 | ✅ |
-| 13 | Vitest **730 tests** (shared 261 + web 469, 148 files) | ✅ |
+| 13 | Vitest **731 tests** (shared 261 + web 470, 148 files) | ✅ |
 | 14 | Playwright E2E (**35** default / **38** with production-smoke) | ✅ |
 | 15 | Sentry·structured log (골격) | ✅ |
 | 16 | 투자 성향 프로필 · ledger · simulation tag 추천 | ✅ |
@@ -294,7 +294,7 @@ npm run test:e2e              # Playwright (선택)
 - 4종 테스트 → ledger → 가중 composite → adjustment → 10유형 + `preferredTags`
 - **비회원**: 프로필 `sessionStorage` / **회원**: `PortfolioPreference.investorProfile`
 - **`buildStockRecommendations`**: VIX·환율·섹터 RS·한·미 레짐 + **enrichment (G–N+)** KR/US 분리 스코oring
-- 후보 풀: 섹터 리더 + 관심종목 + 보유 + Catalog (`findBySymbols`, cap 20/시장)
+- 후보 풀: 섹터 리더 + 관심종목 + 보유 + Catalog — `buildCandidatePoolWithCatalog` (cap 20/시장)
 - 시뮬레이션: enrichment-aware rank (K), `globalRiskOff` deploy 15% cap
 - API: `recommendation-context` · `recommendation-history` · simulation `regimes`·`recommendations`
 

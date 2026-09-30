@@ -91,7 +91,7 @@ test/
 ```
 
 ```bash
-npm run test         # @sar/shared (261) → @sar/web (469) Vitest
+npm run test         # @sar/shared (261) → @sar/web (470) Vitest
 npm run test -w @sar/shared   # shared only (test/shared/)
 npm run test:e2e     # Playwright 35 scenarios (production-smoke 제외)
 npm run test:e2e:all # Playwright 38 scenarios (production-smoke 포함)

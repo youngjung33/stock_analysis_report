@@ -17,7 +17,7 @@ export function lookupCandidatePoolName(
   for (const entry of candidatePool) {
     if (!entry || typeof entry !== 'object') continue;
     const e = entry as CandidatePoolEntry;
-    if (e.market === market && String(e.symbol).toUpperCase() === upper && e.name) {
+    if (e.market === market && String(e.symbol).toUpperCase() === upper) {
       return e.name;
     }
   }
