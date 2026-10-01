@@ -149,8 +149,13 @@ export class ApiMarketRepository implements IMarketRepository {
   async getMarketSentimentSummary(options?: {
     userHoldings?: Array<{ symbol: string; market: Market; name?: string }>;
     userWatchlist?: Array<{ symbol: string; market: Market; name?: string }>;
+    investorProfile?: import('@sar/shared').StoredInvestorProfile | null;
   }) {
-    if (options?.userHoldings?.length || options?.userWatchlist?.length) {
+    if (
+      options?.userHoldings?.length ||
+      options?.userWatchlist?.length ||
+      options?.investorProfile !== undefined
+    ) {
       const { data } = await apiClient.post<MarketSentimentSummaryResult>(
         '/market/sentiment-summary',
         options,
@@ -176,8 +181,13 @@ export class ApiMarketRepository implements IMarketRepository {
   async getMarketAnalysis(options?: {
     userHoldings?: Array<{ symbol: string; market: Market }>;
     userWatchlist?: Array<{ symbol: string; market: Market }>;
+    investorProfile?: import('@sar/shared').StoredInvestorProfile | null;
   }) {
-    if (options?.userHoldings?.length || options?.userWatchlist?.length) {
+    if (
+      options?.userHoldings?.length ||
+      options?.userWatchlist?.length ||
+      options?.investorProfile !== undefined
+    ) {
       const { data } = await apiClient.post<import('@sar/shared').MarketAnalysisReport>(
         '/market/analysis',
         options,

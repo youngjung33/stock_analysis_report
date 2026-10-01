@@ -291,6 +291,9 @@ export {
 } from './market-personalization-scope';
 export type { MarketPersonalizationScope } from './market-personalization-scope';
 export {
+  catalogDisplayNameKey,
+  collectSymbolsNeedingCatalogNames,
+  itemNeedsCatalogDisplayName,
   lookupCandidatePoolName,
   mapRecommendationBatchToView,
   mapRecommendationItemToView,
@@ -304,6 +307,7 @@ export {
   buildMarketContext,
   detectMarketRegimes,
   buildCandidatePool,
+  buildInvestorProfilePoolSymbols,
   scoreCandidates,
   scoreKrCandidate,
   scoreUsCandidate,

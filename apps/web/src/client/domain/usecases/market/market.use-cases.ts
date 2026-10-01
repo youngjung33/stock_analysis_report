@@ -19,6 +19,7 @@ export class GetMarketSentimentSummaryUseCase {
   execute(options?: {
     userHoldings?: Array<{ symbol: string; market: import('@sar/shared').Market; name?: string }>;
     userWatchlist?: Array<{ symbol: string; market: import('@sar/shared').Market; name?: string }>;
+    investorProfile?: import('@sar/shared').StoredInvestorProfile | null;
   }) {
     return this.marketRepo.getMarketSentimentSummary(options);
   }
@@ -52,6 +53,7 @@ export class GetMarketAnalysisUseCase {
   execute(options?: {
     userHoldings?: Array<{ symbol: string; market: import('@sar/shared').Market }>;
     userWatchlist?: Array<{ symbol: string; market: import('@sar/shared').Market }>;
+    investorProfile?: import('@sar/shared').StoredInvestorProfile | null;
   }) {
     return this.marketRepo.getMarketAnalysis(options);
   }

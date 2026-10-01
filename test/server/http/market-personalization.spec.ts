@@ -25,6 +25,15 @@ describe('resolveMarketPersonalization', () => {
       listWatchlistUseCase: {
         execute: vi.fn().mockResolvedValue([{ id: 'w1', symbol: 'AAPL', market: Market.US, name: 'Apple' }]),
       },
+      getPortfolioPreferencesUseCase: {
+        execute: vi.fn().mockResolvedValue({
+          userId: authUser.userId,
+          targetKrPercent: 70,
+          targetUsPercent: 30,
+          maxSingleWeightPercent: 40,
+          investorProfile: null,
+        }),
+      },
     } as never);
   });
 

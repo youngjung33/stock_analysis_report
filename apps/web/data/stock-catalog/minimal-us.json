@@ -1,0 +1,17 @@
+[
+  {"symbol":"AAPL","name":"Apple Inc.","market":"US","board":"NASDAQ","yahooSymbol":"AAPL"},
+  {"symbol":"MSFT","name":"Microsoft Corporation","market":"US","board":"NASDAQ","yahooSymbol":"MSFT"},
+  {"symbol":"NVDA","name":"NVIDIA Corporation","market":"US","board":"NASDAQ","yahooSymbol":"NVDA"},
+  {"symbol":"GOOGL","name":"Alphabet Inc.","market":"US","board":"NASDAQ","yahooSymbol":"GOOGL"},
+  {"symbol":"AMZN","name":"Amazon.com Inc.","market":"US","board":"NASDAQ","yahooSymbol":"AMZN"},
+  {"symbol":"META","name":"Meta Platforms Inc.","market":"US","board":"NASDAQ","yahooSymbol":"META"},
+  {"symbol":"AMD","name":"Advanced Micro Devices Inc.","market":"US","board":"NASDAQ","yahooSymbol":"AMD"},
+  {"symbol":"AVGO","name":"Broadcom Inc.","market":"US","board":"NASDAQ","yahooSymbol":"AVGO"},
+  {"symbol":"JPM","name":"JPMorgan Chase & Co.","market":"US","board":"NYSE","yahooSymbol":"JPM"},
+  {"symbol":"BAC","name":"Bank of America Corp.","market":"US","board":"NYSE","yahooSymbol":"BAC"},
+  {"symbol":"V","name":"Visa Inc.","market":"US","board":"NYSE","yahooSymbol":"V"},
+  {"symbol":"XOM","name":"Exxon Mobil Corporation","market":"US","board":"NYSE","yahooSymbol":"XOM"},
+  {"symbol":"CVX","name":"Chevron Corporation","market":"US","board":"NYSE","yahooSymbol":"CVX"},
+  {"symbol":"UNH","name":"UnitedHealth Group Inc.","market":"US","board":"NYSE","yahooSymbol":"UNH"},
+  {"symbol":"JNJ","name":"Johnson & Johnson","market":"US","board":"NYSE","yahooSymbol":"JNJ"}
+]

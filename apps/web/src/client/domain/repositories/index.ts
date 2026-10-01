@@ -80,12 +80,14 @@ export interface IMarketRepository {
   getMarketSentimentSummary(options?: {
     userHoldings?: Array<{ symbol: string; market: Market; name?: string }>;
     userWatchlist?: Array<{ symbol: string; market: Market; name?: string }>;
+    investorProfile?: import('@sar/shared').StoredInvestorProfile | null;
   }): Promise<MarketSentimentSummaryResult>;
   getStockQuote(symbol: string, market: Market, range: QuoteChartRange): Promise<StockQuoteSnapshot>;
   getMarketStatus(): Promise<MarketProviderStatus[]>;
   getMarketAnalysis(options?: {
     userHoldings?: Array<{ symbol: string; market: Market }>;
     userWatchlist?: Array<{ symbol: string; market: Market }>;
+    investorProfile?: import('@sar/shared').StoredInvestorProfile | null;
   }): Promise<MarketAnalysisReport>;
   getStockAnalysis(input: {
     symbol: string;

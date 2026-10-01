@@ -93,7 +93,9 @@ describe('market API rate limit', () => {
     const res = await postSentimentSummary(req);
     expect(res.status).toBe(200);
     expect(sentimentSummaryExecute).toHaveBeenCalledWith({
+      userHoldings: undefined,
       userWatchlist: [{ symbol: 'AAPL', market: 'US' }],
+      investorProfile: null,
     });
   });
 

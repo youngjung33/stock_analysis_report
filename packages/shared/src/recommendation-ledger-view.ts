@@ -1,4 +1,4 @@
-import type { Market } from './enums';
+import { Market } from './enums';
 import type {
   RecommendationBatchView,
   RecommendationItemView,
@@ -6,6 +6,10 @@ import type {
 } from './recommendation-ledger';
 
 type CandidatePoolEntry = { symbol: string; market: Market; name?: string };
+
+export function catalogDisplayNameKey(market: Market, symbol: string): string {
+  return `${market}:${symbol.toUpperCase()}`;
+}
 
 export function lookupCandidatePoolName(
   candidatePool: unknown,
@@ -22,6 +26,31 @@ export function lookupCandidatePoolName(
     }
   }
   return undefined;
+}
+
+/** 과거 배치: candidatePool 스냅샷에 name이 없을 때만 catalog 조회 필요 */
+export function itemNeedsCatalogDisplayName(
+  item: { symbol: string; market: Market },
+  candidatePool: unknown,
+): boolean {
+  const poolName = lookupCandidatePoolName(candidatePool, item.symbol, item.market);
+  return !poolName || poolName === item.symbol;
+}
+
+export function collectSymbolsNeedingCatalogNames(
+  batches: RecommendationBatchEntityLike[],
+): { kr: string[]; us: string[] } {
+  const kr = new Set<string>();
+  const us = new Set<string>();
+  for (const batch of batches) {
+    const pool = batch.candidatePool ?? null;
+    for (const item of batch.items ?? []) {
+      if (!itemNeedsCatalogDisplayName(item, pool)) continue;
+      if (item.market === Market.KR) kr.add(item.symbol);
+      else us.add(item.symbol);
+    }
+  }
+  return { kr: [...kr], us: [...us] };
 }
 
 export interface RecommendationItemEntityLike {
@@ -68,8 +97,14 @@ function toOutcomeView(o: NonNullable<RecommendationItemEntityLike['outcomes']>[
 export function mapRecommendationItemToView(
   item: RecommendationItemEntityLike,
   candidatePool: unknown,
+  catalogNames?: ReadonlyMap<string, string>,
 ): RecommendationItemView {
-  const name = lookupCandidatePoolName(candidatePool, item.symbol, item.market) ?? item.symbol;
+  const poolName = lookupCandidatePoolName(candidatePool, item.symbol, item.market);
+  const catalogName = catalogNames?.get(catalogDisplayNameKey(item.market, item.symbol));
+  const name =
+    poolName && poolName !== item.symbol
+      ? poolName
+      : catalogName ?? poolName ?? item.symbol;
   return {
     id: item.id,
     rank: item.rank,
@@ -84,7 +119,10 @@ export function mapRecommendationItemToView(
   };
 }
 
-export function mapRecommendationBatchToView(batch: RecommendationBatchEntityLike): RecommendationBatchView {
+export function mapRecommendationBatchToView(
+  batch: RecommendationBatchEntityLike,
+  catalogNames?: ReadonlyMap<string, string>,
+): RecommendationBatchView {
   const candidatePool = batch.candidatePool ?? null;
   return {
     id: batch.id,
@@ -93,6 +131,8 @@ export function mapRecommendationBatchToView(batch: RecommendationBatchEntityLik
     engineVersion: batch.engineVersion,
     profileKey: batch.profileKey,
     regimes: batch.regimes,
-    items: (batch.items ?? []).map((item) => mapRecommendationItemToView(item, candidatePool)),
+    items: (batch.items ?? []).map((item) =>
+      mapRecommendationItemToView(item, candidatePool, catalogNames),
+    ),
   };
 }

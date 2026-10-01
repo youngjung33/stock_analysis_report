@@ -49,8 +49,10 @@ Thumbs.db
 # Turbo (monorepo)
 .turbo/
 
-# 종목 마스터 (fetch:stocks 로 생성 — git에 올리지 않음)
-apps/web/data/stock-catalog/
+# 종목 마스터 (fetch:stocks 산출물 — minimal 시드만 커밋)
+apps/web/data/stock-catalog/*
+!apps/web/data/stock-catalog/minimal-kr.json
+!apps/web/data/stock-catalog/minimal-us.json
 
 # @sar/shared — src에 잘못 떨어진 tsc 산출물
 packages/shared/src/*.js

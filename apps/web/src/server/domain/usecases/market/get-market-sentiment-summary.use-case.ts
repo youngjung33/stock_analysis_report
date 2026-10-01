@@ -3,6 +3,7 @@ import {
   buildMarketInsights,
   Market,
   type MarketInsightsResult,
+  type StoredInvestorProfile,
 } from '@sar/shared';
 import { MarketSentimentSummaryResult } from '../../entities';
 import { IStockCatalogRepository } from '../../repositories';
@@ -23,6 +24,7 @@ export class GetMarketSentimentSummaryUseCase {
   async execute(options?: {
     userHoldings?: Array<{ symbol: string; market: Market; name?: string }>;
     userWatchlist?: Array<{ symbol: string; market: Market; name?: string }>;
+    investorProfile?: StoredInvestorProfile | null;
   }): Promise<MarketSentimentSummaryResult> {
     const [indicesResult, marketContext] = await Promise.all([
       this.getMarketIndicesUseCase.execute(),
@@ -32,6 +34,7 @@ export class GetMarketSentimentSummaryUseCase {
     const pool = await buildCandidatePoolWithCatalog(this.catalogRepo, {
       userHoldings: options?.userHoldings,
       userWatchlist: options?.userWatchlist,
+      investorProfile: options?.investorProfile,
     });
     const quoteTargets = pool.map((c) => ({
       symbol: c.symbol,

@@ -5,23 +5,47 @@ import type { CandidateStockInput } from './types';
 
 export const MAX_CANDIDATES_PER_MARKET = 20;
 
+type CandidateSource = NonNullable<CandidateStockInput['source']>;
+
+const SOURCE_PRIORITY: Record<CandidateSource, number> = {
+  holding: 0,
+  watchlist: 1,
+  profile: 2,
+  catalog: 3,
+  sector: 4,
+};
+
 function symbolKey(symbol: string, market: Market): string {
   return `${market}:${symbol.toUpperCase()}`;
 }
 
-function addCandidate(
-  map: Map<string, CandidateStockInput>,
-  input: CandidateStockInput,
-): void {
+function sourcePriority(source: CandidateStockInput['source']): number {
+  return SOURCE_PRIORITY[source ?? 'sector'];
+}
+
+function addCandidate(map: Map<string, CandidateStockInput>, input: CandidateStockInput): void {
   const key = symbolKey(input.symbol, input.market);
-  if (!map.has(key)) {
+  const existing = map.get(key);
+  if (!existing) {
+    map.set(key, input);
+    return;
+  }
+  if (sourcePriority(input.source) < sourcePriority(existing.source)) {
     map.set(key, input);
   }
+}
+
+function takeTopByMarket(candidates: CandidateStockInput[], market: Market): CandidateStockInput[] {
+  return [...candidates]
+    .filter((c) => c.market === market)
+    .sort((a, b) => sourcePriority(a.source) - sourcePriority(b.source))
+    .slice(0, MAX_CANDIDATES_PER_MARKET);
 }
 
 export function buildCandidatePool(input: {
   userHoldings?: Array<{ symbol: string; market: Market; name?: string }>;
   userWatchlist?: Array<{ symbol: string; market: Market; name?: string }>;
+  profileSymbols?: Array<{ symbol: string; market: Market; name?: string }>;
   catalogSymbols?: Array<{ symbol: string; market: Market; name: string; yahooSymbol?: string }>;
 }): CandidateStockInput[] {
   const map = new Map<string, CandidateStockInput>();
@@ -39,6 +63,16 @@ export function buildCandidatePool(input: {
         });
       }
     }
+  }
+
+  for (const p of input.profileSymbols ?? []) {
+    addCandidate(map, {
+      symbol: p.symbol,
+      name: p.name ?? p.symbol,
+      market: p.market,
+      currency: resolveCurrency(p.market),
+      source: 'profile',
+    });
   }
 
   for (const w of input.userWatchlist ?? []) {
@@ -72,8 +106,9 @@ export function buildCandidatePool(input: {
     });
   }
 
-  const kr = [...map.values()].filter((c) => c.market === Market.KR).slice(0, MAX_CANDIDATES_PER_MARKET);
-  const us = [...map.values()].filter((c) => c.market === Market.US).slice(0, MAX_CANDIDATES_PER_MARKET);
+  const all = [...map.values()];
+  const kr = takeTopByMarket(all, Market.KR);
+  const us = takeTopByMarket(all, Market.US);
   return [...kr, ...us];
 }
 

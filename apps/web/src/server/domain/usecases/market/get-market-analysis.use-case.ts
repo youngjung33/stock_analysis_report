@@ -3,6 +3,7 @@ import {
   MarketAnalysisReport,
   NewsAnalysisInput,
   buildMarketAnalysisReport,
+  type StoredInvestorProfile,
 } from '@sar/shared';
 import { IStockCatalogRepository } from '../../repositories';
 import { buildCandidatePoolWithCatalog } from './build-candidate-pool-with-catalog';
@@ -23,6 +24,7 @@ export class GetMarketAnalysisUseCase {
   async execute(options?: {
     userHoldings?: Array<{ symbol: string; market: Market; name?: string }>;
     userWatchlist?: Array<{ symbol: string; market: Market; name?: string }>;
+    investorProfile?: StoredInvestorProfile | null;
   }): Promise<MarketAnalysisReport> {
     const [marketContext, krNews, usNewsGoogle, finnhubNews] = await Promise.all([
       this.buildMarketContextUseCase.execute(),
@@ -34,6 +36,7 @@ export class GetMarketAnalysisUseCase {
     const pool = await buildCandidatePoolWithCatalog(this.catalogRepo, {
       userHoldings: options?.userHoldings,
       userWatchlist: options?.userWatchlist,
+      investorProfile: options?.investorProfile,
     });
 
     const enrichmentTargets = pool.map((c) => ({

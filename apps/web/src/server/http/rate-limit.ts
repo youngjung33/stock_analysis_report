@@ -115,8 +115,11 @@ export async function enforceRateLimit(
   }
 
   if (process.env.NODE_ENV === 'production') {
+    console.error(
+      '[rate-limit] UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN are required in production (multi-instance).',
+    );
     throw new HttpError(
-      resolveAppErrorMessage(AppErrorCode.INTERNAL),
+      'Rate limiting backend is not configured. Set Upstash Redis env vars for production.',
       503,
       AppErrorCode.INTERNAL,
     );

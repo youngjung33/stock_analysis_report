@@ -195,7 +195,11 @@ Use Case 상세: [USECASES.md](USECASES.md)
 | 종목 가격 해설 지수 대비 | KOSPI | S&P 500 `^GSPC` |
 | 포트폴리오 혼합 벤치·추천 ledger 벤치 | KOSPI | S&P 500 |
 
-후보 종목 pool: 섹터 리더 + (로그인/게스트) 보유·관심 + **StockCatalog** merge — `buildCandidatePoolWithCatalog`로 `sentiment-summary`, `market/analysis`, simulation, **cron ledger** 공통.
+후보 종목 pool: 섹터 리더 + **투자 성향(preferredTags·레벨)** + (로그인/게스트) 보유·관심 + **StockCatalog** merge — `buildCandidatePoolWithCatalog`로 `sentiment-summary`, `market/analysis`, simulation, **cron ledger** 공통. cap 20/시장은 holding → watchlist → profile → catalog → sector 우선순위.
+
+Production **rate limit**: Vercel 등 멀티 인스턴스에서는 `UPSTASH_REDIS_REST_*` 필수(미설정 시 503). 로컬·test는 in-memory fallback.
+
+종목 JSON: `fetch:stocks` 전량은 gitignore, `data/stock-catalog/minimal-*.json` 시드만 커밋 — `npm run db:import-stocks` 기본 경로에 포함.
 
 ---
 

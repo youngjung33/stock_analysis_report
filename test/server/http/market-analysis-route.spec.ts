@@ -50,6 +50,15 @@ function mockServices(overrides: Record<string, unknown> = {}) {
   const listWatchlistUseCase = {
     execute: vi.fn().mockResolvedValue([{ id: 'wl-1', symbol: 'AAPL', market: Market.US, name: 'Apple' }]),
   };
+  const getPortfolioPreferencesUseCase = {
+    execute: vi.fn().mockResolvedValue({
+      userId: authUser.userId,
+      targetKrPercent: 70,
+      targetUsPercent: 30,
+      maxSingleWeightPercent: 40,
+      investorProfile: null,
+    }),
+  };
 
   vi.mocked(getServerServices).mockReturnValue({
     tokenService: {
@@ -58,6 +67,7 @@ function mockServices(overrides: Record<string, unknown> = {}) {
     getMarketAnalysisUseCase,
     getDashboardUseCase,
     listWatchlistUseCase,
+    getPortfolioPreferencesUseCase,
     ...overrides,
   } as never);
 
@@ -84,6 +94,7 @@ describe('market analysis route personalization', () => {
     expect(getMarketAnalysisUseCase.execute).toHaveBeenCalledWith({
       userHoldings: [{ symbol: '005930', market: Market.KR, name: '삼성전자' }],
       userWatchlist: [{ symbol: 'AAPL', market: Market.US, name: 'Apple' }],
+      investorProfile: null,
     });
   });
 
@@ -125,6 +136,7 @@ describe('market analysis route personalization', () => {
     expect(getMarketAnalysisUseCase.execute).toHaveBeenCalledWith({
       userHoldings: [{ symbol: '035720', market: Market.KR }],
       userWatchlist: [{ symbol: 'TSLA', market: Market.US }],
+      investorProfile: null,
     });
   });
 
@@ -148,6 +160,7 @@ describe('market analysis route personalization', () => {
     expect(getMarketAnalysisUseCase.execute).toHaveBeenCalledWith({
       userHoldings: [{ symbol: '005930', market: Market.KR, name: '삼성전자' }],
       userWatchlist: [{ symbol: 'AAPL', market: Market.US, name: 'Apple' }],
+      investorProfile: null,
     });
   });
 });

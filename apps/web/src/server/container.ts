@@ -338,8 +338,14 @@ export function getServerServices(): ServerServices {
       recommendationLedgerRepo,
       marketData,
     ),
-    listRecommendationHistoryUseCase: new ListRecommendationHistoryUseCase(recommendationLedgerRepo),
-    getRecommendationBatchUseCase: new GetRecommendationBatchUseCase(recommendationLedgerRepo),
+    listRecommendationHistoryUseCase: new ListRecommendationHistoryUseCase(
+      recommendationLedgerRepo,
+      catalogRepo,
+    ),
+    getRecommendationBatchUseCase: new GetRecommendationBatchUseCase(
+      recommendationLedgerRepo,
+      catalogRepo,
+    ),
     buildStockAiContextUseCase: new BuildStockAiContextUseCase(
       buildStockAnalysisReportUseCase,
       buildMarketContextUseCase,

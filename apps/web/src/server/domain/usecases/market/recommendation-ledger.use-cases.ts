@@ -8,6 +8,8 @@ import {
   computeReturnPercent,
   horizonReady,
   kstTradingDate,
+  catalogDisplayNameKey,
+  collectSymbolsNeedingCatalogNames,
   mapRecommendationBatchToView,
   type RecommendationBatchMacroSnapshot,
   type RecommendationOutcomeHorizon,
@@ -261,25 +263,52 @@ export class EvaluateRecommendationOutcomesUseCase {
   }
 }
 
+async function loadCatalogDisplayNames(
+  catalogRepo: IStockCatalogRepository,
+  batches: RecommendationBatchEntity[],
+): Promise<Map<string, string>> {
+  const { kr, us } = collectSymbolsNeedingCatalogNames(batches);
+  if (kr.length === 0 && us.length === 0) return new Map();
+
+  const [krRows, usRows] = await Promise.all([
+    kr.length > 0 ? catalogRepo.findBySymbols(kr, Market.KR) : Promise.resolve([]),
+    us.length > 0 ? catalogRepo.findBySymbols(us, Market.US) : Promise.resolve([]),
+  ]);
+
+  const map = new Map<string, string>();
+  for (const row of [...krRows, ...usRows]) {
+    map.set(catalogDisplayNameKey(row.market, row.symbol), row.name);
+  }
+  return map;
+}
+
 export class ListRecommendationHistoryUseCase {
-  constructor(private readonly ledgerRepo: IRecommendationLedgerRepository) {}
+  constructor(
+    private readonly ledgerRepo: IRecommendationLedgerRepository,
+    private readonly catalogRepo: IStockCatalogRepository,
+  ) {}
 
   async execute(input?: { limit?: number; profileKey?: string }) {
     const batches = await this.ledgerRepo.listBatches({
       limit: input?.limit ?? 30,
       profileKey: input?.profileKey ?? GLOBAL_RECOMMENDATION_PROFILE_KEY,
     });
-    return batches.map((batch) => mapRecommendationBatchToView(batch));
+    const catalogNames = await loadCatalogDisplayNames(this.catalogRepo, batches);
+    return batches.map((batch) => mapRecommendationBatchToView(batch, catalogNames));
   }
 }
 
 export class GetRecommendationBatchUseCase {
-  constructor(private readonly ledgerRepo: IRecommendationLedgerRepository) {}
+  constructor(
+    private readonly ledgerRepo: IRecommendationLedgerRepository,
+    private readonly catalogRepo: IStockCatalogRepository,
+  ) {}
 
   async execute(batchId: string) {
     const batch = await this.ledgerRepo.findById(batchId);
     if (!batch) return null;
-    return mapRecommendationBatchToView(batch);
+    const catalogNames = await loadCatalogDisplayNames(this.catalogRepo, [batch]);
+    return mapRecommendationBatchToView(batch, catalogNames);
   }
 }
 

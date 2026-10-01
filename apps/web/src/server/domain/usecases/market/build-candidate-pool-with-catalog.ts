@@ -1,15 +1,28 @@
-import { Market, buildCandidatePool } from '@sar/shared';
+import {
+  Market,
+  buildCandidatePool,
+  buildInvestorProfilePoolSymbols,
+  type StoredInvestorProfile,
+} from '@sar/shared';
 import { IStockCatalogRepository } from '../../repositories';
 
-/** Sector + holdings/watchlist pool with StockCatalog yahooSymbol·name merge (simulation·ledger 동일 패턴) */
+/** Sector + holdings/watchlist + 투자 성향 + StockCatalog yahooSymbol·name merge */
 export async function buildCandidatePoolWithCatalog(
   catalogRepo: IStockCatalogRepository,
   input: {
     userHoldings?: Array<{ symbol: string; market: Market; name?: string }>;
     userWatchlist?: Array<{ symbol: string; market: Market; name?: string }>;
+    investorProfile?: StoredInvestorProfile | null;
   },
 ) {
-  const pool = buildCandidatePool(input);
+  const profileSymbols =
+    input.investorProfile != null ? buildInvestorProfilePoolSymbols(input.investorProfile) : [];
+
+  const pool = buildCandidatePool({
+    userHoldings: input.userHoldings,
+    userWatchlist: input.userWatchlist,
+    profileSymbols,
+  });
   const krSymbols = pool.filter((c) => c.market === Market.KR).map((c) => c.symbol);
   const usSymbols = pool.filter((c) => c.market === Market.US).map((c) => c.symbol);
 
@@ -32,6 +45,7 @@ export async function buildCandidatePoolWithCatalog(
   const merged = buildCandidatePool({
     userHoldings: input.userHoldings,
     userWatchlist: input.userWatchlist,
+    profileSymbols,
     catalogSymbols,
   });
 

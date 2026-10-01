@@ -28,6 +28,8 @@ function parseArgs(): { files: string[] } {
       path.join(STOCK_CATALOG_DIR, 'all-stocks.json'),
       path.join(STOCK_CATALOG_DIR, 'kr-stocks.json'),
       path.join(STOCK_CATALOG_DIR, 'us-stocks.json'),
+      path.join(STOCK_CATALOG_DIR, 'minimal-kr.json'),
+      path.join(STOCK_CATALOG_DIR, 'minimal-us.json'),
     ],
   };
 }
