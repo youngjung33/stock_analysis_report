@@ -3,7 +3,7 @@ import { GetMarketSentimentSummaryUseCase } from '@server/domain/usecases/market
 import { vi } from 'vitest';
 
 describe('GetMarketSentimentSummaryUseCase', () => {
-  it('returns indices and insights with sector candidate quotes', async () => {
+  it('returns indices and insights when pool has quote targets', async () => {
     const getMarketIndicesUseCase = {
       execute: vi.fn().mockResolvedValue({
         indices: [
@@ -71,7 +71,12 @@ describe('GetMarketSentimentSummaryUseCase', () => {
       catalogRepo as never,
     );
 
-    const result = await useCase.execute();
+    const result = await useCase.execute({
+      userWatchlist: [
+        { symbol: '005930', market: Market.KR, name: '삼성전자' },
+        { symbol: 'AAPL', market: Market.US, name: 'Apple' },
+      ],
+    });
 
     expect(result.indices).toHaveLength(2);
     expect(result.insights.kr.label).toBeTruthy();

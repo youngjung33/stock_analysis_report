@@ -24,7 +24,7 @@ describe('buildCandidatePoolWithCatalog', () => {
     expect(kakao?.name).toBe('Catalog Name');
   });
 
-  it('enriches sector leaders for empty personalization (global ledger batch)', async () => {
+  it('seeds guest baseline and merges catalog for empty personalization', async () => {
     const catalogRepo = {
       findBySymbols: vi.fn(async (symbols: string[]) =>
         symbols.map((symbol) => ({
@@ -39,7 +39,7 @@ describe('buildCandidatePoolWithCatalog', () => {
     const pool = await buildCandidatePoolWithCatalog(catalogRepo as never, {});
     expect(pool.length).toBeGreaterThan(0);
     expect(catalogRepo.findBySymbols).toHaveBeenCalled();
-    const withYahoo = pool.filter((c) => c.yahooSymbol);
-    expect(withYahoo.length).toBeGreaterThan(0);
+    const samsung = pool.find((c) => c.symbol === '005930' && c.market === Market.KR);
+    expect(samsung?.yahooSymbol).toBe('005930.KS');
   });
 });

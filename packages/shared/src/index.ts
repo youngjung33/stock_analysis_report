@@ -307,7 +307,6 @@ export {
   buildMarketContext,
   detectMarketRegimes,
   buildCandidatePool,
-  buildInvestorProfilePoolSymbols,
   scoreCandidates,
   scoreKrCandidate,
   scoreUsCandidate,

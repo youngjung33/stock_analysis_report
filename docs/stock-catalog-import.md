@@ -1,6 +1,6 @@
 # 종목 마스터 (StockCatalog) 임포트
 
-종목 검색용 데이터는 **fetch 산출물은 git에 넣지 않고**, 로컬에서 받아 Supabase에 넣습니다. 섹터 리더·E2E용 **minimal 시드**(`minimal-kr.json`, `minimal-us.json`)만 커밋됩니다.
+종목 검색용 데이터는 **fetch 산출물은 git에 넣지 않고**, 로컬에서 받아 Supabase에 넣습니다. 개발·import용 **minimal 시드**(`minimal-kr.json`, `minimal-us.json`)만 커밋됩니다.
 
 - `apps/web/data/stock-catalog/` — fetch 산출물 (gitignore, minimal 시드 예외)
 - `apps/web/prisma/` — schema·migration·seed (gitignore, 로컬/Supabase 전용)

@@ -2,7 +2,6 @@ export * from './types';
 export * from './regime';
 export * from './sector-tags';
 export * from './candidate-pool';
-export * from './investor-profile-pool';
 export * from './scoring';
 export * from './technical-enrichment';
 export * from './news-enrichment';

@@ -58,7 +58,7 @@ export interface CandidateStockInput {
   market: Market;
   currency: string;
   yahooSymbol?: string;
-  source?: 'watchlist' | 'holding' | 'sector' | 'catalog' | 'profile';
+  source?: 'watchlist' | 'holding' | 'catalog' | 'baseline';
 }
 
 export interface MarketContextInput {

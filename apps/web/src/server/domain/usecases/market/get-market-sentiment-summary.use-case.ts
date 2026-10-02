@@ -1,6 +1,8 @@
 import {
   applyIndexRegionSentiment,
+  buildInvestorProfile,
   buildMarketInsights,
+  createDefaultStoredProfile,
   Market,
   type MarketInsightsResult,
   type StoredInvestorProfile,
@@ -34,7 +36,6 @@ export class GetMarketSentimentSummaryUseCase {
     const pool = await buildCandidatePoolWithCatalog(this.catalogRepo, {
       userHoldings: options?.userHoldings,
       userWatchlist: options?.userWatchlist,
-      investorProfile: options?.investorProfile,
     });
     const quoteTargets = pool.map((c) => ({
       symbol: c.symbol,
@@ -49,6 +50,10 @@ export class GetMarketSentimentSummaryUseCase {
         ? await this.fetchRecommendationQuotesUseCase.execute(quoteTargets)
         : [];
 
+    const investorProfile = buildInvestorProfile(
+      options?.investorProfile ?? createDefaultStoredProfile(),
+    );
+
     const base = buildMarketInsights(marketContext.indices, 4, {
       macro: marketContext.macro,
       sectors: marketContext.sectors,
@@ -56,6 +61,10 @@ export class GetMarketSentimentSummaryUseCase {
       candidateQuotes,
       usdKrwRate: marketContext.usdKrwRate,
       usdKrwChange1d: marketContext.usdKrwChange1d,
+      userHoldings: options?.userHoldings,
+      userWatchlist: options?.userWatchlist,
+      investorProfile,
+      preferredTags: investorProfile.preferredTags,
     });
 
     const insights: MarketInsightsResult = applyIndexRegionSentiment(

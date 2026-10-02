@@ -5,10 +5,7 @@ import {
 import { buildStockRecommendations } from './market-recommendation/engine';
 import type { MarketContextInput, StockRecommendationsResult } from './market-recommendation/types';
 
-/**
- * Global baseline — sector-leader candidates + default profile, no user context.
- * Used for Phase Q ledger and engine validation.
- */
+/** Global baseline — pre-fetched candidateQuotes + default profile (no user holdings). */
 export function buildGlobalBaselineRecommendations(input: {
   candidateQuotes?: MarketContextInput['candidateQuotes'];
   marketContext: Omit<

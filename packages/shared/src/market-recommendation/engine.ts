@@ -2,7 +2,7 @@ import { Market } from '../enums';
 import { buildInvestorProfile, createDefaultStoredProfile } from '../investor-survey/profile';
 import { resolveRegionSentimentsFromIndices } from '../market-sentiment';
 import { buildMacroSnapshot } from '../market-macro';
-import { buildCandidatePool, mergeQuotesIntoCandidates } from './candidate-pool';
+import { mergeQuotesIntoCandidates, resolveRecommendationCandidatePool } from './candidate-pool';
 import { buildMarketContext } from './regime';
 import { scoreCandidates } from './scoring';
 import type { MarketContextInput, StockRecommendationsResult } from './types';
@@ -35,11 +35,7 @@ export function buildStockRecommendations(
     figureStatements: input.figureStatements,
   });
 
-  const pool = buildCandidatePool({
-    userHoldings: input.userHoldings,
-    userWatchlist: input.userWatchlist,
-    catalogSymbols: input.catalogSymbols,
-  });
+  const pool = resolveRecommendationCandidatePool(input);
 
   const allQuotes = mergeQuotesIntoCandidates(pool, input.candidateQuotes ?? []);
 

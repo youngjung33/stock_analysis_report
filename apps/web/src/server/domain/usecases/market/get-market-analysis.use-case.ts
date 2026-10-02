@@ -36,7 +36,6 @@ export class GetMarketAnalysisUseCase {
     const pool = await buildCandidatePoolWithCatalog(this.catalogRepo, {
       userHoldings: options?.userHoldings,
       userWatchlist: options?.userWatchlist,
-      investorProfile: options?.investorProfile,
     });
 
     const enrichmentTargets = pool.map((c) => ({

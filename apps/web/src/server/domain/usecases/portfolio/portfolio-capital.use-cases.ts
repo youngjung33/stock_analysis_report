@@ -134,7 +134,6 @@ export class GetPortfolioSimulationUseCase {
     const poolWithCatalog = await buildCandidatePoolWithCatalog(this.catalogRepo, {
       userHoldings,
       userWatchlist,
-      investorProfile: snapshot.preferences.investorProfile ?? null,
     });
 
     const catalogSymbols = catalogSymbolsFromCandidatePool(poolWithCatalog);

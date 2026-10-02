@@ -8,7 +8,7 @@ import {
 describe('recommendation-ledger-view', () => {
   it('lookupCandidatePoolName resolves display name', () => {
     const pool = [
-      { symbol: '005930', market: Market.KR, name: '삼성전자', source: 'sector' },
+      { symbol: '005930', market: Market.KR, name: '삼성전자', source: 'holding' },
     ];
     expect(lookupCandidatePoolName(pool, '005930', Market.KR)).toBe('삼성전자');
     expect(lookupCandidatePoolName(pool, 'AAPL', Market.US)).toBeUndefined();
