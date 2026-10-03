@@ -1,7 +1,15 @@
 import { Market, buildCandidatePool } from '@sar/shared';
 import { IStockCatalogRepository } from '../../repositories';
+import { resolveGuestBaselineSymbols } from './resolve-guest-baseline';
 
-/** Holdings/watchlist pool with StockCatalog yahooSymbol·name merge */
+function hasHoldingsOrWatchlist(input: {
+  userHoldings?: Array<{ symbol: string; market: Market }>;
+  userWatchlist?: Array<{ symbol: string; market: Market }>;
+}): boolean {
+  return (input.userHoldings?.length ?? 0) > 0 || (input.userWatchlist?.length ?? 0) > 0;
+}
+
+/** Holdings/watchlist pool + catalog merge; 비회원은 시총 상위 baseline */
 export async function buildCandidatePoolWithCatalog(
   catalogRepo: IStockCatalogRepository,
   input: {
@@ -9,9 +17,14 @@ export async function buildCandidatePoolWithCatalog(
     userWatchlist?: Array<{ symbol: string; market: Market; name?: string }>;
   },
 ) {
+  const baselineSymbols = hasHoldingsOrWatchlist(input)
+    ? undefined
+    : await resolveGuestBaselineSymbols(catalogRepo);
+
   const pool = buildCandidatePool({
     userHoldings: input.userHoldings,
     userWatchlist: input.userWatchlist,
+    baselineSymbols,
   });
   const krSymbols = pool.filter((c) => c.market === Market.KR).map((c) => c.symbol);
   const usSymbols = pool.filter((c) => c.market === Market.US).map((c) => c.symbol);
@@ -36,6 +49,7 @@ export async function buildCandidatePoolWithCatalog(
     userHoldings: input.userHoldings,
     userWatchlist: input.userWatchlist,
     catalogSymbols,
+    baselineSymbols,
   });
 
   return merged.map((c) => enrichCandidateFromCatalog(c, catalogByKey));

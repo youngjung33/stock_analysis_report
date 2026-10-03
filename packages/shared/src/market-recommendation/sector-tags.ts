@@ -33,8 +33,8 @@ export function getStockSectorTags(symbol: string, market: Market): StockSectorT
   return STOCK_SECTOR_TAGS[symbol.toUpperCase()]?.[market] ?? [];
 }
 
-/** 보유·관심이 없을 때만 pool에 넣는 대표 종목 (비회원·글로벌 ledger·빈 포트) */
-export const GUEST_BASELINE_CANDIDATE_SYMBOLS: Record<Market, readonly string[]> = {
+/** Catalog 시총 데이터 없을 때만 쓰는 fallback (비회원 baseline) */
+export const GUEST_BASELINE_FALLBACK_SYMBOLS: Record<Market, readonly string[]> = {
   [Market.KR]: [
     '005930',
     '000660',

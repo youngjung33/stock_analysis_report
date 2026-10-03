@@ -1,6 +1,6 @@
 import { Market } from '../enums';
 import { resolveCurrency } from '../stock-symbol';
-import { GUEST_BASELINE_CANDIDATE_SYMBOLS } from './sector-tags';
+import { GUEST_BASELINE_FALLBACK_SYMBOLS } from './sector-tags';
 import type { CandidateStockInput, MarketContextInput } from './types';
 
 export const MAX_CANDIDATES_PER_MARKET = 20;
@@ -48,8 +48,24 @@ function hasHoldingsOrWatchlist(input: {
   return (input.userHoldings?.length ?? 0) > 0 || (input.userWatchlist?.length ?? 0) > 0;
 }
 
-function seedGuestBaselineCandidates(map: Map<string, CandidateStockInput>): void {
-  for (const [marketKey, symbols] of Object.entries(GUEST_BASELINE_CANDIDATE_SYMBOLS)) {
+function seedGuestBaselineCandidates(
+  map: Map<string, CandidateStockInput>,
+  rows: Array<{ symbol: string; market: Market; name?: string; yahooSymbol?: string }>,
+): void {
+  for (const row of rows) {
+    addCandidate(map, {
+      symbol: row.symbol,
+      name: row.name ?? row.symbol,
+      market: row.market,
+      currency: resolveCurrency(row.market),
+      yahooSymbol: row.yahooSymbol,
+      source: 'baseline',
+    });
+  }
+}
+
+function seedGuestBaselineFallback(map: Map<string, CandidateStockInput>): void {
+  for (const [marketKey, symbols] of Object.entries(GUEST_BASELINE_FALLBACK_SYMBOLS)) {
     const market = marketKey as Market;
     for (const symbol of symbols) {
       addCandidate(map, {
@@ -63,11 +79,12 @@ function seedGuestBaselineCandidates(map: Map<string, CandidateStockInput>): voi
   }
 }
 
-/** 보유·관심·catalog; 보유·관심 없으면 대표 baseline (비회원·cron) */
+/** 보유·관심·catalog; 보유·관심 없으면 baselineSymbols 또는 static fallback */
 export function buildCandidatePool(input: {
   userHoldings?: Array<{ symbol: string; market: Market; name?: string }>;
   userWatchlist?: Array<{ symbol: string; market: Market; name?: string }>;
   catalogSymbols?: Array<{ symbol: string; market: Market; name: string; yahooSymbol?: string }>;
+  baselineSymbols?: Array<{ symbol: string; market: Market; name?: string; yahooSymbol?: string }>;
 }): CandidateStockInput[] {
   const map = new Map<string, CandidateStockInput>();
 
@@ -103,7 +120,11 @@ export function buildCandidatePool(input: {
   }
 
   if (!hasHoldingsOrWatchlist(input)) {
-    seedGuestBaselineCandidates(map);
+    if (input.baselineSymbols?.length) {
+      seedGuestBaselineCandidates(map, input.baselineSymbols);
+    } else {
+      seedGuestBaselineFallback(map);
+    }
   }
 
   const all = [...map.values()];

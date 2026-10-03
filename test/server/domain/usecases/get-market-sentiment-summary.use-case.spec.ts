@@ -62,6 +62,7 @@ describe('GetMarketSentimentSummaryUseCase', () => {
 
     const catalogRepo = {
       findBySymbols: vi.fn().mockResolvedValue([]),
+      listTopByMarketCap: vi.fn().mockResolvedValue([]),
     };
 
     const useCase = new GetMarketSentimentSummaryUseCase(
@@ -110,6 +111,7 @@ describe('GetMarketSentimentSummaryUseCase', () => {
 
     const catalogRepo = {
       findBySymbols: vi.fn().mockResolvedValue([]),
+      listTopByMarketCap: vi.fn().mockResolvedValue([]),
     };
 
     const useCase = new GetMarketSentimentSummaryUseCase(

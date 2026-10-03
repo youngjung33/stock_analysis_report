@@ -307,6 +307,8 @@ export {
   buildMarketContext,
   detectMarketRegimes,
   buildCandidatePool,
+  MAX_CANDIDATES_PER_MARKET,
+  GUEST_BASELINE_FALLBACK_SYMBOLS,
   scoreCandidates,
   scoreKrCandidate,
   scoreUsCandidate,

@@ -5,6 +5,7 @@ import { buildCandidatePoolWithCatalog } from '@server/domain/usecases/market/bu
 describe('buildCandidatePoolWithCatalog', () => {
   it('merges catalog yahooSymbol for watchlist symbols', async () => {
     const catalogRepo = {
+      listTopByMarketCap: vi.fn(async () => []),
       findBySymbols: vi.fn(async (symbols: string[], market: Market) =>
         symbols.map((symbol) => ({
           symbol,
@@ -26,6 +27,7 @@ describe('buildCandidatePoolWithCatalog', () => {
 
   it('seeds guest baseline and merges catalog for empty personalization', async () => {
     const catalogRepo = {
+      listTopByMarketCap: vi.fn(async () => []),
       findBySymbols: vi.fn(async (symbols: string[]) =>
         symbols.map((symbol) => ({
           symbol,

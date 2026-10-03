@@ -73,6 +73,10 @@ async function upsertBatch(entries: StockCatalogEntry[]): Promise<void> {
         entry.dartCorpCode ??
         (entry.market === Market.KR ? KR_CORP_CODE_FALLBACK[entry.symbol] : undefined) ??
         null;
+      const marketCap =
+        entry.marketCap != null && Number.isFinite(entry.marketCap)
+          ? BigInt(Math.trunc(entry.marketCap))
+          : null;
       return prisma.stockCatalog.upsert({
         where: {
           symbol_market: { symbol: entry.symbol, market: entry.market },
@@ -84,6 +88,7 @@ async function upsertBatch(entries: StockCatalogEntry[]): Promise<void> {
           board: entry.board,
           yahooSymbol: entry.yahooSymbol,
           dartCorpCode,
+          marketCap,
           isActive: true,
           syncedAt: now,
         },
@@ -92,6 +97,7 @@ async function upsertBatch(entries: StockCatalogEntry[]): Promise<void> {
           board: entry.board,
           yahooSymbol: entry.yahooSymbol,
           dartCorpCode,
+          marketCap,
           isActive: true,
           syncedAt: now,
         },

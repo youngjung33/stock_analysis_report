@@ -19,7 +19,8 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "fetch:stocks": "tsx scripts/fetch-stocks.ts",
-    "db:import-stocks": "tsx scripts/import-stocks.ts"
+    "db:import-stocks": "tsx scripts/import-stocks.ts",
+    "refresh:catalog-market-cap": "tsx scripts/refresh-catalog-market-cap.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",

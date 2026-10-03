@@ -150,11 +150,13 @@ model StockCatalog {
   board       String
   yahooSymbol String
   dartCorpCode String?
+  marketCap   BigInt?
   isActive    Boolean  @default(true)
   syncedAt    DateTime @default(now())
 
   @@unique([symbol, market])
   @@index([market, isActive])
+  @@index([market, marketCap(sort: Desc)])
 }
 
 model CorporateAction {

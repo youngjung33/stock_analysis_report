@@ -195,7 +195,7 @@ Use Case 상세: [USECASES.md](USECASES.md)
 | 종목 가격 해설 지수 대비 | KOSPI | S&P 500 `^GSPC` |
 | 포트폴리오 혼합 벤치·추천 ledger 벤치 | KOSPI | S&P 500 |
 
-후보 종목 pool: **보유·관심** + **StockCatalog** merge — `buildCandidatePoolWithCatalog`. 보유·관심이 **없으면** `GUEST_BASELINE_CANDIDATE_SYMBOLS` 대표 종목(비회원·빈 포트·cron). cap 20/시장, holding → watchlist → catalog → baseline. **투자 성향**은 `preferredTags` 스코어링. `STOCK_SECTOR_TAGS`는 스코어·해설 보조만.
+후보 종목 pool: **보유·관심** + **StockCatalog** merge — `buildCandidatePoolWithCatalog`. 보유·관심 **없으면** Catalog **시총 상위**(`listTopByMarketCap`, `npm run refresh:catalog-market-cap`) + `GUEST_BASELINE_FALLBACK_SYMBOLS`. cap 20/시장. **투자 성향** → `preferredTags` (sentiment·analysis). `STOCK_SECTOR_TAGS`는 스코어·해설만.
 
 Production **rate limit**: Vercel 등 멀티 인스턴스에서는 `UPSTASH_REDIS_REST_*` 필수(미설정 시 503). 로컬·test는 in-memory fallback.
 
@@ -273,7 +273,7 @@ npm run test:e2e              # Playwright (선택)
 | 10 | Rate limit + 보안 헤더 | ✅ |
 | 11 | Toast · 에러 마스킹 | ✅ |
 | 12 | 계정 설정·탈퇴·비밀번호 재설정 | ✅ |
-| 13 | Vitest **731 tests** (shared 261 + web 470, 148 files) | ✅ |
+| 13 | Vitest **737+ tests** (shared + web, `npm run test`) | ✅ |
 | 14 | Playwright E2E (**35** default / **38** with production-smoke) | ✅ |
 | 15 | Sentry·structured log (골격) | ✅ |
 | 16 | 투자 성향 프로필 · ledger · simulation tag 추천 | ✅ |

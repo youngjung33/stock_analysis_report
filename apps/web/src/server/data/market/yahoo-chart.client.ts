@@ -18,6 +18,7 @@ interface YahooChartResult {
   meta?: {
     regularMarketPrice?: number;
     chartPreviousClose?: number;
+    marketCap?: number;
   };
   timestamp?: number[];
   indicators?: {
@@ -228,4 +229,18 @@ export async function fetchYahooChartSeries(
   }
 
   return series;
+}
+
+/** Yahoo chart meta.marketCap (import·baseline 시총 갱신용) */
+export async function fetchYahooMarketCap(yahooSymbol: string): Promise<number | null> {
+  const url = `${YAHOO_CHART_BASE}/${encodeURIComponent(yahooSymbol)}?interval=1d&range=1d`;
+  const res = await fetch(url, {
+    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; StockAnalysisReport/1.0)' },
+  });
+  if (!res.ok) return null;
+
+  const data = (await res.json()) as YahooChartResponse;
+  const cap = data.chart?.result?.[0]?.meta?.marketCap;
+  if (cap == null || !Number.isFinite(cap) || cap <= 0) return null;
+  return Math.trunc(cap);
 }

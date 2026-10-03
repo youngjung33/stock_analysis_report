@@ -9,6 +9,8 @@ export interface StockCatalogEntry {
   yahooSymbol: string;
   /** DART Open API corp_code (8-digit) — Phase M */
   dartCorpCode?: string;
+  /** 시가총액 (정렬용 — KR: KRW, US: USD 권장) */
+  marketCap?: number | null;
 }
 
 const US_BOARD_BY_EXCHANGE: Record<string, string> = {

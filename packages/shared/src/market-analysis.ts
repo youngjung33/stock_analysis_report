@@ -992,6 +992,8 @@ export function buildMarketAnalysisReport(input: {
   fetchedAt?: string;
   userHoldings?: Array<{ symbol: string; market: Market }>;
   userWatchlist?: Array<{ symbol: string; market: Market }>;
+  investorProfile?: import('./investor-survey/profile').BuiltInvestorProfile | null;
+  preferredTags?: import('./market-sentiment').RecommendationTag[];
   technicalSnapshots?: import('./market-recommendation/technical-enrichment').StockTechnicalSnapshot[];
   newsSnapshots?: import('./market-recommendation/news-enrichment').StockNewsSnapshot[];
   eventSnapshots?: import('./market-recommendation/event-enrichment').StockEventSnapshot[];
@@ -1032,6 +1034,8 @@ export function buildMarketAnalysisReport(input: {
     usdKrwChange1d: fxMacro?.changePercent1d ?? null,
     userHoldings: input.userHoldings,
     userWatchlist: input.userWatchlist,
+    investorProfile: input.investorProfile,
+    preferredTags: input.preferredTags,
     technicalSnapshots: input.technicalSnapshots,
     newsSnapshots: input.newsSnapshots,
     eventSnapshots: input.eventSnapshots,

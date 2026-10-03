@@ -134,6 +134,11 @@ export interface IStockCatalogRepository {
   countByMarket(market: Market): Promise<number>;
   search(query: string, market: Market, limit?: number): Promise<import('@sar/shared').StockSearchResult[]>;
   findBySymbols(symbols: string[], market: Market): Promise<import('@sar/shared').StockSearchResult[]>;
+  /** 시총 상위 (marketCap NOT NULL) — guest baseline */
+  listTopByMarketCap(
+    market: Market,
+    limit: number,
+  ): Promise<import('@sar/shared').StockSearchResult[]>;
   /** Phase M — KR DART corp_code lookup by symbol */
   findDartCorpCodesBySymbols(symbols: string[]): Promise<Record<string, string>>;
 }

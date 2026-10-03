@@ -2,7 +2,9 @@ import {
   Market,
   MarketAnalysisReport,
   NewsAnalysisInput,
+  buildInvestorProfile,
   buildMarketAnalysisReport,
+  createDefaultStoredProfile,
   type StoredInvestorProfile,
 } from '@sar/shared';
 import { IStockCatalogRepository } from '../../repositories';
@@ -63,6 +65,10 @@ export class GetMarketAnalysisUseCase {
       ...finnhubNews.map((n) => ({ ...n, market: 'global' as const })),
     ];
 
+    const investorProfile = buildInvestorProfile(
+      options?.investorProfile ?? createDefaultStoredProfile(),
+    );
+
     return buildMarketAnalysisReport({
       indexInputs: marketContext.indexInputs,
       candidateQuotes,
@@ -72,6 +78,8 @@ export class GetMarketAnalysisUseCase {
       fetchedAt: new Date().toISOString(),
       userHoldings: options?.userHoldings,
       userWatchlist: options?.userWatchlist,
+      investorProfile,
+      preferredTags: investorProfile.preferredTags,
       technicalSnapshots,
       newsSnapshots,
       eventSnapshots,

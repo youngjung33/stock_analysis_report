@@ -1,11 +1,11 @@
 [
-  {"symbol":"005930","name":"삼성전자","market":"KR","board":"KOSPI","yahooSymbol":"005930.KS"},
-  {"symbol":"000660","name":"SK하이닉스","market":"KR","board":"KOSPI","yahooSymbol":"000660.KS"},
-  {"symbol":"035420","name":"NAVER","market":"KR","board":"KOSPI","yahooSymbol":"035420.KS"},
-  {"symbol":"035720","name":"카카오","market":"KR","board":"KOSPI","yahooSymbol":"035720.KS"},
-  {"symbol":"005380","name":"현대차","market":"KR","board":"KOSPI","yahooSymbol":"005380.KS"},
-  {"symbol":"051910","name":"LG화학","market":"KR","board":"KOSPI","yahooSymbol":"051910.KS"},
-  {"symbol":"055550","name":"신한지주","market":"KR","board":"KOSPI","yahooSymbol":"055550.KS"},
-  {"symbol":"105560","name":"KB금융","market":"KR","board":"KOSPI","yahooSymbol":"105560.KS"},
-  {"symbol":"000270","name":"기아","market":"KR","board":"KOSPI","yahooSymbol":"000270.KS"}
+  {"symbol":"005930","name":"삼성전자","market":"KR","board":"KOSPI","yahooSymbol":"005930.KS","marketCap":420000000000000},
+  {"symbol":"000660","name":"SK하이닉스","market":"KR","board":"KOSPI","yahooSymbol":"000660.KS","marketCap":180000000000000},
+  {"symbol":"035420","name":"NAVER","market":"KR","board":"KOSPI","yahooSymbol":"035420.KS","marketCap":35000000000000},
+  {"symbol":"035720","name":"카카오","market":"KR","board":"KOSPI","yahooSymbol":"035720.KS","marketCap":25000000000000},
+  {"symbol":"005380","name":"현대차","market":"KR","board":"KOSPI","yahooSymbol":"005380.KS","marketCap":45000000000000},
+  {"symbol":"051910","name":"LG화학","market":"KR","board":"KOSPI","yahooSymbol":"051910.KS","marketCap":40000000000000},
+  {"symbol":"055550","name":"신한지주","market":"KR","board":"KOSPI","yahooSymbol":"055550.KS","marketCap":22000000000000},
+  {"symbol":"105560","name":"KB금융","market":"KR","board":"KOSPI","yahooSymbol":"105560.KS","marketCap":28000000000000},
+  {"symbol":"000270","name":"기아","market":"KR","board":"KOSPI","yahooSymbol":"000270.KS","marketCap":38000000000000}
 ]

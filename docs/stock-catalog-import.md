@@ -29,6 +29,8 @@ npm run fetch:stocks
 
 스크립트: `apps/web/scripts/fetch-stocks.ts` (내부: `stock-catalog-fetch.ts`)
 
+시가총액(`marketCap`) — JSON에 넣거나 `npm run refresh:catalog-market-cap` (Yahoo meta). 비회원 추천 baseline은 DB 시총 상위를 사용합니다.
+
 ## 2. JSON 형식
 
 ```json

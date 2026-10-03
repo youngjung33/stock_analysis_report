@@ -58,6 +58,7 @@ describe('GetMarketAnalysisUseCase', () => {
 
     const catalogRepo = {
       findBySymbols: vi.fn().mockResolvedValue([]),
+      listTopByMarketCap: vi.fn().mockResolvedValue([]),
     };
 
     const useCase = new GetMarketAnalysisUseCase(

@@ -51,7 +51,10 @@ describe('GetPortfolioSimulationUseCase', () => {
     const cashRepo = { findByUser: vi.fn().mockResolvedValue([{ id: 'c1' }]) };
     const prefRepo = { findByUser: vi.fn().mockResolvedValue(null) };
     const watchlistRepo = { findByUser: vi.fn().mockResolvedValue([]) };
-    const catalogRepo = { findBySymbols: vi.fn().mockResolvedValue([]) };
+    const catalogRepo = {
+      findBySymbols: vi.fn().mockResolvedValue([]),
+      listTopByMarketCap: vi.fn().mockResolvedValue([]),
+    };
     const buildMarketContextUseCase = {
       execute: vi.fn().mockResolvedValue({
         macro: [],
