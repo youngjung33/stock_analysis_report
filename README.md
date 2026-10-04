@@ -53,12 +53,15 @@ npm run build -w @sar/shared
 ## DB
 
 ```bash
-npm run db:push      # 스키마 적용 (로컬)
-npm run db:migrate   # migration (프로덕션 권장)
+npm run db:push      # 스키마 적용 (로컬, migration 이력 없이)
+npm run db:migrate   # 로컬 migration 개발 (prisma migrate dev)
+npm run db:deploy    # 프로덕션·공유 DB (prisma migrate deploy)
 npm run db:seed      # 초기 데이터
+npm run db:import-stocks   # StockCatalog JSON → DB (minimal 시드 포함)
+npm run refresh:catalog-market-cap  # Yahoo meta로 시총 갱신 (비회원 baseline용)
 ```
 
-seed 계정 정보는 로컬 env에서 지정합니다.
+seed 계정 정보는 로컬 env에서 지정합니다. 종목 마스터·시총은 [docs/stock-catalog-import.md](docs/stock-catalog-import.md).
 
 ## 로컬 실행
 

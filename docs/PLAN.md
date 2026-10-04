@@ -31,8 +31,8 @@
 ```
 stock-analysis-report/
 ├── apps/web/                 # @sar/web — Next.js 풀스택 앱
-│   ├── prisma/               # schema, seed (gitignore — 로컬·배포 DB 전용)
-│   ├── data/stock-catalog/   # fetch:stocks 산출물 (gitignore)
+│   ├── prisma/               # schema, migrations, seed (버전 관리 — 배포 시 migrate deploy)
+│   ├── data/stock-catalog/   # fetch:stocks 산출물 (gitignore, minimal 시드 예외)
 │   ├── scripts/              # fetch-stocks, import-stocks
 │   └── src/
 │       ├── app/              # Next.js App Router + /api
@@ -298,7 +298,7 @@ npm run test:e2e              # Playwright (선택)
 - 4종 테스트 → ledger → 가중 composite → adjustment → 10유형 + `preferredTags`
 - **비회원**: 프로필 `sessionStorage` / **회원**: `PortfolioPreference.investorProfile`
 - **`buildStockRecommendations`**: VIX·환율·섹터 RS·한·미 레짐 + **enrichment (G–N+)** KR/US 분리 스코oring
-- 후보 풀: 보유 + 관심 + Catalog — `buildCandidatePoolWithCatalog` (cap 20/시장)
+- 후보 풀: 보유 + 관심 + Catalog — `buildCandidatePoolWithCatalog` (cap 20/시장; 비회원·빈 포트는 시총 baseline)
 - 시뮬레이션: enrichment-aware rank (K), `globalRiskOff` deploy 15% cap
 - API: `recommendation-context` · `recommendation-history` · simulation `regimes`·`recommendations`
 
