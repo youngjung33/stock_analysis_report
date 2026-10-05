@@ -310,6 +310,6 @@ npm run test:e2e              # Playwright (선택)
 
 - `middleware.ts` — locale cookie + **protected route session** (refreshToken 또는 guest cookie)
 - Account API·E2E 테스트 보강 (회원 E2E env)
-- logger ↔ route-error ↔ Sentry 연동
+- Sentry: `logError` → `captureMessage` when `SENTRY_DSN` set (`route-error` 경유); 필요 시 SDK init·`captureException` 보강
 
 종목 마스터: [stock-catalog-import.md](stock-catalog-import.md)

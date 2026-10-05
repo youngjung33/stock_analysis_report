@@ -80,8 +80,9 @@ http://localhost:3000
 ## 테스트
 
 ```bash
-npm run test           # Vitest (see USECASES.md for count)
+npm run test           # Vitest 739 (shared 265 + web 474) — USECASES.md
 npm run lint           # ESLint (flat config)
+npx playwright install # E2E 최초 1회 (브라우저 바이너리)
 npm run test:e2e       # Playwright 35 scenarios (production-smoke 제외)
 npm run build          # 프로덕션 빌드
 ```

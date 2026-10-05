@@ -18,7 +18,8 @@
     "db:push": "npm run db:push -w @sar/web",
     "db:seed": "npm run db:seed -w @sar/web",
     "fetch:stocks": "npm run fetch:stocks -w @sar/web",
-    "db:import-stocks": "npm run db:import-stocks -w @sar/web"
+    "db:import-stocks": "npm run db:import-stocks -w @sar/web",
+    "refresh:catalog-market-cap": "npm run refresh:catalog-market-cap -w @sar/web"
   },
   "devDependencies": {
     "brace-expansion": "5.0.9",

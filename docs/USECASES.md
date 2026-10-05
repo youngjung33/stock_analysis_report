@@ -91,7 +91,7 @@ test/
 ```
 
 ```bash
-npm run test         # @sar/shared (261) → @sar/web (470) Vitest
+npm run test         # @sar/shared (265) → @sar/web (474) Vitest — 합계 739
 npm run test -w @sar/shared   # shared only (test/shared/)
 npm run test:e2e     # Playwright 35 scenarios (production-smoke 제외)
 npm run test:e2e:all # Playwright 38 scenarios (production-smoke 포함)
@@ -179,7 +179,7 @@ npm run test:e2e:all # Playwright 38 scenarios (production-smoke 포함)
 | Watchlist use cases | `/api/watchlist` | domain + `portfolio-api-routes.spec.ts` |
 | Corporate action use cases | `/api/corporate-actions` | `corporate-actions.use-cases.spec.ts` |
 
-HTTP route 전용 spec **15개** + `remaining-api-routes.spec.ts`(22 route) + `api-route-registry.spec.ts`(**48** route 매핑 검증).
+HTTP route 관련 spec **15개** (`route-utils`·`route-error`·`rate-limit` 포함) + `remaining-api-routes.spec.ts`(**30** tests, 기타 route smoke) + `api-route-registry.spec.ts`(**48** `route.ts` ↔ spec 매핑).
 
 Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 
@@ -243,7 +243,7 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | Verify email | `verify-email-route.spec.ts` | 링크 인증 redirect |
 | Route error | `route-error.spec.ts` | DB 에러 마스킹 |
 | Rate limit helper | `rate-limit.spec.ts` | Upstash limiter |
-| Remaining routes | `remaining-api-routes.spec.ts` | auth/account/market 등 22 route |
+| Remaining routes | `remaining-api-routes.spec.ts` | auth/account/market 등 **30** route smoke tests |
 | Route registry | `api-route-registry.spec.ts` | 48 route ↔ spec 매핑 |
 | Middleware | `middleware.spec.ts` (web) | protected route redirect |
 
@@ -263,6 +263,8 @@ Mock: `test/server/mocks/repositories.mock.ts`, `account.mock.ts`
 | **합계** | **38** | `test:e2e` 기본은 production-smoke **제외 35** |
 
 회원 시나리오: `E2E_USERNAME` / `E2E_PASSWORD` + `DATABASE_URL` (member `beforeEach`에서 거래·현금 원장 reset)
+
+로컬 최초 E2E: `npx playwright install` (`apps/web` 또는 repo root에서 실행).
 
 ---
 
