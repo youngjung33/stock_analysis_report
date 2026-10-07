@@ -3,7 +3,6 @@ import {
   TransactionType,
   type QuoteFailureReasonCode,
   type QuoteSetupHintCode,
-  type QuoteUnavailableReasonCode,
 } from '@sar/shared';
 
 export interface UserEntity {

@@ -11,12 +11,12 @@ export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   try {
+    await enforceRateLimit(req, 'api:ai-stock', 'apiHeavy');
+    const user = requireAiMemberAuth(req);
+
     if (!isAiEnabled()) {
       return jsonData({ enabled: false });
     }
-
-    await enforceRateLimit(req, 'api:ai-stock', 'apiHeavy');
-    const user = requireAiMemberAuth(req);
 
     const body = (await req.json().catch(() => ({}))) as {
       symbol?: string;

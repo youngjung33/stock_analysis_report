@@ -432,7 +432,7 @@ export function buildMarketMoveReasonInsights(input: {
       primary: krPrimary,
       sectors: input.sectors,
       macro: input.macro,
-      usPrimary,
+      usPrimary: usPrimary ?? null,
       news: input.news,
       direction,
     });

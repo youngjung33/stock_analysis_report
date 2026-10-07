@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { usePathname } from 'next/navigation';
 import type { SupportedLocale } from '@sar/shared';
-import i18n, { getAppLocale, syncLocaleFromCookie } from './config';
+import i18n, { getAppLocale, syncI18nLocale, syncLocaleFromCookie } from './config';
 import { pathnameToSeoRoute } from './seo-routes';
 import { syncDocumentSeo } from './sync-document-seo';
 
@@ -20,12 +20,13 @@ function syncSeoForCurrentRoute(): void {
 }
 
 /** Syncs html lang, locale storage/cookie, and document SEO on mount + language change */
-export function I18nProvider({ children, initialLocale: _initialLocale }: Props) {
+export function I18nProvider({ children, initialLocale }: Props) {
   const pathname = usePathname();
 
   useLayoutEffect(() => {
+    syncI18nLocale(initialLocale);
     syncLocaleFromCookie();
-  }, []);
+  }, [initialLocale]);
 
   useEffect(() => {
     syncSeoForCurrentRoute();

@@ -1028,7 +1028,6 @@ export function buildMarketAnalysisReport(input: {
   const base = buildMarketInsights(indexCtx, 6, {
     macro,
     sectors,
-    indices: indexCtx,
     candidateQuotes: input.candidateQuotes,
     usdKrwRate: fxMacro?.value ?? null,
     usdKrwChange1d: fxMacro?.changePercent1d ?? null,

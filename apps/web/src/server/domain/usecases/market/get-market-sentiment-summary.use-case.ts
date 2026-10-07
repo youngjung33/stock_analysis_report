@@ -57,7 +57,6 @@ export class GetMarketSentimentSummaryUseCase {
     const base = buildMarketInsights(marketContext.indices, 4, {
       macro: marketContext.macro,
       sectors: marketContext.sectors,
-      indices: marketContext.indices,
       candidateQuotes,
       usdKrwRate: marketContext.usdKrwRate,
       usdKrwChange1d: marketContext.usdKrwChange1d,

@@ -11,12 +11,12 @@ export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   try {
+    await enforceRateLimit(req, 'api:ai-portfolio', 'apiHeavy');
+    const user = requireAiMemberAuth(req);
+
     if (!isAiEnabled()) {
       return jsonData({ enabled: false });
     }
-
-    await enforceRateLimit(req, 'api:ai-portfolio', 'apiHeavy');
-    const user = requireAiMemberAuth(req);
 
     const body = (await req.json().catch(() => ({}))) as { locale?: string };
     const locale = normalizeLocale(body.locale ?? req.headers.get('accept-language') ?? 'ko');
