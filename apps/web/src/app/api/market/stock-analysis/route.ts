@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
-import { Market } from '@sar/shared';
+import { AppErrorCode, Market } from '@sar/shared';
 import { getServerServices } from '@/server/container';
+import { ValidationError } from '@/server/domain/errors/domain.errors';
 import { enforceRateLimit } from '@/server/http/rate-limit';
 import { handleRouteError, jsonData, tryGetAuth } from '@/server/http/route-utils';
 
