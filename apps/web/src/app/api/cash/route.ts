@@ -2,23 +2,21 @@ import { NextRequest } from 'next/server';
 import { AppErrorCode, CashLedgerType } from '@sar/shared';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
+import { jsonData, requireAuth, runApiRoute } from '@/server/http/route-utils';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:cash-read', 'apiRead');
     const user = requireAuth(req);
     const { getCashSummaryUseCase } = getServerServices();
     const summary = await getCashSummaryUseCase.execute(user.userId);
     return jsonData(summary);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }
 
 export async function POST(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:cash-write', 'apiWrite');
     const user = requireAuth(req);
     const body = (await req.json()) as {
@@ -42,7 +40,5 @@ export async function POST(req: NextRequest) {
     });
 
     return jsonData(entry);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }

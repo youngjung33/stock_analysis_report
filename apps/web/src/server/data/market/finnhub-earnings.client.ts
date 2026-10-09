@@ -1,3 +1,4 @@
+import { outboundFetch } from '@/server/http/outbound-fetch';
 import { MarketDataConfig } from './market-data.config';
 
 const FINNHUB_BASE = 'https://finnhub.io/api/v1';
@@ -37,7 +38,7 @@ export async function fetchFinnhubEarningsCalendar(
   if (!apiKey) return [];
 
   const url = `${FINNHUB_BASE}/calendar/earnings?symbol=${encodeURIComponent(symbol)}&from=${fmt(from)}&to=${fmt(to)}&token=${apiKey}`;
-  const res = await fetch(url, { next: { revalidate: 3600 } });
+  const res = await outboundFetch(url, { next: { revalidate: 3600 } });
   if (!res.ok) return [];
 
   const data = (await res.json()) as { earningsCalendar?: FinnhubEarningsRow[] };
@@ -50,7 +51,7 @@ export async function fetchFinnhubStockEarnings(symbol: string): Promise<Finnhub
   if (!apiKey) return [];
 
   const url = `${FINNHUB_BASE}/stock/earnings?symbol=${encodeURIComponent(symbol)}&token=${apiKey}`;
-  const res = await fetch(url, { next: { revalidate: 3600 } });
+  const res = await outboundFetch(url, { next: { revalidate: 3600 } });
   if (!res.ok) return [];
 
   return (await res.json()) as FinnhubHistoricalEarning[];

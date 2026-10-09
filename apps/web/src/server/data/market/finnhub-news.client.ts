@@ -1,3 +1,4 @@
+import { outboundFetch } from '@/server/http/outbound-fetch';
 import { MarketDataConfig } from './market-data.config';
 
 const FINNHUB_NEWS_URL = 'https://finnhub.io/api/v1/news';
@@ -22,7 +23,7 @@ export async function fetchFinnhubMarketNews(
   if (!apiKey) return [];
 
   const url = `${FINNHUB_NEWS_URL}?category=${category}&token=${apiKey}`;
-  const res = await fetch(url, { next: { revalidate: 300 } });
+  const res = await outboundFetch(url, { next: { revalidate: 300 } });
 
   if (!res.ok) {
     throw new Error(`Finnhub news API error: ${res.status}`);
@@ -45,7 +46,7 @@ export async function fetchFinnhubCompanyNews(
   const fmt = (d: Date) => d.toISOString().slice(0, 10);
 
   const url = `${FINNHUB_NEWS_URL.replace('/news', '/company-news')}?symbol=${encodeURIComponent(symbol)}&from=${fmt(from)}&to=${fmt(to)}&token=${apiKey}`;
-  const res = await fetch(url, { next: { revalidate: 300 } });
+  const res = await outboundFetch(url, { next: { revalidate: 300 } });
 
   if (!res.ok) return [];
 

@@ -3,14 +3,14 @@ import { normalizeLocale } from '@sar/shared';
 import { isAiEnabled } from '@/server/data/ai/ai-config';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import { handleRouteError, jsonData } from '@/server/http/route-utils';
+import { jsonData, runApiRoute } from '@/server/http/route-utils';
 import { requireAiMemberAuth } from '@/server/http/ai-auth';
 import { runAiAnalysisResponse } from '@/server/http/ai-route-helpers';
 
 export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:ai-portfolio', 'apiHeavy');
     const user = requireAiMemberAuth(req);
 
@@ -31,7 +31,5 @@ export async function POST(req: NextRequest) {
       context,
       locale,
     });
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  }, { maxDurationSec: 60 });
 }

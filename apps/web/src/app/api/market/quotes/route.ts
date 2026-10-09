@@ -3,12 +3,12 @@ import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import { handleRouteError, jsonData } from '@/server/http/route-utils';
+import { jsonData, runApiRoute } from '@/server/http/route-utils';
 
 export const maxDuration = 10;
 
 export async function POST(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'market:quotes', 'standard');
     const body = (await req.json()) as {
       stocks?: { stockId?: string; symbol?: string; market?: Market }[];
@@ -29,7 +29,5 @@ export async function POST(req: NextRequest) {
     const { fetchQuotesUseCase } = getServerServices();
     const result = await fetchQuotesUseCase.execute(stocks);
     return jsonData(result);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  }, { maxDurationSec: 10 });
 }

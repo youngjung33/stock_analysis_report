@@ -3,15 +3,10 @@ import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import {
-  handleRouteError,
-  jsonData,
-  setAccessCookie,
-  setRefreshCookie,
-} from '@/server/http/route-utils';
+import { jsonData, setAccessCookie, setRefreshCookie, runApiRoute } from '@/server/http/route-utils';
 
 export async function POST(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'auth:login', 'authLogin');
     const body = (await req.json()) as { username?: string; password?: string };
     if (!body.username || !body.password) {
@@ -28,7 +23,5 @@ export async function POST(req: NextRequest) {
     setAccessCookie(res, result.accessToken);
     setRefreshCookie(res, result.refreshToken);
     return res;
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }

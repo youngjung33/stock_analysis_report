@@ -2,10 +2,10 @@ import { AppSuccessCode, apiSuccessBody } from '@sar/shared';
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
+import { jsonData, requireAuth, runApiRoute } from '@/server/http/route-utils';
 
 export async function POST(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'auth:verify-email-request', 'authRegister');
     const user = requireAuth(req);
     const { requestEmailVerificationUseCase } = getServerServices();
@@ -18,7 +18,5 @@ export async function POST(req: NextRequest) {
         verificationCode: result.verificationCode,
       }),
     );
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }

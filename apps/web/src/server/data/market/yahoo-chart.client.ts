@@ -1,4 +1,5 @@
 import { QuoteChartRange, dailyChangePercentFromCloses } from '@sar/shared';
+import { outboundFetch } from '@/server/http/outbound-fetch';
 
 export interface StockPricePoint {
   timestamp: string;
@@ -110,7 +111,7 @@ export async function fetchYahooChartQuote(
 ): Promise<YahooChartQuote> {
   const { yahooRange, interval, lookbackBars } = getYahooFetchParams(range);
   const url = `${YAHOO_CHART_BASE}/${encodeURIComponent(symbol)}?interval=${interval}&range=${yahooRange}`;
-  const res = await fetch(url, {
+  const res = await outboundFetch(url, {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; StockAnalysisReport/1.0)' },
   });
 
@@ -209,7 +210,7 @@ export async function fetchYahooChartSeries(
   interval = '1d',
 ): Promise<YahooChartSeries> {
   const url = `${YAHOO_CHART_BASE}/${encodeURIComponent(symbol)}?interval=${interval}&range=${yahooRange}`;
-  const res = await fetch(url, {
+  const res = await outboundFetch(url, {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; StockAnalysisReport/1.0)' },
   });
 
@@ -234,7 +235,7 @@ export async function fetchYahooChartSeries(
 /** Yahoo chart meta.marketCap (import·baseline 시총 갱신용) */
 export async function fetchYahooMarketCap(yahooSymbol: string): Promise<number | null> {
   const url = `${YAHOO_CHART_BASE}/${encodeURIComponent(yahooSymbol)}?interval=1d&range=1d`;
-  const res = await fetch(url, {
+  const res = await outboundFetch(url, {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; StockAnalysisReport/1.0)' },
   });
   if (!res.ok) return null;

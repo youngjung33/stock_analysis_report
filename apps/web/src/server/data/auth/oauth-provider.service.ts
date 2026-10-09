@@ -4,6 +4,7 @@ import {
   OAuthProviderId,
   OAuthUserProfile,
 } from '@sar/shared';
+import { outboundFetch } from '@/server/http/outbound-fetch';
 import { ValidationError } from '../../domain/errors/domain.errors';
 import { IOAuthProviderPort } from '../../domain/ports/oauth-provider.port';
 import { createAppleClientSecret, isAppleOAuthConfigured } from './apple-oauth';
@@ -138,7 +139,7 @@ export class EnvOAuthProviderService implements IOAuthProviderPort {
       body.set('client_secret', clientSecret);
     }
 
-    const tokenRes = await fetch(config.tokenUrl, {
+    const tokenRes = await outboundFetch(config.tokenUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body,
@@ -177,7 +178,7 @@ export class EnvOAuthProviderService implements IOAuthProviderPort {
 
   private async fetchGoogleProfile(accessToken?: string): Promise<OAuthUserProfile> {
     if (!accessToken) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
-    const res = await fetch('https://openidconnect.googleapis.com/v1/userinfo', {
+    const res = await outboundFetch('https://openidconnect.googleapis.com/v1/userinfo', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     if (!res.ok) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
@@ -210,7 +211,7 @@ export class EnvOAuthProviderService implements IOAuthProviderPort {
 
   private async fetchNaverProfile(accessToken?: string): Promise<OAuthUserProfile> {
     if (!accessToken) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
-    const res = await fetch('https://openapi.naver.com/v1/nid/me', {
+    const res = await outboundFetch('https://openapi.naver.com/v1/nid/me', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     if (!res.ok) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
@@ -229,7 +230,7 @@ export class EnvOAuthProviderService implements IOAuthProviderPort {
 
   private async fetchKakaoProfile(accessToken?: string): Promise<OAuthUserProfile> {
     if (!accessToken) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);
-    const res = await fetch('https://kapi.kakao.com/v2/user/me', {
+    const res = await outboundFetch('https://kapi.kakao.com/v2/user/me', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     if (!res.ok) throw new ValidationError(AppErrorCode.AUTH_OAUTH_FAILED);

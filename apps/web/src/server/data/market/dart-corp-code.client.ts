@@ -1,4 +1,5 @@
 import { inflateRawSync } from 'node:zlib';
+import { outboundFetch } from '@/server/http/outbound-fetch';
 import { MarketDataConfig } from './market-data.config';
 
 const DART_CORP_CODE_URL = 'https://opendart.fss.or.kr/api/corpCode.xml';
@@ -37,7 +38,7 @@ export async function fetchDartCorpCodeXml(apiKey?: string): Promise<string> {
   }
 
   const url = `${DART_CORP_CODE_URL}?crtfc_key=${encodeURIComponent(key)}`;
-  const res = await fetch(url, {
+  const res = await outboundFetch(url, {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; StockAnalysisReport/1.0)' },
   });
   if (!res.ok) {

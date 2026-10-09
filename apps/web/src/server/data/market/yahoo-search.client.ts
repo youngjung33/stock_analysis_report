@@ -1,3 +1,4 @@
+import { outboundFetch } from '@/server/http/outbound-fetch';
 import {
   Market,
   StockSearchResult,
@@ -26,7 +27,7 @@ export async function fetchYahooStockSearch(
   if (q.length < 1) return [];
 
   const url = `${YAHOO_SEARCH_BASE}?q=${encodeURIComponent(q)}&quotesCount=${limit}&newsCount=0&enableFuzzyQuery=true`;
-  const res = await fetch(url, {
+  const res = await outboundFetch(url, {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; StockAnalysisReport/1.0)' },
   });
 

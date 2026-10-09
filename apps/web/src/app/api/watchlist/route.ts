@@ -3,22 +3,20 @@ import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
+import { jsonData, requireAuth, runApiRoute } from '@/server/http/route-utils';
 
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:watchlist-read', 'apiRead');
     const user = requireAuth(req);
     const { listWatchlistUseCase } = getServerServices();
     const items = await listWatchlistUseCase.execute(user.userId);
     return jsonData({ items });
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }
 
 export async function POST(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:watchlist-write', 'apiWrite');
     const user = requireAuth(req);
     const body = await req.json();
@@ -35,7 +33,5 @@ export async function POST(req: NextRequest) {
       market,
     });
     return jsonData({ item });
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }

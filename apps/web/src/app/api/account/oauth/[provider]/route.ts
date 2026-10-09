@@ -2,13 +2,13 @@ import { AppErrorCode, AppSuccessCode, apiSuccessBody, isOAuthProvider } from '@
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
+import { jsonData, requireAuth, runApiRoute } from '@/server/http/route-utils';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 
 type RouteContext = { params: Promise<{ provider: string }> };
 
 export async function DELETE(req: NextRequest, context: RouteContext) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:account-oauth-unlink', 'apiWrite');
     const user = requireAuth(req);
     const { provider } = await context.params;
@@ -19,7 +19,5 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
     const { unlinkOAuthAccountUseCase } = getServerServices();
     await unlinkOAuthAccountUseCase.execute(user.userId, provider);
     return jsonData(apiSuccessBody(AppSuccessCode.ACCOUNT_OAUTH_UNLINKED));
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }

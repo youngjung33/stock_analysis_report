@@ -1,16 +1,10 @@
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import {
-  clearAccessCookie,
-  clearRefreshCookie,
-  getRefreshToken,
-  handleRouteError,
-  jsonData,
-} from '@/server/http/route-utils';
+import { clearAccessCookie, clearRefreshCookie, getRefreshToken, jsonData, runApiRoute } from '@/server/http/route-utils';
 
 export async function POST(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'auth:logout', 'authLogout');
     const refreshToken = getRefreshToken(req);
     const { logoutUseCase } = getServerServices();
@@ -20,7 +14,5 @@ export async function POST(req: NextRequest) {
     clearAccessCookie(res);
     clearRefreshCookie(res);
     return res;
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }

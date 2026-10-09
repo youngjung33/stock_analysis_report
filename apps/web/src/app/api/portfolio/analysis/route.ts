@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { type PortfolioPeriod } from '@sar/shared';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import { handleRouteError, jsonData, requireAuth, tryGetAuth } from '@/server/http/route-utils';
+import { jsonData, requireAuth, tryGetAuth, runApiRoute } from '@/server/http/route-utils';
 import type { AnalysisHoldingInput } from '@/server/domain/usecases/portfolio/get-portfolio-analysis.use-case';
 
 export const maxDuration = 25;
@@ -28,7 +28,7 @@ function parseIncludeInsights(req: NextRequest, body?: AnalysisBody): boolean {
 }
 
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:portfolio-analysis', 'apiHeavy');
     const user = requireAuth(req);
     const periods = parsePeriods(req);
@@ -37,14 +37,12 @@ export async function GET(req: NextRequest) {
     const { getPortfolioAnalysisUseCase } = getServerServices();
     const result = await getPortfolioAnalysisUseCase.execute(user.userId, periods, includeInsights);
     return jsonData(result);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  }, { maxDurationSec: 25 });
 }
 
 /** Guest/client — dashboard holdings in body */
 export async function POST(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:portfolio-analysis', 'apiHeavy');
     const body = (await req.json().catch(() => ({}))) as AnalysisBody;
     const user = tryGetAuth(req);
@@ -70,7 +68,5 @@ export async function POST(req: NextRequest) {
       includeInsights,
     );
     return jsonData(result);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  }, { maxDurationSec: 25 });
 }

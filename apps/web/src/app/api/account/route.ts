@@ -2,30 +2,21 @@ import { AppSuccessCode, apiSuccessBody } from '@sar/shared';
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import {
-  clearAccessCookie,
-  clearRefreshCookie,
-  getRefreshToken,
-  handleRouteError,
-  jsonData,
-  requireAuth,
-} from '@/server/http/route-utils';
+import { clearAccessCookie, clearRefreshCookie, getRefreshToken, jsonData, requireAuth, runApiRoute } from '@/server/http/route-utils';
 
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:account-read', 'apiRead');
     const user = requireAuth(req);
     const { getAccountUseCase } = getServerServices();
     const profile = await getAccountUseCase.execute(user.userId);
     return jsonData(profile);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }
 
 /** Delete account and related user data (cascade). */
 export async function DELETE(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'auth:delete-account', 'authLogin');
     const user = requireAuth(req);
     const body = (await req.json().catch(() => ({}))) as { password?: string };
@@ -40,7 +31,5 @@ export async function DELETE(req: NextRequest) {
     clearAccessCookie(res);
     clearRefreshCookie(res);
     return res;
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }

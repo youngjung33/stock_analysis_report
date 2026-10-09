@@ -1,4 +1,5 @@
 import { Market } from '@sar/shared';
+import { outboundFetch } from '@/server/http/outbound-fetch';
 
 export interface RssNewsItem {
   title: string;
@@ -33,7 +34,7 @@ export async function fetchGoogleNewsRss(
   limit = 6,
 ): Promise<RssNewsItem[]> {
   const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=${hl}&gl=${gl}&ceid=${gl}:${hl.split('-')[0]}`;
-  const res = await fetch(url, {
+  const res = await outboundFetch(url, {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; StockAnalysisReport/1.0)' },
     next: { revalidate: 300 },
   });

@@ -1,3 +1,4 @@
+import { outboundFetch } from '@/server/http/outbound-fetch';
 import { IEmailSenderPort } from '../../domain/ports/email-sender.port';
 
 /** Resend API — RESEND_API_KEY 설정 시 프로덕션 메일 발송 */
@@ -8,7 +9,7 @@ export class ResendEmailSender implements IEmailSenderPort {
   ) {}
 
   async send(input: { to: string; subject: string; text: string; html?: string }) {
-    const res = await fetch('https://api.resend.com/emails', {
+    const res = await outboundFetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${this.apiKey}`,

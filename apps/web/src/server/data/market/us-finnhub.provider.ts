@@ -1,5 +1,6 @@
 import { Market, type QuoteSetupHintCode } from '@sar/shared';
 import { StockEntity } from '../../domain/entities';
+import { outboundFetch } from '@/server/http/outbound-fetch';
 import { MarketDataConfig } from './market-data.config';
 
 const FINNHUB_QUOTE_URL = 'https://finnhub.io/api/v1/quote';
@@ -38,7 +39,7 @@ export class UsFinnhubMarketProvider {
     }
 
     const url = `${FINNHUB_QUOTE_URL}?symbol=${encodeURIComponent(stock.symbol)}&token=${apiKey}`;
-    const res = await fetch(url);
+    const res = await outboundFetch(url);
     if (!res.ok) {
       throw new Error(`Finnhub API error (${res.status})`);
     }

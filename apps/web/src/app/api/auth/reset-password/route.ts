@@ -2,11 +2,11 @@ import { AppErrorCode, AppSuccessCode, apiSuccessBody } from '@sar/shared';
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import { handleRouteError, jsonData } from '@/server/http/route-utils';
+import { jsonData, runApiRoute } from '@/server/http/route-utils';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 
 export async function POST(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'auth:reset-password', 'authRegister');
     const body = (await req.json()) as {
       token?: string;
@@ -25,7 +25,5 @@ export async function POST(req: NextRequest) {
       passwordConfirm: body.passwordConfirm,
     });
     return jsonData(apiSuccessBody(AppSuccessCode.AUTH_PASSWORD_RESET_COMPLETE));
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }

@@ -1,7 +1,9 @@
 import { dedicatedAnalyzeResponseSchema, aiInsightPayloadSchema } from '@sar/shared';
 import type { AiProviderPort, AiStructuredRequest } from '@/server/domain/ports/ai-provider.port';
+import { outboundFetch } from '@/server/http/outbound-fetch';
 import { AI_INSIGHT_PAYLOAD_JSON_SCHEMA } from './insight-json-schema';
 import { readAiTimeoutMs } from './ai-config';
+
 export class HttpCustomProvider implements AiProviderPort {
   readonly id = 'custom';
 
@@ -12,36 +14,29 @@ export class HttpCustomProvider implements AiProviderPort {
   ) {}
 
   async completeStructured(req: AiStructuredRequest) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), readAiTimeoutMs());
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (this.apiKey) headers.Authorization = `Bearer ${this.apiKey}`;
 
-    try {
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (this.apiKey) headers.Authorization = `Bearer ${this.apiKey}`;
+    const res = await outboundFetch(this.endpoint, {
+      method: 'POST',
+      timeoutMs: readAiTimeoutMs(),
+      headers,
+      body: JSON.stringify({
+        context: req.context,
+        outputSchema: AI_INSIGHT_PAYLOAD_JSON_SCHEMA,
+        locale: req.locale,
+      }),
+    });
 
-      const res = await fetch(this.endpoint, {
-        method: 'POST',
-        headers,
-        signal: controller.signal,
-        body: JSON.stringify({
-          context: req.context,
-          outputSchema: AI_INSIGHT_PAYLOAD_JSON_SCHEMA,
-          locale: req.locale,
-        }),
-      });
-
-      if (!res.ok) throw new Error(`CUSTOM_HTTP_${res.status}`);
-      const body = await res.json();
-      if (body == null || (typeof body === 'object' && Object.keys(body).length === 0)) {
-        throw new Error('CUSTOM_EMPTY_RESPONSE');
-      }
-      const dedicated = dedicatedAnalyzeResponseSchema.safeParse(body);
-      if (dedicated.success) {
-        return aiInsightPayloadSchema.parse({ sections: dedicated.data.insight.sections });
-      }
-      return aiInsightPayloadSchema.parse(body);
-    } finally {
-      clearTimeout(timer);
+    if (!res.ok) throw new Error(`CUSTOM_HTTP_${res.status}`);
+    const body = await res.json();
+    if (body == null || (typeof body === 'object' && Object.keys(body).length === 0)) {
+      throw new Error('CUSTOM_EMPTY_RESPONSE');
     }
+    const dedicated = dedicatedAnalyzeResponseSchema.safeParse(body);
+    if (dedicated.success) {
+      return aiInsightPayloadSchema.parse({ sections: dedicated.data.insight.sections });
+    }
+    return aiInsightPayloadSchema.parse(body);
   }
 }

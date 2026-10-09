@@ -4,9 +4,15 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? '/api';
 
+function readClientTimeoutMs(): number {
+  const raw = Number(process.env.NEXT_PUBLIC_API_CLIENT_TIMEOUT_MS ?? 30_000);
+  return Number.isFinite(raw) && raw > 0 ? raw : 30_000;
+}
+
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
+  timeout: readClientTimeoutMs(),
   headers: { 'Content-Type': 'application/json' },
 });
 

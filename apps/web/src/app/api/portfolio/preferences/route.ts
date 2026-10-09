@@ -2,7 +2,7 @@ import { AppErrorCode, createDefaultStoredProfile, type StoredInvestorProfile } 
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
+import { jsonData, requireAuth, runApiRoute } from '@/server/http/route-utils';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 
 function parseInvestorProfile(value: unknown): StoredInvestorProfile | null | undefined {
@@ -20,19 +20,17 @@ function parseInvestorProfile(value: unknown): StoredInvestorProfile | null | un
 }
 
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:portfolio-preferences-read', 'apiRead');
     const user = requireAuth(req);
     const { getPortfolioPreferencesUseCase } = getServerServices();
     const prefs = await getPortfolioPreferencesUseCase.execute(user.userId);
     return jsonData(prefs);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }
 
 export async function PUT(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:portfolio-preferences-write', 'apiWrite');
     const user = requireAuth(req);
     const body = (await req.json()) as {
@@ -72,7 +70,5 @@ export async function PUT(req: NextRequest) {
     });
 
     return jsonData(prefs);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }

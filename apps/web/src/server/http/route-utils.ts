@@ -4,6 +4,8 @@ import { getServerServices } from '../container';
 import { AuthenticationError } from '../domain/errors/domain.errors';
 
 export { handleRouteError } from './route-error';
+export { runApiRoute } from './run-api-route';
+export type { RunApiRouteOptions } from './run-api-route';
 export type { AccessTokenPayload } from '../domain/auth.types';
 
 export interface AuthUser {

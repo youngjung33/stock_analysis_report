@@ -1,3 +1,4 @@
+import { outboundFetch } from '@/server/http/outbound-fetch';
 import { MarketDataConfig } from './market-data.config';
 
 const DART_BASE = 'https://opendart.fss.or.kr/api';
@@ -33,7 +34,7 @@ export async function fetchDartDisclosureList(
   url.searchParams.set('end_de', ymd(end));
   url.searchParams.set('page_count', '30');
 
-  const res = await fetch(url.toString(), { next: { revalidate: 900 } });
+  const res = await outboundFetch(url.toString(), { next: { revalidate: 900 } });
   if (!res.ok) return [];
 
   const data = (await res.json()) as {

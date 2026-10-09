@@ -1,13 +1,13 @@
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import { handleRouteError, jsonData } from '@/server/http/route-utils';
+import { jsonData, runApiRoute } from '@/server/http/route-utils';
 
 export const maxDuration = 25;
 
 /** 추천 엔진용 매크로·섹터·환율 컨텍스트 (게스트 시뮬 등) */
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'market:recommendation-context', 'heavy');
     const { buildMarketContextUseCase } = getServerServices();
     const ctx = await buildMarketContextUseCase.execute();
@@ -18,7 +18,5 @@ export async function GET(req: NextRequest) {
       usdKrwRate: ctx.usdKrwRate,
       usdKrwChange1d: ctx.usdKrwChange1d,
     });
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  }, { maxDurationSec: 25 });
 }

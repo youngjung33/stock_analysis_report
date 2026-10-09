@@ -3,12 +3,12 @@ import { AppErrorCode, Market } from '@sar/shared';
 import { getServerServices } from '@/server/container';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import { handleRouteError, jsonData, tryGetAuth } from '@/server/http/route-utils';
+import { jsonData, tryGetAuth, runApiRoute, handleRouteError } from '@/server/http/route-utils';
 
 export const maxDuration = 25;
 
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'market:stock-analysis', 'heavy');
 
     const symbol = req.nextUrl.searchParams.get('symbol')?.trim();
@@ -46,7 +46,5 @@ export async function GET(req: NextRequest) {
     });
 
     return jsonData(result);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  }, { maxDurationSec: 25 });
 }

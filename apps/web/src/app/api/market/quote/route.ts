@@ -3,12 +3,12 @@ import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import { handleRouteError, jsonData } from '@/server/http/route-utils';
+import { jsonData, runApiRoute } from '@/server/http/route-utils';
 
 export const maxDuration = 10;
 
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'market:quote', 'standard');
     const symbol = req.nextUrl.searchParams.get('symbol')?.trim();
     const market = req.nextUrl.searchParams.get('market') as Market | null;
@@ -28,7 +28,5 @@ export async function GET(req: NextRequest) {
       range: rangeParam,
     });
     return jsonData(result);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  }, { maxDurationSec: 10 });
 }

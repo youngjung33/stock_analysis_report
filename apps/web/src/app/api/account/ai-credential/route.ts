@@ -2,23 +2,21 @@ import { NextRequest } from 'next/server';
 import { AppErrorCode, type AiProviderId } from '@sar/shared';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
+import { jsonData, requireAuth, runApiRoute } from '@/server/http/route-utils';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:ai-credential-read', 'apiRead');
     const user = requireAuth(req);
     const { getAiCredentialStatusUseCase } = getServerServices();
     const status = await getAiCredentialStatusUseCase.execute(user.userId);
     return jsonData(status);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }
 
 export async function PUT(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:ai-credential-write', 'apiWrite');
     const user = requireAuth(req);
     const body = (await req.json()) as { provider?: string; apiKey?: string };
@@ -32,31 +30,25 @@ export async function PUT(req: NextRequest) {
       body.apiKey,
     );
     return jsonData(result);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }
 
 export async function POST(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:ai-credential-validate', 'apiWrite');
     const user = requireAuth(req);
     const { validateAiCredentialUseCase } = getServerServices();
     const result = await validateAiCredentialUseCase.execute(user.userId);
     return jsonData(result);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }
 
 export async function DELETE(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:ai-credential-delete', 'apiWrite');
     const user = requireAuth(req);
     const { deleteAiCredentialUseCase } = getServerServices();
     await deleteAiCredentialUseCase.execute(user.userId);
     return jsonData({ success: true });
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }

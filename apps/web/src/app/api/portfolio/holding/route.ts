@@ -3,10 +3,10 @@ import { AppErrorCode, Market } from '@sar/shared';
 import { getServerServices } from '@/server/container';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
+import { jsonData, requireAuth, runApiRoute } from '@/server/http/route-utils';
 
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:portfolio-holding', 'apiRead');
     const user = requireAuth(req);
     const symbol = req.nextUrl.searchParams.get('symbol');
@@ -22,7 +22,5 @@ export async function GET(req: NextRequest) {
     const { getHoldingBySymbolUseCase } = getServerServices();
     const holding = await getHoldingBySymbolUseCase.execute(user.userId, symbol, marketParam);
     return jsonData({ holding });
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }

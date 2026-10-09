@@ -1,24 +1,22 @@
 import { NextRequest } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import { handleRouteError, jsonData, requireAuth, tryGetAuth } from '@/server/http/route-utils';
+import { jsonData, requireAuth, tryGetAuth, runApiRoute } from '@/server/http/route-utils';
 import type { PortfolioSimulationSnapshot } from '@/server/domain/usecases/portfolio/portfolio-capital.use-cases';
 
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:portfolio-simulation', 'apiRead');
     const user = requireAuth(req);
     const { getPortfolioSimulationUseCase } = getServerServices();
     const result = await getPortfolioSimulationUseCase.execute(user.userId);
     return jsonData(result);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }
 
 /** Guest/client — portfolio snapshot in body (full enrichment on server) */
 export async function POST(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:portfolio-simulation', 'apiRead');
     const body = (await req.json().catch(() => ({}))) as PortfolioSimulationSnapshot;
     const user = tryGetAuth(req);
@@ -45,7 +43,5 @@ export async function POST(req: NextRequest) {
 
     const result = await getPortfolioSimulationUseCase.executeFromSnapshot(snapshot);
     return jsonData(result);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }

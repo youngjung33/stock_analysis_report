@@ -2,14 +2,14 @@ import { NextRequest } from 'next/server';
 import { AppErrorCode, isOAuthProvider } from '@sar/shared';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import { handleRouteError, jsonData } from '@/server/http/route-utils';
+import { jsonData, runApiRoute } from '@/server/http/route-utils';
 import { ValidationError } from '@/server/domain/errors/domain.errors';
 
 type RouteContext = { params: Promise<{ provider: string }> };
 
 /** OAuth authorize URL 발급 */
 export async function GET(req: NextRequest, context: RouteContext) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'auth:oauth-start', 'authOAuthStart');
     const { provider } = await context.params;
     if (!isOAuthProvider(provider)) {
@@ -27,7 +27,5 @@ export async function GET(req: NextRequest, context: RouteContext) {
       allowedOrigin: req.nextUrl.origin,
     });
     return jsonData(result);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }

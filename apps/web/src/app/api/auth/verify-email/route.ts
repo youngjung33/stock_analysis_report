@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
+import { runApiRoute } from '@/server/http/route-utils';
+
 /** 링크 기반 이메일 인증 — 6자리 code 쿼리 또는 설정 화면 POST confirm-email */
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'auth:verify-email-link', 'authVerifyEmail');
     const code = req.nextUrl.searchParams.get('code')?.trim();
     if (!code) {
@@ -13,7 +15,7 @@ export async function GET(req: NextRequest) {
     const { verifyEmailUseCase } = getServerServices();
     await verifyEmailUseCase.execute(code);
     return NextResponse.redirect(new URL('/settings?verified=1', req.url));
-  } catch {
-    return NextResponse.redirect(new URL('/settings?verifyError=1', req.url));
-  }
+  }, {
+    onError: () => NextResponse.redirect(new URL('/settings?verifyError=1', req.url)),
+  });
 }

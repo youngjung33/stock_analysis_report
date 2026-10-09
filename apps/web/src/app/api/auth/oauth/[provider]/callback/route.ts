@@ -6,6 +6,7 @@ import { logApiError } from '@/server/http/route-error';
 import {
   clearAccessCookie,
   clearRefreshCookie,
+  runApiRoute,
   setAccessCookie,
   setRefreshCookie,
 } from '@/server/http/route-utils';
@@ -17,7 +18,7 @@ type RouteContext = { params: Promise<{ provider: string }> };
 export async function GET(req: NextRequest, context: RouteContext) {
   let provider = 'unknown';
 
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'auth:oauth-callback', 'authOAuthCallback');
     const params = await context.params;
     provider = params.provider;
@@ -51,11 +52,13 @@ export async function GET(req: NextRequest, context: RouteContext) {
     setAccessCookie(res, result.accessToken);
     setRefreshCookie(res, result.refreshToken);
     return res;
-  } catch (error) {
-    logApiError(error, { route: 'oauth/callback', provider });
-    const res = NextResponse.redirect(new URL('/login?oauthError=auth_failed', req.url));
-    clearAccessCookie(res);
-    clearRefreshCookie(res);
-    return res;
-  }
+  }, {
+    onError: (error) => {
+      logApiError(error, { route: 'oauth/callback', provider });
+      const res = NextResponse.redirect(new URL('/login?oauthError=auth_failed', req.url));
+      clearAccessCookie(res);
+      clearRefreshCookie(res);
+      return res;
+    },
+  });
 }

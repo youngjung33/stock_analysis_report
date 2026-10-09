@@ -6,6 +6,7 @@ export const AppErrorCode = {
   INTERNAL: 'INTERNAL',
   DB_UNAVAILABLE: 'DB_UNAVAILABLE',
   RATE_LIMIT: 'RATE_LIMIT',
+  REQUEST_TIMEOUT: 'REQUEST_TIMEOUT',
 
   AUTH_UNAUTHORIZED: 'AUTH_UNAUTHORIZED',
   AUTH_INVALID_CREDENTIALS: 'AUTH_INVALID_CREDENTIALS',
@@ -86,6 +87,7 @@ export const APP_ERROR_MESSAGES: Record<AppErrorCode, string> = {
   [AppErrorCode.INTERNAL]: USER_FACING_SERVER_ERROR_MESSAGE,
   [AppErrorCode.DB_UNAVAILABLE]: USER_FACING_SERVER_ERROR_MESSAGE,
   [AppErrorCode.RATE_LIMIT]: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.',
+  [AppErrorCode.REQUEST_TIMEOUT]: '요청 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.',
 
   [AppErrorCode.AUTH_UNAUTHORIZED]: '로그인이 필요합니다.',
   [AppErrorCode.AUTH_INVALID_CREDENTIALS]: '아이디 또는 비밀번호가 올바르지 않습니다.',

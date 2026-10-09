@@ -2,10 +2,10 @@ import { NextRequest } from 'next/server';
 import { Market, TransactionType } from '@sar/shared';
 import { getServerServices } from '@/server/container';
 import { enforceRateLimit } from '@/server/http/rate-limit';
-import { handleRouteError, jsonData, requireAuth } from '@/server/http/route-utils';
+import { jsonData, requireAuth, runApiRoute } from '@/server/http/route-utils';
 
 export async function POST(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:transactions-write', 'apiWrite');
     const user = requireAuth(req);
     const body = await req.json();
@@ -26,13 +26,11 @@ export async function POST(req: NextRequest) {
     });
 
     return jsonData(result);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }
 
 export async function GET(req: NextRequest) {
-  try {
+  return runApiRoute(async () => {
     await enforceRateLimit(req, 'api:transactions-read', 'apiRead');
     const user = requireAuth(req);
     const stockId = req.nextUrl.searchParams.get('stockId') ?? undefined;
@@ -41,7 +39,5 @@ export async function GET(req: NextRequest) {
     const { listTransactionsUseCase } = getServerServices();
     const result = await listTransactionsUseCase.execute(user.userId, { stockId, type });
     return jsonData(result);
-  } catch (error) {
-    return handleRouteError(error);
-  }
+  });
 }
