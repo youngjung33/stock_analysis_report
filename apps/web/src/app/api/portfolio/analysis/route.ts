@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     const { getPortfolioAnalysisUseCase } = getServerServices();
     const result = await getPortfolioAnalysisUseCase.execute(user.userId, periods, includeInsights);
     return jsonData(result);
-  }, { maxDurationSec: 25 });
+  }, { skipDeadline: true });
 }
 
 /** Guest/client — dashboard holdings in body */
@@ -68,5 +68,5 @@ export async function POST(req: NextRequest) {
       includeInsights,
     );
     return jsonData(result);
-  }, { maxDurationSec: 25 });
+  }, { skipDeadline: true });
 }

@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     const { getMarketAnalysisUseCase } = getServerServices();
     const result = await getMarketAnalysisUseCase.execute(options);
     return jsonData(result);
-  }, { maxDurationSec: 25 });
+  }, { skipDeadline: true });
 }
 
 /** Guest/client personalization — holdings·watchlist in body */
@@ -28,5 +28,5 @@ export async function POST(req: NextRequest) {
     const { getMarketAnalysisUseCase } = getServerServices();
     const result = await getMarketAnalysisUseCase.execute(options);
     return jsonData(result);
-  }, { maxDurationSec: 25 });
+  }, { skipDeadline: true });
 }

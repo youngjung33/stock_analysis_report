@@ -18,5 +18,5 @@ export async function GET(req: NextRequest) {
       usdKrwRate: ctx.usdKrwRate,
       usdKrwChange1d: ctx.usdKrwChange1d,
     });
-  }, { maxDurationSec: 25 });
+  }, { skipDeadline: true });
 }

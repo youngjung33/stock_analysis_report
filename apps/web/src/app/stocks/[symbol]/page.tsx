@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Market } from '@sar/shared';
+import { RouteLoadingFallback } from '@/presentation/components/RouteLoadingFallback';
 import { ProtectedRoute } from '@/presentation/routes/ProtectedRoute';
 import { StockDetailPage } from '@/presentation/pages/StockDetailPage';
 
@@ -29,17 +30,9 @@ function StockDetailRouteInner() {
 }
 
 export default function StockDetailRoutePage() {
-  const { t } = useTranslation();
-
   return (
     <ProtectedRoute>
-      <Suspense
-        fallback={
-          <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
-            {t('common.loading')}
-          </div>
-        }
-      >
+      <Suspense fallback={<RouteLoadingFallback />}>
         <StockDetailRouteInner />
       </Suspense>
     </ProtectedRoute>

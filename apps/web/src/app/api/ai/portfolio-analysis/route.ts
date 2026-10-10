@@ -31,5 +31,5 @@ export async function POST(req: NextRequest) {
       context,
       locale,
     });
-  }, { maxDurationSec: 60 });
+  }, { skipDeadline: true });
 }

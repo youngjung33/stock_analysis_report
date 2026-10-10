@@ -46,5 +46,5 @@ export async function GET(req: NextRequest) {
     });
 
     return jsonData(result);
-  }, { maxDurationSec: 25 });
+  }, { skipDeadline: true });
 }

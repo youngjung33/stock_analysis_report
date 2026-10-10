@@ -12,6 +12,17 @@ describe('runApiRoute', () => {
     await expect(res.json()).resolves.toEqual({ ok: true });
   });
 
+  it('does not apply deadline when skipDeadline is set', async () => {
+    const res = await runApiRoute(
+      () =>
+        new Promise<NextResponse>((resolve) => {
+          setTimeout(() => resolve(NextResponse.json({ ok: true })), 80);
+        }),
+      { skipDeadline: true, deadlineMs: 30 },
+    );
+    expect(res.status).toBe(200);
+  });
+
   it('returns 504 REQUEST_TIMEOUT when handler exceeds deadline', async () => {
     const res = await runApiRoute(
       () =>

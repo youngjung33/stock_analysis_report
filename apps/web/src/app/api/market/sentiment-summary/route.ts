@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     const { getMarketSentimentSummaryUseCase } = getServerServices();
     const result = await getMarketSentimentSummaryUseCase.execute(options);
     return jsonData(result);
-  }, { maxDurationSec: 25 });
+  }, { skipDeadline: true });
 }
 
 /** Guest/client personalization — holdings·watchlist in body */
@@ -28,5 +28,5 @@ export async function POST(req: NextRequest) {
     const { getMarketSentimentSummaryUseCase } = getServerServices();
     const result = await getMarketSentimentSummaryUseCase.execute(options);
     return jsonData(result);
-  }, { maxDurationSec: 25 });
+  }, { skipDeadline: true });
 }

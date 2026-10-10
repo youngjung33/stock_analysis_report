@@ -1,12 +1,11 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
+import { RouteLoadingFallback } from '../components/RouteLoadingFallback';
 import { useAuth } from '../hooks/useAuth';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { t } = useTranslation();
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
@@ -17,11 +16,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }, [isLoading, isAuthenticated, router]);
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
-        {t('common.loading')}
-      </div>
-    );
+    return <RouteLoadingFallback />;
   }
 
   if (!isAuthenticated) {

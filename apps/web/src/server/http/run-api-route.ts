@@ -8,6 +8,11 @@ export type RunApiRouteOptions = {
   /** Match route `export const maxDuration` (seconds) when set */
   maxDurationSec?: number;
   deadlineMs?: number;
+  /**
+   * Heavy report routes (market/portfolio analysis, stock-analysis, AI).
+   * No wall-clock race — use platform `maxDuration` + outbound fetch timeouts only.
+   */
+  skipDeadline?: boolean;
   onError?: (error: unknown) => NextResponse;
 };
 
@@ -33,7 +38,8 @@ async function withRouteDeadline<T>(deadlineMs: number, fn: () => Promise<T>): P
   }
 }
 
-function resolveDeadlineMs(options?: RunApiRouteOptions): number {
+function resolveDeadlineMs(options?: RunApiRouteOptions): number | null {
+  if (options?.skipDeadline) return null;
   if (options?.deadlineMs != null) return options.deadlineMs;
   if (options?.maxDurationSec != null) return deadlineFromMaxDuration(options.maxDurationSec);
   return readApiRouteDeadlineMs();
@@ -48,6 +54,7 @@ export async function runApiRoute(
 ): Promise<NextResponse> {
   const deadlineMs = resolveDeadlineMs(options);
   try {
+    if (deadlineMs == null) return await handler();
     return await withRouteDeadline(deadlineMs, handler);
   } catch (error) {
     if (options?.onError) return options.onError(error);
