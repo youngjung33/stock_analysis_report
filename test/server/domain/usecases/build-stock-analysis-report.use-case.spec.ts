@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import { Market } from '@sar/shared';
+import { Market, createEnrichmentBatchQuality } from '@sar/shared';
 import { BuildStockAnalysisReportUseCase } from '@server/domain/usecases/market/build-stock-analysis-report.use-case';
 
 describe('BuildStockAnalysisReportUseCase', () => {
@@ -40,6 +40,7 @@ describe('BuildStockAnalysisReportUseCase', () => {
         newsSnapshots: [],
         eventSnapshots: [],
         figureStatements: [],
+        quality: createEnrichmentBatchQuality(0),
       }),
     };
 
@@ -49,8 +50,9 @@ describe('BuildStockAnalysisReportUseCase', () => {
         symbol: '005930',
         market: Market.KR,
         currency: 'KRW',
-        currentPrice: 70000,
-        changePercent: 1,
+        currentPrice: 71000,
+        changePercent: 2,
+        fetchedAt: '2026-01-01T00:00:00.000Z',
         range: '6mo',
         points: closes.map((close, i) => ({
           timestamp: new Date(Date.now() - (closes.length - i) * 86400000).toISOString(),
@@ -72,11 +74,16 @@ describe('BuildStockAnalysisReportUseCase', () => {
     });
 
     expect(report.symbol).toBe('005930');
+    expect(report.currentPrice).toBe(71000);
+    expect(report.dataQuality?.priceSource).toBe('live_chart');
     expect(report.insights.some((i) => i.category === 'stockAction')).toBe(true);
     expect(getStockQuoteUseCase.execute).toHaveBeenCalledWith(
       expect.objectContaining({ symbol: '005930', market: Market.KR, range: '6mo' }),
     );
-    expect(buildStockEnrichmentUseCase.execute).toHaveBeenCalled();
+    expect(buildStockEnrichmentUseCase.execute).toHaveBeenCalledWith(
+      [expect.objectContaining({ symbol: '005930' })],
+      { bypassCache: true },
+    );
   });
 
   it('throws STOCK_ANALYSIS_UNAVAILABLE when quote data is insufficient', async () => {
@@ -96,6 +103,7 @@ describe('BuildStockAnalysisReportUseCase', () => {
         newsSnapshots: [],
         eventSnapshots: [],
         figureStatements: [],
+        quality: createEnrichmentBatchQuality(0),
       }),
     };
     const getStockQuoteUseCase = {

@@ -20,6 +20,7 @@ import type { MacroIndicatorSnapshot } from './market-macro';
 import type { SectorEtfSnapshot } from './market-sector';
 import { groupSectorsByMarket } from './market-sector';
 import { getStockSectorTags } from './market-recommendation/sector-tags';
+import type { StockReportDataQuality } from './report-data-quality';
 
 export interface StockPriceExplanationReport {
   symbol: string;
@@ -37,6 +38,7 @@ export interface StockPriceExplanationReport {
   tag: EnrichedStockRecommendation['tag'];
   tagLabel: string;
   score: number | null;
+  dataQuality?: StockReportDataQuality;
 }
 
 type FocusCategory =

@@ -35,6 +35,12 @@ describe('GetMarketAnalysisUseCase', () => {
           dedupeKey: 'news:AAPL:beats',
         }],
         eventSnapshots: [],
+        quality: {
+          quotes: { requested: 0, received: 0, cacheHits: 0, failed: 0 },
+          technical: { requested: 0, received: 0, cacheHits: 0, failed: 0 },
+          news: { requested: 0, received: 0, cacheHits: 0, failed: 0 },
+          events: { requested: 0, received: 0, cacheHits: 0, failed: 0 },
+        },
         figureStatements: [
           {
             figureId: 'musk',
@@ -76,5 +82,6 @@ describe('GetMarketAnalysisUseCase', () => {
     expect(report.figureStatements).toHaveLength(1);
     expect(buildMarketContextUseCase.execute).toHaveBeenCalled();
     expect(buildStockEnrichmentUseCase.execute).toHaveBeenCalled();
+    expect(report.dataQuality?.news.krGoogle).toBeDefined();
   });
 });

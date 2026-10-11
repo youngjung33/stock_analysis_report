@@ -437,6 +437,19 @@ export {
 } from './stock-price-explanation';
 export type { StockPriceExplanationReport } from './stock-price-explanation';
 export {
+  createEnrichmentBatchQuality,
+  createEnrichmentSliceQuality,
+  isEnrichmentBatchIncomplete,
+} from './report-data-quality';
+export type {
+  DataSourceStatus,
+  EnrichmentBatchQuality,
+  EnrichmentSliceQuality,
+  MarketNewsSourceQuality,
+  MarketReportDataQuality,
+  StockReportDataQuality,
+} from './report-data-quality';
+export {
   computeStockActionPlan,
   deriveConservativeBuyBelow,
   deriveConservativeSellAbove,

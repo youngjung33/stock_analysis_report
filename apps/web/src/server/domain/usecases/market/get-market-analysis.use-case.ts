@@ -1,16 +1,17 @@
 import {
   Market,
   MarketAnalysisReport,
-  NewsAnalysisInput,
   buildInvestorProfile,
   buildMarketAnalysisReport,
   createDefaultStoredProfile,
+  isEnrichmentBatchIncomplete,
   type StoredInvestorProfile,
 } from '@sar/shared';
 import { IStockCatalogRepository } from '../../repositories';
 import { buildCandidatePoolWithCatalog } from './build-candidate-pool-with-catalog';
 import { BuildMarketContextUseCase } from './build-market-context.use-case';
 import { BuildStockEnrichmentUseCase } from './build-stock-enrichment.use-case';
+import { fetchMarketHeadlineNews } from './fetch-market-headline-news';
 import { IMarketDataProvider } from '../../ports/market-data.port';
 
 /** 시장 심층 분석 리포트 생성 use case */
@@ -28,11 +29,9 @@ export class GetMarketAnalysisUseCase {
     userWatchlist?: Array<{ symbol: string; market: Market; name?: string }>;
     investorProfile?: StoredInvestorProfile | null;
   }): Promise<MarketAnalysisReport> {
-    const [marketContext, krNews, usNewsGoogle, finnhubNews] = await Promise.all([
+    const [marketContext, headlineNews] = await Promise.all([
       this.buildMarketContextUseCase.execute(),
-      this.marketData.fetchGoogleNews('코스피+증시+주식', Market.KR, 'ko', 'KR', 6).catch(() => []),
-      this.marketData.fetchGoogleNews('US+stock+market+S&P', Market.US, 'en-US', 'US', 6).catch(() => []),
-      this.marketData.fetchFinnhubMarketNews('general', 6).catch(() => []),
+      fetchMarketHeadlineNews(this.marketData),
     ]);
 
     const pool = await buildCandidatePoolWithCatalog(this.catalogRepo, {
@@ -48,33 +47,55 @@ export class GetMarketAnalysisUseCase {
       yahooSymbol: c.yahooSymbol,
     }));
 
-    const { candidateQuotes, technicalSnapshots, newsSnapshots, eventSnapshots, figureStatements } =
+    const enrichment =
       enrichmentTargets.length > 0
         ? await this.buildStockEnrichmentUseCase.execute(enrichmentTargets)
-        : {
-            candidateQuotes: [],
-            technicalSnapshots: [],
-            newsSnapshots: [],
-            eventSnapshots: [],
-            figureStatements: [],
-          };
+        : null;
 
-    const news: NewsAnalysisInput[] = [
-      ...krNews.map((n) => ({ ...n, market: Market.KR as Market | 'global' })),
-      ...usNewsGoogle.map((n) => ({ ...n, market: Market.US as Market | 'global' })),
-      ...finnhubNews.map((n) => ({ ...n, market: 'global' as const })),
-    ];
+    const {
+      candidateQuotes = [],
+      technicalSnapshots = [],
+      newsSnapshots = [],
+      eventSnapshots = [],
+      figureStatements = [],
+      quality: enrichmentQuality,
+    } = enrichment ?? {
+      candidateQuotes: [],
+      technicalSnapshots: [],
+      newsSnapshots: [],
+      eventSnapshots: [],
+      figureStatements: [],
+      quality: undefined,
+    };
 
     const investorProfile = buildInvestorProfile(
       options?.investorProfile ?? createDefaultStoredProfile(),
     );
+
+    const dataQuality =
+      enrichmentQuality != null
+        ? {
+            news: headlineNews.quality,
+            enrichment: enrichmentQuality,
+            incompleteEnrichment: isEnrichmentBatchIncomplete(enrichmentQuality),
+          }
+        : {
+            news: headlineNews.quality,
+            enrichment: {
+              quotes: { requested: 0, received: 0, cacheHits: 0, failed: 0 },
+              technical: { requested: 0, received: 0, cacheHits: 0, failed: 0 },
+              news: { requested: 0, received: 0, cacheHits: 0, failed: 0 },
+              events: { requested: 0, received: 0, cacheHits: 0, failed: 0 },
+            },
+            incompleteEnrichment: false,
+          };
 
     return buildMarketAnalysisReport({
       indexInputs: marketContext.indexInputs,
       candidateQuotes,
       macroInputs: marketContext.macroInputs,
       sectorInputs: marketContext.sectorInputs,
-      news,
+      news: headlineNews.items,
       fetchedAt: new Date().toISOString(),
       userHoldings: options?.userHoldings,
       userWatchlist: options?.userWatchlist,
@@ -84,6 +105,7 @@ export class GetMarketAnalysisUseCase {
       newsSnapshots,
       eventSnapshots,
       figureStatements,
+      dataQuality,
     });
   }
 }

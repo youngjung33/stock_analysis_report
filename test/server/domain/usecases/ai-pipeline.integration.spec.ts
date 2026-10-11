@@ -50,6 +50,11 @@ function mockReport() {
     score: 0.5,
     insights: [{ category: 'stockAction', title: 't', summary: 's' }],
     scoreBreakdown: [{ factor: 'momentum', delta: 0.1 }],
+    snapshots: {
+      technicalSnapshots: [],
+      newsSnapshots: [],
+      eventSnapshots: [],
+    },
   };
 }
 
@@ -82,13 +87,6 @@ describe('AI pipeline integration', () => {
       {
         execute: vi.fn().mockResolvedValue({ macro: [], sectors: [], indices: [] }),
       } as never,
-      {
-        execute: vi.fn().mockResolvedValue({
-          technicalSnapshots: [],
-          newsSnapshots: [],
-          eventSnapshots: [],
-        }),
-      } as never,
       { execute: vi.fn().mockResolvedValue(mockDashboard()) } as never,
       { execute: vi.fn().mockResolvedValue([]) } as never,
     );
@@ -118,7 +116,6 @@ describe('AI pipeline integration', () => {
   it('stops pipeline with AI_CONTEXT_UNAVAILABLE when report fails', async () => {
     const buildContext = new BuildStockAiContextUseCase(
       { execute: vi.fn().mockRejectedValue(new Error('STOCK_ANALYSIS_UNAVAILABLE')) } as never,
-      { execute: vi.fn() } as never,
       { execute: vi.fn() } as never,
       { execute: vi.fn().mockResolvedValue(mockDashboard()) } as never,
       { execute: vi.fn().mockResolvedValue([]) } as never,

@@ -12,6 +12,7 @@ import {
   getCachedRecommendationEvent,
   setCachedRecommendationEvent,
 } from '../../../data/market/recommendation-events.cache';
+import type { EnrichmentFetchOptions } from './enrichment-fetch.types';
 
 export interface RecommendationEventRequest {
   symbol: string;
@@ -27,7 +28,10 @@ export class FetchRecommendationEventSnapshotsUseCase {
     private readonly catalogRepo?: IStockCatalogRepository,
   ) {}
 
-  async execute(stocks: RecommendationEventRequest[]): Promise<StockEventSnapshot[]> {
+  async execute(
+    stocks: RecommendationEventRequest[],
+    options?: EnrichmentFetchOptions,
+  ): Promise<StockEventSnapshot[]> {
     if (stocks.length === 0) return [];
 
     const krSymbols = stocks.filter((s) => s.market === Market.KR).map((s) => s.symbol);
@@ -37,14 +41,22 @@ export class FetchRecommendationEventSnapshotsUseCase {
 
     const snapshots: StockEventSnapshot[] = [];
     const seen = new Set<string>();
+    const quality = options?.quality;
 
     for (const stock of stocks.slice(0, 40)) {
       const key = `${stock.market}:${stock.symbol.toUpperCase()}`;
       if (seen.has(key)) continue;
       seen.add(key);
 
-      const cached = getCachedRecommendationEvent(stock.symbol, stock.market);
+      if (quality) quality.requested += 1;
+
+      const cached =
+        options?.bypassCache ? null : getCachedRecommendationEvent(stock.symbol, stock.market);
       if (cached) {
+        if (quality) {
+          quality.cacheHits += 1;
+          quality.received += 1;
+        }
         snapshots.push(cached);
         continue;
       }
@@ -54,9 +66,12 @@ export class FetchRecommendationEventSnapshotsUseCase {
         if (snap) {
           setCachedRecommendationEvent(snap);
           snapshots.push(snap);
+          if (quality) quality.received += 1;
+        } else if (quality) {
+          quality.failed += 1;
         }
       } catch {
-        // skip failed symbol
+        if (quality) quality.failed += 1;
       }
 
       if (stock.market === Market.US) {

@@ -1,4 +1,5 @@
 import { Market } from './enums';
+import type { MarketReportDataQuality } from './report-data-quality';
 import { MacroIndicatorSnapshot, MacroSeriesInput, buildMacroSnapshot } from './market-macro';
 import {
   SectorEtfSnapshot,
@@ -146,6 +147,7 @@ export interface NewsAnalysisInput {
 
 export interface MarketAnalysisReport extends MarketInsightsResult {
   fetchedAt: string;
+  dataQuality?: MarketReportDataQuality;
   macro: MacroIndicatorSnapshot[];
   indices: IndexTechnicalSnapshot[];
   sectors: SectorEtfSnapshot[];
@@ -998,6 +1000,7 @@ export function buildMarketAnalysisReport(input: {
   newsSnapshots?: import('./market-recommendation/news-enrichment').StockNewsSnapshot[];
   eventSnapshots?: import('./market-recommendation/event-enrichment').StockEventSnapshot[];
   figureStatements?: import('./market-recommendation/figure-enrichment').FigureStatementSnapshot[];
+  dataQuality?: MarketReportDataQuality;
 }): MarketAnalysisReport {
   const indices = input.indexInputs
     .map(buildIndexSnapshot)
@@ -1076,6 +1079,7 @@ export function buildMarketAnalysisReport(input: {
     news: input.news,
     figureStatements: input.figureStatements ?? [],
     policyUncertainty: hasPolicyUncertaintyPulse(input.figureStatements ?? []),
+    dataQuality: input.dataQuality,
   };
 }
 

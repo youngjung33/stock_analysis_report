@@ -10,6 +10,7 @@ import {
   getCachedRecommendationTechnical,
   setCachedRecommendationTechnical,
 } from '../../../data/market/recommendation-technical.cache';
+import type { EnrichmentFetchOptions } from './enrichment-fetch.types';
 
 export interface RecommendationTechnicalRequest {
   symbol: string;
@@ -26,25 +27,37 @@ const BENCHMARK_YAHOO: Record<Market, string> = {
 export class FetchRecommendationTechnicalSnapshotsUseCase {
   constructor(private readonly marketData: IMarketDataProvider) {}
 
-  async execute(stocks: RecommendationTechnicalRequest[]): Promise<StockTechnicalSnapshot[]> {
+  async execute(
+    stocks: RecommendationTechnicalRequest[],
+    options?: EnrichmentFetchOptions,
+  ): Promise<StockTechnicalSnapshot[]> {
     if (stocks.length === 0) return [];
 
     const benchmark1w = await this.loadBenchmark1wChanges();
     const snapshots: StockTechnicalSnapshot[] = [];
     const seen = new Set<string>();
+    const quality = options?.quality;
 
     for (const stock of stocks.slice(0, 40)) {
       const key = `${stock.market}:${stock.symbol.toUpperCase()}`;
       if (seen.has(key)) continue;
       seen.add(key);
 
-      const cached = getCachedRecommendationTechnical(stock.symbol, stock.market);
+      if (quality) quality.requested += 1;
+
+      const cached =
+        options?.bypassCache ? null : getCachedRecommendationTechnical(stock.symbol, stock.market);
       if (cached) {
+        if (quality) {
+          quality.cacheHits += 1;
+          quality.received += 1;
+        }
         snapshots.push(cached);
         continue;
       }
 
       if (!this.marketData.supports(stock.market) || !this.marketData.isAvailable(stock.market)) {
+        if (quality) quality.failed += 1;
         continue;
       }
 
@@ -52,6 +65,7 @@ export class FetchRecommendationTechnicalSnapshotsUseCase {
         const yahoo =
           stock.yahooSymbol ?? resolveYahooSymbol(stock.symbol, stock.market);
         if (!yahoo) {
+          if (quality) quality.failed += 1;
           continue;
         }
         const series = await this.marketData.fetchChartSeries(yahoo, '6mo');
@@ -68,9 +82,12 @@ export class FetchRecommendationTechnicalSnapshotsUseCase {
         if (snap) {
           setCachedRecommendationTechnical(snap);
           snapshots.push(snap);
+          if (quality) quality.received += 1;
+        } else if (quality) {
+          quality.failed += 1;
         }
       } catch {
-        // skip failed series
+        if (quality) quality.failed += 1;
       }
 
       if (stock.market === Market.US) {

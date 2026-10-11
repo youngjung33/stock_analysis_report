@@ -5,6 +5,7 @@ import {
   getCachedRecommendationQuote,
   setCachedRecommendationQuote,
 } from '../../../data/market/recommendation-quote.cache';
+import type { EnrichmentFetchOptions } from './enrichment-fetch.types';
 
 export interface RecommendationQuoteRequest {
   symbol: string;
@@ -18,12 +19,23 @@ export interface RecommendationQuoteRequest {
 export class FetchRecommendationQuotesUseCase {
   constructor(private readonly marketData: IMarketDataProvider) {}
 
-  async execute(stocks: RecommendationQuoteRequest[]): Promise<QuoteInsightInput[]> {
+  async execute(
+    stocks: RecommendationQuoteRequest[],
+    options?: EnrichmentFetchOptions,
+  ): Promise<QuoteInsightInput[]> {
     const quotes: QuoteInsightInput[] = [];
+    const quality = options?.quality;
 
     for (const stock of stocks) {
-      const cached = getCachedRecommendationQuote(stock.symbol, stock.market);
+      if (quality) quality.requested += 1;
+
+      const cached =
+        options?.bypassCache ? null : getCachedRecommendationQuote(stock.symbol, stock.market);
       if (cached) {
+        if (quality) {
+          quality.cacheHits += 1;
+          quality.received += 1;
+        }
         quotes.push({
           symbol: stock.symbol,
           name: stock.name,
@@ -35,7 +47,10 @@ export class FetchRecommendationQuotesUseCase {
         continue;
       }
 
-      if (!marketDataSupports(this.marketData, stock.market)) continue;
+      if (!marketDataSupports(this.marketData, stock.market)) {
+        if (quality) quality.failed += 1;
+        continue;
+      }
 
       try {
         const quote = await this.marketData.fetchStockQuote({
@@ -64,8 +79,9 @@ export class FetchRecommendationQuotesUseCase {
           currentPrice: quote.currentPrice,
           changePercent: quote.changePercent,
         });
+        if (quality) quality.received += 1;
       } catch {
-        // skip failed quote
+        if (quality) quality.failed += 1;
       }
 
       if (stock.market === Market.US) {

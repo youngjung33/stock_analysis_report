@@ -349,7 +349,6 @@ export function getServerServices(): ServerServices {
     buildStockAiContextUseCase: new BuildStockAiContextUseCase(
       buildStockAnalysisReportUseCase,
       buildMarketContextUseCase,
-      buildStockEnrichmentUseCase,
       getDashboardUseCase,
       listWatchlistUseCase,
     ),

@@ -4,7 +4,6 @@ import {
   pickStockEnrichment,
   pickNewsTitlesForAi,
   buildStockDerivedFacts,
-  resolveCurrency,
   detectMarketRegimes,
   findRegionSentimentIndex,
   resolveRegionSentimentsFromIndices,
@@ -13,22 +12,15 @@ import {
 } from '@sar/shared';
 import { BuildStockAnalysisReportUseCase } from '../market/build-stock-analysis-report.use-case';
 import { BuildMarketContextUseCase } from '../market/build-market-context.use-case';
-import { BuildStockEnrichmentUseCase } from '../market/build-stock-enrichment.use-case';
 import { GetDashboardUseCase } from '../portfolio/get-dashboard.use-case';
 import { ListWatchlistUseCase } from '../watchlist/watchlist.use-cases';
 import { computeContextHash } from '@/server/data/ai/context-hash';
-import {
-  EMPTY_MARKET_CONTEXT,
-  EMPTY_STOCK_ENRICHMENT,
-  rethrowAiContextUnavailable,
-  withContextFallback,
-} from './context-build.helpers';
+import { rethrowAiContextUnavailable } from './context-build.helpers';
 
 export class BuildStockAiContextUseCase {
   constructor(
     private readonly buildStockAnalysisReportUseCase: BuildStockAnalysisReportUseCase,
     private readonly buildMarketContextUseCase: BuildMarketContextUseCase,
-    private readonly buildStockEnrichmentUseCase: BuildStockEnrichmentUseCase,
     private readonly getDashboardUseCase: GetDashboardUseCase,
     private readonly listWatchlistUseCase: ListWatchlistUseCase,
   ) {}
@@ -41,28 +33,26 @@ export class BuildStockAiContextUseCase {
     yahooSymbol?: string;
     locale: SupportedLocale;
   }): Promise<StockAiContext> {
-    const [marketContext, dashboard, userWatchlist] = await Promise.all([
-      withContextFallback('stock.marketContext', EMPTY_MARKET_CONTEXT, () =>
-        this.buildMarketContextUseCase.execute(),
-      ),
-      (async () => {
-        try {
-          return await this.getDashboardUseCase.execute(input.userId);
-        } catch (error) {
-          rethrowAiContextUnavailable(error);
-        }
-      })(),
-      withContextFallback('stock.watchlist', [] as Array<{ symbol: string; market: Market }>, async () => {
-        const items = await this.listWatchlistUseCase.execute(input.userId);
-        return items.map((w) => ({ symbol: w.symbol, market: w.market }));
-      }),
-    ]);
+    let dashboard;
+    try {
+      dashboard = await this.getDashboardUseCase.execute(input.userId);
+    } catch (error) {
+      rethrowAiContextUnavailable(error);
+    }
+
+    let userWatchlist: Array<{ symbol: string; market: Market }> = [];
+    try {
+      const items = await this.listWatchlistUseCase.execute(input.userId);
+      userWatchlist = items.map((w) => ({ symbol: w.symbol, market: w.market }));
+    } catch (error) {
+      rethrowAiContextUnavailable(error);
+    }
 
     const userHoldings = dashboard.holdings.map((h) => ({ symbol: h.symbol, market: h.market }));
 
-    let report;
+    let reportBundle;
     try {
-      report = await this.buildStockAnalysisReportUseCase.execute({
+      reportBundle = await this.buildStockAnalysisReportUseCase.execute({
         symbol: input.symbol,
         name: input.name,
         market: input.market,
@@ -74,20 +64,17 @@ export class BuildStockAiContextUseCase {
       rethrowAiContextUnavailable(error);
     }
 
-    const currency = resolveCurrency(input.market);
-    const target = {
-      symbol: input.symbol,
-      name: input.name,
-      market: input.market,
-      currency,
-      yahooSymbol: input.yahooSymbol,
-    };
-    const enrichment = await withContextFallback('stock.enrichment', EMPTY_STOCK_ENRICHMENT, () =>
-      this.buildStockEnrichmentUseCase.execute([target]),
-    );
-    const technical = pickStockEnrichment(enrichment.technicalSnapshots, input.symbol, input.market);
-    const news = pickStockEnrichment(enrichment.newsSnapshots, input.symbol, input.market);
-    const event = pickStockEnrichment(enrichment.eventSnapshots, input.symbol, input.market);
+    let marketContext;
+    try {
+      marketContext = await this.buildMarketContextUseCase.execute();
+    } catch (error) {
+      rethrowAiContextUnavailable(error);
+    }
+
+    const { snapshots, ...report } = reportBundle;
+    const technical = pickStockEnrichment(snapshots.technicalSnapshots, input.symbol, input.market);
+    const news = pickStockEnrichment(snapshots.newsSnapshots, input.symbol, input.market);
+    const event = pickStockEnrichment(snapshots.eventSnapshots, input.symbol, input.market);
 
     const holding = dashboard.holdings.find(
       (h) => h.symbol.toUpperCase() === input.symbol.toUpperCase() && h.market === input.market,
@@ -177,6 +164,7 @@ export class BuildStockAiContextUseCase {
         eventDay: event?.eventDay ?? null,
         ruleTag: report.tag,
       }),
+      dataQuality: report.dataQuality,
     };
 
     const contextHash = computeContextHash({ kind: 'stock', facts });

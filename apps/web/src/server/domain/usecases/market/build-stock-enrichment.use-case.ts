@@ -4,7 +4,9 @@ import type {
   StockEventSnapshot,
   StockNewsSnapshot,
   StockTechnicalSnapshot,
+  EnrichmentBatchQuality,
 } from '@sar/shared';
+import { createEnrichmentBatchQuality } from '@sar/shared';
 import { FetchRecommendationQuotesUseCase, type RecommendationQuoteRequest } from './fetch-recommendation-quotes.use-case';
 import {
   FetchRecommendationTechnicalSnapshotsUseCase,
@@ -20,6 +22,19 @@ import {
 } from './fetch-recommendation-events.use-case';
 import { FetchRecommendationFigureStatementsUseCase } from './fetch-recommendation-figures.use-case';
 
+export interface BuildStockEnrichmentOptions {
+  bypassCache?: boolean;
+}
+
+export interface BuildStockEnrichmentResult {
+  candidateQuotes: QuoteInsightInput[];
+  technicalSnapshots: StockTechnicalSnapshot[];
+  newsSnapshots: StockNewsSnapshot[];
+  eventSnapshots: StockEventSnapshot[];
+  figureStatements: FigureStatementSnapshot[];
+  quality: EnrichmentBatchQuality;
+}
+
 /** Phase G–J — batch fetch quotes + technical + news + events + figure statements */
 export class BuildStockEnrichmentUseCase {
   constructor(
@@ -30,13 +45,19 @@ export class BuildStockEnrichmentUseCase {
     private readonly fetchFiguresUseCase: FetchRecommendationFigureStatementsUseCase,
   ) {}
 
-  async execute(targets: RecommendationQuoteRequest[]): Promise<{
-    candidateQuotes: QuoteInsightInput[];
-    technicalSnapshots: StockTechnicalSnapshot[];
-    newsSnapshots: StockNewsSnapshot[];
-    eventSnapshots: StockEventSnapshot[];
-    figureStatements: FigureStatementSnapshot[];
-  }> {
+  async execute(
+    targets: RecommendationQuoteRequest[],
+    options?: BuildStockEnrichmentOptions,
+  ): Promise<BuildStockEnrichmentResult> {
+    const quality = createEnrichmentBatchQuality(0);
+    const fetchOpts = {
+      bypassCache: options?.bypassCache,
+      quality: quality.quotes,
+    };
+    const technicalOpts = { bypassCache: options?.bypassCache, quality: quality.technical };
+    const newsOpts = { bypassCache: options?.bypassCache, quality: quality.news };
+    const eventOpts = { bypassCache: options?.bypassCache, quality: quality.events };
+
     const newsTargets: RecommendationNewsRequest[] = targets.map((t) => ({
       symbol: t.symbol,
       name: t.name,
@@ -44,9 +65,9 @@ export class BuildStockEnrichmentUseCase {
     }));
 
     const [candidateQuotes, technicalSnapshots, newsSnapshots, figureStatements] = await Promise.all([
-      this.fetchQuotesUseCase.execute(targets),
-      this.fetchTechnicalUseCase.execute(targets as RecommendationTechnicalRequest[]),
-      this.fetchNewsUseCase.execute(newsTargets),
+      this.fetchQuotesUseCase.execute(targets, fetchOpts),
+      this.fetchTechnicalUseCase.execute(targets as RecommendationTechnicalRequest[], technicalOpts),
+      this.fetchNewsUseCase.execute(newsTargets, newsOpts),
       this.fetchFiguresUseCase.execute(),
     ]);
 
@@ -60,8 +81,15 @@ export class BuildStockEnrichmentUseCase {
       headlineSample: headlineByKey.get(`${t.market}:${t.symbol.toUpperCase()}`),
     }));
 
-    const eventSnapshots = await this.fetchEventsUseCase.execute(eventTargets);
+    const eventSnapshots = await this.fetchEventsUseCase.execute(eventTargets, eventOpts);
 
-    return { candidateQuotes, technicalSnapshots, newsSnapshots, eventSnapshots, figureStatements };
+    return {
+      candidateQuotes,
+      technicalSnapshots,
+      newsSnapshots,
+      eventSnapshots,
+      figureStatements,
+      quality,
+    };
   }
 }

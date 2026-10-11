@@ -4,6 +4,7 @@ import {
   getCachedRecommendationNews,
   setCachedRecommendationNews,
 } from '../../../data/market/recommendation-news.cache';
+import type { EnrichmentFetchOptions } from './enrichment-fetch.types';
 
 export interface RecommendationNewsRequest {
   symbol: string;
@@ -15,19 +16,30 @@ export interface RecommendationNewsRequest {
 export class FetchRecommendationNewsSnapshotsUseCase {
   constructor(private readonly marketData: IMarketDataProvider) {}
 
-  async execute(stocks: RecommendationNewsRequest[]): Promise<StockNewsSnapshot[]> {
+  async execute(
+    stocks: RecommendationNewsRequest[],
+    options?: EnrichmentFetchOptions,
+  ): Promise<StockNewsSnapshot[]> {
     if (stocks.length === 0) return [];
 
     const snapshots: StockNewsSnapshot[] = [];
     const seen = new Set<string>();
+    const quality = options?.quality;
 
     for (const stock of stocks.slice(0, 40)) {
       const key = `${stock.market}:${stock.symbol.toUpperCase()}`;
       if (seen.has(key)) continue;
       seen.add(key);
 
-      const cached = getCachedRecommendationNews(stock.symbol, stock.market);
+      if (quality) quality.requested += 1;
+
+      const cached =
+        options?.bypassCache ? null : getCachedRecommendationNews(stock.symbol, stock.market);
       if (cached) {
+        if (quality) {
+          quality.cacheHits += 1;
+          quality.received += 1;
+        }
         snapshots.push(cached);
         continue;
       }
@@ -43,9 +55,12 @@ export class FetchRecommendationNewsSnapshotsUseCase {
         if (snap) {
           setCachedRecommendationNews(snap);
           snapshots.push(snap);
+          if (quality) quality.received += 1;
+        } else if (quality) {
+          quality.failed += 1;
         }
       } catch {
-        // skip failed symbol
+        if (quality) quality.failed += 1;
       }
 
       if (stock.market === Market.US) {

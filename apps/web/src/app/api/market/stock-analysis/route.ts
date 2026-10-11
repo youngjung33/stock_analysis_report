@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     }
 
     const { buildStockAnalysisReportUseCase } = getServerServices();
-    const result = await buildStockAnalysisReportUseCase.execute({
+    const { snapshots: _omit, ...report } = await buildStockAnalysisReportUseCase.execute({
       symbol,
       name,
       market,
@@ -45,6 +45,6 @@ export async function GET(req: NextRequest) {
       userWatchlist,
     });
 
-    return jsonData(result);
+    return jsonData(report);
   }, { skipDeadline: true });
 }

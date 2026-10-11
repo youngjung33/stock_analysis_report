@@ -4,10 +4,20 @@ import {
   resolveCurrency,
   buildStockPriceExplanationReport,
   pickStockEnrichment,
+  isEnrichmentBatchIncomplete,
+  type StockEventSnapshot,
+  type StockNewsSnapshot,
+  type StockTechnicalSnapshot,
 } from '@sar/shared';
 import { BuildMarketContextUseCase } from './build-market-context.use-case';
 import { BuildStockEnrichmentUseCase } from './build-stock-enrichment.use-case';
 import { GetStockQuoteUseCase } from './get-stock-quote.use-case';
+
+export interface StockAnalysisEnrichmentSnapshots {
+  technicalSnapshots: StockTechnicalSnapshot[];
+  newsSnapshots: StockNewsSnapshot[];
+  eventSnapshots: StockEventSnapshot[];
+}
 
 /** 서버: 차트·enrichment 수집 후 종목 가격 해설 리포트 조립 */
 export class BuildStockAnalysisReportUseCase {
@@ -43,21 +53,22 @@ export class BuildStockAnalysisReportUseCase {
       yahooSymbol: input.yahooSymbol,
     };
 
-    const { candidateQuotes, technicalSnapshots, newsSnapshots, eventSnapshots, figureStatements } =
-      await this.buildStockEnrichmentUseCase.execute([target]);
+    const {
+      technicalSnapshots,
+      newsSnapshots,
+      eventSnapshots,
+      figureStatements,
+      quality: enrichmentQuality,
+    } = await this.buildStockEnrichmentUseCase.execute([target], { bypassCache: true });
 
-    const quote =
-      candidateQuotes.find(
-        (q) => q.symbol.toUpperCase() === input.symbol.toUpperCase() && q.market === input.market,
-      ) ??
-      ({
-        symbol: input.symbol,
-        name: input.name,
-        market: input.market,
-        currency,
-        currentPrice: chartQuote.currentPrice,
-        changePercent: chartQuote.changePercent,
-      } as const);
+    const quote = {
+      symbol: input.symbol,
+      name: input.name,
+      market: input.market,
+      currency,
+      currentPrice: chartQuote.currentPrice,
+      changePercent: chartQuote.changePercent,
+    };
 
     const chartCloses = chartQuote.points.map((p) => p.close);
     const chartHighs = chartQuote.points.map((p) => p.high ?? p.close);
@@ -82,13 +93,26 @@ export class BuildStockAnalysisReportUseCase {
       newsSnapshots,
       eventSnapshots,
       figureStatements,
-      fetchedAt: new Date().toISOString(),
+      fetchedAt: chartQuote.fetchedAt,
     });
 
     if (!report) {
       throw new Error('STOCK_ANALYSIS_UNAVAILABLE');
     }
 
-    return report;
+    const dataQuality = {
+      priceSource: 'live_chart' as const,
+      quoteAsOf: chartQuote.fetchedAt,
+      enrichment: enrichmentQuality,
+      incompleteEnrichment: isEnrichmentBatchIncomplete(enrichmentQuality),
+    };
+
+    const snapshots: StockAnalysisEnrichmentSnapshots = {
+      technicalSnapshots,
+      newsSnapshots,
+      eventSnapshots,
+    };
+
+    return { ...report, dataQuality, snapshots };
   }
 }
