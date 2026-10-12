@@ -30,7 +30,9 @@ import {
   ITransactionRepository,
   IWatchlistRepository,
 } from '../../domain/repositories';
-import { apiClient } from '../api/client';
+import { apiClient, readHeavyApiClientTimeoutMs } from '../api/client';
+
+const heavyApiRequest = { timeout: readHeavyApiClientTimeoutMs() };
 import { tokenStorage } from '../auth/token-storage';
 import { AppErrorCode } from '@sar/shared';
 import { toAppError } from '../../domain/errors/api-error';
@@ -130,7 +132,10 @@ export class ApiPortfolioRepository implements IPortfolioRepository {
   }
 
   async getAnalysis() {
-    const { data } = await apiClient.get<PortfolioAnalysisResult>('/portfolio/analysis');
+    const { data } = await apiClient.get<PortfolioAnalysisResult>(
+      '/portfolio/analysis',
+      heavyApiRequest,
+    );
     return data;
   }
 
@@ -159,6 +164,7 @@ export class ApiMarketRepository implements IMarketRepository {
       const { data } = await apiClient.post<MarketSentimentSummaryResult>(
         '/market/sentiment-summary',
         options,
+        heavyApiRequest,
       );
       return data;
     }
@@ -191,10 +197,14 @@ export class ApiMarketRepository implements IMarketRepository {
       const { data } = await apiClient.post<import('@sar/shared').MarketAnalysisReport>(
         '/market/analysis',
         options,
+        heavyApiRequest,
       );
       return data;
     }
-    const { data } = await apiClient.get<import('@sar/shared').MarketAnalysisReport>('/market/analysis');
+    const { data } = await apiClient.get<import('@sar/shared').MarketAnalysisReport>(
+      '/market/analysis',
+      heavyApiRequest,
+    );
     return data;
   }
 
@@ -206,7 +216,7 @@ export class ApiMarketRepository implements IMarketRepository {
   }) {
     const { data } = await apiClient.get<import('@sar/shared').StockPriceExplanationReport>(
       '/market/stock-analysis',
-      { params: input },
+      { params: input, ...heavyApiRequest },
     );
     return data;
   }

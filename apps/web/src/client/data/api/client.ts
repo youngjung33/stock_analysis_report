@@ -9,6 +9,12 @@ function readClientTimeoutMs(): number {
   return Number.isFinite(raw) && raw > 0 ? raw : 30_000;
 }
 
+/** 시장/종목 심층 분석 등 서버가 25–30s 걸릴 수 있는 요청 */
+export function readHeavyApiClientTimeoutMs(): number {
+  const raw = Number(process.env.NEXT_PUBLIC_HEAVY_API_CLIENT_TIMEOUT_MS ?? 90_000);
+  return Number.isFinite(raw) && raw > 0 ? raw : 90_000;
+}
+
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,

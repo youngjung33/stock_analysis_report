@@ -1,5 +1,7 @@
 import type { AiInsightEnvelope, AiProviderId, Market, SupportedLocale } from '@sar/shared';
-import { apiClient } from '../api/client';
+import { apiClient, readHeavyApiClientTimeoutMs } from '../api/client';
+
+const heavyApiRequest = { timeout: readHeavyApiClientTimeoutMs() };
 import { toAppError } from '../../domain/errors/api-error';
 import { AppErrorCode } from '@sar/shared';
 
@@ -14,7 +16,11 @@ export class ApiAiRepository {
     locale: SupportedLocale;
   }): Promise<AiAnalysisResponse> {
     try {
-      const { data } = await apiClient.post<AiAnalysisResponse>('/ai/stock-analysis', input);
+      const { data } = await apiClient.post<AiAnalysisResponse>(
+        '/ai/stock-analysis',
+        input,
+        heavyApiRequest,
+      );
       return data;
     } catch (error) {
       throw toAppError(error, AppErrorCode.AI_PROVIDER_ERROR);
@@ -23,7 +29,11 @@ export class ApiAiRepository {
 
   async fetchPortfolioInsight(locale: SupportedLocale): Promise<AiAnalysisResponse> {
     try {
-      const { data } = await apiClient.post<AiAnalysisResponse>('/ai/portfolio-analysis', { locale });
+      const { data } = await apiClient.post<AiAnalysisResponse>(
+        '/ai/portfolio-analysis',
+        { locale },
+        heavyApiRequest,
+      );
       return data;
     } catch (error) {
       throw toAppError(error, AppErrorCode.AI_PROVIDER_ERROR);
