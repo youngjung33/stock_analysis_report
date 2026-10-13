@@ -13,6 +13,10 @@ import {
   setCachedRecommendationEvent,
 } from '../../../data/market/recommendation-events.cache';
 import type { EnrichmentFetchOptions } from './enrichment-fetch.types';
+import {
+  throttleAfterKrProviderSuccess,
+  throttleAfterUsProviderSuccess,
+} from './recommendation-provider-throttle';
 
 export interface RecommendationEventRequest {
   symbol: string;
@@ -67,17 +71,16 @@ export class FetchRecommendationEventSnapshotsUseCase {
           setCachedRecommendationEvent(snap);
           snapshots.push(snap);
           if (quality) quality.received += 1;
+          if (stock.market === Market.US) {
+            await throttleAfterUsProviderSuccess();
+          } else {
+            await throttleAfterKrProviderSuccess();
+          }
         } else if (quality) {
           quality.failed += 1;
         }
       } catch {
         if (quality) quality.failed += 1;
-      }
-
-      if (stock.market === Market.US) {
-        await sleep(1100);
-      } else {
-        await sleep(250);
       }
     }
 
@@ -121,8 +124,4 @@ export class FetchRecommendationEventSnapshotsUseCase {
 
     return null;
   }
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }

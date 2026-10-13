@@ -75,6 +75,7 @@ describe('BuildStockAnalysisReportUseCase', () => {
 
     expect(report.symbol).toBe('005930');
     expect(report.currentPrice).toBe(71000);
+    expect(report.changePercent1d).toBe(2);
     expect(report.dataQuality?.priceSource).toBe('live_chart');
     expect(report.insights.some((i) => i.category === 'stockAction')).toBe(true);
     expect(getStockQuoteUseCase.execute).toHaveBeenCalledWith(
@@ -82,7 +83,7 @@ describe('BuildStockAnalysisReportUseCase', () => {
     );
     expect(buildStockEnrichmentUseCase.execute).toHaveBeenCalledWith(
       [expect.objectContaining({ symbol: '005930' })],
-      { bypassCache: true },
+      { bypassCache: true, skipQuotes: true },
     );
   });
 

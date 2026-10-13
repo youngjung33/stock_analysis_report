@@ -149,10 +149,23 @@ export async function fetchYahooChartQuote(
     throw new Error(`No chart data from Yahoo Finance for ${symbol}`);
   }
 
-  const currentPrice = closes[closes.length - 1];
-  const basePrice = pickBasePrice(closes, lookbackBars);
-  const changePercent =
-    basePrice > 0 ? ((currentPrice - basePrice) / basePrice) * 100 : null;
+  const livePrice = meta?.regularMarketPrice;
+  const currentPrice =
+    livePrice != null && livePrice > 0 ? livePrice : closes[closes.length - 1];
+
+  let changePercent: number | null;
+  if (lookbackBars === -1) {
+    const timestamps = result?.timestamp ?? [];
+    const lastBarEpochSec = timestamps.length > 0 ? timestamps[timestamps.length - 1] : null;
+    changePercent = dailyChangePercentFromCloses(closes, {
+      livePrice: livePrice != null && livePrice > 0 ? livePrice : undefined,
+      lastBarEpochSec,
+    });
+  } else {
+    const basePrice = pickBasePrice(closes, lookbackBars);
+    changePercent =
+      basePrice > 0 ? ((currentPrice - basePrice) / basePrice) * 100 : null;
+  }
 
   return { currentPrice, changePercent, range, points };
 }

@@ -5,6 +5,7 @@ import {
   setCachedRecommendationNews,
 } from '../../../data/market/recommendation-news.cache';
 import type { EnrichmentFetchOptions } from './enrichment-fetch.types';
+import { throttleAfterUsProviderSuccess } from './recommendation-provider-throttle';
 
 export interface RecommendationNewsRequest {
   symbol: string;
@@ -45,7 +46,7 @@ export class FetchRecommendationNewsSnapshotsUseCase {
       }
 
       try {
-        const articles = await this.fetchArticles(stock);
+        const { articles, usProviderCalled } = await this.fetchArticles(stock);
         const snap = buildStockNewsSnapshot({
           symbol: stock.symbol,
           market: stock.market,
@@ -59,27 +60,36 @@ export class FetchRecommendationNewsSnapshotsUseCase {
         } else if (quality) {
           quality.failed += 1;
         }
+        if (usProviderCalled) {
+          await throttleAfterUsProviderSuccess();
+        }
       } catch {
         if (quality) quality.failed += 1;
-      }
-
-      if (stock.market === Market.US) {
-        await sleep(1100);
       }
     }
 
     return snapshots;
   }
 
-  private async fetchArticles(stock: RecommendationNewsRequest) {
+  private async fetchArticles(stock: RecommendationNewsRequest): Promise<{
+    articles: Array<{ title: string; publishedAt: string; source: string }>;
+    usProviderCalled: boolean;
+  }> {
     if (stock.market === Market.US) {
-      const finnhub = await this.marketData.fetchCompanyNews(stock.symbol, 5);
-      if (finnhub.length > 0) {
-        return finnhub.map((n) => ({
-          title: n.title,
-          publishedAt: n.publishedAt,
-          source: n.source,
-        }));
+      try {
+        const finnhub = await this.marketData.fetchCompanyNews(stock.symbol, 5);
+        if (finnhub.length > 0) {
+          return {
+            usProviderCalled: true,
+            articles: finnhub.map((n) => ({
+              title: n.title,
+              publishedAt: n.publishedAt,
+              source: n.source,
+            })),
+          };
+        }
+      } catch {
+        /* Google RSS fallback — Finnhub 타임아웃·오류 시에도 뉴스 수집 시도 */
       }
     }
 
@@ -96,14 +106,13 @@ export class FetchRecommendationNewsSnapshotsUseCase {
       5,
     );
 
-    return items.map((n) => ({
-      title: n.title,
-      publishedAt: n.publishedAt,
-      source: n.source,
-    }));
+    return {
+      usProviderCalled: false,
+      articles: items.map((n) => ({
+        title: n.title,
+        publishedAt: n.publishedAt,
+        source: n.source,
+      })),
+    };
   }
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }

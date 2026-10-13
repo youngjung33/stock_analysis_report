@@ -8,7 +8,7 @@ import { useServices } from './useServices';
 import { MARKET_QUERY_KEYS, QUERY_STALE } from '../lib/query-config';
 
 export function useMarketSentimentSummary() {
-  const { getMarketSentimentSummaryUseCase, getDashboardUseCase, listWatchlistUseCase } = useServices();
+  const { getMarketSentimentSummaryUseCase, listWatchlistUseCase } = useServices();
   const { isGuest } = useAuth();
   const { data: dashboard } = useDashboard();
   const { stored: investorProfile, loading: profileLoading } = useInvestorProfile();
@@ -38,18 +38,13 @@ export function useMarketSentimentSummary() {
         return getMarketSentimentSummaryUseCase.execute();
       }
 
-      const [dash, watchlist] = await Promise.all([
-        getDashboardUseCase.execute(),
-        listWatchlistUseCase.execute(),
-      ]);
-
       return getMarketSentimentSummaryUseCase.execute({
-        userHoldings: dash.holdings.map((h) => ({
+        userHoldings: dashboard!.holdings.map((h) => ({
           symbol: h.symbol,
           market: h.market,
           name: h.name,
         })),
-        userWatchlist: watchlist.map((w) => ({
+        userWatchlist: (watchlistQuery.data ?? []).map((w) => ({
           symbol: w.symbol,
           market: w.market,
           name: w.name,
@@ -58,6 +53,8 @@ export function useMarketSentimentSummary() {
       });
     },
     staleTime: QUERY_STALE.marketReport,
-    enabled: (!isGuest || dashboard !== undefined) && !profileLoading,
+    enabled:
+      !profileLoading &&
+      (!isGuest || (dashboard !== undefined && !watchlistQuery.isLoading)),
   });
 }

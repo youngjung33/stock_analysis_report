@@ -6,6 +6,7 @@ import {
   setCachedRecommendationQuote,
 } from '../../../data/market/recommendation-quote.cache';
 import type { EnrichmentFetchOptions } from './enrichment-fetch.types';
+import { throttleAfterUsProviderSuccess } from './recommendation-provider-throttle';
 
 export interface RecommendationQuoteRequest {
   symbol: string;
@@ -52,6 +53,7 @@ export class FetchRecommendationQuotesUseCase {
         continue;
       }
 
+      let usThrottle = false;
       try {
         const quote = await this.marketData.fetchStockQuote({
           id: `rec:${stock.market}:${stock.symbol}`,
@@ -80,12 +82,13 @@ export class FetchRecommendationQuotesUseCase {
           changePercent: quote.changePercent,
         });
         if (quality) quality.received += 1;
+        usThrottle = stock.market === Market.US;
       } catch {
         if (quality) quality.failed += 1;
       }
 
-      if (stock.market === Market.US) {
-        await sleep(1100);
+      if (usThrottle) {
+        await throttleAfterUsProviderSuccess();
       }
     }
 
@@ -95,8 +98,4 @@ export class FetchRecommendationQuotesUseCase {
 
 function marketDataSupports(marketData: IMarketDataProvider, market: Market): boolean {
   return marketData.supports(market) && marketData.isAvailable(market);
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }

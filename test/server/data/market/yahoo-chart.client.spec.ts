@@ -31,7 +31,38 @@ describe('fetchYahooChartQuote range', () => {
     );
   });
 
-  it('computes change from closes for 5y range', async () => {
+  it('6mo range: 당일 등락은 live vs 전일 종가 (6개월 수익률 아님) — 종목 집중 분석 회귀', async () => {
+    const yesterdaySec = Math.floor(Date.now() / 1000) - 86_400;
+    const twoDaysAgoSec = yesterdaySec - 86_400;
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        chart: {
+          result: [
+            {
+              meta: { regularMarketPrice: 480_000 },
+              timestamp: [1_600_000_000, twoDaysAgoSec, yesterdaySec],
+              indicators: {
+                quote: [{ close: [300_000, 510_000, 500_000] }],
+              },
+            },
+          ],
+        },
+      }),
+    });
+
+    const quote = await fetchYahooChartQuote('000660.KS', '6mo');
+    expect(quote.currentPrice).toBe(480_000);
+    expect(quote.changePercent).toBeCloseTo(-4, 1);
+    const fullPeriodWrong = ((480_000 - 300_000) / 300_000) * 100;
+    expect(quote.changePercent).not.toBeCloseTo(fullPeriodWrong, 0);
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('interval=1d&range=6mo'),
+      expect.any(Object),
+    );
+  });
+
+  it('uses 1d change (not full-period return) for long daily ranges like 5y', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
@@ -48,7 +79,7 @@ describe('fetchYahooChartQuote range', () => {
 
     const quote = await fetchYahooChartQuote('AAPL', '5y');
     expect(quote.currentPrice).toBe(100);
-    expect(quote.changePercent).toBe(100);
+    expect(quote.changePercent).toBeCloseTo(25, 1);
     expect(quote.points).toHaveLength(4);
     expect(global.fetch).toHaveBeenCalledWith(
       expect.stringContaining('interval=1wk&range=5y'),

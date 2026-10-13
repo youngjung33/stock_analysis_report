@@ -59,7 +59,10 @@ export class BuildStockAnalysisReportUseCase {
       eventSnapshots,
       figureStatements,
       quality: enrichmentQuality,
-    } = await this.buildStockEnrichmentUseCase.execute([target], { bypassCache: true });
+    } = await this.buildStockEnrichmentUseCase.execute([target], {
+      bypassCache: true,
+      skipQuotes: true,
+    });
 
     const quote = {
       symbol: input.symbol,

@@ -24,6 +24,8 @@ import { FetchRecommendationFigureStatementsUseCase } from './fetch-recommendati
 
 export interface BuildStockEnrichmentOptions {
   bypassCache?: boolean;
+  /** 종목 리포트 등 — 표시 가격은 live chart, 풀 시세 fetch 생략 */
+  skipQuotes?: boolean;
 }
 
 export interface BuildStockEnrichmentResult {
@@ -64,8 +66,12 @@ export class BuildStockEnrichmentUseCase {
       market: t.market,
     }));
 
+    const quotesPromise = options?.skipQuotes
+      ? Promise.resolve<QuoteInsightInput[]>([])
+      : this.fetchQuotesUseCase.execute(targets, fetchOpts);
+
     const [candidateQuotes, technicalSnapshots, newsSnapshots, figureStatements] = await Promise.all([
-      this.fetchQuotesUseCase.execute(targets, fetchOpts),
+      quotesPromise,
       this.fetchTechnicalUseCase.execute(targets as RecommendationTechnicalRequest[], technicalOpts),
       this.fetchNewsUseCase.execute(newsTargets, newsOpts),
       this.fetchFiguresUseCase.execute(),
