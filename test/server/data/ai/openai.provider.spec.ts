@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { AppErrorCode } from '@sar/shared';
 import { OpenAiProvider } from '@/server/data/ai/openai.provider';
 
 const validPayload = JSON.stringify({
@@ -73,7 +74,8 @@ describe('OpenAiProvider', () => {
   });
 
   it('aborts on timeout', async () => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.stubEnv('AI_CUSTOM_TIMEOUT_MS', '1000');
     vi.stubGlobal(
       'fetch',
       vi.fn(
@@ -87,8 +89,9 @@ describe('OpenAiProvider', () => {
     );
     const provider = new OpenAiProvider('test-key', 'gpt-4o-mini');
     const promise = provider.completeStructured(minimalRequest);
-    vi.advanceTimersByTime(31_000);
-    await expect(promise).rejects.toMatchObject({ name: 'AbortError' });
+    await vi.advanceTimersByTimeAsync(1500);
+    await expect(promise).rejects.toMatchObject({ code: AppErrorCode.REQUEST_TIMEOUT });
     vi.useRealTimers();
+    vi.unstubAllEnvs();
   });
 });

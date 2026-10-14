@@ -17,6 +17,12 @@ import {
   type SectorEtfSnapshot,
 } from '@sar/shared';
 import { ChartSeriesData, IMarketDataProvider } from '../../ports/market-data.port';
+import {
+  getCachedMarketContext,
+  getMarketContextInFlight,
+  setCachedMarketContext,
+  setMarketContextInFlight,
+} from '../../../data/market/market-context.cache';
 
 export interface BuiltMarketContextData {
   macro: MacroIndicatorSnapshot[];
@@ -34,6 +40,24 @@ export class BuildMarketContextUseCase {
   constructor(private readonly marketData: IMarketDataProvider) {}
 
   async execute(): Promise<BuiltMarketContextData> {
+    const cached = getCachedMarketContext();
+    if (cached) return cached;
+
+    const inFlight = getMarketContextInFlight();
+    if (inFlight) return inFlight;
+
+    const buildPromise = this.buildFresh();
+    setMarketContextInFlight(buildPromise);
+    try {
+      const data = await buildPromise;
+      setCachedMarketContext(data);
+      return data;
+    } finally {
+      setMarketContextInFlight(null);
+    }
+  }
+
+  private async buildFresh(): Promise<BuiltMarketContextData> {
     const sectorBenchmarks = [US_SECTOR_BENCHMARK.yahooSymbol, KR_SECTOR_BENCHMARK.yahooSymbol];
     const allSymbols = [
       ...new Set([

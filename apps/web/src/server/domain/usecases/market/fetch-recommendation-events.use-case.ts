@@ -13,15 +13,12 @@ import {
   setCachedRecommendationEvent,
 } from '../../../data/market/recommendation-events.cache';
 import type { EnrichmentFetchOptions } from './enrichment-fetch.types';
-import {
-  throttleAfterKrProviderSuccess,
-  throttleAfterUsProviderSuccess,
-} from './recommendation-provider-throttle';
+import { throttleAfterKrProviderSuccess } from './recommendation-provider-throttle';
 
 export interface RecommendationEventRequest {
   symbol: string;
   market: Market;
-  /** KR headline fallback when no earnings API */
+  /** KR/US — earnings·공시 실패 시 뉴스 헤드라인 fallback */
   headlineSample?: string;
 }
 
@@ -65,40 +62,62 @@ export class FetchRecommendationEventSnapshotsUseCase {
         continue;
       }
 
-      try {
-        const snap = await this.fetchSnapshot(stock, catalogCorpCodes);
-        if (snap) {
-          setCachedRecommendationEvent(snap);
-          snapshots.push(snap);
-          if (quality) quality.received += 1;
-          if (stock.market === Market.US) {
-            await throttleAfterUsProviderSuccess();
-          } else {
-            await throttleAfterKrProviderSuccess();
-          }
-        } else if (quality) {
-          quality.failed += 1;
+      const snap = await this.resolveSnapshot(stock, catalogCorpCodes);
+      if (snap) {
+        setCachedRecommendationEvent(snap);
+        snapshots.push(snap);
+        if (quality) quality.received += 1;
+        if (stock.market === Market.KR) {
+          await throttleAfterKrProviderSuccess();
         }
-      } catch {
-        if (quality) quality.failed += 1;
+      } else if (quality) {
+        quality.failed += 1;
       }
     }
 
     return snapshots;
   }
 
-  private async fetchSnapshot(
+  private async resolveSnapshot(
+    stock: RecommendationEventRequest,
+    catalogCorpCodes: Record<string, string>,
+  ): Promise<StockEventSnapshot | null> {
+    try {
+      const primary = await this.fetchPrimarySnapshot(stock, catalogCorpCodes);
+      if (primary) return primary;
+    } catch {
+      /* headline fallback below */
+    }
+
+    return this.headlineFallback(stock);
+  }
+
+  private headlineFallback(stock: RecommendationEventRequest): StockEventSnapshot | null {
+    if (!stock.headlineSample?.trim()) return null;
+    return buildStockEventFromHeadline({
+      symbol: stock.symbol,
+      market: stock.market,
+      headline: stock.headlineSample,
+    });
+  }
+
+  private async fetchPrimarySnapshot(
     stock: RecommendationEventRequest,
     catalogCorpCodes: Record<string, string>,
   ): Promise<StockEventSnapshot | null> {
     if (stock.market === Market.US) {
-      const earnings = await this.marketData.fetchCompanyEarnings(stock.symbol);
-      const snap = buildStockEventSnapshot({
-        symbol: stock.symbol,
-        market: stock.market,
-        earnings,
-      });
-      if (snap) return snap;
+      try {
+        const earnings = await this.marketData.fetchCompanyEarnings(stock.symbol);
+        const snap = buildStockEventSnapshot({
+          symbol: stock.symbol,
+          market: stock.market,
+          earnings,
+        });
+        if (snap) return snap;
+      } catch {
+        return this.headlineFallback(stock);
+      }
+      return this.headlineFallback(stock);
     }
 
     if (stock.market === Market.KR) {
@@ -114,14 +133,6 @@ export class FetchRecommendationEventSnapshotsUseCase {
       }
     }
 
-    if (stock.headlineSample) {
-      return buildStockEventFromHeadline({
-        symbol: stock.symbol,
-        market: stock.market,
-        headline: stock.headlineSample,
-      });
-    }
-
-    return null;
+    return this.headlineFallback(stock);
   }
 }

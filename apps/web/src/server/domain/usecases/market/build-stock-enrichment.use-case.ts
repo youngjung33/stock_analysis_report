@@ -78,7 +78,14 @@ export class BuildStockEnrichmentUseCase {
     ]);
 
     const headlineByKey = new Map(
-      newsSnapshots.map((n) => [`${n.market}:${n.symbol.toUpperCase()}`, n.headlineSample]),
+      newsSnapshots.map((n) => {
+        const key = `${n.market}:${n.symbol.toUpperCase()}`;
+        const sample =
+          n.headlineSample?.trim() ||
+          n.recentTitles?.find((t) => t.trim().length > 0)?.trim() ||
+          undefined;
+        return [key, sample];
+      }),
     );
 
     const eventTargets: RecommendationEventRequest[] = targets.map((t) => ({

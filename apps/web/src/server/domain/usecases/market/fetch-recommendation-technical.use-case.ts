@@ -11,7 +11,6 @@ import {
   setCachedRecommendationTechnical,
 } from '../../../data/market/recommendation-technical.cache';
 import type { EnrichmentFetchOptions } from './enrichment-fetch.types';
-import { throttleAfterUsProviderSuccess } from './recommendation-provider-throttle';
 
 export interface RecommendationTechnicalRequest {
   symbol: string;
@@ -62,7 +61,6 @@ export class FetchRecommendationTechnicalSnapshotsUseCase {
         continue;
       }
 
-      let usThrottle = false;
       try {
         const yahoo =
           stock.yahooSymbol ?? resolveYahooSymbol(stock.symbol, stock.market);
@@ -85,16 +83,11 @@ export class FetchRecommendationTechnicalSnapshotsUseCase {
           setCachedRecommendationTechnical(snap);
           snapshots.push(snap);
           if (quality) quality.received += 1;
-          usThrottle = stock.market === Market.US;
         } else if (quality) {
           quality.failed += 1;
         }
       } catch {
         if (quality) quality.failed += 1;
-      }
-
-      if (usThrottle) {
-        await throttleAfterUsProviderSuccess();
       }
     }
 

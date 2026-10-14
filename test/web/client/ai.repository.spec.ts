@@ -11,11 +11,30 @@ vi.mock('@/client/data/api/client', () => ({
     put: vi.fn(),
     delete: vi.fn(),
   },
+  readHeavyApiClientTimeoutMs: () => 90_000,
 }));
 
 import { apiClient } from '@/client/data/api/client';
 
 describe('ApiAiRepository', () => {
+  it('uses heavy client timeout for stock insight', async () => {
+    vi.mocked(apiClient.post).mockResolvedValue({
+      data: { enabled: true, insight: { sections: [] } },
+    });
+    const repo = new ApiAiRepository();
+    await repo.fetchStockInsight({
+      symbol: '005930',
+      name: 'Samsung',
+      market: 'KR' as never,
+      locale: 'ko',
+    });
+    expect(apiClient.post).toHaveBeenCalledWith(
+      '/ai/stock-analysis',
+      expect.any(Object),
+      { timeout: 90_000 },
+    );
+  });
+
   it('returns stock insight payload on success', async () => {
     vi.mocked(apiClient.post).mockResolvedValue({
       data: { enabled: true, insight: { sections: [] } },

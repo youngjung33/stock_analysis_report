@@ -6,7 +6,20 @@ import {
   setCachedRecommendationQuote,
 } from '../../../data/market/recommendation-quote.cache';
 import type { EnrichmentFetchOptions } from './enrichment-fetch.types';
-import { throttleAfterUsProviderSuccess } from './recommendation-provider-throttle';
+import type { StockEntity } from '../../entities';
+
+const inflightQuotes = new Map<
+  string,
+  Promise<{ currentPrice: number; changePercent: number | null }>
+>();
+
+function quoteInflightKey(market: Market, symbol: string): string {
+  return `${market}:${symbol.toUpperCase()}`;
+}
+
+export function clearRecommendationQuoteInflightForTests(): void {
+  inflightQuotes.clear();
+}
 
 export interface RecommendationQuoteRequest {
   symbol: string;
@@ -16,7 +29,7 @@ export interface RecommendationQuoteRequest {
   yahooSymbol?: string;
 }
 
-/** 후보 풀 종목 시세 fetch — 15분 TTL 캐시, US rate limit sleep */
+/** 후보 풀 종목 시세 fetch — 15분 TTL 캐시 + 동시 요청 dedupe */
 export class FetchRecommendationQuotesUseCase {
   constructor(private readonly marketData: IMarketDataProvider) {}
 
@@ -53,9 +66,8 @@ export class FetchRecommendationQuotesUseCase {
         continue;
       }
 
-      let usThrottle = false;
       try {
-        const quote = await this.marketData.fetchStockQuote({
+        const quote = await this.fetchQuoteDeduped({
           id: `rec:${stock.market}:${stock.symbol}`,
           symbol: stock.symbol,
           name: stock.name,
@@ -82,17 +94,24 @@ export class FetchRecommendationQuotesUseCase {
           changePercent: quote.changePercent,
         });
         if (quality) quality.received += 1;
-        usThrottle = stock.market === Market.US;
       } catch {
         if (quality) quality.failed += 1;
-      }
-
-      if (usThrottle) {
-        await throttleAfterUsProviderSuccess();
       }
     }
 
     return quotes;
+  }
+
+  private fetchQuoteDeduped(stock: StockEntity) {
+    const key = quoteInflightKey(stock.market as Market, stock.symbol);
+    const existing = inflightQuotes.get(key);
+    if (existing) return existing;
+
+    const promise = this.marketData.fetchStockQuote(stock).finally(() => {
+      inflightQuotes.delete(key);
+    });
+    inflightQuotes.set(key, promise);
+    return promise;
   }
 }
 

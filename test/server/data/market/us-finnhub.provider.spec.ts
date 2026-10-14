@@ -54,6 +54,7 @@ describe('UsFinnhubMarketProvider', () => {
     expect(quote).toEqual({ currentPrice: 150.5, changePercent: 2.1 });
     expect(global.fetch).toHaveBeenCalledWith(
       expect.stringContaining('finnhub.io/api/v1/quote?symbol=AAPL&token=test-key'),
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
   });
 });

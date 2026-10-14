@@ -15,6 +15,7 @@ import { fetchYahooChartQuote, fetchYahooChartSeries } from './yahoo-chart.clien
 import { fetchYahooStockSearch } from './yahoo-search.client';
 import { KrYahooMarketProvider } from './kr-yahoo.provider';
 import { UsFinnhubMarketProvider } from './us-finnhub.provider';
+import { runOnUsFinnhubQueue } from './us-finnhub-queue';
 
 /** KR/US 시세 adapter — 단일 IMarketDataProvider 구현체 */
 export class MarketDataProvider implements IMarketDataProvider {
@@ -46,7 +47,11 @@ export class MarketDataProvider implements IMarketDataProvider {
   }
 
   fetchStockQuote(stock: StockEntity) {
-    return this.quoteAdapter(stock.market as Market).fetchQuote(stock);
+    const market = stock.market as Market;
+    if (market === Market.US) {
+      return runOnUsFinnhubQueue(() => this.us.fetchQuote(stock));
+    }
+    return this.kr.fetchQuote(stock);
   }
 
   fetchUsdKrwRate() {
@@ -100,7 +105,7 @@ export class MarketDataProvider implements IMarketDataProvider {
     category: 'general' | 'forex' | 'crypto' | 'merger',
     limit = 8,
   ): Promise<NewsItemData[]> {
-    const items = await fetchFinnhubMarketNews(category, limit);
+    const items = await runOnUsFinnhubQueue(() => fetchFinnhubMarketNews(category, limit));
     return items.map((item) => ({
       title: item.headline,
       source: item.source,
@@ -111,7 +116,7 @@ export class MarketDataProvider implements IMarketDataProvider {
   }
 
   async fetchCompanyNews(symbol: string, limit = 5): Promise<NewsItemData[]> {
-    const items = await fetchFinnhubCompanyNews(symbol, limit);
+    const items = await runOnUsFinnhubQueue(() => fetchFinnhubCompanyNews(symbol, limit));
     return items.map((item) => ({
       title: item.headline,
       source: item.source,
@@ -126,7 +131,9 @@ export class MarketDataProvider implements IMarketDataProvider {
     from.setDate(from.getDate() - 3);
     const to = new Date();
     to.setDate(to.getDate() + 3);
-    const rows = await fetchFinnhubEarningsCalendar(symbol, from, to);
+    const rows = await runOnUsFinnhubQueue(() =>
+      fetchFinnhubEarningsCalendar(symbol, from, to),
+    );
     return rows.map((row) => ({
       period: `${row.year ?? ''}Q${row.quarter ?? ''}`,
       reportDate: row.date,
