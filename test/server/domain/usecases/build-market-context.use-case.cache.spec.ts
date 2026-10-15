@@ -29,4 +29,39 @@ describe('BuildMarketContextUseCase cache', () => {
 
     vi.unstubAllEnvs();
   });
+
+  it('dedupes concurrent execute while first build is in flight', async () => {
+    clearMarketContextCacheForTests();
+    vi.stubEnv('MARKET_CONTEXT_CACHE_TTL_MS', '60_000');
+
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+
+    const marketData = {
+      fetchChartSeries: vi.fn().mockImplementation(() =>
+        gate.then(() => ({
+          symbol: '^GSPC',
+          closes: [100, 101],
+          volumes: [1, 1],
+          highs: [101, 102],
+          lows: [99, 100],
+          currentPrice: 101,
+          changePercent1d: 1,
+        })),
+      ),
+    };
+
+    const useCase = new BuildMarketContextUseCase(marketData as never);
+    const first = useCase.execute();
+    const second = useCase.execute();
+    release();
+    await Promise.all([first, second]);
+
+    const calls = marketData.fetchChartSeries.mock.calls.length;
+    expect(calls).toBeGreaterThan(0);
+
+    vi.unstubAllEnvs();
+  });
 });

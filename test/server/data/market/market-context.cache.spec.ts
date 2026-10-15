@@ -40,6 +40,12 @@ describe('market-context.cache', () => {
     expect(getCachedMarketContext()).toEqual(data);
   });
 
+  it('disables cache when TTL is 0', () => {
+    vi.stubEnv('MARKET_CONTEXT_CACHE_TTL_MS', '0');
+    setCachedMarketContext(minimalContext());
+    expect(getCachedMarketContext()).toBeNull();
+  });
+
   it('expires after TTL', () => {
     vi.stubEnv('MARKET_CONTEXT_CACHE_TTL_MS', '1000');
     setCachedMarketContext(minimalContext());
