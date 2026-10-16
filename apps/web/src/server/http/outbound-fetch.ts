@@ -25,7 +25,8 @@ export async function outboundFetch(
   init?: OutboundFetchInit,
 ): Promise<Response> {
   const timeoutMs = init?.timeoutMs ?? readOutboundFetchTimeoutMs();
-  const { timeoutMs: _omit, ...rest } = init ?? {};
+  const { timeoutMs: _timeoutMs, ...rest } = init ?? {};
+  void _timeoutMs;
 
   const timeoutSignal = AbortSignal.timeout(timeoutMs);
   const signal =

@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
-import { AppErrorCode, Market } from '@sar/shared';
+import { Market } from '@sar/shared';
 import { getServerServices } from '@/server/container';
-import { ValidationError } from '@/server/domain/errors/domain.errors';
 import { enforceRateLimit } from '@/server/http/rate-limit';
 import { jsonData, tryGetAuth, runApiRoute, handleRouteError } from '@/server/http/route-utils';
 
@@ -36,7 +35,7 @@ export async function GET(req: NextRequest) {
     }
 
     const { buildStockAnalysisReportUseCase } = getServerServices();
-    const { snapshots: _omit, ...report } = await buildStockAnalysisReportUseCase.execute({
+    const reportBundle = await buildStockAnalysisReportUseCase.execute({
       symbol,
       name,
       market,
@@ -44,6 +43,8 @@ export async function GET(req: NextRequest) {
       userHoldings,
       userWatchlist,
     });
+    const { snapshots: _snapshots, ...report } = reportBundle;
+    void _snapshots;
 
     return jsonData(report);
   }, { skipDeadline: true });
