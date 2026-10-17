@@ -30,13 +30,13 @@ import {
   ITransactionRepository,
   IWatchlistRepository,
 } from '../../domain/repositories';
-import { apiClient, readHeavyApiClientTimeoutMs } from '../api/client';
-
-const heavyApiRequest = { timeout: readHeavyApiClientTimeoutMs() };
-import { tokenStorage } from '../auth/token-storage';
 import { AppErrorCode } from '@sar/shared';
+import { apiClient, readHeavyApiClientTimeoutMs } from '../api/client';
+import { tokenStorage } from '../auth/token-storage';
 import { toAppError } from '../../domain/errors/api-error';
 import type { UsernameCheckResult } from '../../domain/errors/api-success';
+
+const heavyApiRequest = { timeout: readHeavyApiClientTimeoutMs() };
 
 export class ApiAuthRepository implements IAuthRepository {
   async login(username: string, password: string): Promise<LoginResult> {

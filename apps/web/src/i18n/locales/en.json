@@ -654,6 +654,14 @@
     "upDownCount": "↑{{up}} ↓{{down}}",
     "deepAnalysisDesc": "VIX · FX · Treasuries · Sector RS · SMA/RSI/MACD/Bollinger/Stochastic · News",
     "disclaimer": "Reference analysis based on Yahoo Finance, Google News, and Finnhub (optional). Not investment advice.",
+    "dataQualityFootnote": {
+      "title": "Data collection note",
+      "incompleteEnrichment": "Some quotes, charts, news, or event data could not be fully loaded. The analysis reflects only what was collected.",
+      "newsSourceFailed": "Could not load some news sources ({{sources}}).",
+      "newsKrGoogle": "Korea Google",
+      "newsUsGoogle": "US Google",
+      "newsFinnhub": "Finnhub"
+    },
     "watchlistPrefix": "Watchlist:",
     "seeMoreInDetail": "See more in detail",
     "deepAnalysisTitle": "Market outlook · deep analysis",

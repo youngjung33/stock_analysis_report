@@ -34,6 +34,7 @@ import {
 import { RecommendationHistorySection } from './market-analysis/RecommendationHistorySection';
 import { FigurePulseSection } from './market-analysis/FigurePulseSection';
 import { StockFocusSection } from './market-analysis/StockFocusSection';
+import { MarketReportDataQualityNotice } from './ReportDataQualityNotice';
 
 interface Props {
   compact?: boolean;
@@ -417,6 +418,7 @@ export function MarketAnalysisDetailSection({ compact }: Props) {
             </div>
           )}
 
+          <MarketReportDataQualityNotice quality={data.dataQuality} />
           <p className="text-[11px] leading-relaxed text-slate-600">{t('market.disclaimer')}</p>
         </>
       )}

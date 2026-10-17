@@ -34,6 +34,12 @@ function makeT(bundle: typeof ko): TFunction {
 }
 
 describe('stock focus i18n', () => {
+  it('ko and en have matching market.dataQualityFootnote keys', () => {
+    const koKeys = collectKeys(ko.market.dataQualityFootnote).sort();
+    const enKeys = collectKeys(en.market.dataQualityFootnote).sort();
+    expect(koKeys).toEqual(enKeys);
+  });
+
   it('ko and en have matching stockFocus insight keys', () => {
     const koKeys = collectKeys(ko.shared.market.insights.stockFocus).sort();
     const enKeys = collectKeys(en.shared.market.insights.stockFocus).sort();

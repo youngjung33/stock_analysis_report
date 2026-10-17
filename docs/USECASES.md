@@ -91,7 +91,7 @@ test/
 ```
 
 ```bash
-npm run test         # @sar/shared (265) → @sar/web (474) Vitest — 합계 739
+npm run test         # @sar/shared (265) → @sar/web (516) Vitest — 합계 781
 npm run test -w @sar/shared   # shared only (test/shared/)
 npm run test:e2e     # Playwright 35 scenarios (production-smoke 제외)
 npm run test:e2e:all # Playwright 38 scenarios (production-smoke 포함)
@@ -165,10 +165,10 @@ npm run test:e2e:all # Playwright 38 scenarios (production-smoke 포함)
 | `GetMarketIndicesUseCase` | GET `/api/market/indices` | `get-market-indices.use-case.spec.ts` |
 | `GetMarketSentimentSummaryUseCase` | GET/POST `/api/market/sentiment-summary` (보유·관심 개인화) | `get-market-sentiment-summary.use-case.spec.ts` |
 | `GetStockQuoteUseCase` | GET `/api/market/quote` | provider/chart |
-| `FetchQuotesUseCase` | POST `/api/market/quotes` | `market.use-cases.spec.ts` |
+| `FetchQuotesUseCase` | POST `/api/market/quotes` | `fetch-quotes.use-case.spec.ts`, `market.use-cases.spec.ts` |
 | `GetMarketStatusUseCase` | GET `/api/market/status` | `get-market-status.use-case.spec.ts` |
 | `SearchStocksUseCase` | GET `/api/market/search` | `search-stocks.use-case.spec.ts` |
-| `GetFxRateUseCase` | GET `/api/market/fx` | client `market.use-cases.spec.ts` |
+| `GetFxRateUseCase` | GET `/api/market/fx` | `get-fx-rate.use-case.spec.ts`, client `market.use-cases.spec.ts` |
 | `GetMarketAnalysisUseCase` | GET `/api/market/analysis` | `get-market-analysis.use-case.spec.ts` |
 | `BuildStockAnalysisReportUseCase` | GET `/api/market/stock-analysis` | `build-stock-analysis-report.use-case.spec.ts`, `stock-analysis-route.spec.ts` |
 | `RunGlobalRecommendationBatchUseCase` | POST `/api/cron/recommendation-batch` | `global-baseline-recommendations.spec.ts`, cron route |

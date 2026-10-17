@@ -13,6 +13,7 @@
     "test:e2e": "npm run test:e2e -w @sar/web",
     "test:e2e:production": "npm run build && npm run test:e2e:production -w @sar/web",
     "lint": "npm run lint -w @sar/web",
+    "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,md,scss}\"",
     "db:migrate": "npm run db:migrate -w @sar/web",
     "db:deploy": "npm run db:deploy -w @sar/web",
     "db:push": "npm run db:push -w @sar/web",

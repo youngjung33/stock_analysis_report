@@ -654,6 +654,14 @@
     "upDownCount": "↑{{up}} ↓{{down}}",
     "deepAnalysisDesc": "VIX · 환율 · 국채 · 섹터 RS · SMA/RSI/MACD/볼린저/스토캐스틱 · 뉴스",
     "disclaimer": "Yahoo Finance·Google News·Finnhub(선택) 기반 참고용 분석이며 투자 권유가 아닙니다.",
+    "dataQualityFootnote": {
+      "title": "데이터 수집 참고",
+      "incompleteEnrichment": "일부 시세·차트·뉴스·일정 데이터를 모두 가져오지 못했습니다. 표시된 분석은 수집된 데이터만 반영합니다.",
+      "newsSourceFailed": "뉴스 소스 일부({{sources}})를 불러오지 못했습니다.",
+      "newsKrGoogle": "한국 Google",
+      "newsUsGoogle": "미국 Google",
+      "newsFinnhub": "Finnhub"
+    },
     "watchlistPrefix": "관심 종목:",
     "seeMoreInDetail": "상세에서 더 보기",
     "deepAnalysisTitle": "시장 정세 · 심층 분석",
