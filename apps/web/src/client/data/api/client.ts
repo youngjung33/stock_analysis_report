@@ -9,7 +9,7 @@ function readClientTimeoutMs(): number {
   return Number.isFinite(raw) && raw > 0 ? raw : 30_000;
 }
 
-/** 시장/종목 심층 분석 등 서버가 25–30s 걸릴 수 있는 요청 */
+/** 시장/종목 심층 분석 — 서버 maxDuration(~25s)과 무관하게 클라이언트는 최대 90s(환경변수)까지 대기 */
 export function readHeavyApiClientTimeoutMs(): number {
   const raw = Number(process.env.NEXT_PUBLIC_HEAVY_API_CLIENT_TIMEOUT_MS ?? 90_000);
   return Number.isFinite(raw) && raw > 0 ? raw : 90_000;

@@ -35,6 +35,7 @@ import { RecommendationHistorySection } from './market-analysis/RecommendationHi
 import { FigurePulseSection } from './market-analysis/FigurePulseSection';
 import { StockFocusSection } from './market-analysis/StockFocusSection';
 import { MarketReportDataQualityNotice } from './ReportDataQualityNotice';
+import { HeavyRequestLoadingMessage } from './HeavyRequestLoadingMessage';
 
 interface Props {
   compact?: boolean;
@@ -353,9 +354,7 @@ export function MarketAnalysisDetailSection({ compact }: Props) {
         </p>
       </div>
 
-      {isLoading && (
-        <p className="text-sm text-slate-400">{t('market.deepAnalysisLoading')}</p>
-      )}
+      <HeavyRequestLoadingMessage active={isLoading} kind="marketDeep" />
 
       {data && (
         <>

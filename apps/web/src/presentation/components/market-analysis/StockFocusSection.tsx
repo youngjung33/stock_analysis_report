@@ -16,6 +16,7 @@ import { stockDetailHref } from '../../shared/stock-routes';
 import { StockSearchField } from '../../shared/StockSearchField';
 import { AiStockInsightPanel } from '../../features/ai/AiStockInsightPanel';
 import { StockReportDataQualityNotice } from '../ReportDataQualityNotice';
+import { HeavyRequestLoadingMessage } from '../HeavyRequestLoadingMessage';
 
 const TONE_STYLE: Record<AnalysisTone, string> = {
   bullish: 'border-emerald-500/30 bg-emerald-500/5',
@@ -110,8 +111,8 @@ export function StockFocusSection() {
         compact
       />
 
-      {selected && isLoading && (
-        <p className="text-sm text-slate-400">{t('market.stockFocusLoading')}</p>
+      {selected && (
+        <HeavyRequestLoadingMessage active={isLoading} kind="stockFocus" />
       )}
 
       {data && (

@@ -123,7 +123,7 @@ describe('StockFocusSection', () => {
     expect(screen.getByRole('link', { name: /차트 상세/ })).toBeTruthy();
   });
 
-  it('shows loading message while fetching', () => {
+  it('shows dynamic heavy loading message while fetching', () => {
     vi.mocked(useStockAnalysis).mockReturnValue({
       data: undefined,
       isLoading: true,
@@ -132,6 +132,7 @@ describe('StockFocusSection', () => {
 
     render(<StockFocusSection />);
 
-    expect(screen.getByText('차트·시장·일정 분석 중… (최대 25초)')).toBeTruthy();
+    expect(screen.getByRole('progressbar')).toBeTruthy();
+    expect(screen.getByText('차트·시장·일정을 분석하는 중입니다')).toBeTruthy();
   });
 });

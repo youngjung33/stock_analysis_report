@@ -62,7 +62,7 @@ export class FetchQuotesUseCase {
       succeeded.push({ stockId: stock.stockId, symbol: stock.symbol, market: stock.market });
       updated += 1;
 
-      // Finnhub free tier rate limit
+      // US Finnhub 무료 tier — provider 큐와 별도로 게스트 bulk quotes 루프 페이싱
       if (stock.market === Market.US) {
         await sleep(1100);
       }

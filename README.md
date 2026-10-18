@@ -80,7 +80,8 @@ http://localhost:3000
 ## 테스트
 
 ```bash
-npm run test           # Vitest 781 (shared 265 + web 516) — USECASES.md
+npm run test           # Vitest — USECASES.md (합계는 npm test 출력 참고)
+# LIVE_MARKET_API_INTEGRATION=1 npm test -w @sar/web  # 선택: Yahoo/Finnhub 실 API 통합
 npm run lint           # ESLint (flat config)
 npx playwright install # E2E 최초 1회 (브라우저 바이너리)
 npm run test:e2e       # Playwright 35 scenarios (production-smoke 제외)

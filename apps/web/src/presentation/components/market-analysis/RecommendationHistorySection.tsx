@@ -82,9 +82,9 @@ function BacktestSummaryPanel({ batches }: { batches: RecommendationBatchView[] 
               })}
             </span>
           </div>
-          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-800">
+          <div className="sar-progress-track mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-800">
             <div
-              className="h-full rounded-full bg-indigo-500/80 transition-all"
+              className="sar-progress-fill h-full rounded-full bg-indigo-500/80 transition-all"
               style={{ width: `${coverage.coveragePercent ?? 0}%` }}
             />
           </div>

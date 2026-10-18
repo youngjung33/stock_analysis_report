@@ -24,8 +24,7 @@ export { newsToneFromTitle } from './news-tone';
 export type { NewsTone } from './news-tone';
 
 export { Market, TransactionType } from './enums';
-export const REFRESH_TOKEN_COOKIE = 'refreshToken';
-export const ACCESS_TOKEN_COOKIE = 'accessToken';
+export { REFRESH_TOKEN_COOKIE, ACCESS_TOKEN_COOKIE } from './auth-cookies';
 
 export {
   GUEST_SESSION_COOKIE,
@@ -41,6 +40,12 @@ export {
   verifyGuestSessionToken,
 } from './guest-session-token';
 export { isPlausibleRefreshToken, isJwtNotExpired } from './session-cookie';
+export {
+  HEAVY_API_PLATFORM_MAX_DURATION_SEC,
+  HEAVY_API_CLIENT_TIMEOUT_MS_DEFAULT,
+  estimateHeavyAnalysisWaitSec,
+} from './heavy-api-timing';
+export type { HeavyAnalysisKind } from './heavy-api-timing';
 
 export const GUEST_DISPLAY_NAME = '비회원';
 
