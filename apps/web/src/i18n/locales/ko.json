@@ -665,13 +665,11 @@
     "watchlistPrefix": "관심 종목:",
     "seeMoreInDetail": "상세에서 더 보기",
     "deepAnalysisTitle": "시장 정세 · 심층 분석",
-    "deepAnalysisLoading": "경기·지수·업종·뉴스 분석 중…",
     "moveReasonTitle": "전 거래일, 왜 올랐/내렸나?",
     "moveReasonDesc": "전 거래일 종가 기준 코스피·나스닥 지수·업종·매크로·뉴스(48시간)를 교차 분석한 해설입니다.",
     "stockFocusTitle": "종목 집중 분석 — 왜 이 가격인가?",
     "stockFocusDesc": "차트·지수·업종을 먼저 보고, 쉬운 말로 “왜 이 가격대인지” 풀어 드립니다.",
     "stockFocusPriceFirst": "원칙: 가격·차트가 먼저, 뉴스는 보통 뒤따라옵니다. 헤드라인은 괴리가 있을 때만 참고로 붙입니다.",
-    "stockFocusLoading": "차트·시장·일정 분석 중…",
     "heavyLoading": {
       "titleMarket": "시장·뉴스·시세를 모아 분석하는 중입니다",
       "titleStock": "차트·시장·일정을 분석하는 중입니다",

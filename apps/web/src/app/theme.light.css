@@ -82,7 +82,6 @@
     background-color: #d4d4d8;
   }
 
-  /* 진행 막대 트랙(미채움)만 — 채움색(bg-indigo-500/*)은 컴포넌트 그대로 */
   .light :where(.sar-progress-track) {
     background-color: #d4d4d8;
     box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1);
@@ -248,7 +247,6 @@
     color: #c2410c;
   }
 
-  /* 보조 설명(slate-600) — 라이트 배경에서 너무 연한 기본값 보정 */
   .light :where(.text-slate-600) {
     color: #52525b;
   }

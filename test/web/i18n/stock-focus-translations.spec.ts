@@ -63,7 +63,6 @@ describe('stock focus i18n', () => {
       'stockFocusTitle',
       'stockFocusDesc',
       'stockFocusPriceFirst',
-      'stockFocusLoading',
       'stockFocusToday',
       'stockFocus1w',
       'stockFocus1mo',

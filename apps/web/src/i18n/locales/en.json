@@ -665,13 +665,11 @@
     "watchlistPrefix": "Watchlist:",
     "seeMoreInDetail": "See more in detail",
     "deepAnalysisTitle": "Market outlook · deep analysis",
-    "deepAnalysisLoading": "Analyzing economy, indices, sectors, news…",
     "moveReasonTitle": "Previous session: why up or down?",
     "moveReasonDesc": "Cross-check of KOSPI/NASDAQ, sectors, macro, and news (48h) vs the prior session close.",
     "stockFocusTitle": "Stock focus — why this price?",
     "stockFocusDesc": "We start with chart, index, and sector — then explain in plain language why the price is where it is.",
     "stockFocusPriceFirst": "Principle: price and chart first. News usually follows. Headlines appear only when they diverge from price.",
-    "stockFocusLoading": "Analyzing chart, market, and events…",
     "heavyLoading": {
       "titleMarket": "Gathering market, news, and quotes",
       "titleStock": "Analyzing chart, market, and events",

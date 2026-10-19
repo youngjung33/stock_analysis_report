@@ -1,7 +1,3 @@
-/**
- * Edge middleware — 세션 게이트·locale 쿠키.
- * `@sar/shared` barrel 대신 하위 모듈만 import 해 Edge 번들 크기를 줄인다.
- */
 import { NextRequest, NextResponse } from 'next/server';
 import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from '@sar/shared/auth-cookies';
 import { DEFAULT_LOCALE, LOCALE_COOKIE_KEY, type SupportedLocale } from '@sar/shared/i18n';

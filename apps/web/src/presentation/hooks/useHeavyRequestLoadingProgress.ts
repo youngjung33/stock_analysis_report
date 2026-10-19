@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { estimateHeavyAnalysisWaitSec, type HeavyAnalysisKind } from '@sar/shared';
 
 export interface HeavyRequestLoadingState {
-  /** 0–99, 완료 전까지 100은 표시하지 않음 */
   percent: number;
   title: string;
   hint: string;
@@ -15,7 +14,6 @@ function roundToNearest10(sec: number): number {
   return Math.max(10, Math.round(sec / 10) * 10);
 }
 
-/** 사용자용 대략 소요 시간 문구 (서버/클라이언트 스펙 노출 없음) */
 function formatRoughWaitHint(
   typicalMinSec: number,
   typicalMaxSec: number,
@@ -41,7 +39,6 @@ function formatRoughWaitHint(
   return t('market.heavyLoading.hintMinutes', { min: minMin, max: maxMin });
 }
 
-/** 경과 시간 기반 표시용 진행률 (실제 API 진행과 무관한 추정 UI) */
 function computeDisplayPercent(elapsedSec: number, typicalMaxSec: number): number {
   const scale = Math.max(20, typicalMaxSec * 0.9);
   const eased = (1 - Math.exp(-elapsedSec / scale)) * 92;
