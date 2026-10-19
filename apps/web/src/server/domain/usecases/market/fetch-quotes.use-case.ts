@@ -10,11 +10,10 @@ export interface FetchQuoteStockInput {
   market: Market;
 }
 
-/** 다종목 시세 일괄 조회 use case (게스트 quotes API) */
+/** 게스트 quotes API — US는 루프마다 Finnhub 페이싱 */
 export class FetchQuotesUseCase {
   constructor(private readonly marketData: IMarketDataProvider) {}
 
-  /** body 종목 목록별 KR/US 시세 fetch — US는 rate limit sleep */
   async execute(stocks: FetchQuoteStockInput[]): Promise<{
     updated: number;
     quotes: {
@@ -62,7 +61,6 @@ export class FetchQuotesUseCase {
       succeeded.push({ stockId: stock.stockId, symbol: stock.symbol, market: stock.market });
       updated += 1;
 
-      // US Finnhub 무료 tier — provider 큐와 별도로 게스트 bulk quotes 루프 페이싱
       if (stock.market === Market.US) {
         await sleep(1100);
       }

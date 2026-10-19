@@ -1,7 +1,4 @@
-/**
- * 마켓 컨텍스트(매크로·섹터·지수) 단기 TTL 캐시 + 동시 요청 in-flight dedupe.
- * 프로세스 메모리 한정 — 서버리스 인스턴스마다 별도.
- */
+/** 마켓 컨텍스트 단기 TTL + in-flight dedupe (프로세스 메모리) */
 
 import type { BuiltMarketContextData } from '../../domain/usecases/market/build-market-context.use-case';
 

@@ -13,7 +13,6 @@ interface QuoteStock {
   market: Market;
 }
 
-/** 실패 종목을 RefreshQuoteResult.failed 형식으로 누적 */
 export function recordQuoteFailure(
   failed: QuoteFailure[],
   stock: QuoteStock,
@@ -27,7 +26,6 @@ export function recordQuoteFailure(
   });
 }
 
-/** 단일 종목 시세 — 미지원·미설정·fetch 예외 시 null + failed 기록 */
 export async function fetchQuoteForStock(
   marketData: IMarketDataProvider,
   stock: StockEntity,

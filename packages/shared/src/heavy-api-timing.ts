@@ -1,9 +1,5 @@
-/**
- * 심층 시장/종목 분석 로딩 UX·문서용 타이밍 상수.
- * 서버(Vercel maxDuration)와 클라이언트(heavy axios timeout)는 다를 수 있음.
- */
+/** 심층 분석 로딩 UX·타이밍 상수 (서버 maxDuration ≠ 클라 heavy timeout) */
 
-/** `export const maxDuration` on market/stock-analysis routes (seconds) */
 export const HEAVY_API_PLATFORM_MAX_DURATION_SEC = 25;
 
 export const HEAVY_API_CLIENT_TIMEOUT_MS_DEFAULT = 90_000;
@@ -18,10 +14,7 @@ function readUsQueueGapSec(): number {
 
 export type HeavyAnalysisKind = 'marketDeep' | 'stockFocus';
 
-/**
- * Finnhub US 직렬 큐·enrichment 규모를 반영한 **대략** 대기 시간(초).
- * 실제는 캐시·실패·종목 수에 따라 달라짐.
- */
+/** US 큐·enrichment 규모 기반 대략 대기(초) */
 export function estimateHeavyAnalysisWaitSec(
   kind: HeavyAnalysisKind,
   options?: { usSymbolCount?: number },

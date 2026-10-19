@@ -43,8 +43,14 @@ Thumbs.db
 # IDE
 .idea/
 .vscode/
+.cursor/
 *.swp
 *.swo
+
+# 로컬 시크릿·인증서
+*.pem
+*.p12
+*.key
 
 # Turbo (monorepo)
 .turbo/
